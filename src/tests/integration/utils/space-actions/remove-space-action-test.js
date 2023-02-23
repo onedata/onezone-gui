@@ -16,7 +16,7 @@ import {
 } from '../../../helpers/modal';
 
 describe(
-  'Integration | Utility | space actions/remove space action',
+  'Integration | Utility | space-actions/remove-space-action',
   function () {
     setupRenderingTest();
 

@@ -4,7 +4,7 @@ import { setupRenderingTest } from 'ember-mocha';
 import { render, click, find } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 
-describe('Integration | Component | sidebar harvesters/harvester item', function () {
+describe('Integration | Component | sidebar-harvesters/harvester-item', function () {
   setupRenderingTest();
 
   beforeEach(function () {

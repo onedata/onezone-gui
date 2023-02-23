@@ -19,7 +19,7 @@ import { A } from '@ember/array';
 import sinon from 'sinon';
 import ObjectProxy from '@ember/object/proxy';
 
-describe('Integration | Component | modals/apply atm workflow schema dump modal',
+describe('Integration | Component | modals/apply-atm-workflow-schema-dump-modal',
   function () {
     setupRenderingTest();
 
@@ -96,7 +96,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal'
 
       itShowsModalWithContent();
 
-      it('allows changing uploaded file to another one', async function (done) {
+      it('allows changing uploaded file to another one', async function () {
         await showModal(this);
         const modalBody = getModalBody();
 
@@ -121,7 +121,6 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal'
         ).to.have.trimmed.text('wf2');
         expect(modalBody.querySelector('.newWorkflowName-field .form-control'))
           .to.have.value('w2');
-        done();
       });
 
       itShowsWorkflowDumpError();
@@ -144,7 +143,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal'
       itShowsModalWithContent();
       itShowsWorkflowDumpError();
 
-      it('allows changing target inventory', async function (done) {
+      it('allows changing target inventory', async function () {
         await showModal(this);
         const modalBody = getModalBody();
 
@@ -161,7 +160,6 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal'
         expect(modalBody.querySelector('.no-target-workflow-warning')).to.exist;
         expect(modalBody.querySelector('.option-create input'))
           .to.have.property('checked', true);
-        done();
       });
 
       itAllowsChangingTargetWorkflow();
@@ -190,7 +188,7 @@ async function showModal(testCase) {
 
 function itShowsModalWithContent() {
   it('renders modal with class "apply-atm-workflow-schema-dump-modal" and correct content',
-    async function (done) {
+    async function () {
       const isUploadMode = this.get('modalOptions.dumpSourceType') === 'upload';
       const expectedTitle = isUploadMode ? 'Upload workflow' : 'Duplicate revision';
       const dump = this.get('dump');
@@ -233,13 +231,12 @@ function itShowsModalWithContent() {
       expect(submitBtn).to.have.trimmed.text('Apply');
       expect(cancelBtn).to.have.class('btn-default');
       expect(cancelBtn).to.have.trimmed.text('Cancel');
-      done();
     });
 }
 
 function itShowsWorkflowDumpError() {
   it('shows workflow dump error and no forms when dump is corrupted',
-    async function (done) {
+    async function () {
       const isUploadMode = this.get('modalOptions.dumpSourceType') === 'upload';
       this.set('dumpSourceProxy.content.dump', null);
       await showModal(this);
@@ -252,12 +249,11 @@ function itShowsWorkflowDumpError() {
       expect(modalBody.querySelector('.dump-details .error')).to.exist;
       expect(modalBody.querySelector('.inventory-selector')).to.not.exist;
       expect(modalBody.querySelector('.operation-form')).to.not.exist;
-      done();
     });
 }
 
 function itAllowsChangingTargetWorkflow() {
-  it('allows changing target workflow', async function (done) {
+  it('allows changing target workflow', async function () {
     await showModal(this);
     const modalBody = getModalBody();
 
@@ -272,12 +268,11 @@ function itAllowsChangingTargetWorkflow() {
       .querySelector('.targetWorkflow-field .dropdown-field-trigger')
     ).to.have.trimmed.text('wf3');
     expect(modalBody.querySelector('.revision-conflict-warning')).to.exist;
-    done();
   });
 }
 
 function itAllowsChangingOperationAndNewWorkflowName() {
-  it('allows changing operation and new workflow name', async function (done) {
+  it('allows changing operation and new workflow name', async function () {
     await showModal(this);
     const modalBody = getModalBody();
 
@@ -288,13 +283,12 @@ function itAllowsChangingOperationAndNewWorkflowName() {
       .to.have.property('checked', true);
     expect(modalBody.querySelector('.newWorkflowName-field .form-control'))
       .to.have.value('xyz');
-    done();
   });
 }
 
 function itChangesOperationToCreateOnEmptyTargetWorkflows() {
   it('changes operation from "merge" to "create" when there are no target workflows available',
-    async function (done) {
+    async function () {
       await showModal(this);
       const modalBody = getModalBody();
 
@@ -303,12 +297,11 @@ function itChangesOperationToCreateOnEmptyTargetWorkflows() {
 
       expect(modalBody.querySelector('.option-create input'))
         .to.have.property('checked', true);
-      done();
     });
 }
 
 function itSubmitsMergingWorkflowDump() {
-  it('submits info about merging workflow dump', async function (done) {
+  it('submits info about merging workflow dump', async function () {
     await showModal(this);
 
     await click('.submit-btn');
@@ -319,12 +312,11 @@ function itSubmitsMergingWorkflowDump() {
       operation: 'merge',
       targetAtmWorkflowSchema: this.get('atmWorkflowSchemas.1'),
     });
-    done();
   });
 }
 
 function itSubmitsCreatingWorkflow() {
-  it('submits info about creating new workflow from dump', async function (done) {
+  it('submits info about creating new workflow from dump', async function () {
     await showModal(this);
 
     await click('.option-create');
@@ -337,25 +329,23 @@ function itSubmitsCreatingWorkflow() {
       operation: 'create',
       newAtmWorkflowSchemaName: 'xyz',
     });
-    done();
   });
 }
 
 function itBlocksSubmitWhenWorkflowNameEmpty() {
-  it('disallows submission when new workflow name is empty', async function (done) {
+  it('disallows submission when new workflow name is empty', async function () {
     await showModal(this);
 
     await click('.option-create');
     await fillIn('.newWorkflowName-field .form-control', '');
 
     expect(find('.submit-btn')).to.have.attr('disabled');
-    done();
   });
 }
 
 function itDoesntBlockSubmitWnehWorkflowNameIsEmptyInMerge() {
   it('allows submission when new workflow name is empty but operation is "merge"',
-    async function (done) {
+    async function () {
       await showModal(this);
 
       await click('.option-create');
@@ -363,34 +353,31 @@ function itDoesntBlockSubmitWnehWorkflowNameIsEmptyInMerge() {
       await click('.option-merge');
 
       expect(find('.submit-btn')).to.not.have.attr('disabled');
-      done();
     });
 }
 
 function itClosesModal() {
-  it('closes modal on cancel click', async function (done) {
+  it('closes modal on cancel click', async function () {
     const onHideSpy = sinon.spy(this.get('modalManager'), 'onModalHide');
     await showModal(this);
     expect(onHideSpy).to.not.been.called;
 
     await click('.cancel-btn');
     expect(onHideSpy).to.be.calledOnce;
-    done();
   });
 
-  it('closes modal on backdrop click', async function (done) {
+  it('closes modal on backdrop click', async function () {
     const onHideSpy = sinon.spy(this.get('modalManager'), 'onModalHide');
     await showModal(this);
 
     await click(getModal());
     expect(onHideSpy).to.be.calledOnce;
-    done();
   });
 }
 
 function itBlocksControlsAndCloseWhenSubmitting() {
   it('disables all controls and does not close modal on backdrop click when submitting via "save" button',
-    async function (done) {
+    async function () {
       const isUploadMode = this.get('modalOptions.dumpSourceType') === 'upload';
       this.set('modalOptions.onSubmit', () => new Promise(() => {}));
       const onHideSpy = sinon.spy(this.get('modalManager'), 'onModalHide');
@@ -411,6 +398,5 @@ function itBlocksControlsAndCloseWhenSubmitting() {
       expect(find('.newWorkflowName-field .form-control')).to.have.attr('disabled');
       expect(find('.one-way-radio-group')).to.have.class('disabled');
       expect(getModalFooter().querySelector('.cancel-btn')).to.have.attr('disabled');
-      done();
     });
 }

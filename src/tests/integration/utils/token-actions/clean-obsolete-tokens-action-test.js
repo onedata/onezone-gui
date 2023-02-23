@@ -14,7 +14,7 @@ import {
   getModalFooter,
 } from '../../../helpers/modal';
 
-describe('Integration | Utility | token actions/clean obsolete tokens action', function () {
+describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', function () {
   setupRenderingTest();
 
   beforeEach(function () {

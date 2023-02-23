@@ -7,7 +7,7 @@ import sinon from 'sinon';
 import { get } from '@ember/object';
 import { settled } from '@ember/test-helpers';
 
-describe('Integration | Service | url action runner', function () {
+describe('Integration | Service | url-action-runner', function () {
   setupRenderingTest();
 
   afterEach(function () {

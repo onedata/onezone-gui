@@ -11,7 +11,7 @@ import { resolve, Promise } from 'rsvp';
 import { set } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 
-describe('Integration | Component | content tokens new', function () {
+describe('Integration | Component | content-tokens-new', function () {
   setupRenderingTest();
 
   beforeEach(function () {

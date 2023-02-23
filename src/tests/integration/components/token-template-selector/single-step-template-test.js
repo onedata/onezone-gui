@@ -8,7 +8,7 @@ import { htmlSafe } from '@ember/template';
 import sinon from 'sinon';
 
 describe(
-  'Integration | Component | token template selector/single step template',
+  'Integration | Component | token-template-selector/single-step-template',
   function () {
     setupRenderingTest();
 

@@ -23,7 +23,7 @@ const OnedataGraphStub = Service.extend({
   },
 });
 
-describe('Unit | Utility | privilege record proxy', function () {
+describe('Unit | Utility | privilege-record-proxy', function () {
   beforeEach(function () {
     this.store = StoreStub.create();
     this.onedataGraph = OnedataGraphStub.create();

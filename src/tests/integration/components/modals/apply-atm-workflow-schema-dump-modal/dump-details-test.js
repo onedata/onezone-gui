@@ -6,7 +6,7 @@ import { hbs } from 'ember-cli-htmlbars';
 
 const componentClass = 'dump-details';
 
-describe('Integration | Component | modals/apply atm workflow schema dump modal/dump details',
+describe('Integration | Component | modals/apply-atm-workflow-schema-dump-modal/dump-details',
   function () {
     setupRenderingTest();
 

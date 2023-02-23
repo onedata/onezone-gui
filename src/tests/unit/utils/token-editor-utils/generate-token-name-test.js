@@ -11,7 +11,7 @@ import moment from 'moment';
 import backendifyName from 'onedata-gui-common/utils/backendify-name';
 import _ from 'lodash';
 
-describe('Unit | Utility | token editor utils/generate token name', function () {
+describe('Unit | Utility | token-editor-utils/generate-token-name', function () {
   beforeEach(function () {
     const now = moment('2020-04-28 10:05:00');
     this.fakeClock = sinon.useFakeTimers({

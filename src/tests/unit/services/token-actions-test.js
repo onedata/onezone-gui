@@ -5,7 +5,7 @@ import Service from '@ember/service';
 import sinon from 'sinon';
 import { registerService, lookupService } from '../../helpers/stub-service';
 
-describe('Unit | Service | token actions', function () {
+describe('Unit | Service | token-actions', function () {
   setupTest();
 
   beforeEach(function () {

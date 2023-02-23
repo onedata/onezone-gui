@@ -13,7 +13,7 @@ import {
 import sinon from 'sinon';
 import { Promise } from 'rsvp';
 
-describe('Integration | Component | modals/unlink atm lambda modal', function () {
+describe('Integration | Component | modals/unlink-atm-lambda-modal', function () {
   setupRenderingTest();
 
   beforeEach(function () {

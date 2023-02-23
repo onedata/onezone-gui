@@ -8,7 +8,7 @@ import sinon from 'sinon';
 
 const componentClass = 'inventory-selector';
 
-describe('Integration | Component | modals/apply atm workflow schema dump modal/inventory selector',
+describe('Integration | Component | modals/apply-atm-workflow-schema-dump-modal/inventory-selector',
   function () {
     setupRenderingTest();
 

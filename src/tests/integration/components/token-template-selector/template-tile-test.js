@@ -7,7 +7,7 @@ import { lookupService } from '../../../helpers/stub-service';
 import sinon from 'sinon';
 import { htmlSafe } from '@ember/template';
 
-describe('Integration | Component | token template selector/template tile', function () {
+describe('Integration | Component | token-template-selector/template-tile', function () {
   setupRenderingTest();
 
   beforeEach(function () {

@@ -75,7 +75,7 @@ function generateNGroups(context, n) {
   });
 }
 
-describe('Integration | Component | membership visualiser', function () {
+describe('Integration | Component | membership-visualiser', function () {
   setupRenderingTest();
 
   beforeEach(function () {

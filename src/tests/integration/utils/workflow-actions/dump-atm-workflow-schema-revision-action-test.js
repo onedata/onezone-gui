@@ -12,7 +12,7 @@ import { suppressRejections } from '../../../helpers/suppress-rejections';
 const atmWorkflowSchemaId = 'wfkId';
 
 describe(
-  'Integration | Utility | workflow actions/dump atm workflow schema revision action',
+  'Integration | Utility | workflow-actions/dump-atm-workflow-schema-revision-action',
   function () {
     setupRenderingTest();
 

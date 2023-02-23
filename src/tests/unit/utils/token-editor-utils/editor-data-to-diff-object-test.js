@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { editorDataToDiffObject } from 'onezone-gui/utils/token-editor-utils';
 
-describe('Unit | Utility | token editor utils/editor data to diff object', function () {
+describe('Unit | Utility | token-editor-utils/editor-data-to-diff-object', function () {
   it('converts name if it has been changed', function () {
     const result = editorDataToDiffObject({
       basic: {
