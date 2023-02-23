@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9688 Removed arrow placement from one-tooltip
 * VFS-9305 Refactored one-tab-bar to not use jQuery
 * VFS-10103 Changed showing clipboard in popovers info
 * VFS-10367 Updated gui common
