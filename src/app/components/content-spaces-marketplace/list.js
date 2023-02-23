@@ -55,6 +55,7 @@ export default Component.extend(I18n, {
    */
   tags: reads('viewModel.tagsFilter'),
 
+  // FIXME: to raczej powinno być w modelu
   entriesObserver: observer(
     'entries.@each.name',
     function entriesObserver() {

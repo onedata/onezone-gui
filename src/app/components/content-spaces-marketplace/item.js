@@ -102,9 +102,9 @@ export default Component.extend(I18n, {
   }),
 
   tags: computed('spaceItem.tags', function tags() {
-    return this.spaceItem.tags.map(tagName => ({
+    return this.spaceItem.tags?.map(tagName => ({
       label: tagName,
-    }));
+    })) || [];
   }),
 
   tagsLimitExceeded: gt('tags.length', 'tagsLimit'),

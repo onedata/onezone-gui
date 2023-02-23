@@ -22,7 +22,7 @@
     </li>
   {{/if}}
 </ul>
-{{#if viewModel.isAnyFilterActive}}
+{{#if (and (not viewModel.entries.length) viewModel.isAnyFilterActive)}}
   <p class="no-matching-results">{{tt this "noMatchingResults"}}</p>
 {{/if}}
 {{yield}}
