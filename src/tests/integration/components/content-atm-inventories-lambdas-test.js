@@ -21,7 +21,7 @@ import ModifyAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/mo
 import { set, setProperties, get } from '@ember/object';
 import { clearStoreAfterEach } from '../../helpers/clear-store';
 
-describe('Integration | Component | content atm inventories lambdas', function () {
+describe('Integration | Component | content-atm-inventories-lambdas', function () {
   setupRenderingTest();
 
   clearStoreAfterEach();

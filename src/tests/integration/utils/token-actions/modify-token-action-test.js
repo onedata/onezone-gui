@@ -7,7 +7,7 @@ import sinon from 'sinon';
 import { lookupService } from '../../../helpers/stub-service';
 import { reject, resolve } from 'rsvp';
 
-describe('Integration | Utility | token actions/modify token action', function () {
+describe('Integration | Utility | token-actions/modify-token-action', function () {
   setupRenderingTest();
 
   it('executes modifying token (success scenario)', function () {

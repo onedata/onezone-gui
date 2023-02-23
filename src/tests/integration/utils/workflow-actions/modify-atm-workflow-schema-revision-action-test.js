@@ -8,7 +8,7 @@ import { lookupService } from '../../../helpers/stub-service';
 import { get, set } from '@ember/object';
 
 describe(
-  'Integration | Utility | workflow actions/modify atm workflow schema revision action',
+  'Integration | Utility | workflow-actions/modify-atm-workflow-schema-revision-action',
   function () {
     setupRenderingTest();
 

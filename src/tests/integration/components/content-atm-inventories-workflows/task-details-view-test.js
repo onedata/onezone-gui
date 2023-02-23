@@ -80,7 +80,7 @@ const exampleTask = {
   timeSeriesStoreConfig: null,
 };
 
-describe('Integration | Component | content atm inventories workflows/task details view',
+describe('Integration | Component | content-atm-inventories-workflows/task-details-view',
   function () {
     setupRenderingTest();
 

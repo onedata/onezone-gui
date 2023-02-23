@@ -47,7 +47,7 @@ const argumentTypes = argumentAndResultCommonTypes;
 const resultTypes = argumentAndResultCommonTypes;
 
 describe(
-  'Integration | Component | content atm inventories lambdas/atm lambda form',
+  'Integration | Component | content-atm-inventories-lambdas/atm-lambda-form',
   function () {
     setupRenderingTest();
 

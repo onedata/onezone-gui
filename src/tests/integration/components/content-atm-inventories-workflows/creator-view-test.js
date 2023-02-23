@@ -7,7 +7,7 @@ import { lookupService } from '../../../helpers/stub-service';
 import sinon from 'sinon';
 import { resolve } from 'rsvp';
 
-describe('Integration | Component | content atm inventories workflows/creator view',
+describe('Integration | Component | content-atm-inventories-workflows/creator-view',
   function () {
     setupRenderingTest();
 

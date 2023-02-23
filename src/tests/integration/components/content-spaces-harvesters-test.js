@@ -26,7 +26,7 @@ const Router = Service.extend({
   },
 });
 
-describe('Integration | Component | content spaces harvesters', function () {
+describe('Integration | Component | content-spaces-harvesters', function () {
   setupRenderingTest();
 
   beforeEach(function () {

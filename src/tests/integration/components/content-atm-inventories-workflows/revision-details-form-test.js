@@ -19,7 +19,7 @@ const states = [{
   label: 'Deprecated',
 }];
 
-describe('Integration | Component | content atm inventories workflows/revision details form',
+describe('Integration | Component | content-atm-inventories-workflows/revision-details-form',
   function () {
     setupRenderingTest();
 

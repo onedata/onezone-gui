@@ -11,7 +11,7 @@ import {
   sharedDataPropertyName,
 } from 'onedata-gui-common/utils/one-embedded-common';
 
-describe('Integration | Component | one embedded container', function () {
+describe('Integration | Component | one-embedded-container', function () {
   setupRenderingTest();
 
   it('passes the property and action which can be invoked by iframe', async function () {

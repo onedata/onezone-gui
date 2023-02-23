@@ -8,7 +8,7 @@ import EmberObject, { get } from '@ember/object';
 import { resolve } from 'rsvp';
 import { registerService } from '../../helpers/stub-service';
 
-describe('Integration | Component | resource info tile', function () {
+describe('Integration | Component | resource-info-tile', function () {
   setupRenderingTest();
 
   beforeEach(function () {

@@ -12,7 +12,7 @@ function po(val) {
   return PromiseObject.create({ promise: resolve(val) });
 }
 
-describe('Integration | Component | content providers', function () {
+describe('Integration | Component | content-providers', function () {
   setupRenderingTest();
 
   beforeEach(function () {

@@ -6,7 +6,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import EmberObject from '@ember/object';
 
-describe('Integration | Component | content atm inventories workflows/atm workflow schema details form',
+describe('Integration | Component | content-atm-inventories-workflows/atm-workflow-schema-details-form',
   function () {
     setupRenderingTest();
 

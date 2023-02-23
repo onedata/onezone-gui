@@ -8,7 +8,7 @@ import { Promise, resolve } from 'rsvp';
 import { suppressRejections } from '../../../helpers/suppress-rejections';
 import sinon from 'sinon';
 
-describe('Integration | Component | content atm inventories workflows/loading view',
+describe('Integration | Component | content-atm-inventories-workflows/loading-view',
   function () {
     setupRenderingTest();
 

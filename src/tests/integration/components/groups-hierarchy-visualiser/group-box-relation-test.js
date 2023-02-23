@@ -17,7 +17,7 @@ const GlobalNotifyStub = Service.extend({
 });
 
 describe(
-  'Integration | Component | groups hierarchy visualiser/group box relation',
+  'Integration | Component | groups-hierarchy-visualiser/group-box-relation',
   function () {
     setupRenderingTest();
 

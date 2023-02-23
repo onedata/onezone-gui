@@ -6,7 +6,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import EmberObject from '@ember/object';
 import { resolve } from 'rsvp';
 
-describe('Integration | Component | resource members tile', function () {
+describe('Integration | Component | resource-members-tile', function () {
   setupRenderingTest();
 
   it('renders number of members', async function () {
