@@ -154,9 +154,9 @@ export default Component.extend(I18n, {
         this.openfaasOptionsFieldsGroup,
         this.onedataFunctionOptionsFieldsGroup,
         this.preferredBatchSizeField,
+        this.configParametersField,
         this.argumentsFieldsCollectionGroup,
         this.resultsFieldsCollectionGroup,
-        this.configParametersField,
         this.resourcesFieldsGroup,
       ],
     });

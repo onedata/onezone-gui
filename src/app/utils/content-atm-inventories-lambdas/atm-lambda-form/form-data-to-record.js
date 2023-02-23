@@ -51,11 +51,11 @@ export default function formDataToRecord(formData) {
     operationSpec,
     preferredBatchSize: Number.parseInt(formData?.preferredBatchSize) || 1,
     argumentSpecs: atmParameterSpecsEditorValueToRawValue(
-      formData.arguments
+      formData?.arguments
     ),
-    resultSpecs: formResultsToRecordResults(formData.results),
+    resultSpecs: formResultsToRecordResults(formData?.results),
     configParameterSpecs: atmParameterSpecsEditorValueToRawValue(
-      formData.configParameters
+      formData?.configParameters
     ),
     resourceSpec: serializeTaskResourcesFieldsValues(formData?.resources),
   };
@@ -67,12 +67,12 @@ export default function formDataToRecord(formData) {
  * @returns {Array<Object>} record data
  */
 function formResultsToRecordResults(formResults) {
-  return (formResults?.__fieldsValueNames ?? [])
-    .map((valueName) => formResults[valueName])
+  return formResults?.__fieldsValueNames
+    ?.map((valueName) => formResults[valueName])
     .filter(Boolean)
     .map((entry) => ({
       name: entry.entryName,
       dataSpec: formValuesToDataSpec(entry.entryDataSpec),
       relayMethod: entry.entryIsViaFile ? 'filePipe' : 'returnValue',
-    }));
+    })) ?? [];
 }

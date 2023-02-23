@@ -185,7 +185,7 @@ function recordResultsToFormResults(recordResults) {
   const formData = createValuesContainer({
     __fieldsValueNames: [],
   });
-  (recordResults ?? []).forEach((entry, idx) => {
+  recordResults?.forEach((entry, idx) => {
     if (!entry.name || !entry.dataSpec) {
       return;
     }
