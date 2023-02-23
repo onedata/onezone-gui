@@ -20,7 +20,18 @@ const states = [{
   label: 'Deprecated',
 }];
 
-const argumentAndResultCommonTypes = [
+// Types which does not take any additional parameters and are easy to convert
+// to dataSpec object.
+const testConvenientTypes = [
+  'Number',
+  'Boolean',
+  'String',
+  'Object',
+  'Dataset',
+  'Range',
+];
+
+const resultTypes = [
   'Number',
   'Boolean',
   'String',
@@ -31,20 +42,6 @@ const argumentAndResultCommonTypes = [
   'Array',
   'Time series measurement',
 ];
-
-// Selection of types from `argumentAndResultCommonTypes` which does not take
-// any additional parameters and are ease to convert to dataSpec object.
-const testConvenientTypes = [
-  'Number',
-  'Boolean',
-  'String',
-  'Object',
-  'Dataset',
-  'Range',
-];
-
-const argumentTypes = argumentAndResultCommonTypes;
-const resultTypes = argumentAndResultCommonTypes;
 
 describe(
   'Integration | Component | content-atm-inventories-lambdas/atm-lambda-form',
@@ -315,6 +312,17 @@ describe(
         });
       });
 
+      it('renders "config parameters" field with no params defined', async function () {
+        await renderCreate(this);
+
+        const label = find('.configParameters-field .control-label');
+        const entries = findAll('.configParameters-field .entry-field');
+        const addBtn = find('.configParameters-field .add-field-button');
+        expect(label).to.have.trimmed.text('Configuration parameters:');
+        expect(entries).to.have.length(0);
+        expect(addBtn).to.have.trimmed.text('Add parameter');
+      });
+
       it('renders "arguments" field with no argument defined', async function (done) {
         await renderCreate(this);
 
@@ -326,113 +334,6 @@ describe(
         expect(addBtn).to.have.trimmed.text('Add argument');
         done();
       });
-
-      it('allows to add new, empty argument', async function (done) {
-        await renderCreate(this);
-
-        await addArgument();
-
-        const entries = findAll('.arguments-field .entry-field');
-        expect(entries).to.have.length(1);
-        const entry = entries[0];
-
-        const entryNameField = entry.querySelector('.entryName-field .form-control');
-        expect(entryNameField).to.have.attr('type', 'text');
-        expect(entryNameField).to.have.attr('placeholder', 'Name');
-        expect(entryNameField).to.have.value('');
-
-        const entryTypeField = entry.querySelector('.data-spec-editor');
-        expect(entryTypeField).to.have.trimmed.text('Select type...');
-
-        const entryIsOptionalLabel =
-          entry.querySelector('.entryIsOptional-field .control-label');
-        const entryIsOptionalField =
-          entry.querySelector('.entryIsOptional-field .form-control');
-        expect(entryIsOptionalLabel).to.have.trimmed.text('Optional');
-        expect(entryIsOptionalField).to.not.have.class('checked');
-
-        const entryDefaultValueLabel =
-          entry.querySelector('.entryDefaultValue-field .control-label');
-        const entryDefaultValueField =
-          entry.querySelector('.entryDefaultValue-field');
-        expect(entryDefaultValueLabel).to.have.trimmed.text('Default value:');
-        expect(entryDefaultValueField).to.contain('.create-value-btn');
-        done();
-      });
-
-      it('marks "argument name" field as invalid when it is empty',
-        async function (done) {
-          await renderCreate(this);
-          await addArgument();
-
-          await focus('.entryName-field .form-control');
-          await blur('.entryName-field .form-control');
-
-          expect(find('.entryName-field')).to.have.class('has-error');
-          done();
-        });
-
-      it('marks "argument name" field as valid when it is not empty',
-        async function (done) {
-          await renderCreate(this);
-          await addArgument();
-
-          await fillIn('.entryName-field .form-control', 'somename');
-
-          expect(find('.entryName-field')).to.have.class('has-success');
-          done();
-        });
-
-      it('marks "argument name" field as invalid when there are two arguments with the same name',
-        async function (done) {
-          await renderCreate(this);
-          await addArgument();
-          await addArgument();
-
-          const nthArgSelector = i => `.arguments-field .collection-item:nth-child(${i + 1})`;
-          await fillIn(`${nthArgSelector(0)} .entryName-field .form-control`, 'somename');
-          await fillIn(`${nthArgSelector(1)} .entryName-field .form-control`, 'somename');
-
-          const fieldMessages = findAll('.arguments-field .collection-item .field-message');
-          expect(fieldMessages).to.have.length(2);
-          [0, 1].forEach(i =>
-            expect(fieldMessages[i])
-            .to.have.trimmed.text('This field must have a unique value')
-          );
-          expect(findAll('.entryName-field.has-error')).to.have.length(2);
-          done();
-        });
-
-      it('provides argument types options for "argument type" field',
-        async function (done) {
-          await renderCreate(this);
-          await addArgument();
-
-          await clickTrigger('.data-spec-editor');
-
-          const options = document.querySelectorAll('.ember-power-select-option');
-          expect(options).to.have.length(argumentTypes.length);
-          argumentTypes.forEach((type, i) =>
-            expect(options[i]).to.have.trimmed.text(type)
-          );
-          done();
-        });
-
-      it('provides argument types options in array for "argument type" field',
-        async function (done) {
-          await renderCreate(this);
-          await addArgument();
-
-          await selectChoose('.data-spec-editor', 'Array');
-          await clickTrigger('.data-spec-editor');
-
-          const options = document.querySelectorAll('.ember-power-select-option');
-          expect(options).to.have.length(argumentTypes.length);
-          argumentTypes.forEach((type, i) =>
-            expect(options[i]).to.have.trimmed.text(type)
-          );
-          done();
-        });
 
       it('renders "results" field with no result defined', async function (done) {
         await renderCreate(this);
@@ -615,6 +516,19 @@ describe(
         await fillIn('.preferredBatchSize-field .form-control', '250');
 
         for (let i = 0; i < 2; i++) {
+          await addParameter();
+          const nthParamSelector = `.configParameters-field .collection-item:nth-child(${i + 1})`;
+          await fillIn(`${nthParamSelector} .entryName-field .form-control`, `param${i}`);
+          await selectChoose(
+            `${nthParamSelector} .data-spec-editor`,
+            testConvenientTypes[i]
+          );
+          if (i === 0) {
+            await click(`${nthParamSelector} .entryIsOptional-field .form-control`);
+            await click(`${nthParamSelector} .entryDefaultValue-field .create-value-btn`);
+            await fillIn(`${nthParamSelector} .entryDefaultValue-field .form-control`, '20');
+          }
+
           await addArgument();
           const nthArgSelector = `.arguments-field .collection-item:nth-child(${i + 1})`;
           await fillIn(`${nthArgSelector} .entryName-field .form-control`, `arg${i}`);
@@ -688,7 +602,21 @@ describe(
             },
             relayMethod: 'returnValue',
           })),
-          configParameterSpecs: [],
+          configParameterSpecs: testConvenientTypes.slice(0, 2)
+            .map((type, idx) => {
+              const param = {
+                name: `param${idx}`,
+                dataSpec: {
+                  // It's very oversimplified to infer dataSpec from it's translation
+                  // but it's good enough for test purposes.
+                  type: type.toLowerCase(),
+                  valueConstraints: {},
+                },
+                isOptional: idx === 0,
+                defaultValue: idx === 0 ? 20 : null,
+              };
+              return param;
+            }),
           resourceSpec: {
             cpuRequested: 2,
             cpuLimit: 3,
@@ -960,6 +888,48 @@ describe(
           done();
         });
 
+      it('shows parameters of passed lambda', async function () {
+        const parameterTypesToCheck = testConvenientTypes.slice(0, 2);
+        this.set('revision', {
+          operationSpec: {
+            engine: 'openfaas',
+          },
+          configParameterSpecs: parameterTypesToCheck.map((type, idx) => ({
+            name: `entry${idx}`,
+            dataSpec: {
+              type: type.toLocaleLowerCase(),
+              valueConstraints: {},
+            },
+            isOptional: idx === 0,
+            defaultValue: idx === 0 ? 10 : null,
+          })),
+        });
+
+        await renderView();
+
+        expect(find('.field-enabled')).to.not.exist;
+        const entries = findAll('.configParameters-field .entry-field');
+        expect(entries).to.have.length(parameterTypesToCheck.length);
+        parameterTypesToCheck.forEach((type, idx) => {
+          const entry = entries[idx];
+          expect(entry.querySelector('.entryName-field .form-control'))
+            .to.have.value(`entry${idx}`);
+          expect(entry.querySelector('.data-spec-editor'))
+            .to.have.trimmed.text(type);
+          const optionalToggle =
+            entry.querySelector('.entryIsOptional-field .form-control');
+          const defaultValueField =
+            entry.querySelector('.entryDefaultValue-field');
+          if (idx === 0) {
+            expect(optionalToggle).to.have.class('checked');
+            expect(defaultValueField.querySelector('input')).to.have.value('10');
+          } else {
+            expect(optionalToggle).to.not.have.class('checked');
+            expect(defaultValueField.querySelector('input')).to.not.exist;
+          }
+        });
+      });
+
       it('shows arguments of passed lambda', async function (done) {
         const argumentTypesToCheck = testConvenientTypes.slice(0, 2);
         this.set('revision', {
@@ -1100,6 +1070,12 @@ describe(
               name: 'res',
               dataSpec: { type: 'number' },
             }],
+            configParameterSpecs: [{
+              name: 'param',
+              dataSpec: { type: 'string' },
+              isOptional: false,
+              defaultValue: 'defaultParam',
+            }],
           });
 
           await renderEdit(this);
@@ -1115,6 +1091,15 @@ describe(
           expect(find('.engine-field .field-component')).to.have.trimmed.text('OpenFaaS');
           expect(find('.dockerImage-field .form-control')).to.to.have.value('myimage');
           expect(find('.preferredBatchSize-field .form-control')).to.have.value('150');
+          const parameter = find('.configParameters-field .entry-field');
+          expect(parameter.querySelector('.entryName-field .form-control'))
+            .to.have.value('param');
+          expect(parameter.querySelector('.data-spec-editor'))
+            .to.have.trimmed.text('String');
+          expect(parameter.querySelector('.entryIsOptional-field .form-control'))
+            .to.not.have.class('checked');
+          expect(parameter.querySelector('.entryDefaultValue-field .form-control'))
+            .to.have.value('defaultParam');
           const argument = find('.arguments-field .entry-field');
           expect(argument.querySelector('.entryName-field .form-control'))
             .to.have.value('arg');
@@ -1219,6 +1204,10 @@ async function toggleMountSpace(toggleChecked) {
   if (mountToggle.matches('.checked') !== toggleChecked) {
     await click(mountToggle);
   }
+}
+
+async function addParameter() {
+  await click('.configParameters-field .add-field-button');
 }
 
 async function addArgument() {
