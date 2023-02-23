@@ -23,6 +23,7 @@ import height from 'onedata-gui-common/utils/dom/height';
 export default EmberObject.extend(OwnerInjector, {
   spaceManager: service(),
   currentUser: service(),
+  globalNotify: service(),
 
   /**
    * @virtual optional
@@ -155,7 +156,15 @@ export default EmberObject.extend(OwnerInjector, {
   },
 
   async initEntries() {
-    const selectedSpaceMarketplaceInfo = await this.selectedSpaceMarketplaceInfoProxy;
+    let selectedSpaceMarketplaceInfo = null;
+    try {
+      selectedSpaceMarketplaceInfo = await this.selectedSpaceMarketplaceInfoProxy;
+    } catch (selectedSpaceGetError) {
+      console.warn(
+        'Could not get selected space in marketplace with ID',
+        this.selectedSpaceId
+      );
+    }
     const initialJumpIndex = selectedSpaceMarketplaceInfo &&
       get(selectedSpaceMarketplaceInfo, 'index') || null;
     const entries = ReplacingChunksArray.create({
