@@ -7,13 +7,15 @@
  */
 
 import Component from '@ember/component';
-import { computed } from '@ember/object';
+import { computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { dateFormat } from 'onedata-gui-common/helpers/date-format';
-import { or, and, raw, gt, difference } from 'ember-awesome-macros';
+import { or, and, raw, gt, difference, eq } from 'ember-awesome-macros';
 import { htmlSafe } from '@ember/string';
+import waitForRender from 'onedata-gui-common/utils/wait-for-render';
+import sleep from 'onedata-gui-common/utils/sleep';
 
 export default Component.extend(I18n, {
   tagName: 'li',
@@ -23,9 +25,7 @@ export default Component.extend(I18n, {
     // implements infinite scroll table row
     'data-row',
   ],
-  classNameBindings: [
-    'isAccessGranted:iconified-block-marketplace-access-granted:iconified-block-marketplace-available',
-  ],
+  classNameBindings: ['iconifiedBlockClass'],
   attributeBindings: ['id:data-row-id'],
 
   /**
@@ -63,7 +63,9 @@ export default Component.extend(I18n, {
    */
   isRequested: false,
 
-  isDescriptionExpanded: false,
+  isAnimating: false,
+
+  iconifiedBlockClass: 'iconified-block-marketplace-available',
 
   //#endregion
 
@@ -76,7 +78,9 @@ export default Component.extend(I18n, {
    */
   id: reads('spaceItem.id'),
 
-  isAccessGranted: reads('spaceItem.isAccessGranted'),
+  isAccessGrantedProxy: reads('spaceItem.isAccessGrantedProxy'),
+
+  isAccessGranted: reads('isAccessGrantedProxy.content'),
 
   organizationName: reads('spaceItem.organizationName'),
 
@@ -158,6 +162,55 @@ export default Component.extend(I18n, {
       );
     }
   ),
+
+  isNoticed: eq('id', 'viewModel.selectedSpaceId'),
+
+  accessColorsSetter: observer('isAccessGranted', function accessColorsSetter() {
+    if (!this.isAnimating && typeof this.isAccessGranted === 'boolean') {
+      this.setAccessColors();
+    }
+  }),
+
+  init() {
+    this._super(...arguments);
+    if (this.isNoticed) {
+      this.animateAttention();
+    } else if (this.isAccessGrantedProxy.isSettled) {
+      this.accessColorsSetter();
+    }
+  },
+
+  async setAccessColors(additionalClassName = '') {
+    this.set(
+      'iconifiedBlockClass',
+      (
+        this.isAccessGranted ?
+        'iconified-block-marketplace-access-granted' :
+        'iconified-block-marketplace-available'
+      ) + ' ' + additionalClassName
+    );
+  },
+
+  async animateAttention() {
+    if (this.isAnimating) {
+      return;
+    }
+    try {
+      this.setProperties({
+        isAnimating: true,
+        iconifiedBlockClass: 'iconified-block-marketplace-attention',
+      });
+      await waitForRender();
+      await sleep(2000);
+      this.setAccessColors('iconified-block-marketplace-transitionable');
+      // FIXME: should be the same as transition duration or wait for transition end
+      await sleep(2000);
+      // remove transitionable class
+      this.setAccessColors();
+    } finally {
+      this.set('isAnimating', false);
+    }
+  },
 
   actions: {
     requestAccess() {

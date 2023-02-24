@@ -208,3 +208,31 @@
   --iconified-block-icon-background-color-hover: #{darken($leading-color, 8%)};
   --iconified-block-background-color-hover: white;
 }
+
+.iconified-block-marketplace-attention {
+  // FIXME: the same color as in oneprovider file attention - maybe make common
+  $leading-color: hsl(47, 100%, 86%);
+  --iconified-block-border-color: #{darken($leading-color, 15%)};
+  --iconified-block-icon-color: #{darken($leading-color, 25%)};
+  --iconified-block-icon-background-color: #{darken($leading-color, 5%)};
+  --iconified-block-icon-background-color-hover: #{darken($leading-color, 8%)};
+  --iconified-block-background-color-hover: white;
+}
+
+.iconified-block-marketplace-transitionable {
+  @mixin transition($properties) {
+    transition-property: $properties;
+    transition-duration: 2s;
+    transition-timing-function: ease-out;
+  }
+  @include transition(border);
+  .icon-section {
+    @include transition(#{background-color, border-right-color});
+    .one-icon {
+      @include transition(color);
+    }
+    .content-section {
+      @include transition(background-color);
+    }
+  }
+}

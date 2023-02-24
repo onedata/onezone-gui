@@ -17,15 +17,17 @@
       transition: opacity $refresh-transition-duration ease-in;
       transition-delay: $show-spinner-delay;
       opacity: 1;
-      position: sticky;
-      top: 380px;
-      height: 0;
-      width: 0;
     }
   }
+
   .refresh-spinner {
+    position: sticky;
+    top: 380px;
     opacity: 0;
     transition: opacity $refresh-transition-duration ease-out;
+    // do not take place in view
+    height: 0;
+    width: 0;
   }
   .first-row, .table-start-row {
     height: 0;
