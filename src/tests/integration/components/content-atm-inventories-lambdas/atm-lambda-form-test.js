@@ -23,7 +23,6 @@ const states = [{
 // Types which does not take any additional parameters and are easy to convert
 // to dataSpec object.
 const testConvenientTypes = [
-  'Number',
   'Boolean',
   'String',
   'Object',
@@ -488,10 +487,10 @@ describe(
             `${nthParamSelector} .data-spec-editor`,
             testConvenientTypes[i]
           );
-          if (i === 0) {
+          if (i === 1) {
             await click(`${nthParamSelector} .entryIsOptional-field .form-control`);
             await click(`${nthParamSelector} .entryDefaultValue-field .create-value-btn`);
-            await fillIn(`${nthParamSelector} .entryDefaultValue-field .form-control`, '20');
+            await fillIn(`${nthParamSelector} .entryDefaultValue-field .form-control`, 'abc');
           }
 
           await addArgument();
@@ -501,10 +500,10 @@ describe(
             `${nthArgSelector} .data-spec-editor`,
             testConvenientTypes[i]
           );
-          if (i === 0) {
+          if (i === 1) {
             await click(`${nthArgSelector} .entryIsOptional-field .form-control`);
             await click(`${nthArgSelector} .entryDefaultValue-field .create-value-btn`);
-            await fillIn(`${nthArgSelector} .entryDefaultValue-field .form-control`, '10');
+            await fillIn(`${nthArgSelector} .entryDefaultValue-field .form-control`, 'def');
           }
 
           await addResult();
@@ -526,6 +525,7 @@ describe(
         await fillIn('.ephemeralStorageRequested-field .form-control', '1');
         await fillIn('.ephemeralStorageLimit-field .form-control', '10');
         await click('.btn-submit');
+
         expect(this.get('submitStub')).to.be.calledOnce.and.to.be.calledWith({
           name: 'myname',
           state: 'stable',
@@ -552,8 +552,8 @@ describe(
                   type: type.toLowerCase(),
                   valueConstraints: {},
                 },
-                isOptional: idx === 0,
-                defaultValue: idx === 0 ? 10 : null,
+                isOptional: idx === 1,
+                defaultValue: idx === 1 ? 'def' : null,
               };
               return arg;
             }),
@@ -577,8 +577,8 @@ describe(
                   type: type.toLowerCase(),
                   valueConstraints: {},
                 },
-                isOptional: idx === 0,
-                defaultValue: idx === 0 ? 20 : null,
+                isOptional: idx === 1,
+                defaultValue: idx === 1 ? 'abc' : null,
               };
               return param;
             }),
@@ -617,7 +617,7 @@ describe(
           await addResult();
           const resSelector = '.results-field .collection-item:first-child';
           await fillIn(`${resSelector} .entryName-field .form-control`, 'entry');
-          await selectChoose(`${resSelector} .data-spec-editor`, 'Number');
+          await selectChoose(`${resSelector} .data-spec-editor`, 'String');
           await click(`${resSelector} .entryIsViaFile-field .one-way-toggle`);
           await click('.btn-submit');
 
@@ -626,7 +626,7 @@ describe(
               resultSpecs: [{
                 name: 'entry',
                 dataSpec: {
-                  type: 'number',
+                  type: 'string',
                   valueConstraints: {},
                 },
                 relayMethod: 'filePipe',
@@ -679,7 +679,7 @@ describe(
             }],
             resultSpecs: [{
               name: 'res',
-              dataSpec: { type: 'number' },
+              dataSpec: { type: 'string' },
             }],
           });
 
@@ -706,7 +706,7 @@ describe(
           expect(result.querySelector('.entryName-field .form-control'))
             .to.have.value('res');
           expect(result.querySelector('.data-spec-editor'))
-            .to.have.trimmed.text('Number');
+            .to.have.trimmed.text('String');
           expect(find('.readonly-field .form-control')).to.have.class('checked');
           expect(find('.mountSpace-field .form-control')).to.have.class('checked');
           expect(find('.mountPoint-field .form-control')).to.have.value('/some/path');
@@ -854,8 +854,8 @@ describe(
               type: type.toLocaleLowerCase(),
               valueConstraints: {},
             },
-            isOptional: idx === 0,
-            defaultValue: idx === 0 ? 10 : null,
+            isOptional: idx === 1,
+            defaultValue: idx === 1 ? 'abc' : null,
           })),
         });
 
@@ -874,12 +874,12 @@ describe(
             entry.querySelector('.entryIsOptional-field .form-control');
           const defaultValueField =
             entry.querySelector('.entryDefaultValue-field');
-          if (idx === 0) {
+          if (idx === 1) {
             expect(optionalToggle).to.have.class('checked');
-            expect(defaultValueField.querySelector('input')).to.have.value('10');
+            expect(defaultValueField.querySelector('textarea')).to.have.value('abc');
           } else {
             expect(optionalToggle).to.not.have.class('checked');
-            expect(defaultValueField.querySelector('input')).to.not.exist;
+            expect(defaultValueField.querySelector('.full-value-editor')).to.not.exist;
           }
         });
       });
@@ -896,8 +896,8 @@ describe(
               type: type.toLocaleLowerCase(),
               valueConstraints: {},
             },
-            isOptional: idx === 0,
-            defaultValue: idx === 0 ? 10 : null,
+            isOptional: idx === 1,
+            defaultValue: idx === 1 ? 'abc' : null,
           })),
         });
 
@@ -916,12 +916,12 @@ describe(
             entry.querySelector('.entryIsOptional-field .form-control');
           const defaultValueField =
             entry.querySelector('.entryDefaultValue-field');
-          if (idx === 0) {
+          if (idx === 1) {
             expect(optionalToggle).to.have.class('checked');
-            expect(defaultValueField.querySelector('input')).to.have.value('10');
+            expect(defaultValueField.querySelector('textarea')).to.have.value('abc');
           } else {
             expect(optionalToggle).to.not.have.class('checked');
-            expect(defaultValueField.querySelector('input')).to.not.exist;
+            expect(defaultValueField.querySelector('.full-value-editor')).to.not.exist;
           }
         });
       });
@@ -1018,7 +1018,7 @@ describe(
             }],
             resultSpecs: [{
               name: 'res',
-              dataSpec: { type: 'number' },
+              dataSpec: { type: 'string' },
             }],
             configParameterSpecs: [{
               name: 'param',
@@ -1063,7 +1063,7 @@ describe(
           expect(result.querySelector('.entryName-field .form-control'))
             .to.have.value('res');
           expect(result.querySelector('.data-spec-editor'))
-            .to.have.trimmed.text('Number');
+            .to.have.trimmed.text('String');
           expect(find('.readonly-field .form-control')).to.have.class('checked');
           expect(find('.mountSpace-field .form-control')).to.have.class('checked');
           expect(find('.mountPoint-field .form-control')).to.have.value('/some/path');
