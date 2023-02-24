@@ -4,6 +4,17 @@
     class="absolute-middle-centered refresh-spinner"
   }}
 {{/if}}
+{{#if (and (not viewModel.entries.length) (not viewModel.isRefreshing))}}
+  <div class="no-spaces-container">
+    {{#if viewModel.isAnyFilterActive}}
+      {{one-icon class="no-spaces-icon" icon="search"}}
+      <span class="no-spaces-text">{{tt this "noMatchingResults"}}</span>
+    {{else}}
+      {{one-icon class="no-spaces-icon" icon="space-empty"}}
+      <span class="no-spaces-text">{{tt this "noSpacesAvailable"}}</span>
+    {{/if}}
+  </div>
+{{/if}}
 <ul class="list-entries iconified-block-marketplace-access-granted-container">
   <li class="special-row table-start-row"></li>
   <li
@@ -28,7 +39,4 @@
     </li>
   {{/if}}
 </ul>
-{{#if (and (not viewModel.entries.length) viewModel.isAnyFilterActive)}}
-  <p class="no-matching-results">{{tt this "noMatchingResults"}}</p>
-{{/if}}
 {{yield}}

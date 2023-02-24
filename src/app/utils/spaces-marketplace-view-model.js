@@ -273,8 +273,6 @@ export default EmberObject.extend(OwnerInjector, {
     try {
       await this.entries.scheduleReload({ head });
     } finally {
-      safeExec(this, 'set', 'renderRefreshSpinner', false);
-      safeExec(this, 'set', 'isRefreshing', false);
       safeExec(this, 'setProperties', {
         renderRefreshSpinner: false,
         isRefreshing: false,

@@ -29,6 +29,27 @@
     height: 0;
     width: 0;
   }
+  .no-spaces-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: $disabled-opacity;
+    margin-top: 50px;
+    .no-spaces-icon {
+      font-size: 200%;
+      font-weight: bold;
+    }
+    .no-spaces-icon + .no-spaces-text {
+      margin-left: 0.8em;
+    }
+    .no-spaces-icon.oneicon-search,
+    .no-spaces-icon.oneicon-space-empty {
+      margin-bottom: -0.1em;
+    }
+    .no-spaces-text {
+      font-size: 120%;
+    }
+  }
   .first-row, .table-start-row {
     height: 0;
   }
