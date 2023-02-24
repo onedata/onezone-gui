@@ -1,4 +1,32 @@
 .spaces-marketplace-list {
+  $refresh-transition-duration: 80ms;
+  // If show spinner delay is the same as refresh transition duration,
+  // the spinner will start to fade in right after backround ends to fade.
+  // If there is need to delay spinner show further (eg. if you don't want to
+  // show spinner if loading time is very short) then add some time to the value.
+  $show-spinner-delay: $refresh-transition-duration;
+  position: relative;
+  opacity: 1;
+  transition: opacity $refresh-transition-duration ease-out;
+  &.is-refreshing {
+    transition: opacity $refresh-transition-duration ease-in;
+    opacity: 0.25;
+    pointer-events: none;
+    min-height: 420px;
+    .refresh-spinner {
+      transition: opacity $refresh-transition-duration ease-in;
+      transition-delay: $show-spinner-delay;
+      opacity: 1;
+      position: sticky;
+      top: 380px;
+      height: 0;
+      width: 0;
+    }
+  }
+  .refresh-spinner {
+    opacity: 0;
+    transition: opacity $refresh-transition-duration ease-out;
+  }
   .first-row, .table-start-row {
     height: 0;
   }

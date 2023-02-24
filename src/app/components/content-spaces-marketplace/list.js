@@ -17,6 +17,7 @@ import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 
 export default Component.extend(I18n, {
   classNames: ['spaces-marketplace-list'],
+  classNameBindings: ['isRefreshing:is-refreshing'],
 
   /**
    * @override
@@ -74,6 +75,10 @@ export default Component.extend(I18n, {
     'entriesInitialLoad.isSettled',
     'infiniteScroll.fetchingStatus.isFetchingNext'
   ),
+
+  renderRefreshSpinner: reads('viewModel.renderRefreshSpinner'),
+
+  isRefreshing: reads('viewModel.isRefreshing'),
 
   init() {
     this._super(...arguments);
