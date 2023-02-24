@@ -33,11 +33,6 @@ export default Component.extend({
     this.set('viewModel', this.createViewModel());
   },
 
-  didInsertElement() {
-    this._super(...arguments);
-    this.viewModel.mount(this.element);
-  },
-
   /**
    * @returns {ComputedProperty<Utils.SpacesMarketplaceViewModel>}
    */

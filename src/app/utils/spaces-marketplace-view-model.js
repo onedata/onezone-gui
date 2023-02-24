@@ -18,7 +18,6 @@ import filterSpaces from 'onezone-gui/utils/filter-spaces';
 import _ from 'lodash';
 import { Promise } from 'rsvp';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
-import height from 'onedata-gui-common/utils/dom/height';
 import sleep from 'onedata-gui-common/utils/sleep';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
@@ -35,12 +34,6 @@ export default EmberObject.extend(OwnerInjector, {
   selectedSpaceId: null,
 
   //#region state
-
-  /**
-   * HTMLElement of `Components.ContentSpacesMarketplace`
-   * @type {HTMLElement}
-   */
-  element: null,
 
   /**
    * @type {string}
@@ -67,19 +60,6 @@ export default EmberObject.extend(OwnerInjector, {
    * @type {boolean}
    */
   isRefreshing: false,
-
-  /**
-   * If true, a refresh spinner should be rendered.
-   * It is separate property from `isRefreshing`, because refresh spinner
-   * should be inserted before changing `isRefreshing` - when the spinner
-   * is inserted and the view is currently not refreshing, then it is not visible,
-   * because of zero opacity.
-   * Note, that spinner could be reneder all the time, but it is visible only
-   * when refresh is active. This property is used to remove the spinner if it is
-   * unnecessary (for all the time user is browsing marketplace).
-   * @type {boolean}
-   */
-  renderRefreshSpinner: false,
 
   /**
    * Main view state - it starts from `initialLoading`, when entries list is loaded for
@@ -161,14 +141,6 @@ export default EmberObject.extend(OwnerInjector, {
 
     // FIXME: debug code
     window.viewModel = this;
-  },
-
-  /**
-   * Adds reference to rendered element.
-   * @param {HTMLElement} element HTMLElement of `Components.ContentSpacesMarketplace`.
-   */
-  mount(element) {
-    this.set('element', element);
   },
 
   async initEntries() {
@@ -278,15 +250,6 @@ export default EmberObject.extend(OwnerInjector, {
         isRefreshing: false,
       });
     }
-  },
-
-  getStickyHeader() {
-    return this.element?.querySelector('.spaces-marketplace-header') ?? null;
-  },
-
-  getStickyHeaderHeight() {
-    const stickyHeader = this.getStickyHeader();
-    return stickyHeader && height(stickyHeader) || 0;
   },
 });
 

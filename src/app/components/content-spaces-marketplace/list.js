@@ -17,7 +17,6 @@ import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 
 export default Component.extend(I18n, {
   classNames: ['spaces-marketplace-list'],
-  classNameBindings: ['isRefreshing:is-refreshing'],
 
   /**
    * @override
@@ -126,9 +125,7 @@ export default Component.extend(I18n, {
     if (!itemElement) {
       return;
     }
-    const scrollOffset = itemElement.offsetTop -
-      window.parseInt(window.getComputedStyle(itemElement).marginTop) -
-      this.viewModel.getStickyHeaderHeight();
+    const scrollOffset = itemElement.offsetTop;
     this.infiniteScroll.scrollHandler.scrollTo(null, scrollOffset);
   },
 });
