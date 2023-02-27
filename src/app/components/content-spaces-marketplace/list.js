@@ -17,6 +17,7 @@ import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 
 export default Component.extend(I18n, {
   classNames: ['spaces-marketplace-list'],
+  classNameBindings: ['isRefreshing:is-refreshing'],
 
   /**
    * @override

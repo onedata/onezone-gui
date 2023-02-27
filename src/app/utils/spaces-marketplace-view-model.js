@@ -62,6 +62,19 @@ export default EmberObject.extend(OwnerInjector, {
   isRefreshing: false,
 
   /**
+   * If true, a refresh spinner should be rendered.
+   * It is separate property from `isRefreshing`, because refresh spinner
+   * should be inserted before changing `isRefreshing` - when the spinner
+   * is inserted and the view is currently not refreshing, then it is not visible,
+   * because of zero opacity.
+   * Note, that spinner could be reneder all the time, but it is visible only
+   * when refresh is active. This property is used to remove the spinner if it is
+   * unnecessary (for all the time user is browsing marketplace).
+   * @type {boolean}
+   */
+  renderRefreshSpinner: false,
+
+  /**
    * Main view state - it starts from `initialLoading`, when entries list is loaded for
    * the first time. Then if there are no spaces in the marketplace at all,
    * the state is transitioned to `noSpacesAvailable` showing welcome empty-marketplace
