@@ -49,8 +49,6 @@ export default Component.extend(I18n, {
 
   entriesInitialLoad: reads('viewModel.entriesInitialLoad'),
 
-  selectedSpaceId: reads('viewModel.selectedSpaceId'),
-
   /**
    * @type {Array<SpaceTag>}
    */
@@ -115,18 +113,20 @@ export default Component.extend(I18n, {
     this.set('infiniteScroll', infiniteScroll);
   },
 
-  async scrollToSelectedSpace() {
-    if (!this.selectedSpaceId || !this.element) {
+  scrollToSelectedSpace() {
+    if (!this.element) {
       return;
     }
-    /** @type {HTMLElement} */
-    const itemElement = this.element.querySelector(
-      `[data-row-id="${this.selectedSpaceId}"]`
-    );
-    if (!itemElement) {
-      return;
+    if (this.viewModel.selectedSpaceInfo?.consumeShouldScroll()) {
+      /** @type {HTMLElement} */
+      const itemElement = this.element.querySelector(
+        `[data-row-id="${this.viewModel.selectedSpaceInfo.spaceId}"]`
+      );
+      if (!itemElement) {
+        return;
+      }
+      const scrollOffset = itemElement.offsetTop;
+      this.infiniteScroll.scrollHandler.scrollTo(null, scrollOffset);
     }
-    const scrollOffset = itemElement.offsetTop;
-    this.infiniteScroll.scrollHandler.scrollTo(null, scrollOffset);
   },
 });

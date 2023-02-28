@@ -121,6 +121,29 @@ export default EmberObject.extend(OwnerInjector, {
     }
   )),
 
+  /**
+   * @type {ComputedProperty<PromiseObject<SelectedSpaceInfo>>>}
+   */
+  selectedSpaceInfoProxy: promise.object(computed(
+    'selectedSpaceId',
+    async function selectedSpaceInfoProxy() {
+      if (this.selectedSpaceId) {
+        try {
+          const record = await this.spaceManager.getSpaceMarketplaceInfo(
+            this.selectedSpaceId
+          );
+          return new SelectedSpaceInfo(record);
+        } catch (error) {
+          return new SelectedSpaceInfo(null, error);
+        }
+      } else {
+        return new SelectedSpaceInfo();
+      }
+    }
+  )),
+
+  selectedSpaceInfo: reads('selectedSpaceInfoProxy.content'),
+
   viewStateChanger: observer('entriesInitialLoad.isSettled', 'entries.length', function viewStateChanger() {
     const state = this.viewState;
     switch (state) {
@@ -157,17 +180,9 @@ export default EmberObject.extend(OwnerInjector, {
   },
 
   async initEntries() {
-    let selectedSpaceMarketplaceInfo = null;
-    try {
-      selectedSpaceMarketplaceInfo = await this.selectedSpaceMarketplaceInfoProxy;
-    } catch (selectedSpaceGetError) {
-      console.warn(
-        'Could not get selected space in marketplace with ID',
-        this.selectedSpaceId
-      );
-    }
-    const initialJumpIndex = selectedSpaceMarketplaceInfo &&
-      get(selectedSpaceMarketplaceInfo, 'index') || null;
+    const selectedSpaceInfo = await this.selectedSpaceInfoProxy;
+    const initialJumpIndex = selectedSpaceInfo &&
+      selectedSpaceInfo.index || null;
     const entries = ReplacingChunksArray.create({
       fetch: this.fetchFilteredEntries.bind(this),
       startIndex: 0,
@@ -360,5 +375,44 @@ class FilteredEntriesFetcher {
   get viewTags() {
     return this.viewModel.tagsFilter ?
       this.viewModel.tagsFilter.map(({ label }) => label) : undefined;
+  }
+}
+
+// FIXME: jsdoc
+class SelectedSpaceInfo {
+  constructor(record = null, error = null) {
+    this.record = record;
+    this.error = error;
+    const isActivated = Boolean(this.record && !this.error);
+    this.shouldScroll = isActivated;
+    this.shouldBlink = isActivated;
+  }
+  get spaceId() {
+    return this.record && get(this.record, 'entityId');
+  }
+  get index() {
+    return this.record && get(this.record, 'index');
+  }
+  consumeShouldBlink(consumerSpaceId) {
+    if (
+      this.shouldBlink &&
+      this.spaceId === consumerSpaceId
+    ) {
+      this.shouldBlink = false;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  consumeShouldScroll() {
+    if (
+      this.shouldScroll &&
+      this.spaceId
+    ) {
+      this.shouldScroll = false;
+      return true;
+    } else {
+      return false;
+    }
   }
 }

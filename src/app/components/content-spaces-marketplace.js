@@ -2,12 +2,11 @@
  * Content container view of marketplace.
  *
  * @author Jakub Liput
- * @copyright (C) 2022 ACK CYFRONET AGH
+ * @copyright (C) 2022-2023 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Component from '@ember/component';
-import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import SpacesMarketplaceViewModel from 'onezone-gui/utils/spaces-marketplace-view-model';
 
@@ -26,8 +25,6 @@ export default Component.extend({
 
   //#endregion
 
-  selectedSpaceId: reads('navigationState.aspectOptions.selectedSpace'),
-
   init() {
     this._super(...arguments);
     this.set('viewModel', this.createViewModel());
@@ -39,7 +36,7 @@ export default Component.extend({
   createViewModel() {
     return SpacesMarketplaceViewModel.create({
       ownerSource: this,
-      selectedSpaceId: this.selectedSpaceId,
+      selectedSpaceId: this.navigationState.aspectOptions.selectedSpace,
     });
   },
 });

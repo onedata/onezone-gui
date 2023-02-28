@@ -163,8 +163,6 @@ export default Component.extend(I18n, {
     }
   ),
 
-  isNoticed: eq('id', 'viewModel.selectedSpaceId'),
-
   accessColorsSetter: observer('isAccessGranted', function accessColorsSetter() {
     if (!this.isAnimating && typeof this.isAccessGranted === 'boolean') {
       this.setAccessColors();
@@ -173,7 +171,7 @@ export default Component.extend(I18n, {
 
   init() {
     this._super(...arguments);
-    if (this.isNoticed) {
+    if (this.viewModel.selectedSpaceInfo?.consumeShouldBlink(this.id)) {
       this.animateAttention();
     } else if (this.isAccessGrantedProxy.isSettled) {
       this.accessColorsSetter();
