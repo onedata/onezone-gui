@@ -186,8 +186,9 @@ export default EmberObject.extend(OwnerInjector, {
     const entries = ReplacingChunksArray.create({
       fetch: this.fetchFilteredEntries.bind(this),
       startIndex: 0,
-      endIndex: 10,
-      indexMargin: 5,
+      endIndex: 12,
+      indexMargin: 6,
+      chunkSize: 12,
       initialJumpIndex,
     });
     this.set('entries', entries);
