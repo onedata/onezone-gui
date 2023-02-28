@@ -43,7 +43,7 @@ const authorizerManagerStub = Service.extend({
   },
 });
 
-describe('Integration | Component | content users', function () {
+describe('Integration | Component | content-users', function () {
   setupRenderingTest();
 
   beforeEach(function () {

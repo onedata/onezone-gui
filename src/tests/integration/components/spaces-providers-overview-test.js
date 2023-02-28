@@ -17,7 +17,7 @@ const I18nStub = Service.extend({
 
 const NavigationStateStub = Service.extend({});
 
-describe('Integration | Component | spaces providers overview', function () {
+describe('Integration | Component | spaces-providers-overview', function () {
   setupRenderingTest();
 
   beforeEach(function beforeEach() {

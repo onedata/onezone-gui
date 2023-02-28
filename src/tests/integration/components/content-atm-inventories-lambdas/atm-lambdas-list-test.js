@@ -54,7 +54,7 @@ function generateLambda(testCase, name, content) {
 }
 
 describe(
-  'Integration | Component | content atm inventories lambdas/atm lambdas list',
+  'Integration | Component | content-atm-inventories-lambdas/atm-lambdas-list',
   function () {
     setupRenderingTest();
 

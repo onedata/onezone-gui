@@ -7,7 +7,7 @@ import sinon from 'sinon';
 
 const componentClass = 'upload-details';
 
-describe('Integration | Component | modals/apply atm workflow schema dump modal/upload details',
+describe('Integration | Component | modals/apply-atm-workflow-schema-dump-modal/upload-details',
   function () {
     setupRenderingTest();
 

@@ -7,7 +7,7 @@ import {
 import { get, getProperties } from '@ember/object';
 import _ from 'lodash';
 
-describe('Unit | Utility | token editor utils/creator data to token', function () {
+describe('Unit | Utility | token-editor-utils/creator-data-to-token', function () {
   it('converts name', function () {
     const result = creatorDataToToken({
       basic: {

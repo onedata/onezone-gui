@@ -12,7 +12,7 @@ import { reject, Promise } from 'rsvp';
 import { next } from '@ember/runloop';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 
-describe('Integration | Utility | token actions/consume invite token action', function () {
+describe('Integration | Utility | token-actions/consume-invite-token-action', function () {
   setupRenderingTest();
 
   beforeEach(function () {

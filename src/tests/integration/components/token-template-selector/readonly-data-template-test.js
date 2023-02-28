@@ -6,7 +6,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 
 describe(
-  'Integration | Component | token template selector/readonly data template',
+  'Integration | Component | token-template-selector/readonly-data-template',
   function () {
     setupRenderingTest();
 

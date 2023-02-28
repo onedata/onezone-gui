@@ -37,7 +37,7 @@ const templates = [{
   category: advancedCategory,
 }];
 
-describe('Integration | Component | token template selector', function () {
+describe('Integration | Component | token-template-selector', function () {
   setupRenderingTest();
 
   it('has class "token-template-selector"', async function () {

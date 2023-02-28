@@ -9,7 +9,7 @@ import { get } from '@ember/object';
 import { settled } from '@ember/test-helpers';
 
 describe(
-  'Integration | Utility | workflow actions/create atm workflow schema action',
+  'Integration | Utility | workflow-actions/create-atm-workflow-schema-action',
   function () {
     setupRenderingTest();
 

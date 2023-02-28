@@ -125,7 +125,7 @@ class FakeWindow {
   }
 }
 
-describe('Integration | Component | groups hierarchy visualiser', function () {
+describe('Integration | Component | groups-hierarchy-visualiser', function () {
   setupRenderingTest();
 
   beforeEach(function beforeEach() {
