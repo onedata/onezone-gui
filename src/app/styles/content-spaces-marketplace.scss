@@ -19,14 +19,21 @@ $spaces-marketplace-item-secondary-row-icon-size: 150%;
 // FIXME: move to separate file
 
 .spaces-marketplace-header {
+  @mixin eat-content-col-padding($padding) {
+    margin-left: -$padding;
+    padding-left: $padding;
+    margin-right: -$padding;
+    padding-right: $padding;
+  }
+
   position: sticky;
   z-index: 1;
   margin-top: -$content-col-padding;
   padding-top: $content-col-padding;
-  margin-left: -$content-col-padding;
-  padding-left: $content-col-padding;
-  margin-right: -$content-col-padding;
-  padding-right: $content-col-padding;
+  @include eat-content-col-padding($content-col-padding);
+  @media (max-width: $screen-sm-max) {
+    @include eat-content-col-padding($content-col-padding-tablet);
+  }
   top: -$content-col-padding;
   background-color: white;
   padding-bottom: $spaces-marketplace-items-spacing * 0.5;
