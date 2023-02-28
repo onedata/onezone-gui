@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10531 Added allowedValues constraint to atm number and atm string
 * VFS-10452 Added integersOnly constraint to atm number
 * VFS-10148 Removed redundant done() from tests
 * VFS-10333 Unified naming of test suites

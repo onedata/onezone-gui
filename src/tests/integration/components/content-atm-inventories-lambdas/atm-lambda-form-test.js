@@ -697,7 +697,7 @@ describe(
           expect(argument.querySelector('.entryName-field .form-control'))
             .to.have.value('arg');
           expect(argument.querySelector('.data-spec-editor'))
-            .to.have.trimmed.text('String');
+            .to.contain.text('String');
           expect(argument.querySelector('.entryIsOptional-field .form-control'))
             .to.have.class('checked');
           expect(argument.querySelector('.entryDefaultValue-field .form-control'))
@@ -706,7 +706,7 @@ describe(
           expect(result.querySelector('.entryName-field .form-control'))
             .to.have.value('res');
           expect(result.querySelector('.data-spec-editor'))
-            .to.have.trimmed.text('String');
+            .to.contain.text('String');
           expect(find('.readonly-field .form-control')).to.have.class('checked');
           expect(find('.mountSpace-field .form-control')).to.have.class('checked');
           expect(find('.mountPoint-field .form-control')).to.have.value('/some/path');
@@ -868,8 +868,7 @@ describe(
           const entry = entries[idx];
           expect(entry.querySelector('.entryName-field .form-control'))
             .to.have.value(`entry${idx}`);
-          expect(entry.querySelector('.data-spec-editor'))
-            .to.have.trimmed.text(type);
+          expect(entry.querySelector('.data-spec-editor')).to.contain.text(type);
           const optionalToggle =
             entry.querySelector('.entryIsOptional-field .form-control');
           const defaultValueField =
@@ -910,8 +909,7 @@ describe(
           const entry = entries[idx];
           expect(entry.querySelector('.entryName-field .form-control'))
             .to.have.value(`entry${idx}`);
-          expect(entry.querySelector('.data-spec-editor'))
-            .to.have.trimmed.text(type);
+          expect(entry.querySelector('.data-spec-editor')).to.contain.text(type);
           const optionalToggle =
             entry.querySelector('.entryIsOptional-field .form-control');
           const defaultValueField =
@@ -953,8 +951,7 @@ describe(
           const entry = entries[idx];
           expect(entry.querySelector('.entryName-field .form-control'))
             .to.have.value(`entry${idx}`);
-          expect(entry.querySelector('.data-spec-editor'))
-            .to.have.trimmed.text(type);
+          expect(entry.querySelector('.data-spec-editor')).to.contain.text(type);
           const isViaFileToggle =
             entry.querySelector('.entryIsViaFile-field .form-control');
           if (idx === 0) {
@@ -1045,7 +1042,7 @@ describe(
           expect(parameter.querySelector('.entryName-field .form-control'))
             .to.have.value('param');
           expect(parameter.querySelector('.data-spec-editor'))
-            .to.have.trimmed.text('String');
+            .to.contain.text('String');
           expect(parameter.querySelector('.entryIsOptional-field .form-control'))
             .to.not.have.class('checked');
           expect(parameter.querySelector('.entryDefaultValue-field .form-control'))
@@ -1054,7 +1051,7 @@ describe(
           expect(argument.querySelector('.entryName-field .form-control'))
             .to.have.value('arg');
           expect(argument.querySelector('.data-spec-editor'))
-            .to.have.trimmed.text('String');
+            .to.contain.text('String');
           expect(argument.querySelector('.entryIsOptional-field .form-control'))
             .to.have.class('checked');
           expect(argument.querySelector('.entryDefaultValue-field .form-control'))
@@ -1063,7 +1060,7 @@ describe(
           expect(result.querySelector('.entryName-field .form-control'))
             .to.have.value('res');
           expect(result.querySelector('.data-spec-editor'))
-            .to.have.trimmed.text('String');
+            .to.contain.text('String');
           expect(find('.readonly-field .form-control')).to.have.class('checked');
           expect(find('.mountSpace-field .form-control')).to.have.class('checked');
           expect(find('.mountPoint-field .form-control')).to.have.value('/some/path');
