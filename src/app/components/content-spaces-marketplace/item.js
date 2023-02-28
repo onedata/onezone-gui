@@ -200,13 +200,21 @@ export default Component.extend(I18n, {
       });
       await waitForRender();
       await sleep(2000);
+      if (this.isDestroyed || this.isDestroying) {
+        return;
+      }
       this.setAccessColors('iconified-block-marketplace-transitionable');
       // FIXME: should be the same as transition duration or wait for transition end
       await sleep(2000);
+      if (this.isDestroyed || this.isDestroying) {
+        return;
+      }
       // remove transitionable class
       this.setAccessColors();
     } finally {
-      this.set('isAnimating', false);
+      if (!this.isDestroyed && !this.isDestroying) {
+        this.set('isAnimating', false);
+      }
     }
   },
 
