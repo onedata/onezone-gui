@@ -101,7 +101,7 @@ export default Component.extend(I18n, {
           entityType: creatorEntityType,
           entityId: creatorId,
           aspect: 'instance',
-          scope: 'shared',
+          scope: 'auto',
         });
         promise = this.get('store').findRecord(creatorEntityType, creatorGri, {
           adapterOptions: {
