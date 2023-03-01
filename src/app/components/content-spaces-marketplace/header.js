@@ -1,4 +1,10 @@
-// FIXME: jsdoc
+/**
+ * A sticky container for content-spaces marketplace headers.
+ *
+ * @author Jakub Liput
+ * @copyright (C) 2023 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
 
 import Component from '@ember/component';
 import { and, not } from 'ember-awesome-macros';

@@ -2,7 +2,7 @@
  * Single space item in marketplace.
  *
  * @author Jakub Liput
- * @copyright (C) 2022 ACK CYFRONET AGH
+ * @copyright (C) 2022-2023 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -12,10 +12,11 @@ import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { dateFormat } from 'onedata-gui-common/helpers/date-format';
-import { or, and, raw, gt, difference, eq } from 'ember-awesome-macros';
+import { or, and, raw, gt, difference } from 'ember-awesome-macros';
 import { htmlSafe } from '@ember/string';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 import sleep from 'onedata-gui-common/utils/sleep';
+import globalCssVariablesManager from 'onedata-gui-common/utils/global-css-variables-manager';
 
 export default Component.extend(I18n, {
   tagName: 'li',
@@ -46,13 +47,21 @@ export default Component.extend(I18n, {
   spaceItem: undefined,
 
   /**
+   * Time in which the item should be colored for attention in milliseconds.
+   * After this time, the transition to normal colors is started (which is not immediate,
+   * but is animated by CSS).
    * @type {number}
    */
-  tagsLimit: or(
-    and('media.isMobile', raw(4)),
-    and('media.isTablet', raw(6)),
-    raw(12),
-  ),
+  attentionColorTime: 2000,
+
+  /**
+   * Time in which the item should change attention color in milliseconds to normal
+   * color.
+   * @type {number}
+   */
+  attentionTransitionTime: 2000,
+
+  attentionTransitionTimeVarName: '--spaces-marketplace-item-attention-transition-time',
 
   //#region state
 
@@ -68,6 +77,15 @@ export default Component.extend(I18n, {
   iconifiedBlockClass: 'iconified-block-marketplace-available',
 
   //#endregion
+
+  /**
+   * @type {ComputedProperty<number>}
+   */
+  tagsLimit: or(
+    and('media.isMobile', raw(4)),
+    and('media.isTablet', raw(6)),
+    raw(12),
+  ),
 
   spaceName: reads('spaceItem.name'),
 
@@ -171,11 +189,27 @@ export default Component.extend(I18n, {
 
   init() {
     this._super(...arguments);
+    globalCssVariablesManager.setVariable(
+      this,
+      this.attentionTransitionTimeVarName,
+      `${this.attentionTransitionTime / 1000}s`,
+    );
     if (this.viewModel.selectedSpaceInfo?.consumeShouldBlink(this.id)) {
       this.animateAttention();
     } else if (this.isAccessGrantedProxy.isSettled) {
       this.accessColorsSetter();
     }
+  },
+
+  /**
+   * @override
+   */
+  willDestroyElement() {
+    this._super(...arguments);
+    globalCssVariablesManager.unsetVariable(
+      this,
+      this.attentionTransitionTimeVarName,
+    );
   },
 
   async setAccessColors(additionalClassName = '') {
@@ -199,13 +233,12 @@ export default Component.extend(I18n, {
         iconifiedBlockClass: 'iconified-block-marketplace-attention',
       });
       await waitForRender();
-      await sleep(2000);
+      await sleep(this.attentionColorTime || 0);
       if (this.isDestroyed || this.isDestroying) {
         return;
       }
       this.setAccessColors('iconified-block-marketplace-transitionable');
-      // FIXME: should be the same as transition duration or wait for transition end
-      await sleep(2000);
+      await sleep(this.attentionTransitionTime);
       if (this.isDestroyed || this.isDestroying) {
         return;
       }

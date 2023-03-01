@@ -6,12 +6,12 @@
     }
   }
 
-  height: 300px;
+  height: var(--spaces-marketplace-item-height, #{$fallback-spaces-marketplace-item-height});
   overflow: hidden;
 
   // override default spacing
   &, &.iconified-block + .iconified-block.spaces-marketplace-item {
-    margin-top: $spaces-marketplace-items-spacing;
+    margin-top: var(--spaces-marketplace-item-spacing, #{$fallback-spaces-marketplace-item-spacing});
   }
 
   &.iconified-block-marketplace-access-granted {
@@ -210,7 +210,6 @@
 }
 
 .iconified-block-marketplace-attention {
-  // FIXME: the same color as in oneprovider file attention - maybe make common
   $leading-color: hsl(47, 100%, 86%);
   --iconified-block-border-color: #{darken($leading-color, 15%)};
   --iconified-block-icon-color: #{darken($leading-color, 25%)};
@@ -222,7 +221,7 @@
 .iconified-block-marketplace-transitionable {
   @mixin transition($properties) {
     transition-property: $properties;
-    transition-duration: 2s;
+    transition-duration: var(--spaces-marketplace-item-attention-transition-time, 2s);
     transition-timing-function: ease-out;
   }
   @include transition(border);

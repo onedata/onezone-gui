@@ -8,8 +8,18 @@ import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
+import gri from 'onedata-gui-websocket-client/utils/gri';
 
 export const aspect = 'marketplace_data';
+
+export function generateGri(spaceId) {
+  return gri({
+    entityType: 'space',
+    entityId: spaceId,
+    aspect,
+    scope: 'auto',
+  });
+}
 
 export default Model.extend(GraphSingleModelMixin, {
   /**

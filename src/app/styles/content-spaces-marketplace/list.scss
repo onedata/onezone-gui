@@ -1,20 +1,20 @@
 .spaces-marketplace-list {
-  $refresh-transition-duration: 80ms;
+ $fallback-refresh-transition-duration: 80ms;
   // If show spinner delay is the same as refresh transition duration,
   // the spinner will start to fade in right after backround ends to fade.
   // If there is need to delay spinner show further (eg. if you don't want to
   // show spinner if loading time is very short) then add some time to the value.
-  $show-spinner-delay: $refresh-transition-duration;
+  $show-spinner-delay: var(--spaces-marketplace-refresh-transition-duration, #{$fallback-refresh-transition-duration});
   position: relative;
   opacity: 1;
-  transition: opacity $refresh-transition-duration ease-out;
+  transition: opacity var(--spaces-marketplace-refresh-transition-duration, #{$fallback-refresh-transition-duration}) ease-out;
   &.is-refreshing {
-    transition: opacity $refresh-transition-duration ease-in;
+    transition: opacity var(--spaces-marketplace-refresh-transition-duration, #{$fallback-refresh-transition-duration}) ease-in;
     opacity: 0.25;
     pointer-events: none;
     min-height: 420px;
     .refresh-spinner {
-      transition: opacity $refresh-transition-duration ease-in;
+      transition: opacity var(--spaces-marketplace-refresh-transition-duration, #{$fallback-refresh-transition-duration}) ease-in;
       transition-delay: $show-spinner-delay;
       opacity: 1;
     }
@@ -24,7 +24,7 @@
     position: sticky;
     top: 380px;
     opacity: 0;
-    transition: opacity $refresh-transition-duration ease-out;
+    transition: opacity var(--spaces-marketplace-refresh-transition-duration, #{$fallback-refresh-transition-duration}) ease-out;
     // do not take place in view
     height: 0;
     width: 0;
@@ -64,10 +64,10 @@
     height: 100px;
   }
   .no-matching-results {
-    padding-top: $spaces-marketplace-items-spacing;
+    padding-top: var(--spaces-marketplace-item-spacing, #{$fallback-spaces-marketplace-item-spacing});
   }
   .list-entries {
     padding-left: 0;
-    padding-bottom: $spaces-marketplace-items-spacing * 3;
+    padding-bottom: calc(var(--spaces-marketplace-item-spacing, #{$fallback-spaces-marketplace-item-spacing}) * 3);
   }
 }

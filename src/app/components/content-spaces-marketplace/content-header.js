@@ -1,4 +1,10 @@
-// FIXME: jsdoc
+/**
+ * A header typical for content views intended for spaces marketplace.
+ *
+ * @author Jakub Liput
+ * @copyright (C) 2023 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
 
 import Component from '@ember/component';
 import { computed } from '@ember/object';
@@ -19,9 +25,8 @@ export default Component.extend(I18n, {
    */
   i18nPrefix: 'components.contentSpacesMarketplace.contentHeader',
 
-  // TODO: VFS-10263 make "Add your space" action available in mobile mode
-  // FIXME: jeśli jest refresh, to nie powinno być globalActions tylko lokalna tablica
-  globalActions: conditional(
+  // TODO: VFS-10263 make "Add your space" and refresh actions available in mobile mode
+  actionsArray: conditional(
     'viewModel.showEmptyListView',
     collect('refreshAdvertisedSpacesListAction'),
     collect('chooseSpaceToAdvertiseAction', 'refreshAdvertisedSpacesListAction'),
@@ -49,7 +54,6 @@ export default Component.extend(I18n, {
           className: 'refresh-advertised-spaces-list',
           icon: 'refresh',
           onExecute: async () => {
-            // FIXME: animation like in file browser?
             const result = ActionResult.create();
             await result.interceptPromise(this.viewModel.refreshList());
             return result;

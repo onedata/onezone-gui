@@ -21,6 +21,9 @@ import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import sleep from 'onedata-gui-common/utils/sleep';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
+import addConflictLabels from 'onedata-gui-common/utils/add-conflict-labels';
+import { debounce } from '@ember/runloop';
+import globalCssVariablesManager from 'onedata-gui-common/utils/global-css-variables-manager';
 
 export default EmberObject.extend(OwnerInjector, {
   spaceManager: service(),
@@ -32,6 +35,18 @@ export default EmberObject.extend(OwnerInjector, {
    * @type {string|null}
    */
   selectedSpaceId: null,
+
+  //#region config
+
+  /**
+   * Time in ms.
+   * @type {number}
+   */
+  refreshTransitionDuration: 80,
+
+  refreshTransitionDurationVarName: '--spaces-marketplace-refresh-transition-duration',
+
+  //#endregion
 
   //#region state
 
@@ -169,14 +184,42 @@ export default EmberObject.extend(OwnerInjector, {
     }
   }),
 
+  entriesConflictNamesSetter: observer(
+    'entries.@each.name',
+    function entriesConflictNamesSetter() {
+      debounce(this, 'setConflictNames', 100);
+    }
+  ),
+
   init() {
     this._super(...arguments);
+    this.registerCssVariables();
     // infinite loading before entries array is initialized async
     this.set('entriesInitialLoad', promiseObject(new Promise(() => {})));
     this.initEntries();
+  },
 
-    // FIXME: debug code
-    window.viewModel = this;
+  /**
+   * @override
+   */
+  destroy() {
+    this._super(...arguments);
+    this.deregisterCssVariables();
+  },
+
+  registerCssVariables() {
+    globalCssVariablesManager.setVariable(
+      this,
+      this.refreshTransitionDurationVarName,
+      `${this.refreshTransitionDuration}ms`,
+    );
+  },
+
+  deregisterCssVariables() {
+    globalCssVariablesManager.unsetVariable(
+      this,
+      this.refreshTransitionDurationVarName,
+    );
   },
 
   async initEntries() {
@@ -192,11 +235,16 @@ export default EmberObject.extend(OwnerInjector, {
       initialJumpIndex,
     });
     this.set('entries', entries);
-    // FIXME: debug
-    window.entries = entries;
     defineProperty(this, 'entriesInitialLoad', reads('entries.initialLoad'));
     // needed after defineProperty
     this.notifyPropertyChange('entriesInitialLoad');
+  },
+
+  setConflictNames() {
+    const loadedEntries = this.entries.filter(entry => entry?.id);
+    if (!_.isEmpty(loadedEntries)) {
+      addConflictLabels(loadedEntries, 'name', 'spaceId');
+    }
   },
 
   /**
@@ -268,9 +316,7 @@ export default EmberObject.extend(OwnerInjector, {
     // spinner should be rendered before changing fade-in class
     await waitForRender();
     this.set('isRefreshing', true);
-    // FIXME: synchronize with scss / non-local property
-    const fadeTime = 80;
-    await sleep(fadeTime);
+    await sleep(this.refreshTransitionDuration);
     try {
       await this.entries.scheduleReload({ head });
     } finally {
@@ -282,7 +328,14 @@ export default EmberObject.extend(OwnerInjector, {
   },
 });
 
-// FIXME: more jsdoc about this class; names of methods
+/**
+ * When fetch with filtering is performed, it is possible that user changes filtering
+ * options. A fetch function for ReplacingChunksArray is done one time for listing spaces
+ * that should be filtered using these user-defined filters. This class manages repeated
+ * fetches to fulfill filter requirements, because the virtual filtered fetch could need
+ * multiple SpaceManager fetches and in single fetch call it may be required to start
+ * listing from beginning.
+ */
 class FilteredEntriesFetcher {
   /**
    * @param {Utils.SpacesMarketplaceViewModel} viewModel
@@ -379,7 +432,11 @@ class FilteredEntriesFetcher {
   }
 }
 
-// FIXME: jsdoc
+/**
+ * The view supports focusing selected space in the marketplace (eg. via URL). Instance of
+ * this class is an encapsulated state of the selection actions, which is distributed
+ * among various components.
+ */
 class SelectedSpaceInfo {
   constructor(record = null, error = null) {
     this.record = record;

@@ -9,7 +9,7 @@
 
 import Service, { inject as service } from '@ember/service';
 import { get, getProperties } from '@ember/object';
-import { resolve, all as allFulfilled } from 'rsvp';
+import { resolve, all as allFulfilled, allSettled } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import {
@@ -17,9 +17,8 @@ import {
   aspects as spaceAspects,
 } from 'onezone-gui/models/space';
 import {
-  aspect as spaceMarketplaceInfoAspect,
+  generateGri as generateSpaceMarketplaceInfoGri,
 } from 'onezone-gui/models/space-marketplace-info';
-import sleep from 'onedata-gui-common/utils/sleep';
 
 export const listMarketplaceAspect = 'list_marketplace';
 
@@ -31,29 +30,6 @@ export const listMarketplaceAspect = 'list_marketplace';
  * The same properties as in `Models.SpaceMarketplaceInfo` model.
  * @typedef {Object} SpaceMarketplaceRawData
  */
-
-// FIXME: make generic type for infinite scroll
-/**
- * @typedef {Object} SpaceMarketplaceInfiniteScrollListingParams
- * @property {string|null} [index] an anchor where the listing should start.
- * @property {number} [limit] how many log entries should be fetched
- * @property {number} [offset] says where the listing should start relative to
- *   the provided `index`. Default is 0 which means that the
- *   specified log entry will be the first one in the results. When negative
- *   integer is provided, the listing will start before specified log entry.
- *   When it is a positive integer, it will omit that number of entries during
- *   the listing.
- */
-
-// FIXME: maybe move to models/space-marketplace-info
-export function generateSpaceMarketplaceInfoGri(spaceId) {
-  return gri({
-    entityType: 'space',
-    entityId: spaceId,
-    aspect: spaceMarketplaceInfoAspect,
-    scope: 'auto',
-  });
-}
 
 export default Service.extend({
   store: service(),
@@ -108,11 +84,6 @@ export default Service.extend({
       .then(user => {
         return this.get('store').createRecord('space', {
             name,
-            // FIXME: debug code
-            advertisedInMarketplace: true,
-            description: 'deskrypcja',
-            marketplaceContactEmail: 'a@a.pl',
-            organizationName: 'AGH',
             _meta: {
               authHint: ['asUser', get(user, 'entityId')],
             },
@@ -555,16 +526,18 @@ export default Service.extend({
       listingParams,
       tags
     );
-    // FIXME: debug
-    // await sleep(1000);
     const recordsPromises = idsList.map(({ spaceId }) =>
       this.getSpaceMarketplaceInfo(spaceId)
     );
-    // FIXME: think about fetching single spaces failures
-    const array = await allFulfilled(recordsPromises);
+    const promiseStates = await allSettled(recordsPromises);
+    const array = promiseStates
+      .filter(promiseState => promiseState.state === 'fulfilled')
+      .map(promiseState => promiseState.value);
+    // protection for arrays with only failed items
+    const effIsLast = (listingParams.limit && !array.length) ? true : isLast;
     return {
       array,
-      isLast,
+      isLast: effIsLast,
     };
   },
 

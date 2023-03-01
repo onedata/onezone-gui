@@ -7,14 +7,13 @@
  */
 
 import Component from '@ember/component';
-import { observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import addConflictLabels from 'onedata-gui-common/utils/add-conflict-labels';
 import InfiniteScroll from 'onedata-gui-common/utils/infinite-scroll';
-import { and } from 'ember-awesome-macros';
+import { and, sum } from 'ember-awesome-macros';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 import _ from 'lodash';
+import globalCssVariablesManager from 'onedata-gui-common/utils/global-css-variables-manager';
 
 export default Component.extend(I18n, {
   classNames: ['spaces-marketplace-list'],
@@ -31,6 +30,26 @@ export default Component.extend(I18n, {
    */
   viewModel: undefined,
 
+  //#region config
+
+  /**
+   * Spacing between items in px.
+   * @type {number}
+   */
+  itemSpacing: 20,
+
+  itemSpacingVarName: '--spaces-marketplace-item-spacing',
+
+  /**
+   * Height of single item in px.
+   * @type {number}
+   */
+  itemHeight: 300,
+
+  itemHeightVarName: '--spaces-marketplace-item-height',
+
+  //#endregion
+
   //#region state
 
   /**
@@ -40,11 +59,7 @@ export default Component.extend(I18n, {
 
   //#endregion
 
-  // FIXME: synchronize with scss using the service (300 height + 20 margin-top)
-  rowHeight: 320,
-
-  // FIXME: review properties
-  spaceItems: reads('viewModel.spaceItems'),
+  rowHeight: sum('itemHeight', 'itemSpacing'),
 
   entries: reads('viewModel.entries'),
 
@@ -54,17 +69,6 @@ export default Component.extend(I18n, {
    * @type {Array<SpaceTag>}
    */
   tags: reads('viewModel.tagsFilter'),
-
-  // FIXME: to raczej powinno być w modelu
-  entriesObserver: observer(
-    'entries.@each.name',
-    function entriesObserver() {
-      const loadedEntries = this.entries.filter(entry => entry?.id);
-      if (!_.isEmpty(loadedEntries)) {
-        addConflictLabels(loadedEntries, 'name', 'spaceId');
-      }
-    }
-  ),
 
   showFetchPrevLoader: and(
     'entriesInitialLoad.isSettled',
@@ -82,8 +86,32 @@ export default Component.extend(I18n, {
 
   init() {
     this._super(...arguments);
+    this.registerCssVariables();
     this.initInfiniteScroll();
-    this.entriesObserver();
+  },
+
+  registerCssVariables() {
+    globalCssVariablesManager.setVariable(
+      this,
+      this.itemSpacingVarName,
+      `${this.itemSpacing}px`,
+    );
+    globalCssVariablesManager.setVariable(
+      this,
+      this.itemHeightVarName,
+      `${this.itemHeight}px`,
+    );
+  },
+
+  deregisterCssVariables() {
+    globalCssVariablesManager.unsetVariable(
+      this,
+      this.itemSpacingVarName,
+    );
+    globalCssVariablesManager.unsetVariable(
+      this,
+      this.itemHeightVarName,
+    );
   },
 
   /**
@@ -97,11 +125,17 @@ export default Component.extend(I18n, {
     );
     (async () => {
       await this.entriesInitialLoad;
-      // FIXME: experimental wait for current task
-      // await this.viewModel.entries.taskQueue.currentTask?.deferred.promise;
       await waitForRender();
       this.scrollToSelectedSpace();
     })();
+  },
+
+  /**
+   * @override
+   */
+  willDestroyElement() {
+    this._super(...arguments);
+    this.deregisterCssVariables();
   },
 
   initInfiniteScroll() {

@@ -1,5 +1,6 @@
-$spaces-marketplace-items-spacing: 20px;
 $spaces-marketplace-item-secondary-row-icon-size: 150%;
+$fallback-spaces-marketplace-item-spacing: 20px;
+$fallback-spaces-marketplace-item-height: 300px;
 
 .content-spaces-marketplace {
   @media (max-width: $screen-xs-max) {
@@ -16,31 +17,6 @@ $spaces-marketplace-item-secondary-row-icon-size: 150%;
   }
 }
 
-// FIXME: move to separate file
-
-.spaces-marketplace-header {
-  @mixin eat-content-col-padding($padding) {
-    margin-left: -$padding;
-    padding-left: $padding;
-    margin-right: -$padding;
-    padding-right: $padding;
-  }
-
-  position: sticky;
-  z-index: 1;
-  margin-top: -$content-col-padding;
-  padding-top: $content-col-padding;
-  @include eat-content-col-padding($content-col-padding);
-  @media (max-width: $screen-sm-max) {
-    @include eat-content-col-padding($content-col-padding-tablet);
-  }
-  top: -$content-col-padding;
-  background-color: white;
-  padding-bottom: $spaces-marketplace-items-spacing * 0.5;
-
-  @include before-bottom-shadow;
-}
-
 .col-content.on-top {
   .spaces-marketplace-header {
     @include hide-before-shadow;
@@ -53,6 +29,7 @@ $spaces-marketplace-item-secondary-row-icon-size: 150%;
   }
 }
 
+@import './content-spaces-marketplace/header';
 @import './content-spaces-marketplace/filter-header';
 @import './content-spaces-marketplace/list';
 @import './content-spaces-marketplace/item';
