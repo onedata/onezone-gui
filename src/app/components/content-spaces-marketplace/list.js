@@ -14,6 +14,7 @@ import addConflictLabels from 'onedata-gui-common/utils/add-conflict-labels';
 import InfiniteScroll from 'onedata-gui-common/utils/infinite-scroll';
 import { and } from 'ember-awesome-macros';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
+import _ from 'lodash';
 
 export default Component.extend(I18n, {
   classNames: ['spaces-marketplace-list'],
@@ -58,8 +59,9 @@ export default Component.extend(I18n, {
   entriesObserver: observer(
     'entries.@each.name',
     function entriesObserver() {
-      if (this.entries) {
-        addConflictLabels(this.entries, 'name', 'spaceId');
+      const loadedEntries = this.entries.filter(entry => entry?.id);
+      if (!_.isEmpty(loadedEntries)) {
+        addConflictLabels(loadedEntries, 'name', 'spaceId');
       }
     }
   ),

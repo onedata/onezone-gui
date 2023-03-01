@@ -28,10 +28,14 @@
     </li>
   {{/if}}
   {{#each entries key="id" as |spaceItem|}}
-    {{content-spaces-marketplace/item
-      viewModel=viewModel
-      spaceItem=spaceItem
-    }}
+    {{#if (not spaceItem.id)}}
+      {{content-spaces-marketplace/item-placeholder}}
+    {{else}}
+      {{content-spaces-marketplace/item
+        viewModel=viewModel
+        spaceItem=spaceItem
+      }}
+    {{/if}}
   {{/each}}
   {{#if showFetchNextLoader}}
     <li class="special-row loading-row">
