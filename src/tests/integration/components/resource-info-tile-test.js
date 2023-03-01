@@ -24,7 +24,7 @@ describe('Integration | Component | resource-info-tile', function () {
 
     const storeStub = Service.extend({
       findRecord(modelType, id) {
-        if (id === 'user.abc.instance:shared') {
+        if (id === 'user.abc.instance:auto') {
           return resolve(exampleUser);
         }
       },
