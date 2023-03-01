@@ -8,20 +8,23 @@ import EmberObject, { get } from '@ember/object';
 import { resolve } from 'rsvp';
 import { registerService } from '../../helpers/stub-service';
 
-describe('Integration | Component | resource info tile', function () {
+describe('Integration | Component | resource-info-tile', function () {
   setupRenderingTest();
 
   beforeEach(function () {
     const exampleUser = EmberObject.create({
-      name: 'user1',
+      name: 'user1_fullname',
       fullName: 'user1_fullname',
       username: 'user1_username',
       entityId: 'user1_id',
+      constructor: {
+        modelName: 'user',
+      },
     });
 
     const storeStub = Service.extend({
       findRecord(modelType, id) {
-        if (id === 'user.abc.instance:shared') {
+        if (id === 'user.abc.instance:auto') {
           return resolve(exampleUser);
         }
       },
@@ -44,8 +47,8 @@ describe('Integration | Component | resource info tile', function () {
 
     expect(find('.resource-name')).to.contain.text(get(record, 'name'));
     expect(find('.id input')).to.have.value(get(record, 'entityId'));
-    expect(find('.user-with-icon .flippable-front.one-icon')).to.have.class('oneicon-user');
-    expect(find('.user-fullname')).to.contain.text('user1_fullname');
-    expect(find('.user-username')).to.contain.text('user1_username');
+    expect(find('.record-with-icon .flippable-front.one-icon')).to.have.class('oneicon-user');
+    expect(find('.record-name-general')).to.contain.text('user1_fullname');
+    expect(find('.record-username')).to.contain.text('user1_username');
   });
 });

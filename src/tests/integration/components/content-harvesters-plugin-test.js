@@ -16,7 +16,7 @@ function resolvingAjax() {
   return resolve();
 }
 
-describe('Integration | Component | content harvesters plugin', function () {
+describe('Integration | Component | content-harvesters-plugin', function () {
   setupRenderingTest();
 
   beforeEach(function () {

@@ -10,8 +10,7 @@
     display: inline-flex;
   }
 
-  .arguments-field,
-  .results-field {
+  .input-output-data-collection {
     > .field-component > .collapse {
       > .collection-item {
         position: relative;
@@ -76,8 +75,7 @@
   }
 
   @media (max-width: $screen-xs-max) {
-    .arguments-field,
-    .results-field {
+    .input-output-data-collection {
       > .control-label {
         margin-bottom: $form-group-margin-bottom * 0.5;
       }
@@ -90,8 +88,7 @@
       text-align: left;
     }
 
-    .arguments-field,
-    .results-field {
+    .input-output-data-collection {
       flex-wrap: nowrap;
 
       .entry-children {
@@ -129,14 +126,12 @@
         margin-right: $padding-right;
       }
 
-      .arguments-field,
-      .results-field {
+      .input-output-data-collection {
         margin-right: 0;
       }
     }
 
-    .arguments-field,
-    .results-field {
+    .input-output-data-collection {
       .entryName-field {
         flex: 0 1 calc(50% - #{$padding-right * 0.5});
       }

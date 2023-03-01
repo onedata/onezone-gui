@@ -16,7 +16,7 @@ import _ from 'lodash';
 import ModifyAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/modify-atm-workflow-schema-revision-action';
 import { findByText } from '../../../helpers/find';
 
-describe('Integration | Component | content atm inventories workflows/editor view',
+describe('Integration | Component | content-atm-inventories-workflows/editor-view',
   function () {
     setupRenderingTest();
 

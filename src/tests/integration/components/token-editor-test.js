@@ -202,7 +202,7 @@ const regions = [
   { label: 'South America', value: 'SouthAmerica' },
 ];
 
-describe('Integration | Component | token editor', function () {
+describe('Integration | Component | token-editor', function () {
   setupRenderingTest();
 
   beforeEach(function () {

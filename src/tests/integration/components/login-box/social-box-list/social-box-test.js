@@ -6,7 +6,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import { onezoneDefaultRootPath } from 'onedata-gui-common/utils/onedata-urls';
 
-describe('Integration | Component | login box/social box list/social box',
+describe('Integration | Component | login-box/social-box-list/social-box',
   function () {
     setupRenderingTest();
 

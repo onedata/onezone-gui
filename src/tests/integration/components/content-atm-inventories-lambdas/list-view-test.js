@@ -9,7 +9,7 @@ import { resolve } from 'rsvp';
 import sinon from 'sinon';
 import { lookupService } from '../../../helpers/stub-service';
 
-describe('Integration | Component | content atm inventories lambdas/list view',
+describe('Integration | Component | content-atm-inventories-lambdas/list-view',
   function () {
     setupRenderingTest();
 

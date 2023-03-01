@@ -3,7 +3,7 @@ import { describe, it } from 'mocha';
 import oneproviderClusterResourceStats from 'onezone-gui/utils/oneprovider-cluster-resource-stats';
 import { resolve } from 'rsvp';
 
-describe('Unit | Utility | oneprovider cluster resource stats', function () {
+describe('Unit | Utility | oneprovider-cluster-resource-stats', function () {
   it('creates the Oneprovider cluster stats object', function () {
     const cluster = {
       oneproviderEffectiveUsers: resolve({

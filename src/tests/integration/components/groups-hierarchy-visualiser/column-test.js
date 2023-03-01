@@ -13,7 +13,7 @@ import { resolve } from 'rsvp';
 import { createEmptyColumnModel } from 'onezone-gui/utils/groups-hierarchy-visualiser/column';
 
 describe(
-  'Integration | Component | groups hierarchy visualiser/column',
+  'Integration | Component | groups-hierarchy-visualiser/column',
   function () {
     setupRenderingTest();
 

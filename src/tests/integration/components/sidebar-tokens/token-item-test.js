@@ -9,7 +9,7 @@ import Service from '@ember/service';
 import sinon from 'sinon';
 import { setProperties } from '@ember/object';
 
-describe('Integration | Component | sidebar tokens/token item', function () {
+describe('Integration | Component | sidebar-tokens/token-item', function () {
   setupRenderingTest();
 
   beforeEach(function () {

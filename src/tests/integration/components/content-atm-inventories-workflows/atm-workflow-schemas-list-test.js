@@ -68,7 +68,7 @@ function generateAtmWorkflowSchema(name) {
   };
 }
 
-describe('Integration | Component | content atm inventories workflows/atm workflow schemas list',
+describe('Integration | Component | content-atm-inventories-workflows/atm-workflow-schemas-list',
   function () {
     setupRenderingTest();
 

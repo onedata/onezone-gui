@@ -19,7 +19,7 @@ const exampleHarvester = {
   public: true,
 };
 
-describe('Integration | Component | harvester configuration/general', function () {
+describe('Integration | Component | harvester-configuration/general', function () {
   setupRenderingTest();
 
   beforeEach(function () {

@@ -63,22 +63,6 @@ export default {
     arguments: {
       label: 'Arguments',
       addButtonText: 'Add argument',
-      entry: {
-        entryName: {
-          label: 'Name',
-          placeholder: 'Name',
-          errors: {
-            notUnique: 'This field must have a unique value',
-          },
-        },
-        entryIsOptional: {
-          label: 'Optional',
-        },
-        entryDefaultValue: {
-          label: 'Default value',
-          valueCreatorButtonLabel: 'Set default value',
-        },
-      },
     },
     results: {
       label: 'Results',
@@ -95,6 +79,10 @@ export default {
           label: 'Via file',
         },
       },
+    },
+    configParameters: {
+      label: 'Configuration parameters',
+      addButtonText: 'Add parameter',
     },
     resources: Object.assign({}, taskResourcesFields, {
       label: 'Resources',

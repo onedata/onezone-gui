@@ -22,7 +22,7 @@ const revisionActionsClasses = [{
   revisionNumberField: 'revisionNumber',
 }];
 
-describe('Integration | Utility | atm workflow/atm workflow schema/revision actions factory',
+describe('Integration | Utility | atm-workflow/atm-workflow-schema/revision-actions-factory',
   function () {
     setupRenderingTest();
 

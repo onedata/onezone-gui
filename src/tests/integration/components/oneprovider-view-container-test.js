@@ -10,7 +10,7 @@ import sinon from 'sinon';
 import { getStorageOneproviderKey } from 'onezone-gui/mixins/choose-default-oneprovider';
 import { lookupService } from '../../helpers/stub-service';
 
-describe('Integration | Component | oneprovider view container', function () {
+describe('Integration | Component | oneprovider-view-container', function () {
   setupRenderingTest();
 
   context('with single modern Oneprovider', function () {

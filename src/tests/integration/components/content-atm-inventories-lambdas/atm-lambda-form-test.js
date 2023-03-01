@@ -20,7 +20,18 @@ const states = [{
   label: 'Deprecated',
 }];
 
-const argumentAndResultCommonTypes = [
+// Types which does not take any additional parameters and are easy to convert
+// to dataSpec object.
+const testConvenientTypes = [
+  'Number',
+  'Boolean',
+  'String',
+  'Object',
+  'Dataset',
+  'Range',
+];
+
+const resultTypes = [
   'Number',
   'Boolean',
   'String',
@@ -32,22 +43,8 @@ const argumentAndResultCommonTypes = [
   'Time series measurement',
 ];
 
-// Selection of types from `argumentAndResultCommonTypes` which does not take
-// any additional parameters and are ease to convert to dataSpec object.
-const testConvenientTypes = [
-  'Number',
-  'Boolean',
-  'String',
-  'Object',
-  'Dataset',
-  'Range',
-];
-
-const argumentTypes = argumentAndResultCommonTypes;
-const resultTypes = argumentAndResultCommonTypes;
-
 describe(
-  'Integration | Component | content atm inventories lambdas/atm lambda form',
+  'Integration | Component | content-atm-inventories-lambdas/atm-lambda-form',
   function () {
     setupRenderingTest();
 
@@ -66,23 +63,21 @@ describe(
       });
     });
 
-    it('has class "atm-lambda-form"', async function (done) {
+    it('has class "atm-lambda-form"', async function () {
       await render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form}}`);
 
       expect(this.element.children).to.have.length(1);
       expect(this.element.children[0]).to.have.class('atm-lambda-form');
-      done();
     });
 
     context('in "create" mode', function () {
-      it('has class "mode-create"', async function (done) {
+      it('has class "mode-create"', async function () {
         await renderCreate(this);
 
         expect(find('.atm-lambda-form')).to.have.class('mode-create');
-        done();
       });
 
-      it('renders empty "name" field', async function (done) {
+      it('renders empty "name" field', async function () {
         await renderCreate(this);
 
         const label = find('.name-field .control-label');
@@ -90,39 +85,35 @@ describe(
         expect(label).to.have.trimmed.text('Name:');
         expect(field).to.have.attr('type', 'text');
         expect(field).to.have.value('');
-        done();
       });
 
-      it('marks "name" field as invalid when it is empty', async function (done) {
+      it('marks "name" field as invalid when it is empty', async function () {
         await renderCreate(this);
 
         await focus('.name-field .form-control');
         await blur('.name-field .form-control');
 
         expect(find('.name-field')).to.have.class('has-error');
-        done();
       });
 
-      it('marks "name" field as valid when it is not empty', async function (done) {
+      it('marks "name" field as valid when it is not empty', async function () {
         await renderCreate(this);
 
         await fillIn('.name-field .form-control', 'somename');
 
         expect(find('.name-field')).to.have.class('has-success');
-        done();
       });
 
-      it('renders "state" field with preselected "draft" option', async function (done) {
+      it('renders "state" field with preselected "draft" option', async function () {
         await renderCreate(this);
 
         const label = find('.state-field .control-label');
         const field = find('.state-field .dropdown-field-trigger');
         expect(label).to.have.trimmed.text('State:');
         expect(field).to.have.trimmed.text('Draft');
-        done();
       });
 
-      it('allows to choose different state for "state" field', async function (done) {
+      it('allows to choose different state for "state" field', async function () {
         await renderCreate(this);
 
         await clickTrigger('.state-field');
@@ -132,10 +123,9 @@ describe(
         states.forEach(({ label }, idx) =>
           expect(options[idx]).to.have.trimmed.text(label)
         );
-        done();
       });
 
-      it('renders empty "summary" field', async function (done) {
+      it('renders empty "summary" field', async function () {
         await renderCreate(this);
 
         const label = find('.summary-field .control-label');
@@ -143,31 +133,28 @@ describe(
         expect(label).to.have.trimmed.text('Summary (optional):');
         expect(field).to.have.attr('type', 'text');
         expect(field).to.have.value('');
-        done();
       });
 
-      it('marks "summary" field as valid when it is empty', async function (done) {
+      it('marks "summary" field as valid when it is empty', async function () {
         await renderCreate(this);
 
         await focus('.summary-field .form-control');
         await blur('.summary-field .form-control');
 
         expect(find('.summary-field')).to.have.class('has-success');
-        done();
       });
 
       it('renders "engine" field with preselected "openfaas" option',
-        async function (done) {
+        async function () {
           await renderCreate(this);
 
           const label = find('.engine-field .control-label');
           const field = find('.engine-field .dropdown-field-trigger');
           expect(label).to.have.trimmed.text('Engine:');
           expect(field).to.have.trimmed.text('OpenFaaS');
-          done();
         });
 
-      it('provides only "openfass" option for "engine" field', async function (done) {
+      it('provides only "openfass" option for "engine" field', async function () {
         await renderCreate(this);
 
         await clickTrigger('.engine-field');
@@ -175,19 +162,17 @@ describe(
         const options = document.querySelectorAll('.ember-power-select-option');
         expect(options).to.have.length(1);
         expect(options[0]).to.have.trimmed.text('OpenFaaS');
-        done();
       });
 
       context('when selected engine is "openfaas"', function () {
-        it('shows only openfaas-related fields', async function (done) {
+        it('shows only openfaas-related fields', async function () {
           await renderCreate(this);
 
           expect(find('.openfaasOptions-collapse')).to.have.class('in');
           expect(find('.onedataFunctionOptions-collapse')).to.not.exist;
-          done();
         });
 
-        it('renders empty "docker image" field', async function (done) {
+        it('renders empty "docker image" field', async function () {
           await renderCreate(this);
 
           const label = find('.dockerImage-field .control-label');
@@ -195,63 +180,57 @@ describe(
           expect(label).to.have.trimmed.text('Docker image:');
           expect(field).to.have.attr('type', 'text');
           expect(field).to.have.value('');
-          done();
         });
 
         it('marks "docker image" field as invalid when it is empty',
-          async function (done) {
+          async function () {
             await renderCreate(this);
 
             await focus('.dockerImage-field .form-control');
             await blur('.dockerImage-field .form-control');
 
             expect(find('.dockerImage-field')).to.have.class('has-error');
-            done();
           });
 
         it('marks "docker image" field as valid when it is not empty',
-          async function (done) {
+          async function () {
             await renderCreate(this);
 
             await fillIn('.dockerImage-field .form-control', 'somename');
 
             expect(find('.dockerImage-field')).to.have.class('has-success');
-            done();
           });
 
-        it('renders checked "readonly" toggle', async function (done) {
+        it('renders checked "readonly" toggle', async function () {
           await renderCreate(this);
 
           const label = find('.readonly-field .control-label');
           const field = find('.readonly-field .form-control');
           expect(label).to.have.trimmed.text('Read-only:');
           expect(field).to.have.class('checked');
-          done();
         });
 
-        it('renders checked "mount space" toggle', async function (done) {
+        it('renders checked "mount space" toggle', async function () {
           await renderCreate(this);
 
           const label = find('.mountSpace-field .control-label');
           const field = find('.mountSpace-field .form-control');
           expect(label).to.have.trimmed.text('Mount space:');
           expect(field).to.have.class('checked');
-          done();
         });
 
         context('when "mount space" is checked', function () {
           it('renders expanded mount space options',
-            async function (done) {
+            async function () {
               await renderCreate(this);
 
               await toggleMountSpace(true);
 
               expect(find('.mountSpaceOptions-collapse')).to.have.class('in');
-              done();
             });
 
           it('renders "mount point" field with "/mnt/onedata" as a default value',
-            async function (done) {
+            async function () {
               await renderCreate(this);
               await toggleMountSpace(true);
 
@@ -261,21 +240,19 @@ describe(
               expect(label).to.have.trimmed.text('Mount point:');
               expect(field).to.have.attr('type', 'text');
               expect(field).to.have.value('/mnt/onedata');
-              done();
             });
 
           it('marks "mount point" field as invalid when it is empty',
-            async function (done) {
+            async function () {
               await renderCreate(this);
               await toggleMountSpace(true);
 
               await fillIn('.mountPoint-field .form-control', '');
 
               expect(find('.mountPoint-field')).to.have.class('has-error');
-              done();
             });
 
-          it('renders empty "oneclient options" field', async function (done) {
+          it('renders empty "oneclient options" field', async function () {
             await renderCreate(this);
             await toggleMountSpace(true);
 
@@ -287,35 +264,43 @@ describe(
             expect(label).to.have.trimmed.text('Oneclient options:');
             expect(field).to.have.attr('type', 'text');
             expect(field).to.have.value('');
-            done();
           });
 
           it('marks "oneclient options" field as valid when it is empty',
-            async function (done) {
+            async function () {
               await renderCreate(this);
 
               await focus('.oneclientOptions-field .form-control');
               await blur('.oneclientOptions-field .form-control');
 
               expect(find('.oneclientOptions-field')).to.have.class('has-success');
-              done();
             });
         });
 
         context('when "mount space" is unchecked', function () {
           it('renders collapsed mount space options',
-            async function (done) {
+            async function () {
               await renderCreate(this);
 
               await toggleMountSpace(false);
 
               expect(find('.mountSpaceOptions-collapse')).to.not.have.class('in');
-              done();
             });
         });
       });
 
-      it('renders "arguments" field with no argument defined', async function (done) {
+      it('renders "config parameters" field with no params defined', async function () {
+        await renderCreate(this);
+
+        const label = find('.configParameters-field .control-label');
+        const entries = findAll('.configParameters-field .entry-field');
+        const addBtn = find('.configParameters-field .add-field-button');
+        expect(label).to.have.trimmed.text('Configuration parameters:');
+        expect(entries).to.have.length(0);
+        expect(addBtn).to.have.trimmed.text('Add parameter');
+      });
+
+      it('renders "arguments" field with no argument defined', async function () {
         await renderCreate(this);
 
         const label = find('.arguments-field .control-label');
@@ -324,117 +309,9 @@ describe(
         expect(label).to.have.trimmed.text('Arguments:');
         expect(entries).to.have.length(0);
         expect(addBtn).to.have.trimmed.text('Add argument');
-        done();
       });
 
-      it('allows to add new, empty argument', async function (done) {
-        await renderCreate(this);
-
-        await addArgument();
-
-        const entries = findAll('.arguments-field .entry-field');
-        expect(entries).to.have.length(1);
-        const entry = entries[0];
-
-        const entryNameField = entry.querySelector('.entryName-field .form-control');
-        expect(entryNameField).to.have.attr('type', 'text');
-        expect(entryNameField).to.have.attr('placeholder', 'Name');
-        expect(entryNameField).to.have.value('');
-
-        const entryTypeField = entry.querySelector('.data-spec-editor');
-        expect(entryTypeField).to.have.trimmed.text('Select type...');
-
-        const entryIsOptionalLabel =
-          entry.querySelector('.entryIsOptional-field .control-label');
-        const entryIsOptionalField =
-          entry.querySelector('.entryIsOptional-field .form-control');
-        expect(entryIsOptionalLabel).to.have.trimmed.text('Optional');
-        expect(entryIsOptionalField).to.not.have.class('checked');
-
-        const entryDefaultValueLabel =
-          entry.querySelector('.entryDefaultValue-field .control-label');
-        const entryDefaultValueField =
-          entry.querySelector('.entryDefaultValue-field');
-        expect(entryDefaultValueLabel).to.have.trimmed.text('Default value:');
-        expect(entryDefaultValueField).to.contain('.create-value-btn');
-        done();
-      });
-
-      it('marks "argument name" field as invalid when it is empty',
-        async function (done) {
-          await renderCreate(this);
-          await addArgument();
-
-          await focus('.entryName-field .form-control');
-          await blur('.entryName-field .form-control');
-
-          expect(find('.entryName-field')).to.have.class('has-error');
-          done();
-        });
-
-      it('marks "argument name" field as valid when it is not empty',
-        async function (done) {
-          await renderCreate(this);
-          await addArgument();
-
-          await fillIn('.entryName-field .form-control', 'somename');
-
-          expect(find('.entryName-field')).to.have.class('has-success');
-          done();
-        });
-
-      it('marks "argument name" field as invalid when there are two arguments with the same name',
-        async function (done) {
-          await renderCreate(this);
-          await addArgument();
-          await addArgument();
-
-          const nthArgSelector = i => `.arguments-field .collection-item:nth-child(${i + 1})`;
-          await fillIn(`${nthArgSelector(0)} .entryName-field .form-control`, 'somename');
-          await fillIn(`${nthArgSelector(1)} .entryName-field .form-control`, 'somename');
-
-          const fieldMessages = findAll('.arguments-field .collection-item .field-message');
-          expect(fieldMessages).to.have.length(2);
-          [0, 1].forEach(i =>
-            expect(fieldMessages[i])
-            .to.have.trimmed.text('This field must have a unique value')
-          );
-          expect(findAll('.entryName-field.has-error')).to.have.length(2);
-          done();
-        });
-
-      it('provides argument types options for "argument type" field',
-        async function (done) {
-          await renderCreate(this);
-          await addArgument();
-
-          await clickTrigger('.data-spec-editor');
-
-          const options = document.querySelectorAll('.ember-power-select-option');
-          expect(options).to.have.length(argumentTypes.length);
-          argumentTypes.forEach((type, i) =>
-            expect(options[i]).to.have.trimmed.text(type)
-          );
-          done();
-        });
-
-      it('provides argument types options in array for "argument type" field',
-        async function (done) {
-          await renderCreate(this);
-          await addArgument();
-
-          await selectChoose('.data-spec-editor', 'Array');
-          await clickTrigger('.data-spec-editor');
-
-          const options = document.querySelectorAll('.ember-power-select-option');
-          expect(options).to.have.length(argumentTypes.length);
-          argumentTypes.forEach((type, i) =>
-            expect(options[i]).to.have.trimmed.text(type)
-          );
-          done();
-        });
-
-      it('renders "results" field with no result defined', async function (done) {
+      it('renders "results" field with no result defined', async function () {
         await renderCreate(this);
 
         const label = find('.results-field .control-label');
@@ -443,10 +320,9 @@ describe(
         expect(label).to.have.trimmed.text('Results:');
         expect(entries).to.have.length(0);
         expect(addBtn).to.have.trimmed.text('Add result');
-        done();
       });
 
-      it('allows to add new, empty result', async function (done) {
+      it('allows to add new, empty result', async function () {
         await renderCreate(this);
 
         await addResult();
@@ -462,10 +338,9 @@ describe(
 
         const entryTypeField = entry.querySelector('.data-spec-editor');
         expect(entryTypeField).to.have.trimmed.text('Select type...');
-        done();
       });
 
-      it('marks "result name" field as invalid when it is empty', async function (done) {
+      it('marks "result name" field as invalid when it is empty', async function () {
         await renderCreate(this);
         await addResult();
 
@@ -473,34 +348,31 @@ describe(
         await blur('.entryName-field .form-control');
 
         expect(find('.entryName-field')).to.have.class('has-error');
-        done();
       });
 
       it('marks "result name" field as invalid when it contains reserved name "exception"',
-        async function (done) {
+        async function () {
           await renderCreate(this);
           await addResult();
 
           await fillIn('.entryName-field .form-control', 'exception');
 
           expect(find('.entryName-field')).to.have.class('has-error');
-          done();
         }
       );
 
       it('marks "result name" field as valid when it is not empty',
-        async function (done) {
+        async function () {
           await renderCreate(this);
           await addResult();
 
           await fillIn('.entryName-field .form-control', 'somename');
 
           expect(find('.entryName-field')).to.have.class('has-success');
-          done();
         });
 
       it('marks "result name" field as invalid when there are two results with the same name',
-        async function (done) {
+        async function () {
           await renderCreate(this);
           await addResult();
           await addResult();
@@ -516,10 +388,9 @@ describe(
             .to.have.trimmed.text('This field must have a unique value')
           );
           expect(findAll('.entryName-field.has-error')).to.have.length(2);
-          done();
         });
 
-      it('provides result types options for "result type" field', async function (done) {
+      it('provides result types options for "result type" field', async function () {
         await renderCreate(this);
         await addResult();
 
@@ -530,11 +401,10 @@ describe(
         resultTypes.forEach((type, i) =>
           expect(options[i]).to.have.trimmed.text(type)
         );
-        done();
       });
 
       it('renders "resources" section with cpu, memory and storage fields groups',
-        async function (done) {
+        async function () {
           await renderCreate(this);
 
           const resourcesSection = find('.resources-field');
@@ -565,10 +435,9 @@ describe(
             expect(limitField.querySelector('.ember-power-select-trigger'))
               .to.contain.text(limit[1]);
           });
-          done();
         });
 
-      it('creates simple lambda on submit button click', async function (done) {
+      it('creates simple lambda on submit button click', async function () {
         await renderCreate(this);
 
         const revision = await fillWithMinimumData();
@@ -576,20 +445,18 @@ describe(
 
         expect(this.get('submitStub')).to.be.calledOnce
           .and.to.be.calledWith(revision);
-        done();
       });
 
-      it('resets form on successfull submission', async function (done) {
+      it('resets form on successfull submission', async function () {
         await renderCreate(this);
 
         await fillWithMinimumData();
         await click('.btn-submit');
 
         expect(find('.name-field .form-control')).to.have.value('');
-        done();
       });
 
-      it('does not reset form on failed submission', async function (done) {
+      it('does not reset form on failed submission', async function () {
         await renderCreate(this);
         let rejectSubmit;
         this.get('submitStub').returns(
@@ -602,10 +469,9 @@ describe(
         await settled();
 
         expect(find('.name-field .form-control')).to.not.have.value('');
-        done();
       });
 
-      it('creates complex lambda on submit button click', async function (done) {
+      it('creates complex lambda on submit button click', async function () {
         await renderCreate(this);
 
         await fillIn('.name-field .form-control', 'myname');
@@ -615,6 +481,19 @@ describe(
         await fillIn('.preferredBatchSize-field .form-control', '250');
 
         for (let i = 0; i < 2; i++) {
+          await addParameter();
+          const nthParamSelector = `.configParameters-field .collection-item:nth-child(${i + 1})`;
+          await fillIn(`${nthParamSelector} .entryName-field .form-control`, `param${i}`);
+          await selectChoose(
+            `${nthParamSelector} .data-spec-editor`,
+            testConvenientTypes[i]
+          );
+          if (i === 0) {
+            await click(`${nthParamSelector} .entryIsOptional-field .form-control`);
+            await click(`${nthParamSelector} .entryDefaultValue-field .create-value-btn`);
+            await fillIn(`${nthParamSelector} .entryDefaultValue-field .form-control`, '20');
+          }
+
           await addArgument();
           const nthArgSelector = `.arguments-field .collection-item:nth-child(${i + 1})`;
           await fillIn(`${nthArgSelector} .entryName-field .form-control`, `arg${i}`);
@@ -688,7 +567,21 @@ describe(
             },
             relayMethod: 'returnValue',
           })),
-          configParameterSpecs: [],
+          configParameterSpecs: testConvenientTypes.slice(0, 2)
+            .map((type, idx) => {
+              const param = {
+                name: `param${idx}`,
+                dataSpec: {
+                  // It's very oversimplified to infer dataSpec from it's translation
+                  // but it's good enough for test purposes.
+                  type: type.toLowerCase(),
+                  valueConstraints: {},
+                },
+                isOptional: idx === 0,
+                defaultValue: idx === 0 ? 20 : null,
+              };
+              return param;
+            }),
           resourceSpec: {
             cpuRequested: 2,
             cpuLimit: 3,
@@ -698,12 +591,11 @@ describe(
             ephemeralStorageLimit: 10 * 1024 * 1024,
           },
         });
-        done();
       });
 
       states.forEach(({ value, label }) => {
         it(`creates lambda in "${label}" state on submit button click`,
-          async function (done) {
+          async function () {
             await renderCreate(this);
 
             const revision = await fillWithMinimumData();
@@ -714,12 +606,11 @@ describe(
               .and.to.be.calledWith(Object.assign(revision, {
                 state: value,
               }));
-            done();
           });
       });
 
       it('creates lambda result "via file" on submit button click',
-        async function (done) {
+        async function () {
           await renderCreate(this);
 
           const revision = await fillWithMinimumData();
@@ -741,20 +632,18 @@ describe(
                 relayMethod: 'filePipe',
               }],
             }));
-          done();
         });
 
-      it('disables sumbit button when one of fields is invalid', async function (done) {
+      it('disables sumbit button when one of fields is invalid', async function () {
         await renderCreate(this);
 
         await fillWithMinimumData();
         await fillIn('.name-field .form-control', '');
 
         expect(find('.btn-submit')).to.have.attr('disabled');
-        done();
       });
 
-      it('disables sumbit button when submission is pending', async function (done) {
+      it('disables sumbit button when submission is pending', async function () {
         await renderCreate(this);
         this.set('submitStub', sinon.stub().returns(new Promise(() => {})));
 
@@ -762,11 +651,10 @@ describe(
         await click('.btn-submit');
 
         expect(find('.btn-submit')).to.have.attr('disabled');
-        done();
       });
 
       it('fills form fields with initial data taken from "revision"',
-        async function (done) {
+        async function () {
           this.set('revision', {
             name: 'myname',
             state: 'stable',
@@ -823,27 +711,24 @@ describe(
           expect(find('.mountSpace-field .form-control')).to.have.class('checked');
           expect(find('.mountPoint-field .form-control')).to.have.value('/some/path');
           expect(find('.oneclientOptions-field .form-control')).to.have.value('oc-options');
-          done();
         });
     });
 
     context('in "view" mode', function () {
-      it('has class "mode-view"', async function (done) {
+      it('has class "mode-view"', async function () {
         await renderView();
 
         expect(find('.atm-lambda-form')).to.have.class('mode-view');
-        done();
       });
 
-      it('does not show submit button', async function (done) {
+      it('does not show submit button', async function () {
         await renderView();
 
         expect(find('.btn-submit')).to.not.exist;
-        done();
       });
 
       it('shows simple openfaas lambda with minimal resources spec',
-        async function (done) {
+        async function () {
           this.set('revision', {
             name: 'myname',
             state: 'draft',
@@ -893,11 +778,10 @@ describe(
           expect(
             find('.ephemeralStorageLimit-field .form-control')
           ).to.have.value('');
-          done();
         });
 
       it('shows simple onedata function lambda with full resources spec',
-        async function (done) {
+        async function () {
           this.set('revision', {
             name: 'myname',
             state: 'draft',
@@ -934,11 +818,10 @@ describe(
           expect(find('.memoryLimit-field .form-control')).to.have.value('256');
           expect(find('.ephemeralStorageRequested-field .form-control')).to.have.value('1');
           expect(find('.ephemeralStorageLimit-field .form-control')).to.have.value('10');
-          done();
         });
 
       it('shows mount space options when passed lambda has "mount space" enabled',
-        async function (done) {
+        async function () {
           this.set('revision', {
             operationSpec: {
               engine: 'openfaas',
@@ -957,10 +840,51 @@ describe(
           expect(find('.mountPoint-field .form-control')).to.have.value('/some/path');
           expect(find('.oneclientOptions-field .form-control'))
             .to.have.value('oc-options');
-          done();
         });
 
-      it('shows arguments of passed lambda', async function (done) {
+      it('shows parameters of passed lambda', async function () {
+        const parameterTypesToCheck = testConvenientTypes.slice(0, 2);
+        this.set('revision', {
+          operationSpec: {
+            engine: 'openfaas',
+          },
+          configParameterSpecs: parameterTypesToCheck.map((type, idx) => ({
+            name: `entry${idx}`,
+            dataSpec: {
+              type: type.toLocaleLowerCase(),
+              valueConstraints: {},
+            },
+            isOptional: idx === 0,
+            defaultValue: idx === 0 ? 10 : null,
+          })),
+        });
+
+        await renderView();
+
+        expect(find('.field-enabled')).to.not.exist;
+        const entries = findAll('.configParameters-field .entry-field');
+        expect(entries).to.have.length(parameterTypesToCheck.length);
+        parameterTypesToCheck.forEach((type, idx) => {
+          const entry = entries[idx];
+          expect(entry.querySelector('.entryName-field .form-control'))
+            .to.have.value(`entry${idx}`);
+          expect(entry.querySelector('.data-spec-editor'))
+            .to.have.trimmed.text(type);
+          const optionalToggle =
+            entry.querySelector('.entryIsOptional-field .form-control');
+          const defaultValueField =
+            entry.querySelector('.entryDefaultValue-field');
+          if (idx === 0) {
+            expect(optionalToggle).to.have.class('checked');
+            expect(defaultValueField.querySelector('input')).to.have.value('10');
+          } else {
+            expect(optionalToggle).to.not.have.class('checked');
+            expect(defaultValueField.querySelector('input')).to.not.exist;
+          }
+        });
+      });
+
+      it('shows arguments of passed lambda', async function () {
         const argumentTypesToCheck = testConvenientTypes.slice(0, 2);
         this.set('revision', {
           operationSpec: {
@@ -1000,10 +924,9 @@ describe(
             expect(defaultValueField.querySelector('input')).to.not.exist;
           }
         });
-        done();
       });
 
-      it('shows results of passed lambda', async function (done) {
+      it('shows results of passed lambda', async function () {
         const resultTypesToCheck = testConvenientTypes.slice(0, 2);
         this.set('revision', {
           operationSpec: {
@@ -1040,7 +963,6 @@ describe(
             expect(isViaFileToggle).to.not.have.class('checked');
           }
         });
-        done();
       });
     });
 
@@ -1053,14 +975,13 @@ describe(
         });
       });
 
-      it('has class "mode-edit"', async function (done) {
+      it('has class "mode-edit"', async function () {
         await renderEdit(this);
 
         expect(find('.atm-lambda-form')).to.have.class('mode-edit');
-        done();
       });
 
-      it('renders two buttons - save and cancel', async function (done) {
+      it('renders two buttons - save and cancel', async function () {
         await renderEdit(this);
 
         const saveBtn = find('.btn-submit');
@@ -1069,11 +990,10 @@ describe(
         expect(saveBtn).to.have.trimmed.text('Save');
         expect(cancelBtn).to.exist;
         expect(cancelBtn).to.have.trimmed.text('Cancel');
-        done();
       });
 
       it('shows lambda values and only one field enabled - state',
-        async function (done) {
+        async function () {
           this.set('revision', {
             name: 'myname',
             state: 'stable',
@@ -1100,6 +1020,12 @@ describe(
               name: 'res',
               dataSpec: { type: 'number' },
             }],
+            configParameterSpecs: [{
+              name: 'param',
+              dataSpec: { type: 'string' },
+              isOptional: false,
+              defaultValue: 'defaultParam',
+            }],
           });
 
           await renderEdit(this);
@@ -1115,6 +1041,15 @@ describe(
           expect(find('.engine-field .field-component')).to.have.trimmed.text('OpenFaaS');
           expect(find('.dockerImage-field .form-control')).to.to.have.value('myimage');
           expect(find('.preferredBatchSize-field .form-control')).to.have.value('150');
+          const parameter = find('.configParameters-field .entry-field');
+          expect(parameter.querySelector('.entryName-field .form-control'))
+            .to.have.value('param');
+          expect(parameter.querySelector('.data-spec-editor'))
+            .to.have.trimmed.text('String');
+          expect(parameter.querySelector('.entryIsOptional-field .form-control'))
+            .to.not.have.class('checked');
+          expect(parameter.querySelector('.entryDefaultValue-field .form-control'))
+            .to.have.value('defaultParam');
           const argument = find('.arguments-field .entry-field');
           expect(argument.querySelector('.entryName-field .form-control'))
             .to.have.value('arg');
@@ -1134,11 +1069,10 @@ describe(
           expect(find('.mountPoint-field .form-control')).to.have.value('/some/path');
           expect(find('.oneclientOptions-field .form-control'))
             .to.have.value('oc-options');
-          done();
         });
 
       it('modifies lambda on submit button click (all enabled fields modified)',
-        async function (done) {
+        async function () {
           await renderEdit(this);
 
           await selectChoose('.state-field', 'Stable');
@@ -1146,31 +1080,28 @@ describe(
 
           expect(this.get('submitStub')).to.be.calledOnce
             .and.to.be.calledWith({ state: 'stable' });
-          done();
         });
 
       it('modifies lambda on submit button click (no fields modified)',
-        async function (done) {
+        async function () {
           await renderEdit(this);
 
           await click('.btn-submit');
 
           expect(this.get('submitStub')).to.be.calledOnce
             .and.to.be.calledWith({});
-          done();
         });
 
-      it('calls onCancel on "cancel" click', async function (done) {
+      it('calls onCancel on "cancel" click', async function () {
         await renderEdit(this);
 
         await click('.btn-cancel');
 
         expect(this.get('cancelSpy')).to.be.calledOnce;
-        done();
       });
 
       it('disables sumbit and cancel buttons when submission is pending',
-        async function (done) {
+        async function () {
           await renderEdit(this);
           this.set('submitStub', sinon.stub().returns(new Promise(() => {})));
 
@@ -1178,7 +1109,6 @@ describe(
 
           expect(find('.btn-submit')).to.have.attr('disabled');
           expect(find('.btn-cancel')).to.have.attr('disabled');
-          done();
         });
     });
   }
@@ -1219,6 +1149,10 @@ async function toggleMountSpace(toggleChecked) {
   if (mountToggle.matches('.checked') !== toggleChecked) {
     await click(mountToggle);
   }
+}
+
+async function addParameter() {
+  await click('.configParameters-field .add-field-button');
 }
 
 async function addArgument() {
