@@ -496,7 +496,8 @@ function createSpacesRecords(store) {
       currentUserEffPrivileges: spacePrivilegesFlags,
       directMembership: true,
       info: {
-        creatorType: 'root',
+        creatorType: 'user',
+        creatorId: USER_ID,
         creationTime: 1540995468,
         sharedDirectories: 0,
       },
