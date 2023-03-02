@@ -54,9 +54,7 @@ export default Component.extend(I18n, {
           className: 'refresh-advertised-spaces-list',
           icon: 'refresh',
           onExecute: async () => {
-            const result = ActionResult.create();
-            await result.interceptPromise(this.viewModel.refreshList());
-            return result;
+            return await this.viewModel.refreshList();
           },
         });
     }
