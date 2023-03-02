@@ -9,6 +9,19 @@
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import SpacesMarketplaceViewModel from 'onezone-gui/utils/spaces-marketplace-view-model';
+import globalCssVariablesManager from 'onedata-gui-common/utils/global-css-variables-manager';
+
+/**
+ * Spacing between items in px.
+ * @type {number}
+ */
+export const itemSpacing = 20;
+
+globalCssVariablesManager.setVariable(
+  'components/content-spaces-marketplace/list',
+  '--spaces-marketplace-item-spacing',
+  `${itemSpacing}px`,
+);
 
 export default Component.extend({
   classNames: ['content-spaces-marketplace'],

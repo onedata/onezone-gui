@@ -10,9 +10,24 @@ import Component from '@ember/component';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import InfiniteScroll from 'onedata-gui-common/utils/infinite-scroll';
-import { and, sum } from 'ember-awesome-macros';
+import { and } from 'ember-awesome-macros';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 import globalCssVariablesManager from 'onedata-gui-common/utils/global-css-variables-manager';
+import { itemSpacing } from 'onezone-gui/components/content-spaces-marketplace';
+
+/**
+ * Height of single item in px.
+ * @type {number}
+ */
+export const itemHeight = 300;
+
+export const rowHeight = itemHeight + itemSpacing;
+
+globalCssVariablesManager.setVariable(
+  'components/content-spaces-marketplace/list',
+  '--spaces-marketplace-item-height',
+  `${itemHeight}px`,
+);
 
 export default Component.extend(I18n, {
   classNames: ['spaces-marketplace-list'],
@@ -29,26 +44,6 @@ export default Component.extend(I18n, {
    */
   viewModel: undefined,
 
-  //#region config
-
-  /**
-   * Spacing between items in px.
-   * @type {number}
-   */
-  itemSpacing: 20,
-
-  itemSpacingVarName: '--spaces-marketplace-item-spacing',
-
-  /**
-   * Height of single item in px.
-   * @type {number}
-   */
-  itemHeight: 300,
-
-  itemHeightVarName: '--spaces-marketplace-item-height',
-
-  //#endregion
-
   //#region state
 
   /**
@@ -57,8 +52,6 @@ export default Component.extend(I18n, {
   infiniteScroll: undefined,
 
   //#endregion
-
-  rowHeight: sum('itemHeight', 'itemSpacing'),
 
   entries: reads('viewModel.entries'),
 
@@ -85,32 +78,7 @@ export default Component.extend(I18n, {
 
   init() {
     this._super(...arguments);
-    this.registerCssVariables();
     this.initInfiniteScroll();
-  },
-
-  registerCssVariables() {
-    globalCssVariablesManager.setVariable(
-      this,
-      this.itemSpacingVarName,
-      `${this.itemSpacing}px`,
-    );
-    globalCssVariablesManager.setVariable(
-      this,
-      this.itemHeightVarName,
-      `${this.itemHeight}px`,
-    );
-  },
-
-  deregisterCssVariables() {
-    globalCssVariablesManager.unsetVariable(
-      this,
-      this.itemSpacingVarName,
-    );
-    globalCssVariablesManager.unsetVariable(
-      this,
-      this.itemHeightVarName,
-    );
   },
 
   /**
@@ -118,23 +86,12 @@ export default Component.extend(I18n, {
    */
   didInsertElement() {
     this._super(...arguments);
-    this.infiniteScroll.mount(
-      this.element.querySelector('.list-entries'),
-      this.element.closest('.ps')
-    );
+    this.infiniteScroll.mount(this.element.querySelector('.list-entries'));
     (async () => {
       await this.entriesInitialLoad;
       await waitForRender();
       this.scrollToSelectedSpace();
     })();
-  },
-
-  /**
-   * @override
-   */
-  willDestroyElement() {
-    this._super(...arguments);
-    this.deregisterCssVariables();
   },
 
   initInfiniteScroll() {
@@ -143,7 +100,7 @@ export default Component.extend(I18n, {
     }
     const infiniteScroll = InfiniteScroll.create({
       entries: this.entries,
-      singleRowHeight: this.rowHeight,
+      singleRowHeight: rowHeight,
     });
     this.set('infiniteScroll', infiniteScroll);
   },

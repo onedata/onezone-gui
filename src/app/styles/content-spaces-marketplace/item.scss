@@ -219,9 +219,10 @@
 }
 
 .iconified-block-marketplace-transitionable {
+  $fallback-attention-transition-time: 2s;
   @mixin transition($properties) {
     transition-property: $properties;
-    transition-duration: var(--spaces-marketplace-item-attention-transition-time, 2s);
+    transition-duration: var(--spaces-marketplace-item-attention-transition-time, $fallback-attention-transition-time);
     transition-timing-function: ease-out;
   }
   @include transition(border);

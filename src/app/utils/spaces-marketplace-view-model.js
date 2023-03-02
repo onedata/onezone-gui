@@ -25,6 +25,18 @@ import addConflictLabels from 'onedata-gui-common/utils/add-conflict-labels';
 import { debounce } from '@ember/runloop';
 import globalCssVariablesManager from 'onedata-gui-common/utils/global-css-variables-manager';
 
+/**
+ * Time in ms.
+ * @type {number}
+ */
+export const refreshTransitionDuration = 80;
+
+globalCssVariablesManager.setVariable(
+  'utils/spaces-marketplace-view-model',
+  '--spaces-marketplace-refresh-transition-duration',
+  `${refreshTransitionDuration}ms`,
+);
+
 export default EmberObject.extend(OwnerInjector, {
   spaceManager: service(),
   currentUser: service(),
@@ -35,18 +47,6 @@ export default EmberObject.extend(OwnerInjector, {
    * @type {string|null}
    */
   selectedSpaceId: null,
-
-  //#region config
-
-  /**
-   * Time in ms.
-   * @type {number}
-   */
-  refreshTransitionDuration: 80,
-
-  refreshTransitionDurationVarName: '--spaces-marketplace-refresh-transition-duration',
-
-  //#endregion
 
   //#region state
 
@@ -183,33 +183,9 @@ export default EmberObject.extend(OwnerInjector, {
 
   init() {
     this._super(...arguments);
-    this.registerCssVariables();
     // infinite loading before entries array is initialized async
     this.set('entriesInitialLoad', promiseObject(new Promise(() => {})));
     this.initEntries();
-  },
-
-  /**
-   * @override
-   */
-  destroy() {
-    this._super(...arguments);
-    this.deregisterCssVariables();
-  },
-
-  registerCssVariables() {
-    globalCssVariablesManager.setVariable(
-      this,
-      this.refreshTransitionDurationVarName,
-      `${this.refreshTransitionDuration}ms`,
-    );
-  },
-
-  deregisterCssVariables() {
-    globalCssVariablesManager.unsetVariable(
-      this,
-      this.refreshTransitionDurationVarName,
-    );
   },
 
   async initEntries() {
@@ -305,7 +281,7 @@ export default EmberObject.extend(OwnerInjector, {
     // spinner should be rendered before changing fade-in class
     await waitForRender();
     this.set('isRefreshing', true);
-    await sleep(this.refreshTransitionDuration);
+    await sleep(refreshTransitionDuration);
     try {
       await this.entries.scheduleReload({ head });
     } finally {

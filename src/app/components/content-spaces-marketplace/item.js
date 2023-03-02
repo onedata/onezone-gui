@@ -18,6 +18,19 @@ import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 import sleep from 'onedata-gui-common/utils/sleep';
 import globalCssVariablesManager from 'onedata-gui-common/utils/global-css-variables-manager';
 
+/**
+ * Time in which the item should change attention color in milliseconds to normal
+ * color.
+ * @type {number}
+ */
+export const attentionTransitionTime = 2000;
+
+globalCssVariablesManager.setVariable(
+  'components/content-spaces-marketplace/item',
+  '--spaces-marketplace-item-attention-transition-time',
+  `${attentionTransitionTime}ms`,
+);
+
 export default Component.extend(I18n, {
   tagName: 'li',
   classNames: [
@@ -47,21 +60,18 @@ export default Component.extend(I18n, {
   spaceItem: undefined,
 
   /**
+   * @virtual
+   * @type {Utils.SpacesMarketplaceViewModel}
+   */
+  viewModel: undefined,
+
+  /**
    * Time in which the item should be colored for attention in milliseconds.
    * After this time, the transition to normal colors is started (which is not immediate,
    * but is animated by CSS).
    * @type {number}
    */
   attentionColorTime: 2000,
-
-  /**
-   * Time in which the item should change attention color in milliseconds to normal
-   * color.
-   * @type {number}
-   */
-  attentionTransitionTime: 2000,
-
-  attentionTransitionTimeVarName: '--spaces-marketplace-item-attention-transition-time',
 
   //#region state
 
@@ -189,27 +199,11 @@ export default Component.extend(I18n, {
 
   init() {
     this._super(...arguments);
-    globalCssVariablesManager.setVariable(
-      this,
-      this.attentionTransitionTimeVarName,
-      `${this.attentionTransitionTime / 1000}s`,
-    );
     if (this.viewModel.selectedSpaceInfo?.consumeShouldBlink(this.id)) {
       this.animateAttention();
     } else if (this.isAccessGrantedProxy.isSettled) {
       this.accessColorsSetter();
     }
-  },
-
-  /**
-   * @override
-   */
-  willDestroyElement() {
-    this._super(...arguments);
-    globalCssVariablesManager.unsetVariable(
-      this,
-      this.attentionTransitionTimeVarName,
-    );
   },
 
   async setAccessColors(additionalClassName = '') {
@@ -238,7 +232,7 @@ export default Component.extend(I18n, {
         return;
       }
       this.setAccessColors('iconified-block-marketplace-transitionable');
-      await sleep(this.attentionTransitionTime);
+      await sleep(attentionTransitionTime);
       if (this.isDestroyed || this.isDestroying) {
         return;
       }
