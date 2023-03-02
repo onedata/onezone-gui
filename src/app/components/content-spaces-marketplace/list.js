@@ -12,7 +12,6 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import InfiniteScroll from 'onedata-gui-common/utils/infinite-scroll';
 import { and, sum } from 'ember-awesome-macros';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
-import _ from 'lodash';
 import globalCssVariablesManager from 'onedata-gui-common/utils/global-css-variables-manager';
 
 export default Component.extend(I18n, {

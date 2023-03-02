@@ -1,11 +1,12 @@
 .spaces-marketplace-filter-header {
-  padding-top: var(--spaces-marketplace-item-spacing, #{$fallback-spaces-marketplace-item-spacing});
+  $item-spacing: var(--spaces-marketplace-item-spacing, #{$fallback-spaces-marketplace-item-spacing});
+  padding-top: $item-spacing;
 
   .form-group.search-form-group {
     margin-bottom: 0;
   }
   .search-form-group + .tags-filter-form-group {
-    $vertical-margin: calc(var(--spaces-marketplace-item-spacing, #{$fallback-spaces-marketplace-item-spacing}) * 0.5);
+    $vertical-margin: calc($item-spacing * 0.5);
     margin-top: $vertical-margin;
     margin-bottom: $vertical-margin;
   }

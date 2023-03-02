@@ -1189,7 +1189,7 @@ async function generateMarketplaceMock(store, listRecords) {
   );
   const ownedSpaceMarketplaceInfo = store.createRecord('spaceMarketplaceInfo', {
     id: generateSpaceMarketplaceInfoGri('space-0'),
-    indx: 'Space 0@space-0',
+    index: 'Space 0@space-0',
     name: get(firstSpace, 'name'),
     organizationName: get(firstSpace, 'organizationName'),
     description: get(firstSpace, 'description'),

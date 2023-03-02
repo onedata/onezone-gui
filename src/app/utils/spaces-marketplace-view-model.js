@@ -126,16 +126,6 @@ export default EmberObject.extend(OwnerInjector, {
     }
   )),
 
-  selectedSpaceMarketplaceInfoProxy: promise.object(computed(
-    'selectedSpaceId',
-    async function selectedSpaceMarketplaceInfoProxy() {
-      if (!this.selectedSpaceId) {
-        return null;
-      }
-      return this.spaceManager.getSpaceMarketplaceInfo(this.selectedSpaceId);
-    }
-  )),
-
   /**
    * @type {ComputedProperty<PromiseObject<SelectedSpaceInfo>>>}
    */
@@ -224,8 +214,7 @@ export default EmberObject.extend(OwnerInjector, {
 
   async initEntries() {
     const selectedSpaceInfo = await this.selectedSpaceInfoProxy;
-    const initialJumpIndex = selectedSpaceInfo &&
-      selectedSpaceInfo.index || null;
+    const initialJumpIndex = selectedSpaceInfo?.index ?? null;
     const entries = ReplacingChunksArray.create({
       fetch: this.fetchFilteredEntries.bind(this),
       startIndex: 0,
@@ -358,11 +347,11 @@ class FilteredEntriesFetcher {
   }
 
   async performFetch() {
-    while (this.currentLimit > 0 && !this.finalIsLast) {
+    while (this.finalArray.length < this.initialLimit && !this.finalIsLast) {
       /** @type {{ array: Array, isLast: boolean }} */
       const result = await this.fetchEntries({
         index: this.currentIndex,
-        limit: this.currentLimit,
+        limit: this.initialLimit,
         offset: this.currentOffset,
         tags: this.tags,
       });
@@ -375,10 +364,6 @@ class FilteredEntriesFetcher {
           break;
         }
         this.currentOffset = 1;
-        this.currentLimit = Math.min(
-          this.initialLimit,
-          this.initialLimit - this.finalArray.length
-        );
         this.finalIsLast = result.isLast;
       } else {
         this.reinitializeState();
@@ -404,9 +389,6 @@ class FilteredEntriesFetcher {
 
     /** @type {number} */
     this.currentOffset = this.initialOffset;
-
-    /** @type {number} */
-    this.currentLimit = this.initialLimit;
 
     /** @type {Array} */
     this.finalArray = [];

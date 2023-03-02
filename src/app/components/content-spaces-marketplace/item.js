@@ -23,7 +23,7 @@ export default Component.extend(I18n, {
   classNames: [
     'spaces-marketplace-item',
     'iconified-block',
-    // implements infinite scroll table row
+    // implements infinite scroll list row
     'data-row',
   ],
   classNameBindings: ['iconifiedBlockClass'],

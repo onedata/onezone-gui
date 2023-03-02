@@ -17,7 +17,7 @@ export default Component.extend(I18n, {
     'spaces-marketplace-item-placeholder',
     'iconified-block',
     'iconified-block-marketplace-placeholder',
-    // implements infinite scroll table row
+    // implements infinite scroll list row
     'data-row',
   ],
 });
