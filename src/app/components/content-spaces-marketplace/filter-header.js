@@ -1,5 +1,5 @@
 /**
- * An additional header with spaces list filtering options, inteted to use below
+ * An additional header with spaces list filtering options, intended to use below
  * content header.
  *
  * @author Jakub Liput

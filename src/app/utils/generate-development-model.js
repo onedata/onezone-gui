@@ -33,7 +33,9 @@ import {
   generateShareEntityId,
 } from 'onedata-gui-websocket-client/utils/development-model-common';
 import { exampleMarkdownShort, exampleMarkdownLong } from 'onedata-gui-common/utils/mock-data';
-import { generateSpaceMarketplaceInfoGri } from 'onezone-gui/services/space-manager';
+import {
+  generateGri as generateSpaceMarketplaceInfoGri,
+} from 'onezone-gui/models/space-marketplace-info';
 
 const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
