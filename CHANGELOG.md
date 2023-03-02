@@ -6,6 +6,8 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10531 Added allowedValues constraint to atm number and atm string
+* VFS-10452 Added integersOnly constraint to atm number
 * VFS-10372 Added harvester popover in spaces harvesters list
 * VFS-10289 Added group popover in members
 * VFS-10148 Removed redundant done() from tests
