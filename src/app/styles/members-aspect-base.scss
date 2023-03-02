@@ -85,7 +85,7 @@
   }
 
   .header-content-container {
-    .user-info-with-icon {
+    .record-info-with-icon {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
@@ -93,7 +93,7 @@
       padding-right: 210px;
       width: 100%;
 
-      .user-fullname {
+      .record-name {
         padding-left: 18px;
       }
     }
