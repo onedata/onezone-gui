@@ -23,15 +23,26 @@ export default EmberObject.extend({
    */
   viewModel: undefined,
 
+  /**
+   * Index for infinite scroll.
+   * @type {string}
+   */
+  index: reads('spaceMarketplaceInfo.index'),
+
   name: reads('spaceMarketplaceInfo.name'),
   organizationName: reads('spaceMarketplaceInfo.organizationName'),
   description: reads('spaceMarketplaceInfo.description'),
   tags: reads('spaceMarketplaceInfo.tags'),
-  // TODO: VFS-10427 use space-marketplace-info creationTime property in views
   creationTime: reads('spaceMarketplaceInfo.creationTime'),
   totalSupportSize: reads('spaceMarketplaceInfo.totalSupportSize'),
   providerNames: reads('spaceMarketplaceInfo.providerNames'),
   spaceId: reads('spaceMarketplaceInfo.entityId'),
+
+  /**
+   * Implements id property used by `Utils.InfiniteScroll.ScrollHandler`.
+   * @type {ComputedProperty<string>}
+   */
+  id: reads('spaceId'),
 
   /**
    * @type {ComputedProperty<boolean|null>}

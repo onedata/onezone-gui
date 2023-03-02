@@ -1,3 +1,4 @@
 export default {
-  noMatchingResults: 'There are no spaces in marketplace that match your search.',
+  noMatchingResults: 'No matching results.',
+  noSpacesAvailable: 'No spaces available.',
 };

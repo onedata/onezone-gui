@@ -2,23 +2,54 @@
  * Content container view of marketplace.
  *
  * @author Jakub Liput
- * @copyright (C) 2022 ACK CYFRONET AGH
+ * @copyright (C) 2022-2023 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Component from '@ember/component';
-import { reads } from '@ember/object/computed';
-import { computed } from '@ember/object';
+import { inject as service } from '@ember/service';
 import SpacesMarketplaceViewModel from 'onezone-gui/utils/spaces-marketplace-view-model';
+import globalCssVariablesManager from 'onedata-gui-common/utils/global-css-variables-manager';
+
+/**
+ * Spacing between items in px.
+ * @type {number}
+ */
+export const itemSpacing = 20;
+
+globalCssVariablesManager.setVariable(
+  'components/content-spaces-marketplace/list',
+  '--spaces-marketplace-item-spacing',
+  `${itemSpacing}px`,
+);
 
 export default Component.extend({
   classNames: ['content-spaces-marketplace'],
+  classNameBindings: ['viewModel.showEmptyListView:no-spaces-available'],
 
-  isEmpty: reads('viewModel.isEmpty'),
+  navigationState: service(),
 
-  viewModel: computed(function viewModel() {
+  //#region state
+
+  /**
+   * @type {Utils.SpacesMarketplaceViewModel}
+   */
+  viewModel: undefined,
+
+  //#endregion
+
+  init() {
+    this._super(...arguments);
+    this.set('viewModel', this.createViewModel());
+  },
+
+  /**
+   * @returns {ComputedProperty<Utils.SpacesMarketplaceViewModel>}
+   */
+  createViewModel() {
     return SpacesMarketplaceViewModel.create({
       ownerSource: this,
+      selectedSpaceId: this.navigationState.aspectOptions.selectedSpace,
     });
-  }),
+  },
 });

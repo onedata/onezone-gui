@@ -50,4 +50,9 @@ export default Component.extend(ContentOverflowDetector, {
     });
     this.addOverflowDetectionListener();
   },
+
+  willDestroyElement() {
+    this._super(...arguments);
+    this.removeOverflowDetectionListener();
+  },
 });

@@ -2,25 +2,36 @@
  * Spaces in marketplace list with search.
  *
  * @author Jakub Liput
- * @copyright (C) 2022 ACK CYFRONET AGH
+ * @copyright (C) 2022-2023 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Component from '@ember/component';
-import { observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { debounce } from '@ember/runloop';
-import config from 'ember-get-config';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { inject as service } from '@ember/service';
-import addConflictLabels from 'onedata-gui-common/utils/add-conflict-labels';
+import InfiniteScroll from 'onedata-gui-common/utils/infinite-scroll';
+import { and } from 'ember-awesome-macros';
+import waitForRender from 'onedata-gui-common/utils/wait-for-render';
+import globalCssVariablesManager from 'onedata-gui-common/utils/global-css-variables-manager';
+import { itemSpacing } from 'onezone-gui/components/content-spaces-marketplace';
 
-const typingActionDebouce = config.timing.typingActionDebouce;
+/**
+ * Height of single item in px.
+ * @type {number}
+ */
+export const itemHeight = 300;
+
+export const rowHeight = itemHeight + itemSpacing;
+
+globalCssVariablesManager.setVariable(
+  'components/content-spaces-marketplace/list',
+  '--spaces-marketplace-item-height',
+  `${itemHeight}px`,
+);
 
 export default Component.extend(I18n, {
   classNames: ['spaces-marketplace-list'],
-
-  navigationState: service(),
+  classNameBindings: ['isRefreshing:is-refreshing'],
 
   /**
    * @override
@@ -33,43 +44,81 @@ export default Component.extend(I18n, {
    */
   viewModel: undefined,
 
+  //#region state
+
   /**
-   * @type {ComputedProperty<Array<Utils.SpacesMarketplaceItem>>}
+   * @type {Utils.InfiniteScroll}
    */
-  filteredCollection: reads('viewModel.filteredCollection'),
+  infiniteScroll: undefined,
 
-  urlSelectedSpace: reads('navigationState.aspectOptions.selectedSpace'),
+  //#endregion
 
-  collectionObserver: observer(
-    'filteredCollection.@each.name',
-    function collectionObserver() {
-      addConflictLabels(this.filteredCollection, 'name', 'spaceId');
-    }
+  entries: reads('viewModel.entries'),
+
+  entriesInitialLoad: reads('viewModel.entriesInitialLoad'),
+
+  /**
+   * @type {Array<SpaceTag>}
+   */
+  tags: reads('viewModel.tagsFilter'),
+
+  showFetchPrevLoader: and(
+    'entriesInitialLoad.isSettled',
+    'infiniteScroll.fetchingStatus.isFetchingPrev'
   ),
+
+  showFetchNextLoader: and(
+    'entriesInitialLoad.isSettled',
+    'infiniteScroll.fetchingStatus.isFetchingNext'
+  ),
+
+  renderRefreshSpinner: reads('viewModel.renderRefreshSpinner'),
+
+  isRefreshing: reads('viewModel.isRefreshing'),
+
+  init() {
+    this._super(...arguments);
+    this.initInfiniteScroll();
+  },
 
   /**
    * @override
    */
   didInsertElement() {
     this._super(...arguments);
-    this.scrollToSelectedSpace();
+    this.infiniteScroll.mount(this.element.querySelector('.list-entries'));
+    (async () => {
+      await this.entriesInitialLoad;
+      await waitForRender();
+      this.scrollToSelectedSpace();
+    })();
+  },
+
+  initInfiniteScroll() {
+    if (this.infiniteScroll) {
+      throw new Error('inifiniteScroll is already initialized');
+    }
+    const infiniteScroll = InfiniteScroll.create({
+      entries: this.entries,
+      singleRowHeight: rowHeight,
+    });
+    this.set('infiniteScroll', infiniteScroll);
   },
 
   scrollToSelectedSpace() {
-    if (!this.urlSelectedSpace || !this.element) {
+    if (!this.element) {
       return;
     }
-    /** @type {HTMLElement} */
-    const itemElement = this.element.querySelector(`[data-space-id="${this.urlSelectedSpace}"]`);
-    if (!itemElement) {
-      return;
+    if (this.viewModel.selectedSpaceInfo?.consumeShouldScroll()) {
+      /** @type {HTMLElement} */
+      const itemElement = this.element.querySelector(
+        `[data-row-id="${this.viewModel.selectedSpaceInfo.spaceId}"]`
+      );
+      if (!itemElement) {
+        return;
+      }
+      const scrollOffset = itemElement.offsetTop;
+      this.infiniteScroll.scrollHandler.scrollTo(null, scrollOffset);
     }
-    itemElement.scrollIntoView();
-  },
-
-  actions: {
-    changeSearchValue(newValue) {
-      debounce(this.viewModel, 'changeSearchValue', newValue, typingActionDebouce);
-    },
   },
 });

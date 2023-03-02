@@ -2,26 +2,45 @@
  * Single space item in marketplace.
  *
  * @author Jakub Liput
- * @copyright (C) 2022 ACK CYFRONET AGH
+ * @copyright (C) 2022-2023 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Component from '@ember/component';
-import { computed } from '@ember/object';
+import { computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { dateFormat } from 'onedata-gui-common/helpers/date-format';
 import { or, and, raw, gt, difference } from 'ember-awesome-macros';
 import { htmlSafe } from '@ember/string';
+import waitForRender from 'onedata-gui-common/utils/wait-for-render';
+import sleep from 'onedata-gui-common/utils/sleep';
+import globalCssVariablesManager from 'onedata-gui-common/utils/global-css-variables-manager';
+
+/**
+ * Time in which the item should change attention color in milliseconds to normal
+ * color.
+ * @type {number}
+ */
+export const attentionTransitionTime = 2000;
+
+globalCssVariablesManager.setVariable(
+  'components/content-spaces-marketplace/item',
+  '--spaces-marketplace-item-attention-transition-time',
+  `${attentionTransitionTime}ms`,
+);
 
 export default Component.extend(I18n, {
   tagName: 'li',
-  classNames: ['spaces-marketplace-item', 'iconified-block'],
-  classNameBindings: [
-    'isAccessGranted:iconified-block-marketplace-access-granted:iconified-block-marketplace-available',
+  classNames: [
+    'spaces-marketplace-item',
+    'iconified-block',
+    // implements infinite scroll list row
+    'data-row',
   ],
-  attributeBindings: ['spaceId:data-space-id'],
+  classNameBindings: ['iconifiedBlockClass'],
+  attributeBindings: ['id:data-row-id'],
 
   /**
    * @override
@@ -41,13 +60,18 @@ export default Component.extend(I18n, {
   spaceItem: undefined,
 
   /**
+   * @virtual
+   * @type {Utils.SpacesMarketplaceViewModel}
+   */
+  viewModel: undefined,
+
+  /**
+   * Time in which the item should be colored for attention in milliseconds.
+   * After this time, the transition to normal colors is started (which is not immediate,
+   * but is animated by CSS).
    * @type {number}
    */
-  tagsLimit: or(
-    and('media.isMobile', raw(4)),
-    and('media.isTablet', raw(6)),
-    raw(12),
-  ),
+  attentionColorTime: 2000,
 
   //#region state
 
@@ -58,15 +82,33 @@ export default Component.extend(I18n, {
    */
   isRequested: false,
 
-  isDescriptionExpanded: false,
+  isAnimating: false,
+
+  iconifiedBlockClass: 'iconified-block-marketplace-available',
 
   //#endregion
 
+  /**
+   * @type {ComputedProperty<number>}
+   */
+  tagsLimit: or(
+    and('media.isMobile', raw(4)),
+    and('media.isTablet', raw(6)),
+    raw(12),
+  ),
+
   spaceName: reads('spaceItem.name'),
 
-  spaceId: reads('spaceItem.entityId'),
+  /**
+   * Implements `id` property for use in infinite scroll (in pair to `id` of
+   * `Utils.SpacesMarketplaceItem`).
+   * @type {string}
+   */
+  id: reads('spaceItem.id'),
 
-  isAccessGranted: reads('spaceItem.isAccessGranted'),
+  isAccessGrantedProxy: reads('spaceItem.isAccessGrantedProxy'),
+
+  isAccessGranted: reads('isAccessGrantedProxy.content'),
 
   organizationName: reads('spaceItem.organizationName'),
 
@@ -92,9 +134,9 @@ export default Component.extend(I18n, {
   }),
 
   tags: computed('spaceItem.tags', function tags() {
-    return this.spaceItem.tags.map(tagName => ({
+    return this.spaceItem.tags?.map(tagName => ({
       label: tagName,
-    }));
+    })) || [];
   }),
 
   tagsLimitExceeded: gt('tags.length', 'tagsLimit'),
@@ -148,6 +190,60 @@ export default Component.extend(I18n, {
       );
     }
   ),
+
+  accessColorsSetter: observer('isAccessGranted', function accessColorsSetter() {
+    if (!this.isAnimating && typeof this.isAccessGranted === 'boolean') {
+      this.setAccessColors();
+    }
+  }),
+
+  init() {
+    this._super(...arguments);
+    if (this.viewModel.selectedSpaceInfo?.consumeShouldBlink(this.id)) {
+      this.animateAttention();
+    } else if (this.isAccessGrantedProxy.isSettled) {
+      this.accessColorsSetter();
+    }
+  },
+
+  async setAccessColors(additionalClassName = '') {
+    this.set(
+      'iconifiedBlockClass',
+      (
+        this.isAccessGranted ?
+        'iconified-block-marketplace-access-granted' :
+        'iconified-block-marketplace-available'
+      ) + ' ' + additionalClassName
+    );
+  },
+
+  async animateAttention() {
+    if (this.isAnimating) {
+      return;
+    }
+    try {
+      this.setProperties({
+        isAnimating: true,
+        iconifiedBlockClass: 'iconified-block-marketplace-attention',
+      });
+      await waitForRender();
+      await sleep(this.attentionColorTime || 0);
+      if (this.isDestroyed || this.isDestroying) {
+        return;
+      }
+      this.setAccessColors('iconified-block-marketplace-transitionable');
+      await sleep(attentionTransitionTime);
+      if (this.isDestroyed || this.isDestroying) {
+        return;
+      }
+      // remove transitionable class
+      this.setAccessColors();
+    } finally {
+      if (!this.isDestroyed && !this.isDestroying) {
+        this.set('isAnimating', false);
+      }
+    }
+  },
 
   actions: {
     requestAccess() {

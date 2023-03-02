@@ -25,7 +25,7 @@ export default {
   advertised: {
     label: 'Advertise in marketplace',
     lockHint: {
-      requiredFieldsEmpty: 'Advertising space in marketplace requires organization name, tags and description to be set.',
+      requiredFieldsEmpty: 'Advertising space in marketplace requires organization name and description to be set.',
     },
   },
   contactEmail: {

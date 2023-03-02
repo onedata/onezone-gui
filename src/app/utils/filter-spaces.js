@@ -16,7 +16,7 @@ const defaultFilterSpacesOptions = {
     'description',
     'organizationName',
   ],
-  arrayProperties: ['tags'],
+  arrayProperties: [],
 };
 
 /**

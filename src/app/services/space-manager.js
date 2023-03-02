@@ -9,7 +9,7 @@
 
 import Service, { inject as service } from '@ember/service';
 import { get, getProperties } from '@ember/object';
-import { resolve, all as allFulfilled } from 'rsvp';
+import { resolve, all as allFulfilled, allSettled } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import {
@@ -17,11 +17,18 @@ import {
   aspects as spaceAspects,
 } from 'onezone-gui/models/space';
 import {
-  aspect as spaceMarketplaceInfoListAspect,
-} from 'onezone-gui/models/space-marketplace-info-list';
+  generateGri as generateSpaceMarketplaceInfoGri,
+} from 'onezone-gui/models/space-marketplace-info';
+
+export const listMarketplaceAspect = 'list_marketplace';
 
 /**
  * @typedef {Pick<SpaceSupportParameters, 'dirStatsServiceEnabled'>} SpaceSupportParametersUpdate
+ */
+
+/**
+ * The same properties as in `Models.SpaceMarketplaceInfo` model.
+ * @typedef {Object} SpaceMarketplaceRawData
  */
 
 export default Service.extend({
@@ -417,25 +424,6 @@ export default Service.extend({
       );
     }
   },
-  /**
-   * @returns {<Promise<Models.SpaceMarketplaceInfoList>>}
-   */
-  async getSpacesMarketplaceList(reload = false) {
-    const requestGri = gri({
-      entityType: 'space',
-      entityId: 'null',
-      aspect: spaceMarketplaceInfoListAspect,
-      scope: 'protected',
-    });
-    return this.store.findRecord('spaceMarketplaceInfoList', requestGri, {
-      reload,
-      adapterOptions: {
-        _meta: {
-          subscribe: false,
-        },
-      },
-    });
-  },
 
   // TODO: VFS-10384 mock of successful response; integrate with backend
   /**
@@ -478,4 +466,85 @@ export default Service.extend({
 
   // TODO: VFS-10384 integrate with backend
   async grantSpaceAccess( /* requestId */ ) {},
+
+  /**
+   * @param {InfiniteScrollListingParams} listingParams
+   * @param {Array<string>} [tags]
+   * @returns {Promise<{ list: Array<{ spaceId: string, index: string }>, isLast: boolean }>}
+   */
+  async fetchSpacesMarkeplaceIds(listingParams, tags) {
+    const requestGri = gri({
+      entityType: 'space',
+      entityId: 'null',
+      aspect: listMarketplaceAspect,
+      scope: 'protected',
+    });
+    const data = { ...listingParams };
+    if (tags) {
+      data.tags = tags;
+    }
+    return await this.onedataGraph.request({
+      gri: requestGri,
+      operation: 'create',
+      data,
+      subscribe: false,
+    });
+  },
+
+  // TODO: VFS-10524 use LS+ version of spaces marketplace info listing in list view
+  /**
+   * @param {InfiniteScrollListingParams} listingParams
+   * @param {Array<string>} tags
+   * @returns {Promise<{ list: Array<SpaceMarketplaceRawData>, isLast: boolean }>}
+   */
+  async fetchSpacesMarkeplaceRawData(listingParams, tags) {
+    const requestGri = gri({
+      entityType: 'space',
+      entityId: 'null',
+      aspect: 'list_marketplace_with_data',
+      scope: 'protected',
+    });
+    const data = { ...listingParams };
+    if (tags) {
+      data.tags = tags;
+    }
+    return await this.onedataGraph.request({
+      gri: requestGri,
+      operation: 'create',
+      data,
+      subscribe: false,
+    });
+  },
+
+  /**
+   * @param {InfiniteScrollListingParams} listingParams
+   * @param {Array<string>} [tags]
+   * @returns {Promise<{ array: Array<Models.SpaceMarketplaceInfo>, isLast: boolean }>}
+   */
+  async fetchSpacesMarkeplaceInfoRecords(listingParams, tags) {
+    const { list: idsList, isLast } = await this.fetchSpacesMarkeplaceIds(
+      listingParams,
+      tags
+    );
+    const recordsPromises = idsList.map(({ spaceId }) =>
+      this.getSpaceMarketplaceInfo(spaceId)
+    );
+    const promiseStates = await allSettled(recordsPromises);
+    const array = promiseStates
+      .filter(promiseState => promiseState.state === 'fulfilled')
+      .map(promiseState => promiseState.value);
+    // protection for arrays with only failed items
+    const effIsLast = (listingParams.limit && !array.length) ? true : isLast;
+    return {
+      array,
+      isLast: effIsLast,
+    };
+  },
+
+  async getSpaceMarketplaceInfo(spaceId) {
+    return this.store.findRecord(
+      'spaceMarketplaceInfo',
+      generateSpaceMarketplaceInfoGri(spaceId)
+    );
+  },
 });

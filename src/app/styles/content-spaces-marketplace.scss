@@ -1,5 +1,6 @@
-$spaces-marketplace-items-spacing: 20px;
 $spaces-marketplace-item-secondary-row-icon-size: 150%;
+$fallback-spaces-marketplace-item-spacing: 20px;
+$fallback-spaces-marketplace-item-height: 300px;
 
 .content-spaces-marketplace {
   @media (max-width: $screen-xs-max) {
@@ -7,7 +8,31 @@ $spaces-marketplace-item-secondary-row-icon-size: 150%;
   }
 }
 
+.content-spaces-marketplace.no-spaces-available {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  .spaces-marketplace-header {
+    background-color: transparent;
+  }
+}
+
+.col-content.on-top {
+  .spaces-marketplace-header {
+    @include hide-before-shadow;
+  }
+}
+
+.scrollbar-above-spaces-marketplace {
+  ~ .ps__rail-y {
+    z-index: 2;
+  }
+}
+
+@import './content-spaces-marketplace/header';
+@import './content-spaces-marketplace/filter-header';
 @import './content-spaces-marketplace/list';
 @import './content-spaces-marketplace/item';
+@import './content-spaces-marketplace/item-placeholder';
 @import './content-spaces-marketplace/space-item-support-list';
 @import './content-spaces-marketplace/space-description';

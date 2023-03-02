@@ -75,7 +75,7 @@ describe('Unit | Utility | filter-spaces', function () {
     }
   );
 
-  it('filters out records with matching name or tag', function () {
+  it('can filter out records with matching name or tag using arrayProperties', function () {
     const collection = [
       { name: 'one', tags: ['hello'] },
       { name: 'two', tags: ['world'] },
@@ -84,7 +84,10 @@ describe('Unit | Utility | filter-spaces', function () {
       { name: 'five', tags: ['foo'] },
     ];
 
-    const result = filterSpaces(collection, 'one');
+    const result = filterSpaces(collection, 'one', {
+      stringProperties: ['name'],
+      arrayProperties: ['tags'],
+    });
 
     expect(result).to.deep.equal([
       { name: 'one', tags: ['hello'] },
@@ -92,13 +95,13 @@ describe('Unit | Utility | filter-spaces', function () {
     ]);
   });
 
-  it('filters out records with matching part of tag', function () {
+  it('can filter out records with matching part of tag using arrayProperties', function () {
     const collection = [
       { name: 'one', tags: ['hello'] },
       { name: 'two', tags: ['world'] },
     ];
 
-    const result = filterSpaces(collection, 'he');
+    const result = filterSpaces(collection, 'he', { arrayProperties: ['tags'] });
 
     expect(result).to.deep.equal([
       { name: 'one', tags: ['hello'] },

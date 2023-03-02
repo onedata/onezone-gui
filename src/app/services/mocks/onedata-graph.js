@@ -15,6 +15,7 @@ import { resolve } from 'rsvp';
 import { get, getProperties } from '@ember/object';
 import { inject as service } from '@ember/service';
 import _ from 'lodash';
+import { listMarketplaceAspect } from 'onezone-gui/services/space-manager';
 
 const spaceHandlers = {
   provider(operation) {
@@ -91,6 +92,42 @@ const spaceHandlers = {
         }],
         apiRoot: 'https://dev-onezone.default.svc.cluster.local/api/v3/onezone',
       },
+    };
+  },
+  [listMarketplaceAspect](operation, entityId, data) {
+    const store = this.store;
+    if (operation !== 'create') {
+      throw messageNotSupported;
+    }
+    const emptyResponse = Object.freeze({
+      list: [],
+      isLast: true,
+    });
+    const {
+      index,
+      limit,
+    } = data;
+    // NOTE: this mock is basic
+    // - it resolves marketplace spaces data no matter, if their spaces are currently
+    //   advertised or not
+    // - currently it supports only listing from beginning (null index)
+    if (index) {
+      return emptyResponse;
+    }
+    if (!store.developmentModel) {
+      console.warn(
+        `To use mock of onedataGraph space ${listMarketplaceAspect} you need to turn on \`clearOnReload\` for developmentModel.`
+      );
+      return emptyResponse;
+    }
+    const marketplaceInfos = store.developmentModel
+      .entityRecords['spaceMarketplaceInfo'];
+    return {
+      list: marketplaceInfos.slice(0, limit).map(info => ({
+        spaceId: get(info, 'entityId'),
+        index: get(info, 'index'),
+      })),
+      isLast: true,
     };
   },
 };
@@ -327,6 +364,7 @@ const tokenHandlers = {
 
 export default OnedataGraphMock.extend({
   recordManager: service(),
+  store: service(),
 
   init() {
     this._super(...arguments);
