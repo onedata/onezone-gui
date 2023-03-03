@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10491 Fixed revision migration strategy in task arguments and results
 * VFS-10531 Added allowedValues constraint to atm number and atm string
 * VFS-10452 Added integersOnly constraint to atm number
 * VFS-10372 Added harvester popover in spaces harvesters list
