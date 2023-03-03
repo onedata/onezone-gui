@@ -2,8 +2,7 @@
  * Shows information about number of members for given record. It is a tile
  * component ready to place in overview page.
  *
- * @module components/resource-members-tile
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

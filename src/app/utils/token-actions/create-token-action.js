@@ -2,7 +2,6 @@
  * Creates new token. Needs rawToken object passed in context - it will be used
  * to create new token record.
  *
- * @module utils/token-actions/create-token-action
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

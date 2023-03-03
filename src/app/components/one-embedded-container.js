@@ -3,8 +3,7 @@
  * It provides integration between two web applications.
  * It will share common object with it's child window via element's
  * `appProxy` property.
- * 
- * @module components/one-embedded-container
+ *
  * @author Jakub Liput, Michał Borzęcki
  * @copyright (C) 2019-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

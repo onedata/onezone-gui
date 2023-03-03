@@ -2,7 +2,6 @@
  * Allows to (un)make a specific user an owner of a given record.
  * Needs recordBeingOwned, ownerRecord and (optionally) owners passed via context.
  *
- * @module utils/user-actions/toggle-being-owner-action
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

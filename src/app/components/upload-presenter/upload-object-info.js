@@ -1,7 +1,6 @@
 /**
  * Header of upload list item, that shows info about upload.
  *
- * @module components/upload-presenter/upload-object-info
  * @author Michał Borzęcki
  * @copyright (C) 2019-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

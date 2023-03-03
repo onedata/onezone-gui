@@ -1,7 +1,6 @@
 /**
  * Converts token to object consumable by token-editor component in view mode.
  *
- * @module utils/token-editor-utils/token-to-editor-default-data
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

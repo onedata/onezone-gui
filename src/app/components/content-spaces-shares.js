@@ -1,7 +1,6 @@
 /**
  * Container for signed-in user's shared file browser
  *
- * @module components/content-spaces-shares
  * @author Jakub Liput
  * @copyright (C) 2019-2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

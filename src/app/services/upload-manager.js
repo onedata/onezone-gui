@@ -2,7 +2,6 @@
  * Manages upload process by communicating with oneprovider iframes and
  * dealing with UploadObject objects.
  *
- * @module services/upload-manager
  * @author Michał Borzęcki
  * @copyright (C) 2019-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

@@ -1,7 +1,6 @@
 /**
  * A sidebar for automation inventories (extension of `one-sidebar`)
  *
- * @module components/sidebar-atm-inventories
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

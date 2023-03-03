@@ -1,7 +1,6 @@
 /**
  * Container for remote file browser of single space with Oneprovider selector
- * 
- * @module components/content-spaces-data
+ *
  * @author Jakub Liput
  * @copyright (C) 2019-2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

@@ -1,7 +1,6 @@
 /**
  * Allows to view and create lambdas for automation inventory.
  *
- * @module components/content-atm-inventories-lambdas
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

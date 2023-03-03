@@ -1,7 +1,6 @@
 /**
  * A public share container for embedded component served from Oneprovider.
- * 
- * @module components/conent-public-share-container
+ *
  * @author Jakub Liput
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

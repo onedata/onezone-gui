@@ -2,7 +2,6 @@
  * Dumps workflow schema revision to JSON file. Needs `atmWorkflowSchema` and
  * `revisionNumber` passed in context.
  *
- * @module utils/workflow-actions/dump-atm-workflow-schema-revision-action
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

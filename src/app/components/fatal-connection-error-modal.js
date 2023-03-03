@@ -1,8 +1,7 @@
 /**
  * Blocking modal that should be displayed when there is non-recoverable
  * WebSocket connection error.
- * 
- * @module components/fatal-connection-error-modal
+ *
  * @author Jakub Liput
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

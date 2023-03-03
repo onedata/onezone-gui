@@ -56,8 +56,7 @@
  * Because we search for paths level-by-level, then all found paths are the
  * shortest ones. It means, that the alogorithm is more BFS-like, than DFS-like.
  *
- * @module components/membership-visualiser
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

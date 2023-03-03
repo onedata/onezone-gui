@@ -1,7 +1,6 @@
 /**
- * A create new space view 
+ * A create new space view
  *
- * @module components/content-spaces-new
  * @author Jakub Liput
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

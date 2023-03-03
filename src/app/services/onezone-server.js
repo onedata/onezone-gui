@@ -1,7 +1,6 @@
 /**
  * A set of server methods for acquiring data which is not directly related to any model.
  *
- * @module services/onezone-server
  * @author Jakub Liput, Michał Borzęcki
  * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

@@ -2,8 +2,8 @@
  * Login container implementation specific for Onezone. In addition to standard
  * login/password form, introduces sign in using auth providers specified
  * by backend.
- * @module components/login-box/login-form-container
- * @author Michal Borzecki, Jakub Liput
+ *
+ * @author Michał Borzęcki, Jakub Liput
  * @copyright (C) 2016-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

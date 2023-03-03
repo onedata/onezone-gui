@@ -2,8 +2,7 @@
  * Shows number of groups in relation (parents or children) in groups hierarchy
  * visualiser. Also shows status of loading relation data (spinner or error).
  *
- * @module components/groups-hierarchy-visualiser/group-box-relation
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

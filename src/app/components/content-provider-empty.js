@@ -1,7 +1,6 @@
 /**
  * A component with information about no available provider.
  *
- * @module components/content-provider-empty
  * @author Jakub Liput
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

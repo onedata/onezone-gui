@@ -1,7 +1,6 @@
 /**
  * Generates a default name for a token using it's type, invite type and invite target name.
  *
- * @module utils/token-editor-utils/generate-token-name
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

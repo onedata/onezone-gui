@@ -2,7 +2,6 @@
  * Introduces onezone-related action runners. See more in the base class documentation in
  * onedata-gui-common.
  *
- * @module services/url-action-runner
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

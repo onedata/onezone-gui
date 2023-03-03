@@ -1,9 +1,8 @@
 /**
  * Object used internally by membership-visualiser component. Acts as a container
  * for records, which create membership path.
- * 
- * @module utils/membership-visualiser/membership-path
- * @author Michal Borzecki
+ *
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
@@ -71,7 +70,7 @@ export default EmberObject.extend({
 
   /**
    * Loads record using given GRI
-   * @param {string} recordGri 
+   * @param {string} recordGri
    * @returns {Promise<GraphSingleModel|null>}
    */
   fetchRecordByGri(recordGri) {
