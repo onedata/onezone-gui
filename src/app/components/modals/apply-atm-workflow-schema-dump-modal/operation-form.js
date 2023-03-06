@@ -1,7 +1,6 @@
 /**
  * Allows to choose the way in which dump will be applied.
  *
- * @module components/modals/apply-atm-workflow-schema-dump/operation-form
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

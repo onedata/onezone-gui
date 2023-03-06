@@ -2,8 +2,7 @@
  * A mocked version of Onedata RPC service.
  * For properties description see non-mocked `services/onedata-rpc`
  *
- * @module services/mocks/onedata-crpc
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

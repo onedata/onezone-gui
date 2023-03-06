@@ -2,8 +2,7 @@
  * Draws a group box line (left or right) in groups hierarchy visualiser according
  * to values passed using the `line` property.
  *
- * @module components/groups-hierarchy-visualiser/group-box-line
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

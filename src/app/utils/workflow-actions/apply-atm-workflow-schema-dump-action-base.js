@@ -2,7 +2,6 @@
  * Base class, that should be extended by actions working with application of
  * workflow schema dump and apply-atm-workflow-schema-dump modal
  *
- * @module utils/workflow-actions/apply-atm-workflow-schema-dump-action-base
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

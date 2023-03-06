@@ -1,8 +1,7 @@
 /**
  * A component that shows a form for creating a group.
  *
- * @module components/content-groups-new
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

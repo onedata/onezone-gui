@@ -2,7 +2,6 @@
  * An advanced filters component for tokens sidebar. Provides filtering by token
  * type and target.
  *
- * @module components/sidebar-tokens/advanced-filters
  * @author  Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

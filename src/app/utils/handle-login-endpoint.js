@@ -1,7 +1,6 @@
 /**
- * Using authorizer data, redirect to login endpoint 
+ * Using authorizer data, redirect to login endpoint
  *
- * @module utils/handle-login-endpoint
  * @author Jakub Liput
  * @copyright (C) 2017 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

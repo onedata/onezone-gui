@@ -1,7 +1,6 @@
 /**
  * Handles WebSocket errors with graphical components (which use global state).
- * 
- * @module services/onedata-websocket-error-handler
+ *
  * @author Jakub Liput
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -61,8 +60,8 @@ export default OnedataWebsocketErrorHandler.extend({
 
   /**
    * @override
-   * @param {CloseEvent} closeEvent 
-   * @param {boolean} openingCompleted 
+   * @param {CloseEvent} closeEvent
+   * @param {boolean} openingCompleted
    */
   abnormalClose(closeEvent, openingCompleted) {
     console.warn(

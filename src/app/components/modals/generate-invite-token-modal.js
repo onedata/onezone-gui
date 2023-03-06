@@ -4,7 +4,6 @@
  * - inviteType - type of invite token, e.g. userJoinSpace,
  * - targetRecord - target of invitation, e.g. space record for userJoinSpace type.
  *
- * @module components/modals/generate-invite-token-modal
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

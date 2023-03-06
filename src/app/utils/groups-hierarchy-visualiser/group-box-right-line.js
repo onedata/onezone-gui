@@ -1,8 +1,7 @@
 /**
  * Right GroupBoxLine implementation for groups hierarchy visualiser.
  *
- * @module utils/groups-hierarchy-visualiser/group-box-right-line
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

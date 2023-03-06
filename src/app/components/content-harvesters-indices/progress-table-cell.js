@@ -2,7 +2,6 @@
  * A component that is used internally by progress-table to visualise actual
  * harvesting progress for specified index, space and provider.
  *
- * @module components/content-harvesters-indices/progress-table-cell
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

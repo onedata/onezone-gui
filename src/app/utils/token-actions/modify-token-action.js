@@ -2,7 +2,6 @@
  * Modifies existing token. Needs `token` (model) and `tokenDiff` (changed fields) passed
  * in context.
  *
- * @module utils/token-actions/modify-token-action
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

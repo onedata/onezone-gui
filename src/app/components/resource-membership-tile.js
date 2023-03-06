@@ -2,8 +2,7 @@
  * Shows information about user membership for given record. It is a tile
  * component ready to place in overview page.
  *
- * @module components/resource-membership-tile
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

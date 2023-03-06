@@ -1,7 +1,6 @@
 /**
  * Manages harvesters of specified space
  *
- * @module components/content-spaces-harvesters
  * @author Michał Borzęcki, Agnieszka Warchoł
  * @copyright (C) 2020-2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

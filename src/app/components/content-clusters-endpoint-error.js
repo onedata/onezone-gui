@@ -1,8 +1,7 @@
 /**
  * Shown when connection test to Onepanel API fails before redirection to cluster
  * view
- * 
- * @module components/content-clusters-endpoint-error
+ *
  * @author Jakub Liput
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

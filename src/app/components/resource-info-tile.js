@@ -2,8 +2,7 @@
  * Shows basic information about given record. It is a tile component ready
  * to place in overview page.
  *
- * @module components/resource-info-tile
- * @author Michal Borzecki, Agnieszka Warchoł
+ * @author Michał Borzęcki, Agnieszka Warchoł
  * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

@@ -1,7 +1,7 @@
 /**
  * Exports a real onedata-rpc service or its mock.
- * @module services/onedata-rpc
- * @author Michal Borzecki
+ *
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

@@ -1,7 +1,6 @@
 /**
  * Content for support space tab: copy command to setup provider
  *
- * @module components/content-spaces-support/deploy-provider
  * @author Jakub Liput, Michał Borzęcki
  * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

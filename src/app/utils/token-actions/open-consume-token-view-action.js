@@ -1,7 +1,6 @@
 /**
  * Redirects to token consumer page on execute.
  *
- * @module utils/token-actions/open-consume-token-view-action
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

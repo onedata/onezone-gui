@@ -2,7 +2,6 @@
  * One-tile component customized for token templates. Is a base for showing all of token
  * templates.
  *
- * @module components/token-template-selector/template-tile
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
