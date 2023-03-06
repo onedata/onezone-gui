@@ -1,7 +1,6 @@
 /**
  * Adds computed properties for fetching Oneprovider-specific data of cluster
- * 
- * @module mixin/models/oneprovider-cluster-info
+ *
  * @author Jakub Liput
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

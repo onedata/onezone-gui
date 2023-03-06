@@ -1,8 +1,8 @@
 /**
  * Renders single login button. Can optionally have a "link" property set to go
  * to a provided link instead of invoking action.
- * @module components/login-box/social-box-list/social-box
- * @author Jakub Liput, Michal Borzecki
+ *
+ * @author Jakub Liput, Michał Borzęcki
  * @copyright (C) 2016-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

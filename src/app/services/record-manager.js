@@ -1,7 +1,6 @@
 /**
  * Has generic functions to manage records and relations.
  *
- * @module services/record-manager
  * @author Michał Borzęcki
  * @copyright (C) 2020-2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

@@ -3,7 +3,6 @@
  * NOTE: it does not persist any data. To do that, you need to do this on your own
  * using data passed via `onChange` callback.
  *
- * @module components/content-atm-inventories-workflows/atm-workflow-schema-details-form
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

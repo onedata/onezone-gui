@@ -159,8 +159,7 @@
  *     rendered components (e.g. real height of rendered group box) - all values
  *     are fixed in Workspace and properties computed in utils.
  *
- * @module components/groups-hierarchy-visualiser
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

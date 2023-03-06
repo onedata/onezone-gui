@@ -1,7 +1,6 @@
 /**
  * Create and save example records for onezone-gui using store
  *
- * @module utils/generate-development-model
  * @author Jakub Liput
  * @copyright (C) 2017-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

@@ -1,7 +1,6 @@
 /**
  * Converts data from token-editor in edition mode to object with change diff.
  *
- * @module utils/token-editor-utils/editor-data-to-diff-object
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

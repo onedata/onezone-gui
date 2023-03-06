@@ -1,7 +1,6 @@
 /**
  * Provider name, icon and popup with more details
- * 
- * @module components/provider-info-name
+ *
  * @author Agnieszka Warchoł
  * @copyright (C) 2022 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

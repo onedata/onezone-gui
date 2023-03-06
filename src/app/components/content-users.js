@@ -1,7 +1,6 @@
 /**
  * A content page with user account details
  *
- * @module components/content-users
  * @author Michał Borzęcki, Jakub Liput
  * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

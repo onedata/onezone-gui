@@ -1,7 +1,6 @@
 /**
  * A component that shows an iframe with harvester plugin application
  *
- * @module components/content-harvesters-plugin
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

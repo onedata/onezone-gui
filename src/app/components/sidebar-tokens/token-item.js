@@ -1,7 +1,6 @@
 /**
  * A first-level item component for tokens sidebar
  *
- * @module components/sidebar-tokens/token-item
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

@@ -2,7 +2,6 @@
  * Onepanel REST token template. Sets token API to "rest" and narrows allowed services
  * to any Onepanel.
  *
- * @module components/token-template-selector/onepanel-rest-template
  * @author Agnieszka Warchoł
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

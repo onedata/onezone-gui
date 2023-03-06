@@ -1,8 +1,7 @@
 /**
  * Immediately tries to fetch provider redirection URL
- * and automatically go to it 
+ * and automatically go to it
  *
- * @module components/content-provider-redirect
  * @author Jakub Liput
  * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -32,7 +31,7 @@ export default Component.extend(I18n, {
   guiUtils: service(),
 
   /**
-   * @override 
+   * @override
    */
   i18nPrefix: 'components.contentProviderRedirect.',
 

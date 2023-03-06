@@ -2,7 +2,6 @@
  * A modal that allows to upload/duplicate workflow schema revision into specific
  * workflow.
  *
- * @module components/modals/apply-atm-workflow-schema-dump
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

@@ -1,7 +1,6 @@
 /**
  * Converts lambda form data to an object, which can be used to create lambda record.
  *
- * @module utils/content-atm-inventories-lambdas/atm-lambda-form/form-data-to-record
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

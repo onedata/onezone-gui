@@ -1,7 +1,6 @@
 /**
  * Default content for single space - overview of space aspects
  *
- * @module components/content-spaces-index
  * @author Jakub Liput, Michał Borzęcki
  * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -35,7 +34,7 @@ export default Component.extend(
     apiSamplesActions: service(),
 
     /**
-     * @override 
+     * @override
      */
     i18nPrefix: 'components.contentSpacesIndex.',
 
@@ -163,7 +162,7 @@ export default Component.extend(
 
     /**
      * Shows global info about save error.
-     * @param {object} error 
+     * @param {object} error
      * @returns {undefined}
      */
     _saveErrorHandler(error) {

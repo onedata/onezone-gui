@@ -1,7 +1,6 @@
 /**
  * An abstraction layer for getting data for sidebar of various tabs
  *
- * @module services/sidebar-resources
  * @author Jakub Liput, Michał Borzęcki
  * @copyright (C) 2017-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

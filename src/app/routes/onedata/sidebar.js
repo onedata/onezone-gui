@@ -2,7 +2,6 @@
  * Extension of onedata.sidebar route from onedata-gui-common. Adds filtering of
  * routes for conditional menu items.
  *
- * @module routes/onedata/sidebar
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

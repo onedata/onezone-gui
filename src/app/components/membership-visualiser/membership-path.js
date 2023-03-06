@@ -2,8 +2,7 @@
  * A component, that shows membership path visualisation. Is used internally by
  * membership-visualiser component.
  *
- * @module components/membership-visualiser/membership-path
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

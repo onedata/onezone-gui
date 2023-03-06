@@ -3,10 +3,9 @@
  * - display provider icon using custom color (from provider.color property),
  * - notify about actual state of items filtration (by providersFilterAction
  *   callback)
- * - set custom actions for providers (using providerActions - 
+ * - set custom actions for providers (using providerActions -
  *   see property comment for more details)
  *
- * @module components/providers-list.js
  * @author Michał Borzęcki, Jakub Liput
  * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -32,7 +31,7 @@ export default Component.extend({
   }),
 
   /**
-   * Array of objects {provider, color}. 
+   * Array of objects {provider, color}.
    * To inject.
    * @type {Ember.Array.Object}
    */
@@ -63,7 +62,7 @@ export default Component.extend({
   providersFilterAction: () => {},
 
   /**
-   * Array of possible actions per provider. Each action must be in format: 
+   * Array of possible actions per provider. Each action must be in format:
    * ```
    * {
    *   text: 'Action trigger text',
@@ -71,8 +70,8 @@ export default Component.extend({
    *   class: 'class-for-trigger-element,
    * }
    * ```
-   * An actions will be displayed on the right side of the provider 
-   * item as a popover. Provider object will be passed to the action 
+   * An actions will be displayed on the right side of the provider
+   * item as a popover. Provider object will be passed to the action
    * callback as an argument.
    * @type {Array.Object}
    */

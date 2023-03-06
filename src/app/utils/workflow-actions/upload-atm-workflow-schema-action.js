@@ -2,7 +2,6 @@
  * Uploads workflow schema from JSON file. Needs `atmInventory` passed
  * in context.
  *
- * @module utils/workflow-actions/upload-atm-workflow-schema-action
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

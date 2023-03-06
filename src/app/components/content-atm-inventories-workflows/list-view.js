@@ -2,7 +2,6 @@
  * Lists workflow schemas. It is a whole view component - may be used for
  * a full page carousel.
  *
- * @module components/content-atm-inventories-workflows/list-view
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
