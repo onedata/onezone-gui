@@ -56,21 +56,30 @@
 
   {{#if verificationProxy.isSettled}}
     {{#modal.footer class="btn-toolbar"}}
-      {{#one-button
-        type="default"
-        class="cancel-btn"
-        onClick=modal.close
-      }}
-        {{tt this closeButtonType}}
-      {{/one-button}}
       {{#if isProceedButtonVisible}}
+        {{#one-button
+          type="grant"
+          class="proceed-btn"
+          disabled=(not isProceedAvailable)
+          onClick=(action "reject")
+        }}
+          {{tt this "rejectBtn"}}
+        {{/one-button}}
         {{#one-button
           type="primary"
           class="proceed-btn"
           disabled=(not isProceedAvailable)
-          onClick=(action "confirm")
+          onClick=(action "grant")
         }}
-          {{tt this "proceed"}}
+          {{tt this "grantBtn"}}
+        {{/one-button}}
+      {{else}}
+        {{#one-button
+          type="default"
+          class="close-btn"
+          onClick=modal.close
+        }}
+          {{tt this "close"}}
         {{/one-button}}
       {{/if}}
     {{/modal.footer}}

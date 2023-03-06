@@ -15,6 +15,7 @@ import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-s
 
 /**
  * @typedef {Object} ConfirmSpaceJoinRequestActionContext
+ * @property {string} spaceId
  * @property {string} requestId Space join request as used in
  *   `SpaceManager#checkSpaceAccessRequest`.
  */
@@ -35,12 +36,15 @@ export default Action.extend({
 
   requestId: reads('context.requestId'),
 
+  spaceId: reads('context.spaceId'),
+
   /**
    * @override
    */
   async onExecute() {
     const result = ActionResult.create();
     const modalInstance = this.modalManager.show('spaces/confirm-join-request-modal', {
+      spaceId: this.spaceId,
       joinRequestId: this.requestId,
       onConfirmed: ({ userId, spaceId }) => {
         set(result, 'status', 'done');

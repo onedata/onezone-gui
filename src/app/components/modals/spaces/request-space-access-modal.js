@@ -36,9 +36,6 @@ export default Component.extend(I18n, {
   spaceId: reads('spaceMarketplaceData.spaceId'),
 
   rootField: computed(
-    'i18nPrefix',
-    'messageField',
-    'emailField',
     function rootField() {
       return FormFieldsRootGroup.create({
         ownerSource: this,
@@ -76,16 +73,16 @@ export default Component.extend(I18n, {
 
   actions: {
     /**
-     * @param {(data) => void} modalSubmitCallback
+     * @param {(data: SpaceAccessRequestMessageData) => void} modalSubmitCallback
      */
     async submit(modalSubmitCallback) {
       const {
-        email,
+        email: contactEmail,
         message,
       } = this.rootField.dumpValue();
 
       return modalSubmitCallback?.({
-        email,
+        contactEmail,
         message,
         spaceId: this.spaceId,
       });

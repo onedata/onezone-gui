@@ -20,7 +20,7 @@ import { htmlSafe } from '@ember/string';
 /**
  * @typedef {Object} SpaceAccessRequestMessageData
  * @property {string} message
- * @property {string} email
+ * @property {string} contactEmail
  * @property {string} spaceId
  */
 
@@ -52,6 +52,9 @@ export default Action.extend({
    */
   icon: 'cart',
 
+  /**
+   * @type {{ spaceId: string, name: string }}
+   */
   spaceMarketplaceData: reads('context.spaceMarketplaceData'),
 
   /**
@@ -62,6 +65,7 @@ export default Action.extend({
     const modalInstance = this.modalManager
       .show('spaces/request-space-access-modal', {
         hideAfterSubmit: false,
+        /** @param {SpaceAccessRequestMessageData} requestData */
         onSubmit: async (requestData) => {
           try {
             await result.interceptPromise(this.sendRequest(requestData));

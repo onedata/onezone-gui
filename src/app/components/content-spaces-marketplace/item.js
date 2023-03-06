@@ -249,7 +249,7 @@ export default Component.extend(I18n, {
     requestAccess() {
       (async () => {
         const result = await this.spaceActions.createRequestSpaceAccessAction({
-          spaceMarketplaceData: this.spaceItem.spaceMarketplaceInfo,
+          spaceMarketplaceData: this.spaceItem,
         }).execute();
         if (result.status === 'done') {
           this.set('isRequested', true);

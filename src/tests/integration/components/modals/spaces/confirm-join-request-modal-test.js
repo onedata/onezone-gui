@@ -125,8 +125,10 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
   it('renders header, error info and close button if space join request is rejected', async function () {
     suppressRejections();
     const helper = new Helper(this);
+    const spaceId = 'space_id';
     const joinRequestId = 'join_request_id';
     helper.modalOptions = {
+      spaceId,
       joinRequestId,
     };
     const checkSpaceAccessRequest = sinon.stub(
@@ -146,8 +148,10 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
 
   it('renders loading header and spinner only when verification request is being made', async function () {
     const helper = new Helper(this);
+    const spaceId = 'space_id';
     const joinRequestId = 'join_request_id';
     helper.modalOptions = {
+      spaceId,
       joinRequestId,
     };
     const checkSpaceAccessRequest = sinon.stub(

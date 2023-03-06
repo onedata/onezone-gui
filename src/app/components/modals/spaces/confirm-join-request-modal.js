@@ -12,12 +12,13 @@ import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import { promise, conditional, raw } from 'ember-awesome-macros';
+import { promise, bool } from 'ember-awesome-macros';
 
 /**
  * @typedef {Object} ConfirmJoinRequestModalOptions
  * @property {({ userId: string, spaceId: string }) => void} onConfirmed Callback invoked
  *   after access granting method has been successfully resolved.
+ * @property {string} spaceId ID of space, for which the access will be considered.
  * @property {string} joinRequestId Request ID used in granting access to space used in
  *   `spaceManager#grantSpaceAccess`.
  */
@@ -32,12 +33,6 @@ export default Component.extend(I18n, {
   recordManager: service(),
   globalNotify: service(),
   modalManager: service(),
-
-  closeButtonType: conditional(
-    'isValid',
-    raw('cancel'),
-    raw('close')
-  ),
 
   /**
    * @virtual
@@ -54,9 +49,11 @@ export default Component.extend(I18n, {
   verificationProxy: promise.object(computed(
     'joinRequestId',
     async function verificationProxy() {
-      return await this.spaceManager.checkSpaceAccessRequest({
-        joinRequestId: this.joinRequestId,
-      });
+      // FIXME: z jakiegoś powodu uruchamia się dwa razy
+      return await this.spaceManager.checkSpaceAccessRequest(
+        this.spaceId,
+        this.joinRequestId,
+      );
     }
   )),
 
@@ -67,35 +64,61 @@ export default Component.extend(I18n, {
 
   joinRequestId: reads('modalOptions.joinRequestId'),
 
-  isValid: reads('verificationProxy.content.isValid'),
+  spaceId: reads('modalOptions.spaceId'),
+
+  isValid: bool('verificationProxy.content'),
+
+  // FIXME: inne dane
 
   userId: reads('verificationProxy.content.userId'),
 
-  spaceId: reads('verificationProxy.content.spaceId'),
-
   spaceName: reads('verificationProxy.content.spaceName'),
 
-  userName: reads('userProxy.content.name'),
-
-  // TODO: VFS-10384 check if user info will be available by other user
-  userProxy: promise.object(computed('userId', async function userProxy() {
-    if (!this.userId) {
-      return null;
-    }
-    return this.recordManager.getRecordById('user', this.userId);
-  })),
+  // FIXME: use data from verificationProxy
+  // userName: reads('userProxy.content.name'),
 
   isProceedButtonVisible: reads('isValid'),
 
   isProceedAvailable: reads('isValid'),
 
+  async grantAccess() {
+    this.spaceManager.resolveMarketplaceSpaceAccess(
+      this.spaceId,
+      this.joinRequestId,
+      true
+    );
+  },
+
+  async rejectAccess() {
+    this.spaceManager.resolveMarketplaceSpaceAccess(
+      this.spaceId,
+      this.joinRequestId,
+      false
+    );
+  },
+
   actions: {
-    async confirm() {
+    async grant() {
       if (!this.isProceedAvailable) {
         return;
       }
       try {
-        await this.spaceManager.grantSpaceAccess(this.joinRequestId);
+        await this.grantAccess();
+        this.modalManager.hide(this.modalId);
+        this.onConfirmed({
+          spaceId: this.spaceId,
+          userId: this.userId,
+        });
+      } catch (error) {
+        this.globalNotify.backendError(this.t('grantingSpaceAccess'), error);
+      }
+    },
+    async reject() {
+      if (!this.isProceedAvailable) {
+        return;
+      }
+      try {
+        await this.grantAccess();
         this.modalManager.hide(this.modalId);
         this.onConfirmed({
           spaceId: this.spaceId,

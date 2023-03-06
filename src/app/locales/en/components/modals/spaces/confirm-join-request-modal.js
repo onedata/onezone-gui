@@ -17,7 +17,8 @@ export default {
     },
   },
   grantingSpaceAccess: 'granting space access',
-  cancel: 'Cancel',
+  rejectingSpaceAccess: 'rejecting space access request',
   close: 'Close',
-  proceed: 'Confirm',
+  rejectBtn: 'Reject request',
+  grantBtn: 'Grant access',
 };
