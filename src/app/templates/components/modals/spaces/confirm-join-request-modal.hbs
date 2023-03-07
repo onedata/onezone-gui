@@ -6,7 +6,7 @@
 }}
   {{#modal.header}}
     <h1>
-      {{#if verificationProxy.isFulfilled}}
+      {{#if requesterInfoProxy.isFulfilled}}
         {{#if isValid}}
           {{one-icon icon="sign-info-rounded"}}
           <span class="one-label">{{tt this "header.valid"}}</span>
@@ -14,7 +14,7 @@
           {{one-icon icon="sign-warning-rounded"}}
           <span class="one-label">{{tt this "header.invalid"}}</span>
         {{/if}}
-      {{else if verificationProxy.isPending}}
+      {{else if requesterInfoProxy.isPending}}
         {{one-icon icon="sign-info-rounded"}}
         <span class="one-label">{{tt this "header.loading"}}</span>
       {{else}}
@@ -27,21 +27,26 @@
   {{#modal.body}}
     {{#promise-proxy-container
       tagName="div"
-      class=(if verificationProxy.isPending "loadable-row")
-      proxy=verificationProxy
+      class=(if requesterInfoProxy.isPending "loadable-row")
+      proxy=requesterInfoProxy
     }}
       {{#if isValid}}
         {{#promise-proxy-container
           tagName="div"
-          class=(if userProxy.isPending "loadable-row")
-          proxy=userProxy
+          class=(if spaceProxy.isPending "loadable-row")
+          proxy=spaceProxy
         }}
-          <p>{{tt this "body.valid.text" spaceName=spaceName userName=userName}}</p>
+          <p>
+            {{tt this "body.valid.text"
+              spaceName=spaceName
+              userName=requesterInfo.fullName
+            }}
+          </p>
           <p>{{tt this "body.valid.info"}}</p>
           {{join-image
             class="user-join-space-image hidden-xs"
             joiningModelName="user"
-            joiningRecord=userProxy.content
+            joiningRecord=requesterInfo
             inviteTargetModelName="space"
             inviteTargetId=spaceId
             inviteTargetName=spaceName
@@ -54,7 +59,7 @@
     {{/promise-proxy-container}}
   {{/modal.body}}
 
-  {{#if verificationProxy.isSettled}}
+  {{#if requesterInfoProxy.isSettled}}
     {{#modal.footer class="btn-toolbar"}}
       {{#if isProceedButtonVisible}}
         {{#one-button

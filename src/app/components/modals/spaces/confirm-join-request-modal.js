@@ -19,8 +19,7 @@ import { promise, bool } from 'ember-awesome-macros';
  * @property {({ userId: string, spaceId: string }) => void} onConfirmed Callback invoked
  *   after access granting method has been successfully resolved.
  * @property {string} spaceId ID of space, for which the access will be considered.
- * @property {string} joinRequestId Request ID used in granting access to space used in
- *   `spaceManager#grantSpaceAccess`.
+ * @property {string} joinRequestId Space membership request ID.
  */
 
 export default Component.extend(I18n, {
@@ -46,16 +45,32 @@ export default Component.extend(I18n, {
    */
   modalOptions: undefined,
 
-  verificationProxy: promise.object(computed(
+  /**
+   * @type {PromiseObject<SpaceMembershipRequesterInfo>}
+   */
+  requesterInfoProxy: promise.object(computed(
     'joinRequestId',
-    async function verificationProxy() {
-      // FIXME: z jakiegoś powodu uruchamia się dwa razy
-      return await this.spaceManager.checkSpaceAccessRequest(
+    async function requesterInfoProxy() {
+      return await this.spaceManager.getSpaceMembershipRequesterInfo(
         this.spaceId,
         this.joinRequestId,
       );
     }
   )),
+
+  /**
+   * @type {SpaceMembershipRequesterInfo|null}
+   */
+  requesterInfo: reads('requesterInfoProxy.content'),
+
+  spaceProxy: promise.object(computed(
+    'spaceId',
+    async function spaceProxy() {
+      return await this.spaceManager.getRecordById(this.spaceId);
+    }
+  )),
+
+  space: reads('spaceProxy.content'),
 
   /**
    * @type {({ userId: string, spaceId: string }) => void}
@@ -66,16 +81,11 @@ export default Component.extend(I18n, {
 
   spaceId: reads('modalOptions.spaceId'),
 
-  isValid: bool('verificationProxy.content'),
+  isValid: bool('requesterInfoProxy.isFulfilled'),
 
-  // FIXME: inne dane
+  userId: reads('requesterInfo.userId'),
 
-  userId: reads('verificationProxy.content.userId'),
-
-  spaceName: reads('verificationProxy.content.spaceName'),
-
-  // FIXME: use data from verificationProxy
-  // userName: reads('userProxy.content.name'),
+  spaceName: reads('space.name'),
 
   isProceedButtonVisible: reads('isValid'),
 

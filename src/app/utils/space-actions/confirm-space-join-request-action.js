@@ -17,7 +17,7 @@ import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-s
  * @typedef {Object} ConfirmSpaceJoinRequestActionContext
  * @property {string} spaceId
  * @property {string} requestId Space join request as used in
- *   `SpaceManager#checkSpaceAccessRequest`.
+ *   `SpaceManager#getSpaceMembershipRequesterInfo`.
  */
 
 export default Action.extend({

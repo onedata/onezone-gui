@@ -17,13 +17,6 @@ import { htmlSafe } from '@ember/string';
  * @property {SpaceMarketplaceModel} spaceMarketplaceData
  */
 
-/**
- * @typedef {Object} SpaceAccessRequestMessageData
- * @property {string} message
- * @property {string} contactEmail
- * @property {string} spaceId
- */
-
 export default Action.extend({
   modalManager: service(),
   router: service(),

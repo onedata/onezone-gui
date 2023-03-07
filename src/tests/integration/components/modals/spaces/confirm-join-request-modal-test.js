@@ -19,17 +19,19 @@ import { suppressRejections } from '../../../../helpers/suppress-rejections';
 describe('Integration | Component | modals/spaces/confirm-join-request-modal', function () {
   setupRenderingTest();
 
+  // FIXME: dopasować dane z getSpaceMembershipRequesterInfo do formatu z spaceManagera (brak isValid itd.)
+
   it('renders header and close button if space join request is invalid', async function () {
     const helper = new Helper(this);
     const joinRequestId = 'join_request_id';
     helper.modalOptions = {
       joinRequestId,
     };
-    const checkSpaceAccessRequest = sinon.stub(
+    const getSpaceMembershipRequesterInfo = sinon.stub(
       helper.spaceManager,
-      'checkSpaceAccessRequest'
+      'getSpaceMembershipRequesterInfo'
     );
-    checkSpaceAccessRequest.resolves({ isValid: false });
+    getSpaceMembershipRequesterInfo.resolves({ isValid: false });
 
     await helper.showModal();
 
@@ -48,12 +50,12 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
     helper.modalOptions = {
       joinRequestId,
     };
-    const checkSpaceAccessRequest = sinon.stub(
+    const getSpaceMembershipRequesterInfo = sinon.stub(
       helper.spaceManager,
-      'checkSpaceAccessRequest'
+      'getSpaceMembershipRequesterInfo'
     );
-    checkSpaceAccessRequest.resolves({ isValid: false });
-    checkSpaceAccessRequest.withArgs(sinon.match({ joinRequestId })).resolves({
+    getSpaceMembershipRequesterInfo.resolves({ isValid: false });
+    getSpaceMembershipRequesterInfo.withArgs(sinon.match({ joinRequestId })).resolves({
       isValid: true,
       userId,
       spaceId,
@@ -73,21 +75,21 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
     expect(helper.proceedButton).to.contain.text('Confirm');
   });
 
-  it('invokes grantSpaceAccess on confirm click', async function () {
+  it('invokes getSpaceMembershipRequesterInfo with "grant: true" on grant button click', async function () {
     const helper = new Helper(this);
     const joinRequestId = 'join_request_id';
     helper.modalOptions = {
       joinRequestId,
     };
-    const checkSpaceAccessRequest = sinon.stub(
+    const getSpaceMembershipRequesterInfo = sinon.stub(
       helper.spaceManager,
-      'checkSpaceAccessRequest'
+      'getSpaceMembershipRequesterInfo'
     );
     const grantSpaceAccess = sinon.stub(
       helper.spaceManager,
       'grantSpaceAccess'
     );
-    checkSpaceAccessRequest.resolves({ isValid: true });
+    getSpaceMembershipRequesterInfo.resolves({ isValid: true });
 
     await helper.showModal();
     await click(helper.proceedButton);
@@ -102,12 +104,12 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
     helper.modalOptions = {
       joinRequestId,
     };
-    const checkSpaceAccessRequest = sinon.stub(
+    const getSpaceMembershipRequesterInfo = sinon.stub(
       helper.spaceManager,
-      'checkSpaceAccessRequest'
+      'getSpaceMembershipRequesterInfo'
     );
-    checkSpaceAccessRequest.resolves({ isValid: false });
-    checkSpaceAccessRequest.withArgs(sinon.match({ joinRequestId })).resolves({
+    getSpaceMembershipRequesterInfo.resolves({ isValid: false });
+    getSpaceMembershipRequesterInfo.withArgs(sinon.match({ joinRequestId })).resolves({
       isValid: false,
     });
 
@@ -131,11 +133,11 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
       spaceId,
       joinRequestId,
     };
-    const checkSpaceAccessRequest = sinon.stub(
+    const getSpaceMembershipRequesterInfo = sinon.stub(
       helper.spaceManager,
-      'checkSpaceAccessRequest'
+      'getSpaceMembershipRequesterInfo'
     );
-    checkSpaceAccessRequest.rejects(new Error('test error'));
+    getSpaceMembershipRequesterInfo.rejects(new Error('test error'));
 
     await helper.showModal();
 
@@ -154,11 +156,11 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
       spaceId,
       joinRequestId,
     };
-    const checkSpaceAccessRequest = sinon.stub(
+    const getSpaceMembershipRequesterInfo = sinon.stub(
       helper.spaceManager,
-      'checkSpaceAccessRequest'
+      'getSpaceMembershipRequesterInfo'
     );
-    checkSpaceAccessRequest.returns(new Promise(() => {}));
+    getSpaceMembershipRequesterInfo.returns(new Promise(() => {}));
 
     await helper.showModal();
 
