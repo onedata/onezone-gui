@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-8701 Removed ember-one-way-controls
 * VFS-10491 Fixed revision migration strategy in task arguments and results
 * VFS-9196 Removed @module jsdoc
 * VFS-10531 Added allowedValues constraint to atm number and atm string
