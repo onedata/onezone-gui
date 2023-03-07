@@ -1,7 +1,6 @@
 /**
  * Generates actions for specific atm workflow schema revision.
  *
- * @module utils/atm-workflow/atm-workflow-schema/revision-actions-factory
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

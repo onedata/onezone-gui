@@ -1,8 +1,7 @@
 /**
  * Membership information
- * 
- * @module models/membership
- * @author Michal Borzecki
+ *
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
@@ -15,7 +14,7 @@ import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/gr
 export default Model.extend(GraphSingleModelMixin, {
   /**
    * Array of direct members gri (of record related to entityId), which are
-   * elements of membership paths. 
+   * elements of membership paths.
    * @type {Array<string>}
    */
   intermediaries: attr('array'),

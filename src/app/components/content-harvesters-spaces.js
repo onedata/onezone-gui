@@ -1,7 +1,6 @@
 /**
  * A component that shows spaces attached to harvester
  *
- * @module components/content-harvesters-spaces
  * @author Michał Borzęcki, Agnieszka Warchoł
  * @copyright (C) 2019-2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

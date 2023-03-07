@@ -1,7 +1,6 @@
 /**
  * Content for support space tab: copy command to setup provider with existing data
  *
- * @module components/content-spaces-support/expose-data
  * @author Jakub Liput, Michał Borzęcki
  * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

@@ -1,7 +1,6 @@
 /**
  * Generates actions for specific atm lambda revision.
  *
- * @module utils/atm-workflow/atm-lambda/revision-actions-factory
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

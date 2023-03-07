@@ -1,7 +1,6 @@
 /**
  * Creates new automation inventory.
  *
- * @module components/content-atm-inventories-new
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

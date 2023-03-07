@@ -3,7 +3,6 @@
  * the token form. Each template is token-compatible object with some fields containing
  * default data.
  *
- * @module components/token-template-selector
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

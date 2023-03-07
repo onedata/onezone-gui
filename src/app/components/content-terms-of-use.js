@@ -1,7 +1,6 @@
 /**
  * A component that shows terms of use content.
- * 
- * @module components/content-terms-of-use
+ *
  * @author Agnieszka Warchoł
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

@@ -1,7 +1,6 @@
 /**
  * Container for datasets views for single space (with Oneprovider selector)
  *
- * @module components/content-spaces-datasets
  * @author Jakub Liput
  * @copyright (C) 2019-2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

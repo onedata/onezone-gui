@@ -1,7 +1,6 @@
 /**
  * Redirects to automation inventory creation page on execute.
  *
- * @module utils/workflow-actions/open-create-atm-inventory-view-action
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

@@ -1,8 +1,7 @@
 /**
- * Single tab for provider used in one-tab-bar (it's parent component should be 
+ * Single tab for provider used in one-tab-bar (it's parent component should be
  * `one-tab-bar/tab-bar-ul`).
- * 
- * @module components/provider-tab-li
+ *
  * @author Agnieszka Warchoł
  * @copyright (C) 2022 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

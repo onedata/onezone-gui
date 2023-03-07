@@ -2,8 +2,7 @@
  * Draws column in groups hierarchy visualiser. Deals with scroll change and
  * passes group/relation actions down to the group boxes.
  *
- * @module components/groups-hierarchy-visualiser/column
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

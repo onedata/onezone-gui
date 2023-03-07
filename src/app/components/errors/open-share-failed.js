@@ -1,7 +1,6 @@
 /**
  * Component that shows info "Could not open share".
  *
- * @module components/open-share-failed
  * @author Agnieszka Warchoł
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

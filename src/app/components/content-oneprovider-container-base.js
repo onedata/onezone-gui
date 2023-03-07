@@ -4,7 +4,6 @@
  * at the template root (which is tagless) and typically a header and body
  * of the view. The body is typically an embedde component.
  *
- * @module components/content-oneprovider-container-base
  * @author Jakub Liput
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

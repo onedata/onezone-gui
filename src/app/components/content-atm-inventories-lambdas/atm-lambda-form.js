@@ -3,7 +3,6 @@
  * NOTE: it does not persist data. To save created lambda, you need
  * to do it on your own by providing `onSubmit` (which should return a promise).
  *
- * @module components/content-atm-inventories-lambdas/atm-lambda-form
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

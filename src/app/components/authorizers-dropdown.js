@@ -1,8 +1,7 @@
 /**
  * A dropdown component which presents authorizers.
  *
- * @module components/authorizers-dropdown
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
@@ -62,7 +61,7 @@ export default Component.extend({
 
   /**
    * Powerselect item matcher used by its search engine.
-   * @param {AuthorizerInfo} authorizer 
+   * @param {AuthorizerInfo} authorizer
    * @param {string} term Query string.
    * @returns {boolean} True, if authorizer matches given term.
    */

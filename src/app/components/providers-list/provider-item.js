@@ -1,7 +1,6 @@
 /**
  * Providers sidebar item representing single provider visible for current user
  *
- * @module components/providers-list/provider-item
  * @author Jakub Liput
  * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -41,7 +40,7 @@ export default Component.extend({
 
   /**
    * @virtual
-   * 
+   *
    * Array of possible actions per provider. Each action must be in format:
    * ```
    * {

@@ -2,7 +2,6 @@
  * A providers view for single space - show supporting providers summary
  * and settings per provider
  *
- * @module components/content-spaces-providers
  * @author Jakub Liput
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

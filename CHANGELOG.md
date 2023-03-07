@@ -7,6 +7,8 @@ CHANGELOG
 ### Latest changes
 
 * VFS-8701 Removed ember-one-way-controls
+* VFS-10491 Fixed revision migration strategy in task arguments and results
+* VFS-9196 Removed @module jsdoc
 * VFS-10531 Added allowedValues constraint to atm number and atm string
 * VFS-10452 Added integersOnly constraint to atm number
 * VFS-10372 Added harvester popover in spaces harvesters list

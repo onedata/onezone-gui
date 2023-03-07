@@ -2,8 +2,7 @@
  * A component, that shows one block in membership path. Is used internally by
  * membership-visualiser component.
  *
- * @module components/membership-visualiser/membership-block
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
