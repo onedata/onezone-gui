@@ -104,6 +104,8 @@ export default EmberObject.extend(OwnerInjector, {
 
   //#endregion
 
+  marketplaceConfig: reads('spaceManager.marketplaceConfig'),
+
   /**
    * True, if the current list considering search conditions, is empty.
    * @type {ComputedProperty<boolean>}

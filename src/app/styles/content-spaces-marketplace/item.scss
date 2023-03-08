@@ -20,6 +20,7 @@
         flex-direction: row;
         min-width: 100%;
         align-items: center;
+
         .access-granted-container {
           margin-left: -0.2em;
         }
@@ -127,6 +128,21 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+
+    &.access-info-col-outdated {
+      flex-direction: row;
+      align-items: center;
+      .status-btn-external-icon {
+        color: $color-one-warning;
+      }
+    }
+
+    .status-btn-external-icon {
+      margin-bottom: -0.3em;
+      margin-right: 1em;
+      color: $color-one-warning;
+      font-size: 120%;
+    }
     > * {
       margin-top: 0.25em;
       &:first-child {
@@ -159,7 +175,7 @@
   }
 
   .access-links-container {
-    margin-top: 1em;
+    margin-top: 0.5em;
     margin-right: 0.35em;
   }
 

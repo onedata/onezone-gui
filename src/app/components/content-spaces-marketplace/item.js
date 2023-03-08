@@ -17,6 +17,7 @@ import { htmlSafe } from '@ember/string';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 import sleep from 'onedata-gui-common/utils/sleep';
 import globalCssVariablesManager from 'onedata-gui-common/utils/global-css-variables-manager';
+import { MarketplaceSpaceStatus } from 'onezone-gui/utils/spaces-marketplace-item';
 
 /**
  * Time in which the item should change attention color in milliseconds to normal
@@ -86,6 +87,8 @@ export default Component.extend(I18n, {
 
   iconifiedBlockClass: 'iconified-block-marketplace-available',
 
+  MarketplaceSpaceStatusEnum: MarketplaceSpaceStatus,
+
   //#endregion
 
   /**
@@ -113,6 +116,8 @@ export default Component.extend(I18n, {
   organizationName: reads('spaceItem.organizationName'),
 
   creationTime: reads('spaceItem.creationTime'),
+
+  status: reads('spaceItem.marketplaceSpaceStatusProxy.content'),
 
   creationDateText: computed('creationTime', function creationDateText() {
     return htmlSafe(
@@ -190,6 +195,25 @@ export default Component.extend(I18n, {
       );
     }
   ),
+
+  lastActivityDateText: computed(
+    'spaceItem.requestInfo.lastActivity',
+    function lastActivityDateText() {
+      if (!this.spaceItem.requestInfo?.lastActivity) {
+        return '';
+      }
+      return dateFormat([this.spaceItem.requestInfo.lastActivity], {
+        format: 'dateWithMinutes',
+      });
+    }
+  ),
+
+  accessInfoColClassName: computed('status', function accessInfoColClassName() {
+    if (!this.status) {
+      return '';
+    }
+    return `access-info-col-${this.status}`;
+  }),
 
   accessColorsSetter: observer('isAccessGranted', function accessColorsSetter() {
     if (!this.isAnimating && typeof this.isAccessGranted === 'boolean') {

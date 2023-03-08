@@ -6,7 +6,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import EmberObject, { computed } from '@ember/object';
+import EmberObject, { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { promise } from 'ember-awesome-macros';
 import { all as allFulfilled } from 'rsvp';
@@ -60,6 +60,8 @@ export default EmberObject.extend({
    */
   id: reads('spaceId'),
 
+  // FIXME: isAccessGranted może już nie być potrzebne
+
   /**
    * @type {ComputedProperty<boolean|null>}
    */
@@ -76,23 +78,26 @@ export default EmberObject.extend({
   /**
    * @type {ComputedProperty<PromiseObject<SpaceMembershipRequestInfo>>}
    */
-  requestInfo: promise.object(computed(
+  requestInfoProxy: promise.object(computed(
     'viewModel.spaceMembershipRequestsInfoProxy.content',
-    function requestInfo() {
+    async function requestInfoProxy() {
       const spaceMembershipRequestsInfo = this.viewModel.spaceMembershipRequestsInfoProxy;
       if (!spaceMembershipRequestsInfo) {
         return null;
       }
-      return spaceMembershipRequestsInfo.pending[this.spaceId] ??
-        spaceMembershipRequestsInfo.rejected[this.spaceId] ??
+      return get(spaceMembershipRequestsInfo, 'pending')[this.spaceId] ??
+        get(spaceMembershipRequestsInfo, 'pending')[this.spaceId] ??
         null;
     }
   )),
+
+  requestInfo: reads('requestInfoProxy.content'),
 
   marketplaceSpaceStatusProxy: promise.object(computed(
     'spaceId',
     'viewModel.{userSpacesIdsProxy.content,spaceMembershipRequestsInfoProxy.content}',
     async function marketplaceSpaceStatusProxy() {
+      // FIXME: w praktyce uruchamia się wielokrotnie
       // FIXME: może by to przerobić tak, żeby te poniższe dane były konieczne do
       // załadowania widoku nadrzędnego
       const [
@@ -104,24 +109,24 @@ export default EmberObject.extend({
       ]);
       if (userSpacesIds.includes(this.spaceId)) {
         return MarketplaceSpaceStatus.Granted;
-      } else if (spaceMembershipRequestsInfo?.rejected?.[this.spaceId]) {
-        const requestInfo = spaceMembershipRequestsInfo.rejected[this.spaceId];
+      } else if (get(spaceMembershipRequestsInfo, 'rejected')?.[this.spaceId]) {
+        const requestInfo = get(spaceMembershipRequestsInfo, 'rejected')[this.spaceId];
         const lastActivity = requestInfo.lastActivity ?? 0;
         const minBackoff =
-          this.spaceManager.marketplaceConfig.minBackoffAfterRejection ?? 0;
-        const now = Date.now() / 1000;
-        if (now < lastActivity + minBackoff) {
+          this.viewModel.marketplaceConfig.minBackoffAfterRejection ?? 0;
+        const now = Math.floor(Date.now() / 1000);
+        if (lastActivity + minBackoff < now) {
           return MarketplaceSpaceStatus.Visible;
         } else {
           return MarketplaceSpaceStatus.Rejected;
         }
-      } else if (spaceMembershipRequestsInfo?.pending?.[this.spaceId]) {
-        const requestInfo = spaceMembershipRequestsInfo.pending[this.spaceId];
+      } else if (get(spaceMembershipRequestsInfo, 'pending')?.[this.spaceId]) {
+        const requestInfo = get(spaceMembershipRequestsInfo, 'pending')[this.spaceId];
         const lastActivity = requestInfo.lastActivity ?? 0;
         const minBackoff =
-          this.spaceManager.marketplaceConfig.minBackoffBetweenReminders ?? 0;
-        const now = Date.now() / 1000;
-        if (now < lastActivity + minBackoff) {
+          this.viewModel.marketplaceConfig.minBackoffBetweenReminders ?? 0;
+        const now = Math.floor(Date.now() / 1000);
+        if (lastActivity + minBackoff < now) {
           return MarketplaceSpaceStatus.Outdated;
         } else {
           return MarketplaceSpaceStatus.Pending;
