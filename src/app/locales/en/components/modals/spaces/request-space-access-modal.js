@@ -13,4 +13,5 @@ export default {
   email: {
     label: 'Your e-mail address',
   },
+  emailShareCheckboxText: 'I understand, that my Onedata user data and above contact e-mail address will be shared with space maintainer for membership request processing purposes.',
 };

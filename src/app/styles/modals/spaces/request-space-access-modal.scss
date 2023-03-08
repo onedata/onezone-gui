@@ -7,5 +7,12 @@
       min-height: 10em;
     }
   }
+  .row-understand-notice {
+    .text-understand {
+      color: $main-text-color;
+      // make larger spacing from checkbox to text, to look like label-input spacing
+      padding-left: 34px;
+    }
+  }
 }
 

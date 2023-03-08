@@ -14,6 +14,7 @@ import TextField from 'onedata-gui-common/utils/form-component/text-field';
 import TextAreaField from 'onedata-gui-common/utils/form-component/textarea-field';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
 import { validator } from 'ember-cp-validations';
+import { and } from 'ember-awesome-macros';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -28,6 +29,12 @@ export default Component.extend(I18n, {
    * @type {RequestSpaceAccessActionContext}
    */
   modalOptions: undefined,
+
+  //#region state
+
+  isEmailShareConfirmed: false,
+
+  //#endregion
 
   spaceMarketplaceData: reads('modalOptions.spaceMarketplaceData'),
 
@@ -74,7 +81,7 @@ export default Component.extend(I18n, {
     });
   }),
 
-  isProceedAvailable: reads('rootField.isValid'),
+  isProceedAvailable: and('rootField.isValid', 'isEmailShareConfirmed'),
 
   actions: {
     /**
