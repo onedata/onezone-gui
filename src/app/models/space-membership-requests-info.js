@@ -25,12 +25,6 @@ export function generateGri(userId) {
 }
 
 /**
- * @typedef {Object} UserSpaceMembershipRequestsMap
- * @property {SpaceMembershipRequestsMap} pending
- * @property {SpaceMembershipRequestsMap} rejected
- */
-
-/**
  * @typedef {Object} SpaceMembershipRequestInfo
  * @property {string} requestId
  * @property {string} contactEmail
@@ -42,12 +36,18 @@ export function generateGri(userId) {
 /**
  * @typedef {Object<string, SpaceMembershipRequestInfo>} SpaceMembershipRequestsMap
  * Keys are space entity IDs.
- * Values are
+ * Values are information about request made for the space.
  */
 
 export default Model.extend(GraphSingleModelMixin, {
+
   /**
-   * @type {ComputedProperty<UserSpaceMembershipRequestsMap>}
+   * @type {ComputedProperty<SpaceMembershipRequestsMap>}
    */
-  requestPerSpace: attr('object'),
+  pending: attr('object'),
+
+  /**
+   * @type {ComputedProperty<SpaceMembershipRequestsMap>}
+   */
+  rejected: attr('object'),
 }).reopenClass(StaticGraphModelMixin);

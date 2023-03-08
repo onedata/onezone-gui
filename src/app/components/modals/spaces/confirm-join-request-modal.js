@@ -63,6 +63,18 @@ export default Component.extend(I18n, {
    */
   requesterInfo: reads('requesterInfoProxy.content'),
 
+  /**
+   * Make requesterInfo compatible with `join-image` component.
+   * @type {ComputedProperty<Object>} User-like record.
+   */
+  joiningUserLikeRecord: computed('requesterInfo', function joiningUserLikeRecord() {
+    return {
+      entityId: this.requesterInfo.userId,
+      name: this.requesterInfo.fullName,
+      username: this.requesterInfo.username,
+    };
+  }),
+
   spaceProxy: promise.object(computed(
     'spaceId',
     async function spaceProxy() {

@@ -73,9 +73,25 @@ export default EmberObject.extend({
     }
   )),
 
+  /**
+   * @type {ComputedProperty<PromiseObject<SpaceMembershipRequestInfo>>}
+   */
+  requestInfo: promise.object(computed(
+    'viewModel.spaceMembershipRequestsInfoProxy.content',
+    function requestInfo() {
+      const spaceMembershipRequestsInfo = this.viewModel.spaceMembershipRequestsInfoProxy;
+      if (!spaceMembershipRequestsInfo) {
+        return null;
+      }
+      return spaceMembershipRequestsInfo.pending[this.spaceId] ??
+        spaceMembershipRequestsInfo.rejected[this.spaceId] ??
+        null;
+    }
+  )),
+
   marketplaceSpaceStatusProxy: promise.object(computed(
     'spaceId',
-    'viewModel.userSpacesIdsProxy',
+    'viewModel.{userSpacesIdsProxy.content,spaceMembershipRequestsInfoProxy.content}',
     async function marketplaceSpaceStatusProxy() {
       // FIXME: może by to przerobić tak, żeby te poniższe dane były konieczne do
       // załadowania widoku nadrzędnego

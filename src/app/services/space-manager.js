@@ -598,7 +598,7 @@ export default Service.extend({
     const requestGri = gri({
       entityType: spaceEntityType,
       entityId: spaceId,
-      aspect: 'membership_request',
+      aspect: 'membership_requester_info',
       aspectId: requestId,
     });
     return this.onedataGraph.request({
@@ -640,15 +640,7 @@ export default Service.extend({
    */
   async getSpaceMembershipRequestsInfo() {
     const requestGri = generateSpaceMembershipRequestsInfoGri(this.currentUser.userId);
-    return await this.store.findRecord('spaceMembershipRequestsInfo', requestGri, {
-      adapterOptions: {
-        _meta: {
-          // FIXME: miało być subscribable - trzeba to ustalić z backendem
-          // jak faktycznie nie ma być subscr. to można usunąć model i zrobić typedef
-          subscribe: false,
-        },
-      },
-    });
+    return await this.store.findRecord('spaceMembershipRequestsInfo', requestGri);
   },
 
   //#endregion

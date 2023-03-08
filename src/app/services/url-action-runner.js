@@ -59,22 +59,21 @@ export default UrlActionRunner.extend({
    * @returns {Promise}
    */
   async confirmSpaceJoinRequestActionRunner(actionParams, transition) {
-    let spaceId = actionParams.action_spaceId;
+    const spaceId = actionParams.action_spaceId;
     const requestId = actionParams.action_requestId;
-    // FIXME: workaround code - decide if spaceId will be provided
-    if (!spaceId) {
-      spaceId = requestId.split('-')[0];
-    }
     if (!spaceId || !requestId) {
       return;
     }
-    // load the modal as early as it can be loaded
+    try {
+      await transition;
+    } catch {
+      // onedata transition could fail, but it should not cause action to cancel
+    }
     this.spaceActions.createConfirmSpaceJoinRequestAction({
       spaceId,
       requestId,
     }).execute();
     // allow transition that invoked URL action to complete its handlers
-    await transition;
     await this.router.transitionTo(
       'onedata.sidebar.content.aspect',
       'spaces',

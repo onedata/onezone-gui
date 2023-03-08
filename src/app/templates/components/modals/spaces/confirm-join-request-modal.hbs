@@ -46,7 +46,7 @@
           {{join-image
             class="user-join-space-image hidden-xs"
             joiningModelName="user"
-            joiningRecord=requesterInfo
+            joiningRecord=joiningUserLikeRecord
             inviteTargetModelName="space"
             inviteTargetId=spaceId
             inviteTargetName=spaceName
@@ -63,8 +63,8 @@
     {{#modal.footer class="btn-toolbar"}}
       {{#if isProceedButtonVisible}}
         {{#one-button
-          type="grant"
-          class="proceed-btn"
+          type="warning"
+          class="reject-btn"
           disabled=(not isProceedAvailable)
           onClick=(action "reject")
         }}
@@ -72,7 +72,7 @@
         {{/one-button}}
         {{#one-button
           type="primary"
-          class="proceed-btn"
+          class="grant-btn"
           disabled=(not isProceedAvailable)
           onClick=(action "grant")
         }}

@@ -251,9 +251,12 @@ export default Component.extend(I18n, {
         const result = await this.spaceActions.createRequestSpaceAccessAction({
           spaceMarketplaceData: this.spaceItem,
         }).execute();
-        if (result.status === 'done') {
-          this.set('isRequested', true);
-        }
+        // FIXME: ręczna aktualizacja spaceMembershipRequestsInfo
+        // FIXME: tymczasowy stan - do usunięcia, powinno działać na zasadzie odczytu
+        // info o space membership requestach
+        // if (result.status === 'done') {
+        //   this.set('isRequested', true);
+        // }
       })();
     },
   },
