@@ -8,7 +8,7 @@
  */
 
 import Service, { inject as service } from '@ember/service';
-import { get, getProperties } from '@ember/object';
+import { get, getProperties, computed } from '@ember/object';
 import { resolve, all as allFulfilled, allSettled } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import gri from 'onedata-gui-websocket-client/utils/gri';
@@ -16,10 +16,12 @@ import {
   entityType as spaceEntityType,
   aspects as spaceAspects,
 } from 'onezone-gui/models/space';
-import { entityType as userEntityType } from 'onezone-gui/models/user';
 import {
   generateGri as generateSpaceMarketplaceInfoGri,
 } from 'onezone-gui/models/space-marketplace-info';
+import {
+  generateGri as generateSpaceMembershipRequestsInfoGri,
+} from 'onezone-gui/models/space-membership-requests-info';
 
 export const listMarketplaceAspect = 'list_marketplace';
 
@@ -51,6 +53,13 @@ export const listMarketplaceAspect = 'list_marketplace';
  *   when space membership has been requested.
  */
 
+/**
+ * @typedef {Object} SpacesMarketplaceConfig
+ * @property {boolean} enabled
+ * @property {number} minBackoffBetweenReminders
+ * @property {number} minBackoffAfterRejection
+ */
+
 export default Service.extend({
   store: service(),
   currentUser: service(),
@@ -61,6 +70,27 @@ export default Service.extend({
   onedataGraphUtils: service(),
   recordManager: service(),
   onedataConnection: service(),
+
+  /**
+   * @type {ComputedProperty<SpacesMarketplaceConfig>}
+   */
+  marketplaceConfig: computed(
+    'onedataConnection.{spaceMarketplaceEnabled,spaceMarketplaceMinBackoffBetweenReminders,spaceMarketplaceMinBackoffAfterRejection}',
+    function marketplaceConfig() {
+      const {
+        spaceMarketplaceEnabled,
+        spaceMarketplaceMinBackoffBetweenReminders,
+        spaceMarketplaceMinBackoffAfterRejection,
+      } = this.onedataConnection;
+      return {
+        enabled: spaceMarketplaceEnabled ?? false,
+        minBackoffBetweenReminders: spaceMarketplaceMinBackoffBetweenReminders ??
+          Number.MAX_SAFE_INTEGER,
+        minBackoffAfterRejection: spaceMarketplaceMinBackoffAfterRejection ??
+          Number.MAX_SAFE_INTEGER,
+      };
+    }
+  ),
 
   /**
    * Fetches collection of all spaces
@@ -455,7 +485,7 @@ export default Service.extend({
       availableSpaceTags : {};
   },
 
-  //#region spaces marketplace items
+  //#region spaces marketplace
 
   /**
    * @param {InfiniteScrollListingParams} listingParams
@@ -538,10 +568,6 @@ export default Service.extend({
     );
   },
 
-  //#endregion
-
-  //#region spaces marketplace membership requesting/resolving
-
   /**
    * @param {SpaceAccessRequestMessageData} requestData
    */
@@ -613,13 +639,16 @@ export default Service.extend({
    * @returns {Promise<Models.SpaceMembershipRequestsInfo>}
    */
   async getSpaceMembershipRequestsInfo() {
-    const requestGri = gri({
-      entityType: userEntityType,
-      entityId: this.currentUser.userId,
-      aspect: 'space_membership_requests',
-      scope: 'private',
+    const requestGri = generateSpaceMembershipRequestsInfoGri(this.currentUser.userId);
+    return await this.store.findRecord('spaceMembershipRequestsInfo', requestGri, {
+      adapterOptions: {
+        _meta: {
+          // FIXME: miało być subscribable - trzeba to ustalić z backendem
+          // jak faktycznie nie ma być subscr. to można usunąć model i zrobić typedef
+          subscribe: false,
+        },
+      },
     });
-    return await this.store.findRecord('spaceMembershipRequestsInfo', requestGri);
   },
 
   //#endregion

@@ -10,15 +10,17 @@ import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/st
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { entityType as userEntityType } from 'onezone-gui/models/user';
+import { assert } from '@ember/debug';
 
 export const aspect = 'space_membership_requests';
 
 export function generateGri(userId) {
+  assert('spaceMembershipRequestsInfo GRI needs a userId to be generated', userId);
   return gri({
     entityType: userEntityType,
     entityId: userId,
     aspect,
-    scope: 'private',
+    scope: 'auto',
   });
 }
 

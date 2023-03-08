@@ -63,6 +63,29 @@ const OnezoneConnection = ProductionSymbol.extend({
   availableSpaceTags: reads('attributes.availableSpaceTags'),
 
   /**
+   * @type {boolean}
+   */
+  spaceMarketplaceEnabled: reads('attributes.spaceMarketplaceEnabled'),
+
+  /**
+   * Time in seconds in which user can request for markeplace space membership after the
+   * previous request was sent and it was nor accepted or rejected.
+   * @type {number}
+   */
+  spaceMarketplaceMinBackoffBetweenReminders: reads(
+    'attributes.spaceMarketplaceMinBackoffBetweenReminders'
+  ),
+
+  /**
+   * Time in seconds in which user can request for markeplace space membership after the
+   * previous request was rejected.
+   * @type {number}
+   */
+  spaceMarketplaceMinBackoffAfterRejection: reads(
+    'attributes.spaceMarketplaceMinBackoffAfterRejection'
+  ),
+
+  /**
    * @type {ComputedProperty<EmberObject>}
    */
   onezoneRecord: computed(function onezoneRecord() {
