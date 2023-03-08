@@ -24,6 +24,7 @@ export default Action.extend({
   modalManager: service(),
   router: service(),
   navigationState: service(),
+  recordManager: service(),
 
   // NOTE: This action is not intended to use as menu action, so it doesn't have
   // title, class and icon.
@@ -46,8 +47,9 @@ export default Action.extend({
     const modalInstance = this.modalManager.show('spaces/confirm-join-request-modal', {
       spaceId: this.spaceId,
       joinRequestId: this.requestId,
-      onGranted: ({ userId, spaceId }) => {
+      onGranted: async ({ userId, spaceId }) => {
         set(result, 'status', 'done');
+        await this.recordManager.reloadUserRecordList('space');
         if (!userId || !spaceId) {
           return;
         }
@@ -57,11 +59,9 @@ export default Action.extend({
         ) {
           this.navigationState.changeRouteAspectOptions({
             member: userId,
-            action: null,
-            joinRequestId: null,
           });
         } else {
-          this.router.transitionTo(
+          await this.router.transitionTo(
             'onedata.sidebar.content.aspect',
             'spaces',
             spaceId,
@@ -74,8 +74,6 @@ export default Action.extend({
             }
           );
         }
-
-        // TODO: VFS-10384 check how it behaves when space will be pushed to list
       },
     });
     await modalInstance.hiddenPromise;

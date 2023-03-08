@@ -127,10 +127,15 @@ export default Component.extend(I18n, {
       try {
         await this.grantAccess();
         this.modalManager.hide(this.modalId);
-        this.onGranted({
-          spaceId: this.spaceId,
-          userId: this.userId,
-        });
+        try {
+          await this.onGranted({
+            spaceId: this.spaceId,
+            userId: this.userId,
+          });
+        } catch (onGrantedHookError) {
+          // ignore hook failure - it is not necessary for action to complete
+          console.warn('Executing onGranted hook failed', onGrantedHookError);
+        }
       } catch (error) {
         this.globalNotify.backendError(this.t('grantingSpaceAccess'), error);
       }
