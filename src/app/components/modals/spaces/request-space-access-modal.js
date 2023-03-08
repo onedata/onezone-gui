@@ -53,6 +53,11 @@ export default Component.extend(I18n, {
       name: 'message',
       defaultValue: '',
       isOptional: true,
+      customValidators: [
+        validator('length', {
+          max: 2000,
+        }),
+      ],
     });
   }),
 
