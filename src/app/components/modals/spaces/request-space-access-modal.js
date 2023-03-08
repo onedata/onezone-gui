@@ -14,7 +14,7 @@ import TextField from 'onedata-gui-common/utils/form-component/text-field';
 import TextAreaField from 'onedata-gui-common/utils/form-component/textarea-field';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
 import { validator } from 'ember-cp-validations';
-import { and } from 'ember-awesome-macros';
+import { and, not } from 'ember-awesome-macros';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -34,6 +34,8 @@ export default Component.extend(I18n, {
 
   isEmailShareConfirmed: false,
 
+  isDisabled: false,
+
   //#endregion
 
   spaceMarketplaceData: reads('modalOptions.spaceMarketplaceData'),
@@ -42,16 +44,28 @@ export default Component.extend(I18n, {
 
   spaceId: reads('spaceMarketplaceData.spaceId'),
 
+  modalClassNames: computed('isDisabled', function modalClassNames() {
+    const classes = ['request-space-access-modal'];
+    if (this.isDisabled) {
+      classes.push('disabled');
+    }
+    return classes;
+  }),
+
   rootField: computed(
     function rootField() {
-      return FormFieldsRootGroup.create({
-        ownerSource: this,
-        i18nPrefix: this.i18nPrefix,
-        fields: [
-          this.messageField,
-          this.emailField,
-        ],
-      });
+      return FormFieldsRootGroup.extend({
+          isEnabled: not('requestSpaceAccessModal.isDisabled'),
+        })
+        .create({
+          requestSpaceAccessModal: this,
+          ownerSource: this,
+          i18nPrefix: this.i18nPrefix,
+          fields: [
+            this.messageField,
+            this.emailField,
+          ],
+        });
     }
   ),
 
@@ -88,16 +102,30 @@ export default Component.extend(I18n, {
      * @param {(data: SpaceAccessRequestMessageData) => void} modalSubmitCallback
      */
     async submit(modalSubmitCallback) {
-      const {
-        email: contactEmail,
-        message,
-      } = this.rootField.dumpValue();
+      if (!this.isProceedAvailable || this.isDisabled) {
+        return;
+      }
 
-      return modalSubmitCallback?.({
-        contactEmail,
-        message,
-        spaceId: this.spaceId,
-      });
+      this.set('isDisabled', true);
+      try {
+        const {
+          email: contactEmail,
+          message,
+        } = this.rootField.dumpValue();
+        return await modalSubmitCallback?.({
+          contactEmail,
+          message,
+          spaceId: this.spaceId,
+        });
+      } finally {
+        this.set('isDisabled', false);
+      }
+    },
+    toggleEmailShareConfirmation(state = !this.isEmailShareConfirmed) {
+      if (this.isDisabled) {
+        return;
+      }
+      this.set('isEmailShareConfirmed', state);
     },
   },
 });

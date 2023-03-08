@@ -1,4 +1,10 @@
 .request-space-access-modal {
+  &.disabled {
+    .row-understand-notice .text-understand {
+      color: $main-text-color-disabled;
+    }
+  }
+
   p + .request-access-form {
     margin-top: 1em;
   }
