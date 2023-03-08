@@ -37,6 +37,7 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
   createActionsForRevisionNumber(revisionNumber) {
     return [
       this.createRedesignAsNewRevisionAction(revisionNumber),
+      this.createDumpRevisionAction(revisionNumber),
     ];
   },
 
@@ -72,6 +73,18 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
       atmLambda,
       originRevisionNumber: revisionNumber,
       onRevisionCreate,
+    });
+  },
+
+  /**
+   * @private
+   * @param {RevisionNumber} revisionNumber
+   * @returns {Utils.Action}
+   */
+  createDumpRevisionAction(revisionNumber) {
+    return this.workflowActions.createDumpAtmLambdaRevisionAction({
+      atmLambda: this.atmLambda,
+      revisionNumber: revisionNumber,
     });
   },
 });

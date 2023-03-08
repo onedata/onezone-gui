@@ -23,6 +23,7 @@
             visible=(eq effectiveActiveSlide "editor")
             onBackSlide=(action "showListView")
             onAtmLambdaRevisionSaved=(action "showListView")
+            onRegisterViewActions=(action "registerViewActions" "editor")
           }}
         {{else}}
           {{content-atm-inventories-lambdas/loading-view

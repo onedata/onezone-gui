@@ -197,6 +197,27 @@ export default Service.extend({
   },
 
   /**
+   * @param {string} atmLambdaId
+   * @param {RevisionNumber} revisionNumber
+   * @returns {Promise<Object>} lambda dump
+   */
+  async getAtmLambdaDump(atmLambdaId, revisionNumber) {
+    return await this.onedataGraph.request({
+      gri: gri({
+        entityType: atmLambdaEntityType,
+        entityId: atmLambdaId,
+        aspect: 'dump',
+        scope: 'private',
+      }),
+      operation: 'create',
+      subscribe: false,
+      data: {
+        includeRevision: revisionNumber,
+      },
+    });
+  },
+
+  /**
    * @param {String} atmLambdaId
    * @param {RevisionNumber} revisionNumber
    * @param {Object} revisionData

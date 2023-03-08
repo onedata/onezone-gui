@@ -34,6 +34,10 @@ const revisionActionsSpec = [{
   className: 'create-atm-lambda-revision-action-trigger',
   label: 'Redesign as new revision',
   icon: 'plus',
+}, {
+  className: 'dump-atm-lambda-revision-action-trigger',
+  label: 'Download (json)',
+  icon: 'browser-download',
 }];
 
 const lambdaSelectionActionsSpec = [lambdaPresentationActionsSpec[1]];
