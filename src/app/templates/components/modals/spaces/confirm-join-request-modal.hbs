@@ -1,6 +1,7 @@
 {{#global-modal
   classNames="confirm-join-request-modal"
   modalId=modalId
+  allowClose=false
   size="lg"
   as |modal|
 }}
@@ -44,7 +45,7 @@
             {{#if requesterInfo.contactEmail}}
               {{!-- do not break all lines to avoid spaces --}}
               (<a
-                class="user-email"
+                class="azure user-email"
                 href={{concat "mailto:" requesterInfo.contactEmail}}
               >{{requesterInfo.contactEmail}}</a>)
             {{/if}}

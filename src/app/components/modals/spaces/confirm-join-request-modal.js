@@ -16,7 +16,7 @@ import { promise, bool } from 'ember-awesome-macros';
 
 /**
  * @typedef {Object} ConfirmJoinRequestModalOptions
- * @property {({ userId: string, spaceId: string }) => void} onConfirmed Callback invoked
+ * @property {({ userId: string, spaceId: string }) => void} onGranted Callback invoked
  *   after access granting method has been successfully resolved.
  * @property {string} spaceId ID of space, for which the access will be considered.
  * @property {string} joinRequestId Space membership request ID.
@@ -87,7 +87,7 @@ export default Component.extend(I18n, {
   /**
    * @type {({ userId: string, spaceId: string }) => void}
    */
-  onConfirmed: reads('modalOptions.onConfirmed'),
+  onGranted: reads('modalOptions.onGranted'),
 
   joinRequestId: reads('modalOptions.joinRequestId'),
 
@@ -127,7 +127,7 @@ export default Component.extend(I18n, {
       try {
         await this.grantAccess();
         this.modalManager.hide(this.modalId);
-        this.onConfirmed({
+        this.onGranted({
           spaceId: this.spaceId,
           userId: this.userId,
         });
@@ -140,14 +140,10 @@ export default Component.extend(I18n, {
         return;
       }
       try {
-        await this.grantAccess();
+        await this.rejectAccess();
         this.modalManager.hide(this.modalId);
-        this.onConfirmed({
-          spaceId: this.spaceId,
-          userId: this.userId,
-        });
       } catch (error) {
-        this.globalNotify.backendError(this.t('grantingSpaceAccess'), error);
+        this.globalNotify.backendError(this.t('rejectingSpaceAccess'), error);
       }
     },
   },

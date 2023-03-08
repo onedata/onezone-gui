@@ -46,7 +46,7 @@ export default Action.extend({
     const modalInstance = this.modalManager.show('spaces/confirm-join-request-modal', {
       spaceId: this.spaceId,
       joinRequestId: this.requestId,
-      onConfirmed: ({ userId, spaceId }) => {
+      onGranted: ({ userId, spaceId }) => {
         set(result, 'status', 'done');
         if (!userId || !spaceId) {
           return;
