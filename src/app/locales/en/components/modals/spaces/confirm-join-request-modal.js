@@ -8,7 +8,9 @@ export default {
   },
   body: {
     valid: {
-      text: 'An access to <strong>{{spaceName}}</strong> space has been requested by <strong>{{userName}}</strong> using spaces marketplace.',
+      accessTo: 'An access to',
+      spaceRequestedBy: 'space has been requested by',
+      usingMarketplace: 'using spaces marketplace.',
       info: 'Right after granting the access, the user will gain default privileges to space, but you can modify them.',
       question: 'Do you want to confirm granting access?',
     },

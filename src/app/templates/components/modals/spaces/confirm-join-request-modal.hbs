@@ -37,10 +37,18 @@
           proxy=spaceProxy
         }}
           <p>
-            {{tt this "body.valid.text"
-              spaceName=spaceName
-              userName=requesterInfo.fullName
-            }}
+            {{tt this "body.valid.accessTo"}}
+            <strong class="space-name">{{name-conflict item=spaceProxy.content}}</strong>
+            {{tt this "body.valid.spaceRequestedBy"}}
+            <strong class="user-full-name">{{requesterInfo.fullName}}</strong>
+            {{#if requesterInfo.contactEmail}}
+              {{!-- do not break all lines to avoid spaces --}}
+              (<a
+                class="user-email"
+                href={{concat "mailto:" requesterInfo.contactEmail}}
+              >{{requesterInfo.contactEmail}}</a>)
+            {{/if}}
+            {{tt this "body.valid.usingMarketplace"}}
           </p>
           <p>{{tt this "body.valid.info"}}</p>
           {{join-image
