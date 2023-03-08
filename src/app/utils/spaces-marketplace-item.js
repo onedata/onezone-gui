@@ -76,42 +76,58 @@ export default EmberObject.extend({
   )),
 
   /**
-   * @type {ComputedProperty<PromiseObject<SpaceMembershipRequestInfo>>}
+   * @type {ComputedProperty<PromiseObject<{ requestInfo: SpaceMembershipRequestInfo, collectionName: 'pending'|'rejected'>>}
    */
-  requestInfoProxy: promise.object(computed(
-    'viewModel.spaceMembershipRequestsInfoProxy.content',
-    async function requestInfoProxy() {
-      const spaceMembershipRequestsInfo = this.viewModel.spaceMembershipRequestsInfoProxy;
+  itemRequestInfoProxy: promise.object(computed(
+    'spaceMembershipRequestsInfoProxy.content.{pending,rejected}',
+    async function itemRequestInfoProxy() {
+      const spaceMembershipRequestsInfo = await this.spaceMembershipRequestsInfoProxy;
       if (!spaceMembershipRequestsInfo) {
         return null;
       }
-      return get(spaceMembershipRequestsInfo, 'pending')[this.spaceId] ??
-        get(spaceMembershipRequestsInfo, 'pending')[this.spaceId] ??
-        null;
+
+      /** @type {'pending'|'rejected'} */
+      let collectionName = null;
+      for (collectionName of ['pending', 'rejected']) {
+        const requestInfo =
+          get(spaceMembershipRequestsInfo, collectionName)?.[this.spaceId];
+        if (requestInfo) {
+          return {
+            requestInfo,
+            collectionName,
+          };
+        }
+      }
+      return null;
     }
   )),
 
-  requestInfo: reads('requestInfoProxy.content'),
+  itemRequestInfo: reads('itemRequestInfoProxy.content'),
 
+  userSpacesIdsProxy: reads('viewModel.userSpacesIdsProxy'),
+
+  spaceMembershipRequestsInfoProxy: reads('viewModel.spaceMembershipRequestsInfoProxy'),
+
+  // FIXME: uprościć do .content
   marketplaceSpaceStatusProxy: promise.object(computed(
     'spaceId',
-    'viewModel.{userSpacesIdsProxy.content,spaceMembershipRequestsInfoProxy.content}',
+    'userSpacesIdsProxy.content',
+    'itemRequestInfoProxy.content.lastActivity',
     async function marketplaceSpaceStatusProxy() {
       // FIXME: w praktyce uruchamia się wielokrotnie
       // FIXME: może by to przerobić tak, żeby te poniższe dane były konieczne do
       // załadowania widoku nadrzędnego
       const [
+        itemRequestInfo,
         userSpacesIds,
-        spaceMembershipRequestsInfo,
       ] = await allFulfilled([
-        this.viewModel.userSpacesIdsProxy,
-        this.viewModel.spaceMembershipRequestsInfoProxy,
+        this.itemRequestInfoProxy,
+        this.userSpacesIdsProxy,
       ]);
       if (userSpacesIds.includes(this.spaceId)) {
         return MarketplaceSpaceStatus.Granted;
-      } else if (get(spaceMembershipRequestsInfo, 'rejected')?.[this.spaceId]) {
-        const requestInfo = get(spaceMembershipRequestsInfo, 'rejected')[this.spaceId];
-        const lastActivity = requestInfo.lastActivity ?? 0;
+      } else if (itemRequestInfo?.collectionName === 'rejected') {
+        const lastActivity = itemRequestInfo.requestInfo.lastActivity ?? 0;
         const minBackoff =
           this.viewModel.marketplaceConfig.minBackoffAfterRejection ?? 0;
         const now = Math.floor(Date.now() / 1000);
@@ -120,9 +136,8 @@ export default EmberObject.extend({
         } else {
           return MarketplaceSpaceStatus.Rejected;
         }
-      } else if (get(spaceMembershipRequestsInfo, 'pending')?.[this.spaceId]) {
-        const requestInfo = get(spaceMembershipRequestsInfo, 'pending')[this.spaceId];
-        const lastActivity = requestInfo.lastActivity ?? 0;
+      } else if (itemRequestInfo?.collectionName === 'pending') {
+        const lastActivity = itemRequestInfo.requestInfo.lastActivity ?? 0;
         const minBackoff =
           this.viewModel.marketplaceConfig.minBackoffBetweenReminders ?? 0;
         const now = Math.floor(Date.now() / 1000);

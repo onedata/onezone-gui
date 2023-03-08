@@ -638,9 +638,14 @@ export default Service.extend({
    * made by current user.
    * @returns {Promise<Models.SpaceMembershipRequestsInfo>}
    */
-  async getSpaceMembershipRequestsInfo() {
+  async getSpaceMembershipRequestsInfo(reload = false) {
     const requestGri = generateSpaceMembershipRequestsInfoGri(this.currentUser.userId);
-    return await this.store.findRecord('spaceMembershipRequestsInfo', requestGri);
+    return await this.store.findRecord(
+      'spaceMembershipRequestsInfo',
+      requestGri, {
+        reload,
+      }
+    );
   },
 
   //#endregion

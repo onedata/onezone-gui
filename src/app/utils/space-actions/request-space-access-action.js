@@ -62,6 +62,12 @@ export default Action.extend({
         onSubmit: async (requestData) => {
           try {
             await result.interceptPromise(this.sendRequest(requestData));
+            try {
+              await this.reloadSpaceMembershipRequestsInfo();
+            } catch (error) {
+              // reloading is not critical, so just print error on console and continue
+              console.warn('Reloading SpaceMembershipRequestsInfo failed', error);
+            }
             this.showSuccessInfo(requestData);
             this.modalManager.hide(modalInstance.id);
           } catch {
@@ -90,5 +96,12 @@ export default Action.extend({
    */
   async sendRequest(requestData) {
     return this.spaceManager.requestSpaceAccess(requestData);
+  },
+
+  /**
+   * @returns {Promise<Models.SpaceMembershipRequestsInfo>}
+   */
+  async reloadSpaceMembershipRequestsInfo() {
+    return this.spaceManager.getSpaceMembershipRequestsInfo(true);
   },
 });

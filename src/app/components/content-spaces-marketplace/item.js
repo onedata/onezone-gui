@@ -197,7 +197,7 @@ export default Component.extend(I18n, {
   ),
 
   lastActivityDateText: computed(
-    'spaceItem.requestInfo.lastActivity',
+    'spaceItem.itemRequestInfo.requestInfo.lastActivity',
     function lastActivityDateText() {
       if (!this.spaceItem.requestInfo?.lastActivity) {
         return '';
