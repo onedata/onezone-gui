@@ -104,6 +104,8 @@ export default Component.extend(validations, I18n, {
 
   //#endregion
 
+  isMarketplaceEnabled: reads('spaceManager.marketplaceConfig.enabled'),
+
   spaceId: reads('space.entityId'),
 
   isReadOnly: not('space.privileges.update'),
