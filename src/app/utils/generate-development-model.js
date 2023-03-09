@@ -1183,9 +1183,15 @@ function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
 async function generateSpaceMembershipRequestsInfo(
   store,
   user,
-  pending = [],
-  rejected = []
 ) {
+  const pending = {
+    'space-market-info-1': {
+      requestId: 'abcd',
+      contactEmail: 'the_requester@example.com',
+      lastActivity: 1678309227,
+    },
+  };
+  const rejected = [];
   return store.createRecord('spaceMembershipRequestsInfo', {
     id: generateSpaceMembershipRequestsInfoGri(get(user, 'entityId')),
     pending,

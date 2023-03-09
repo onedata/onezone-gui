@@ -54,7 +54,11 @@
         {{else if (eq status MarketplaceSpaceStatusEnum.Outdated)}}
           {{#one-icon icon="sign-warning-rounded" class="status-btn-external-icon"}}
             {{one-tooltip
-              title=(tt this "retryWarningTip" dateText=lastActivityDateText)
+              class="tooltip-lg tooltip-text-left"
+              title=(tt this "retryWarningTip"
+                dateText=lastActivityDateText
+                email=lastRequesterEmail
+              )
             }}
           {{/one-icon}}
           {{#one-button size="sm" onClick=(action "requestAccess")}}
@@ -65,6 +69,13 @@
           {{#one-button size="sm" disabled=true}}
             {{one-icon icon="cart"}}
             <span class="text">{{tt this "requestSent"}}</span>
+            {{one-tooltip
+              class="tooltip-lg tooltip-text-left"
+              title=(tt this "requestPendingTip"
+                dateText=lastActivityDateText
+                email=lastRequesterEmail
+              )
+            }}
           {{/one-button}}
         {{else if (eq status MarketplaceSpaceStatusEnum.Granted)}}
           <div class="access-granted-container">

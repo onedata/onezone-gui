@@ -120,20 +120,18 @@ export default Component.extend(I18n, {
   status: reads('spaceItem.marketplaceSpaceStatusProxy.content'),
 
   creationDateText: computed('creationTime', function creationDateText() {
-    return htmlSafe(
+    return makeSpacesNonBreakable(
       dateFormat([this.creationTime], {
         format: 'date',
       })
-      .replaceAll(' ', '&nbsp;')
     );
   }),
 
   creationTimeTooltip: computed('creationTime', function creationTimeTooltip() {
-    const creationTimeText = htmlSafe(
+    const creationTimeText = makeSpacesNonBreakable(
       dateFormat([this.creationTime], {
         format: 'dateWithMinutes',
       })
-      .replaceAll(' ', '&nbsp;')
     );
     return this.t('creationTimeTooltip', { creationTimeText });
   }),
@@ -199,14 +197,17 @@ export default Component.extend(I18n, {
   lastActivityDateText: computed(
     'spaceItem.itemRequestInfo.requestInfo.lastActivity',
     function lastActivityDateText() {
-      if (!this.spaceItem.requestInfo?.lastActivity) {
+      const lastActivity = this.spaceItem?.itemRequestInfo?.requestInfo?.lastActivity;
+      if (!lastActivity) {
         return '';
       }
-      return dateFormat([this.spaceItem.requestInfo.lastActivity], {
+      return makeSpacesNonBreakable(dateFormat([lastActivity], {
         format: 'dateWithMinutes',
-      });
+      }));
     }
   ),
+
+  lastRequesterEmail: reads('spaceItem.itemRequestInfo.requestInfo.contactEmail'),
 
   accessInfoColClassName: computed('status', function accessInfoColClassName() {
     if (!this.status) {
@@ -285,3 +286,7 @@ export default Component.extend(I18n, {
     },
   },
 });
+
+function makeSpacesNonBreakable(text) {
+  return htmlSafe(text.replaceAll(' ', '&nbsp;'));
+}
