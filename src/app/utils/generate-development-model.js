@@ -1186,12 +1186,19 @@ async function generateSpaceMembershipRequestsInfo(
 ) {
   const pending = {
     'space-market-info-1': {
-      requestId: 'abcd',
+      requestId: 'abcd-1',
       contactEmail: 'the_requester@example.com',
-      lastActivity: 1678309227,
+      // use earlier timestamp value to see "outdated" state
+      lastActivity: Math.floor(Date.now() / 1000) - 10000,
     },
   };
-  const rejected = [];
+  const rejected = {
+    'space-market-info-2': {
+      requestId: 'abcd-2',
+      contactEmail: 'rejected_requester@example.com',
+      lastActivity: Math.floor(Date.now() / 1000),
+    },
+  };
   return store.createRecord('spaceMembershipRequestsInfo', {
     id: generateSpaceMembershipRequestsInfoGri(get(user, 'entityId')),
     pending,

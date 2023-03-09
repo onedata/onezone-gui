@@ -207,6 +207,25 @@ export default Component.extend(I18n, {
     }
   ),
 
+  againRequestDateText: computed(
+    'spaceItem.itemRequestInfo.requestInfo.lastActivity',
+    'viewModel.marketplaceConfig.minBackoffAfterRejection',
+    function againRequestDateText() {
+      const lastActivity = this.spaceItem?.itemRequestInfo?.requestInfo?.lastActivity;
+      const minBackoff = this.viewModel.marketplaceConfig?.minBackoffAfterRejection;
+      if (
+        !lastActivity ||
+        !minBackoff ||
+        this.spaceItem.itemRequestInfo.collectionName !== 'rejected'
+      ) {
+        return '';
+      }
+      return makeSpacesNonBreakable(dateFormat([lastActivity + minBackoff], {
+        format: 'dateWithMinutes',
+      }));
+    }
+  ),
+
   lastRequesterEmail: reads('spaceItem.itemRequestInfo.requestInfo.contactEmail'),
 
   accessInfoColClassName: computed('status', function accessInfoColClassName() {
@@ -271,18 +290,13 @@ export default Component.extend(I18n, {
   },
 
   actions: {
+    /**
+     * @returns {Promise}
+     */
     requestAccess() {
-      (async () => {
-        const result = await this.spaceActions.createRequestSpaceAccessAction({
-          spaceMarketplaceData: this.spaceItem,
-        }).execute();
-        // FIXME: ręczna aktualizacja spaceMembershipRequestsInfo
-        // FIXME: tymczasowy stan - do usunięcia, powinno działać na zasadzie odczytu
-        // info o space membership requestach
-        // if (result.status === 'done') {
-        //   this.set('isRequested', true);
-        // }
-      })();
+      return this.spaceActions.createRequestSpaceAccessAction({
+        spaceMarketplaceData: this.spaceItem,
+      }).execute();
     },
   },
 });

@@ -78,7 +78,7 @@
             }}
           {{/one-button}}
         {{else if (eq status MarketplaceSpaceStatusEnum.Granted)}}
-          <div class="access-granted-container">
+          <div class="access-info-head-container access-granted-container">
             {{one-icon icon="cart-checked"}}
             <span class="text">{{tt this "accessGranted"}}</span>
           </div>
@@ -92,6 +92,19 @@
               <span class="text">{{tt this "configure"}}</span>
               {{one-icon icon="link-external"}}
             </a>
+          </div>
+        {{else if (eq status MarketplaceSpaceStatusEnum.Rejected)}}
+          {{!-- FIXME: zmienić nazwę klasy, żeby była wspólna dla ikona + tekst i rozróżniająca --}}
+          <div class="access-info-head-container access-denied-container">
+            {{one-icon class="access-denied-icon" icon="warning"}}
+            <span class="text">{{tt this "accessDenied"}}</span>
+            {{one-tooltip
+              class="tooltip-lg tooltip-text-left"
+              title=(tt this "requestRejectedTip"
+                againDateText=againRequestDateText
+                email=lastRequesterEmail
+              )
+            }}
           </div>
         {{/if}}
       </div>

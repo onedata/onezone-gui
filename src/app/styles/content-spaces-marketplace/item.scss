@@ -21,7 +21,7 @@
         min-width: 100%;
         align-items: center;
 
-        .access-granted-container {
+        .access-info-head-container {
           margin-left: -0.2em;
         }
         .access-links-container {
@@ -34,7 +34,7 @@
       .access-info-col {
         min-width: 100%;
         align-items: flex-start;
-        .access-granted-container {
+        .access-info-head-container {
           margin-left: -0.2em;
         }
       }
@@ -162,7 +162,7 @@
     }
   }
 
-  .access-granted-container {
+  .access-info-head-container {
     display: flex;
     align-items: center;
     margin-right: 0.5em;
@@ -170,7 +170,14 @@
       font-size: 2em;
     }
     .text {
+      @include font-semibold;
       margin-left: 0.4em;
+    }
+  }
+
+  .access-denied-container {
+    .access-denied-icon {
+      color: $color-one-warning;
     }
   }
 
