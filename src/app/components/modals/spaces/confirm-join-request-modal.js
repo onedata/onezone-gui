@@ -1,6 +1,10 @@
 /**
- * Verifies, shows info and allows to confirm access request to space made by some user
- * using spaces marketplace.
+ * Shows necessary information about space membership request and allows to decide
+ * if request should be accepted (grant access) or declined (reject request).
+ *
+ * This modal provides request validation, request information and controls for making
+ * decision. Implementation of granting access or rejecting request with post-decision
+ * actions should be injected.
  *
  * @author Jakub Liput
  * @copyright (C) 2023 ACK CYFRONET AGH
@@ -12,7 +16,7 @@ import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import { promise, bool } from 'ember-awesome-macros';
+import { promise, bool, and, not } from 'ember-awesome-macros';
 
 /**
  * @typedef {Object} ConfirmJoinRequestModalOptions
@@ -44,6 +48,12 @@ export default Component.extend(I18n, {
    * @type {ConfirmJoinRequestModalOptions}
    */
   modalOptions: undefined,
+
+  //#region state
+
+  isProcessing: false,
+
+  //#endregion
 
   /**
    * @type {PromiseObject<SpaceMembershipRequesterInfo>}
@@ -85,9 +95,16 @@ export default Component.extend(I18n, {
   space: reads('spaceProxy.content'),
 
   /**
-   * @type {({ userId: string, spaceId: string }) => void}
+   * Execute implementation of granting space membership by request.
+   * @type {(userId) => Promise}}
    */
-  onGranted: reads('modalOptions.onGranted'),
+  onGrant: reads('modalOptions.onGrant'),
+
+  /**
+   * Execute implementation of rejecting space membership request.
+   * @type {() => Promise}
+   */
+  onReject: reads('modalOptions.onReject'),
 
   joinRequestId: reads('modalOptions.joinRequestId'),
 
@@ -101,54 +118,35 @@ export default Component.extend(I18n, {
 
   isProceedButtonVisible: reads('isValid'),
 
-  isProceedAvailable: reads('isValid'),
-
-  async grantAccess() {
-    this.spaceManager.resolveMarketplaceSpaceAccess(
-      this.spaceId,
-      this.joinRequestId,
-      true
-    );
-  },
-
-  async rejectAccess() {
-    this.spaceManager.resolveMarketplaceSpaceAccess(
-      this.spaceId,
-      this.joinRequestId,
-      false
-    );
-  },
+  isProceedAvailable: and('isValid', not('isProcessing')),
 
   actions: {
     async grant() {
       if (!this.isProceedAvailable) {
         return;
       }
+      this.set('isProcessing', true);
       try {
-        await this.grantAccess();
+        await this.onGrant(this.userId);
         this.modalManager.hide(this.modalId);
-        try {
-          await this.onGranted({
-            spaceId: this.spaceId,
-            userId: this.userId,
-          });
-        } catch (onGrantedHookError) {
-          // ignore hook failure - it is not necessary for action to complete
-          console.warn('Executing onGranted hook failed', onGrantedHookError);
-        }
       } catch (error) {
         this.globalNotify.backendError(this.t('grantingSpaceAccess'), error);
+      } finally {
+        this.set('isProcessing', false);
       }
     },
     async reject() {
       if (!this.isProceedAvailable) {
         return;
       }
+      this.set('isProcessing', true);
       try {
-        await this.rejectAccess();
+        await this.onReject();
         this.modalManager.hide(this.modalId);
       } catch (error) {
         this.globalNotify.backendError(this.t('rejectingSpaceAccess'), error);
+      } finally {
+        this.set('isProcessing', false);
       }
     },
   },

@@ -130,6 +130,19 @@ const spaceHandlers = {
       isLast: true,
     };
   },
+  // example URL to use in mocked app (space-0 is first mocked spaceId)
+  // http://localhost:4200/#/onedata?action_name=confirmJoinSpaceRequest&action_spaceId=space-0&action_requestId=fb50b5c1e09b3910e89ab35327671e19ch18d4-a2647bf5
+  membership_requester_info(operation) {
+    if (operation !== 'get') {
+      throw messageNotSupported;
+    }
+    return {
+      userId: 'requesting_user_id',
+      fullName: 'John Doe',
+      username: 'joe',
+      contactEmail: 'joe@example.com',
+    };
+  },
 };
 
 const groupHandlers = {
