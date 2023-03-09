@@ -120,6 +120,8 @@ export default Component.extend(I18n, {
 
   isProceedAvailable: and('isValid', not('isProcessing')),
 
+  bodyRequiredDataProxy: promise.object(promise.all('requesterInfoProxy', 'spaceProxy')),
+
   actions: {
     async grant() {
       if (!this.isProceedAvailable) {
