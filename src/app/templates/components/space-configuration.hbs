@@ -180,56 +180,63 @@
       }}
     {{/render-later}}
   </div>
-  {{#if isMarketplaceEnabled}}
-    <div class="form-group advertised-form-group">
-      <label class="control-label">
-        {{tt this "advertised.label"}}:
-      </label>
-      {{one-way-toggle
-        class="form-control advertised-toggle"
-        isReadOnly=(or isReadOnly isAdvertisedToggleDisabled)
-        checked=isAdvertised
-        update=(action "saveValue" "advertised")
-        lockHint=(or readOnlyTip advertisedToggleLockHint)
-      }}
-      {{#if isAdvertised}}
-        <a href={{viewInMarketplaceHref}} class="view-in-marketplace-link">
-          <span class="text">{{tt this "viewInMarketplace"}}</span>
-          {{one-icon icon="link-external"}}
-        </a>
-      {{/if}}
+  {{#if (and isAdvertised (not isMarketplaceEnabled))}}
+    <div class="field-alert marketplace-disabled-alert">
+      {{one-icon class="field-alert-icon" icon="sign-warning-rounded"}}
+      <span class="text">{{tt this "advertisedInDisabledMarketplace"}}</span>
     </div>
-    {{#if isAdvertised}}
-      <div class="contact-email-form-container">
-        <div class={{concat-classes
-          "form-group contact-email-form-group"
-          (if emailValidation.error "has-error")
-        }}>
-          <label class="control-label">
-            {{tt this "contactEmail.label"}}:
-          </label>
-          {{#if isReadOnly}}
-            {{#if contactEmail}}
-              <span class="static-value">{{contactEmail}}</span>
-            {{else}}
-              <span class="static-value static-not-set">{{tt this "notSet"}}</span>
-            {{/if}}
-          {{else}}
-            {{one-inline-editor
-              class="contact-email"
-              value=contactEmail
-              onInputValueChanged=(action "currentEmailChanged")
-              isSaveDisabled=emailValidation.error
-              saveButtonTip=emailValidation.message
-              onSave=(action "saveValue" "contactEmail")
-            }}
-          {{/if}}
-        </div>
-        <div class="email-visible-alert">
-          {{one-icon class="email-visible-alert-icon" icon="sign-warning-rounded"}}
-          {{tt this "emailVisibleAlert"}}
-        </div>
-      </div>
+  {{/if}}
+  <div class="form-group advertised-form-group">
+    <label class="control-label">
+      {{tt this "advertised.label"}}:
+    </label>
+    {{one-way-toggle
+      class="form-control advertised-toggle"
+      isReadOnly=(or isReadOnly isAdvertisedToggleDisabled)
+      checked=isAdvertised
+      update=(action "saveValue" "advertised")
+      lockHint=(or readOnlyTip advertisedToggleLockHint)
+    }}
+    {{#if (and isAdvertised isMarketplaceEnabled)}}
+      <a href={{viewInMarketplaceHref}} class="view-in-marketplace-link">
+        <span class="text">{{tt this "viewInMarketplace"}}</span>
+        {{one-icon icon="link-external"}}
+      </a>
     {{/if}}
+  </div>
+  {{#if isAdvertised}}
+    <div class="contact-email-form-container">
+      <div class={{concat-classes
+        "form-group contact-email-form-group"
+        (if emailValidation.error "has-error")
+      }}>
+        <label class="control-label">
+          {{tt this "contactEmail.label"}}:
+        </label>
+        {{#if isReadOnly}}
+          {{#if contactEmail}}
+            <span class="static-value">{{contactEmail}}</span>
+          {{else}}
+            <span class="static-value static-not-set">{{tt this "notSet"}}</span>
+          {{/if}}
+        {{else}}
+          {{one-inline-editor
+            class="contact-email"
+            value=contactEmail
+            onInputValueChanged=(action "currentEmailChanged")
+            isSaveDisabled=emailValidation.error
+            saveButtonTip=emailValidation.message
+            onSave=(action "saveValue" "contactEmail")
+          }}
+        {{/if}}
+      </div>
+      <div class="field-alert email-visible-alert">
+        {{one-icon
+          class="field-alert-icon email-visible-alert-icon"
+          icon="sign-info-rounded"
+        }}
+        {{tt this "emailVisibleAlert"}}
+      </div>
+    </div>
   {{/if}}
 </div>

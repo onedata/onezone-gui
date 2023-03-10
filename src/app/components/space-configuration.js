@@ -177,10 +177,16 @@ export default Component.extend(validations, I18n, {
     isEmpty('spaceDescription'),
   ),
 
-  advertisedToggleLockHint: conditional(
-    and(not('isAdvertised'), 'areAdvertiseRequirementsNotMet'),
-    computedT('advertised.lockHint.requiredFieldsEmpty'),
-    raw('')
+  advertisedToggleLockHint: or(
+    and(
+      and(not('isAdvertised'), 'areAdvertiseRequirementsNotMet'),
+      computedT('advertised.lockHint.requiredFieldsEmpty')
+    ),
+    and(
+      and(not('isMarketplaceEnabled'), not('isAdvertised')),
+      computedT('advertised.lockHint.marketplaceDisabled')
+    ),
+    raw(''),
   ),
 
   /**

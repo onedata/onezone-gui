@@ -162,23 +162,35 @@
     display: flex;
     @media (max-width: $screen-md-max) {
       flex-wrap: wrap;
-      .email-visible-alert {
-        min-width: 100%;
-        padding-left: 0;
-        padding-bottom: 0;
-      }
     }
   }
-
-  .email-visible-alert {
+  .field-alert {
     display: flex;
     align-items: center;
     padding-bottom: 1.5em;
-    padding-left: 3em;
-    .email-visible-alert-icon {
-      color: $color-one-warning;
-      margin-right: 0.5em;
-      font-size: 150%;
+
+    &.email-visible-alert {
+      padding-left: 3em;
+    }
+  }
+  @media (max-width: $screen-md-max) {
+    .field-alert.email-visible-alert {
+      min-width: 100%;
+      padding-left: 0;
+      padding-bottom: 0;
+    }
+  }
+  .field-alert-icon {
+    color: $color-one-warning;
+    margin-right: 0.5em;
+    font-size: 150%;
+  }
+  .email-visible-alert-icon {
+    color: $color-one-info;
+  }
+  .marketplace-disabled-alert {
+    .text {
+      @include font-semibold;
     }
   }
 }
