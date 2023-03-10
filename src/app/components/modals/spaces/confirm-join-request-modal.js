@@ -57,7 +57,7 @@ export default Component.extend(I18n, {
 
   //#endregion
 
-  isMarketplaceEnabled: bool('spaceManger.marketplaceConfig.enabled'),
+  isMarketplaceEnabled: bool('spaceManager.marketplaceConfig.enabled'),
 
   /**
    * @type {PromiseObject<SpaceMembershipRequesterInfo>}
