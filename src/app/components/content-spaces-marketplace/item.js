@@ -12,7 +12,7 @@ import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { dateFormat } from 'onedata-gui-common/helpers/date-format';
-import { or, and, raw, gt, difference } from 'ember-awesome-macros';
+import { or, and, raw, gt, difference, promise } from 'ember-awesome-macros';
 import { htmlSafe } from '@ember/string';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 import sleep from 'onedata-gui-common/utils/sleep';
@@ -250,7 +250,7 @@ export default Component.extend(I18n, {
     }
   },
 
-  async setAccessColors(additionalClassName = '') {
+  setAccessColors(additionalClassName = '') {
     this.set(
       'iconifiedBlockClass',
       (

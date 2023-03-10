@@ -60,15 +60,8 @@ export default EmberObject.extend({
    */
   id: reads('spaceId'),
 
-  // FIXME: isAccessGranted może już nie być potrzebne
-
-  /**
-   * @type {ComputedProperty<boolean|null>}
-   */
-  isAccessGranted: reads('isAccessGrantedProxy.content'),
-
   isAccessGrantedProxy: promise.object(computed(
-    'marketplaceSpaceStatusProxy',
+    'marketplaceSpaceStatusProxy.content',
     async function isAccessGrantedProxy() {
       const status = await this.marketplaceSpaceStatusProxy;
       return status === MarketplaceSpaceStatus.Granted;
@@ -108,7 +101,6 @@ export default EmberObject.extend({
 
   spaceMembershipRequestsInfoProxy: reads('viewModel.spaceMembershipRequestsInfoProxy'),
 
-  // FIXME: uprościć do .content
   marketplaceSpaceStatusProxy: promise.object(computed(
     'spaceId',
     'userSpacesIdsProxy.content',
