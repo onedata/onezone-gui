@@ -29,6 +29,12 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
+   * @type {Models.AtmInventory}
+   */
+  atmInventory: undefined,
+
+  /**
+   * @virtual
    * @type {Models.AtmWorkflowSchema}
    */
   atmWorkflowSchema: undefined,
@@ -140,17 +146,15 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.AtmWorkflow.AtmWorkflowSchema.RevisionActionsFactory>}
    */
   revisionActionsFactory: computed(
+    'atmInventory',
     'atmWorkflowSchema',
     'onRevisionCreated',
     function revisionActionsFactory() {
-      const {
-        atmWorkflowSchema,
-        onRevisionCreated,
-      } = this.getProperties('atmWorkflowSchema', 'onRevisionCreated');
       return RevisionActionsFactory.create({
         ownerSource: this,
-        atmWorkflowSchema,
-        onRevisionCreated,
+        atmInventory: this.atmInventory,
+        atmWorkflowSchema: this.atmWorkflowSchema,
+        onRevisionCreated: this.onRevisionCreated,
       });
     }
   ),

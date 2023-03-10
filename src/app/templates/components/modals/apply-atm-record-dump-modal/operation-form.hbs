@@ -9,22 +9,22 @@
   <div class="radio-option-subcontent">
     {{#if (eq option.value "merge")}}
       {{#if isMergeDisabled}}
-        <div class="no-target-workflow-warning alert alert-info small">
-          {{tt this (concat "operations.merge.noTargetWorkflowWarning." dumpSourceType)}}
+        <div class="no-target-atm-record-warning alert alert-info small">
+          {{tt this (concat "operations.merge.noTargetAtmRecordWarning." dumpSourceType "." atmModelName)}}
         </div>
       {{else}}
-        {{form-component/field-renderer field=targetWorkflowField}}
+        {{form-component/field-renderer field=targetAtmRecordField}}
         {{#if isRevisionConflictWarningVisible}}
           <div class="revision-conflict-warning alert alert-warning small">
             {{tt this
-              (concat "operations.merge.revisionConflictWarning." dumpSourceType)
+              (concat "operations.merge.revisionConflictWarning." dumpSourceType "." atmModelName)
               revisionNumber=revisionNumber
             }}
           </div>
         {{/if}}
       {{/if}}
     {{else if (eq option.value "create")}}
-      {{form-component/field-renderer field=newWorkflowsNameField}}
+      {{form-component/field-renderer field=newAtmRecordNameField}}
     {{/if}}
   </div>
 {{/one-way-radio-group}}

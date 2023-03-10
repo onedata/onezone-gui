@@ -8,7 +8,7 @@ import sinon from 'sinon';
 
 const componentClass = 'inventory-selector';
 
-describe('Integration | Component | modals/apply-atm-workflow-schema-dump-modal/inventory-selector',
+describe('Integration | Component | modals/apply-atm-record-dump-modal/inventory-selector',
   function () {
     setupRenderingTest();
 
@@ -92,7 +92,7 @@ describe('Integration | Component | modals/apply-atm-workflow-schema-dump-modal/
   });
 
 async function renderComponent() {
-  await render(hbs `{{modals/apply-atm-workflow-schema-dump-modal/inventory-selector
+  await render(hbs `{{modals/apply-atm-record-dump-modal/inventory-selector
     atmInventories=atmInventories
     selectedAtmInventory=selectedAtmInventory
     onChange=onChange

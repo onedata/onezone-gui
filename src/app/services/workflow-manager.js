@@ -31,6 +31,7 @@ import { promise } from 'ember-awesome-macros';
 import onlyFulfilledValues from 'onedata-gui-common/utils/only-fulfilled-values';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import ArrayProxy from '@ember/array/proxy';
+import getNextFreeRevisionNumber from 'onedata-gui-common/utils/revisions/get-next-free-revision-number';
 
 export default Service.extend({
   store: service(),
@@ -215,6 +216,37 @@ export default Service.extend({
         includeRevision: revisionNumber,
       },
     });
+  },
+
+  /**
+   * @param {string} atmLambdaId
+   * @param {Object} atmLambdaDump
+   * @returns {Promise<{ atmLambda: Models.AtmLambda, revisionNumber: RevisionNumber }>}
+   */
+  async mergeAtmLambdaDumpToExistingLambda(
+    atmLambdaId,
+    atmLambdaDump
+  ) {
+    const atmLambda =
+      await this.recordManager.getRecordById('atmLambda', atmLambdaId);
+
+    const revisionNumberFromDump = atmLambdaDump?.revision?.originalRevisionNumber;
+    const existingRevisionNumbers = Object.keys(get(atmLambda, 'revisionRegistry'))
+      .map((rev) => Number.parseInt(rev));
+    const targetRevisionNumber = revisionNumberFromDump &&
+      !existingRevisionNumbers.includes(revisionNumberFromDump) ?
+      revisionNumberFromDump : getNextFreeRevisionNumber(existingRevisionNumbers);
+
+    await this.createAtmLambdaRevision(
+      atmLambdaId,
+      targetRevisionNumber,
+      atmLambdaDump.revision.atmLambdaRevision,
+    );
+
+    return {
+      atmLambda,
+      revisionNumber: targetRevisionNumber,
+    };
   },
 
   /**

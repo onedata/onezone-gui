@@ -2,7 +2,7 @@
  * Allows to choose the way in which dump will be applied.
  *
  * @author Michał Borzęcki
- * @copyright (C) 2021 ACK CYFRONET AGH
+ * @copyright (C) 2021-2023 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -33,7 +33,12 @@ export default Component.extend(I18n, {
   /**
    * @override
    */
-  i18nPrefix: 'components.modals.applyAtmWorkflowSchemaDumpModal.operationForm',
+  i18nPrefix: 'components.modals.applyAtmRecordDumpModal.operationForm',
+
+  /**
+   * @type {DumpableAtmModelName}
+   */
+  atmModelName: undefined,
 
   /**
    * @virtual
@@ -55,21 +60,21 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
-   * @type {Array<Models.AtmWorkflowSchema>}
+   * @type {Array<DumpableAtmModel>}
    */
-  targetWorkflows: undefined,
+  targetAtmRecords: undefined,
 
   /**
    * @virtual
-   * @type {Models.AtmWorkflowSchema}
+   * @type {DumpableAtmModel}
    */
-  selectedTargetWorkflow: undefined,
+  selectedTargetAtmRecord: undefined,
 
   /**
    * @virtual
    * @type {String}
    */
-  newWorkflowName: undefined,
+  newAtmRecordName: undefined,
 
   /**
    * @virtual
@@ -91,47 +96,46 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Boolean>}
    */
-  isMergeDisabled: not('targetWorkflows.length'),
+  isMergeDisabled: not('targetAtmRecords.length'),
 
   /**
    * @type {ComputedProperty<Boolean>}
    */
   isRevisionConflictWarningVisible: and(
     eq('selectedOperation', raw('merge')),
-    bool(getBy('selectedTargetWorkflow.revisionRegistry', 'revisionNumber'))
+    bool(getBy('selectedTargetAtmRecord.revisionRegistry', 'revisionNumber'))
   ),
 
   /**
    * @type {ComputedProperty<Array<Object>>}
    */
-  operationsRadioOptions: computed('isMergeDisabled', function operationsRadioOptions() {
-    return [{
-      name: 'merge',
-      value: 'merge',
-      label: this.t('operations.merge.label'),
-      disabled: this.get('isMergeDisabled'),
-    }, {
-      name: 'create',
-      value: 'create',
-      label: this.t('operations.create.label'),
-    }];
-  }),
+  operationsRadioOptions: computed(
+    'atmModelName',
+    'isMergeDisabled',
+    function operationsRadioOptions() {
+      return [{
+        name: 'merge',
+        value: 'merge',
+        label: this.t(`operations.merge.label.${this.atmModelName}`),
+        disabled: this.isMergeDisabled,
+      }, {
+        name: 'create',
+        value: 'create',
+        label: this.t(`operations.create.label.${this.atmModelName}`),
+      }];
+    }
+  ),
 
   /**
    * @type {ComputedProperty<Object>}
    */
   formValues: computed(
-    'selectedTargetWorkflow',
-    'newWorkflowName',
+    'selectedTargetAtmRecord',
+    'newAtmRecordName',
     function formValues() {
-      const {
-        selectedTargetWorkflow,
-        newWorkflowName,
-      } = this.getProperties('selectedTargetWorkflow', 'newWorkflowName');
-
       return {
-        targetWorkflow: selectedTargetWorkflow,
-        newWorkflowName,
+        targetAtmRecord: this.selectedTargetAtmRecord,
+        newAtmRecordName: this.newAtmRecordName,
       };
     }
   ),
@@ -140,15 +144,10 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsRootGroup>}
    */
   fields: computed(function fields() {
-    const {
-      targetWorkflowField,
-      newWorkflowsNameField,
-    } = this.getProperties('targetWorkflowField', 'newWorkflowsNameField');
-
     const component = this;
     return FormFieldsRootGroup
       .extend({
-        i18nPrefix: tag `${'component.i18nPrefix'}.fields`,
+        i18nPrefix: tag`${'component.i18nPrefix'}.fields.${'component.atmModelName'}`,
         valuesSource: reads('component.formValues'),
         onValueChange(value, field) {
           field.markAsModified();
@@ -164,8 +163,8 @@ export default Component.extend(I18n, {
         component,
         ownerSource: this,
         fields: [
-          targetWorkflowField,
-          newWorkflowsNameField,
+          this.targetAtmRecordField,
+          this.newAtmRecordNameField,
         ],
       });
   }),
@@ -173,20 +172,20 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Utils.FormComponent.DropdownField>}
    */
-  targetWorkflowField: computed(function targetWorkflowField() {
+  targetAtmRecordField: computed(function targetAtmRecordField() {
     return DropdownField.extend({
-      options: computed('component.targetWorkflows', function options() {
-        const workflows = this.get('component.targetWorkflows') || [];
-        return workflows.sortBy('name').map(workflow => ({
-          label: get(workflow, 'name'),
-          value: workflow,
-        }));
+      options: computed('component.targetAtmRecords', function options() {
+        const atmRecords = this.get('component.targetAtmRecords') || [];
+        return atmRecords.map((record) => ({
+          label: get(record, 'name') || get(record, 'latestRevision.name'),
+          value: record,
+        })).sortBy('label');
       }),
       isEnabled: eq('component.selectedOperation', raw('merge')),
     }).create({
       component: this,
-      name: 'targetWorkflow',
-      notifyChangeName: 'selectedTargetWorkflow',
+      name: 'targetAtmRecord',
+      notifyChangeName: 'selectedTargetAtmRecord',
       classes: 'form-group-sm',
     });
   }),
@@ -194,19 +193,19 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Utils.FormComponent.TextField>}
    */
-  newWorkflowsNameField: computed(function newWorkflowsNameField() {
+  newAtmRecordNameField: computed(function newAtmRecordNameField() {
     return TextField.extend({
       isEnabled: eq('component.selectedOperation', raw('create')),
     }).create({
       component: this,
-      name: 'newWorkflowName',
+      name: 'newAtmRecordName',
       classes: 'form-group-sm',
     });
   }),
 
   init() {
     this._super(...arguments);
-    this.get('fields');
+    this.fields;
   },
 
   /**
@@ -218,10 +217,7 @@ export default Component.extend(I18n, {
   },
 
   notifyAboutChange(fieldName, newValue) {
-    const onValueChange = this.get('onValueChange');
-    if (onValueChange) {
-      onValueChange(fieldName, newValue);
-    }
+    this.onValueChange?.(fieldName, newValue);
   },
 
   actions: {

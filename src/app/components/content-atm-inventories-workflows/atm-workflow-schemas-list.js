@@ -25,6 +25,12 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
+   * @type {Models.AtmInventory}
+   */
+  atmInventory: undefined,
+
+  /**
+   * @virtual
    * @type {Array<Models.AtmWorkflowSchema>}
    */
   collection: undefined,

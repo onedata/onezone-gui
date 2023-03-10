@@ -2,7 +2,7 @@
  * Allows to choose dump application target automation inventory.
  *
  * @author Michał Borzęcki
- * @copyright (C) 2021 ACK CYFRONET AGH
+ * @copyright (C) 2021-2023 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -22,7 +22,7 @@ export default Component.extend(I18n, {
   /**
    * @override
    */
-  i18nPrefix: 'components.modals.applyAtmWorkflowSchemaDumpModal.inventorySelector',
+  i18nPrefix: 'components.modals.applyAtmRecordDumpModal.inventorySelector',
 
   /**
    * @virtual

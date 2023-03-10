@@ -1,8 +1,8 @@
 /**
- * Shows information about workflow schema dump.
+ * Shows information about automation record dump.
  *
  * @author Michał Borzęcki
- * @copyright (C) 2021 ACK CYFRONET AGH
+ * @copyright (C) 2021-2023 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -10,7 +10,7 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import { reads } from '@ember/object/computed';
-import { isEmpty } from 'ember-awesome-macros';
+import { or, isEmpty } from 'ember-awesome-macros';
 
 export default Component.extend(I18n, {
   classNames: ['dump-details'],
@@ -20,9 +20,15 @@ export default Component.extend(I18n, {
   /**
    * @override
    */
-  i18nPrefix: 'components.modals.applyAtmWorkflowSchemaDumpModal.dumpDetails',
+  i18nPrefix: 'components.modals.applyAtmRecordDumpModal.dumpDetails',
 
   /**
+   * @type {DumpableAtmModelName}
+   */
+  atmModelName: undefined,
+
+  /**
+   * @virtual
    * @type {Object}
    */
   dump: undefined,
@@ -30,12 +36,12 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<String>}
    */
-  name: reads('dump.name'),
+  name: or('dump.revision.atmLambdaRevision.name', 'dump.name'),
 
   /**
    * @type {ComputedProperty<String>}
    */
-  summary: reads('dump.summary'),
+  summary: or('dump.revision.atmLambdaRevision.summary', 'dump.summary'),
 
   /**
    * @type {ComputedProperty<RevisionNumber>}

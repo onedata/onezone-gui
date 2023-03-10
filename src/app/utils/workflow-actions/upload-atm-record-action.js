@@ -1,36 +1,32 @@
 /**
- * Uploads workflow schema from JSON file. Needs `atmInventory` passed
+ * Uploads automation record from JSON file. Needs `atmInventory` passed
  * in context.
  *
  * @author Michał Borzęcki
- * @copyright (C) 2021 ACK CYFRONET AGH
+ * @copyright (C) 2021-2023 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
+import { dasherize } from '@ember/string';
 import ActionResult from 'onedata-gui-common/utils/action-result';
 import EmberObject, { computed, get, set } from '@ember/object';
-import { bool, not } from 'ember-awesome-macros';
+import { notEmpty } from 'ember-awesome-macros';
 import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 import { defer, Promise } from 'rsvp';
 import config from 'ember-get-config';
 import ObjectProxy from '@ember/object/proxy';
-import ApplyAtmWorkflowSchemaDumpActionBase from 'onezone-gui/utils/workflow-actions/apply-atm-workflow-schema-dump-action-base';
+import ApplyAtmRecordDumpActionBase from 'onezone-gui/utils/workflow-actions/apply-atm-record-dump-action-base';
 
-export default ApplyAtmWorkflowSchemaDumpActionBase.extend({
+export default ApplyAtmRecordDumpActionBase.extend({
   workflowManager: service(),
   modalManager: service(),
 
   /**
    * @override
    */
-  i18nPrefix: 'utils.workflowActions.uploadAtmWorkflowSchemaAction',
-
-  /**
-   * @override
-   */
-  className: 'upload-atm-workflow-schema-action-trigger',
+  i18nPrefix: 'utils.workflowActions.uploadAtmRecordAction',
 
   /**
    * @override
@@ -50,29 +46,25 @@ export default ApplyAtmWorkflowSchemaDumpActionBase.extend({
   /**
    * @override
    */
-  disabled: not('hasManageWorkflowSchemasPrivilege'),
+  className: computed('atmModelName', function className() {
+    return `upload-atm-record-action-trigger upload-${dasherize(this.atmModelName)}-action-trigger`;
+  }),
 
   /**
    * @override
    */
-  tip: computed(
-    'hasManageWorkflowSchemasPrivilege',
-    function tip() {
-      const {
-        i18n,
-        hasManageWorkflowSchemasPrivilege,
-      } = this.getProperties(
-        'i18n',
-        'hasManageWorkflowSchemasPrivilege'
-      );
+  disabled: notEmpty('missingPrivilegeFlags'),
 
-      return hasManageWorkflowSchemasPrivilege ? '' : insufficientPrivilegesMessage({
-        i18n,
-        modelName: 'atmInventory',
-        privilegeFlag: 'atm_inventory_manage_workflow_schemas',
-      });
-    }
-  ),
+  /**
+   * @override
+   */
+  tip: computed('missingPrivilegeFlags.[]', function tip() {
+    return this.missingPrivilegeFlags.length ? insufficientPrivilegesMessage({
+      i18n: this.i18n,
+      modelName: 'atmInventory',
+      privilegeFlag: this.missingPrivilegeFlags,
+    }) : '';
+  }),
 
   /**
    * @type {ComputedProperty<Models.AtmInventory>}
@@ -80,9 +72,28 @@ export default ApplyAtmWorkflowSchemaDumpActionBase.extend({
   atmInventory: reads('context.atmInventory'),
 
   /**
-   * @type {ComputedProperty<Boolean>}
+   * @type {ComputedProperty<Array<string>>}
    */
-  hasManageWorkflowSchemasPrivilege: bool('atmInventory.privileges.manageWorkflowSchemas'),
+  missingPrivilegeFlags: computed(
+    'atmModelName',
+    'atmInventory.privileges',
+    function missingPrivileges() {
+      const missing = [];
+
+      if (
+        this.atmModelName === 'atmWorkflowSchema' &&
+        !this.atmInventory?.privileges?.manageWorkflowSchemas
+      ) {
+        missing.push('atm_inventory_manage_workflow_schemas');
+      }
+
+      if (!this.atmInventory?.privileges?.manageLambdas) {
+        missing.push('atm_inventory_manage_lambdas');
+      }
+
+      return missing;
+    }
+  ),
 
   /**
    * @override
@@ -90,8 +101,9 @@ export default ApplyAtmWorkflowSchemaDumpActionBase.extend({
   init() {
     this._super(...arguments);
     this.set('dumpLoader', DumpLoader.create({
+      atmModelName: this.atmModelName,
       onExternalUpload: () => this.execute(),
-      _window: this.get('_window'),
+      _window: this._window,
     }));
   },
 
@@ -100,7 +112,7 @@ export default ApplyAtmWorkflowSchemaDumpActionBase.extend({
    */
   willDestroy() {
     try {
-      this.get('dumpLoader').destroy();
+      this.dumpLoader.destroy();
     } finally {
       this._super(...arguments);
     }
@@ -110,36 +122,28 @@ export default ApplyAtmWorkflowSchemaDumpActionBase.extend({
    * @override
    */
   async onExecute() {
-    const {
-      atmInventory,
-      modalManager,
-      dumpLoader,
-    } = this.getProperties(
-      'atmInventory',
-      'modalManager',
-      'dumpLoader',
-    );
-    const uploadedFileProxy = get(dumpLoader, 'uploadedFileProxy');
+    const uploadedFileProxy = this.dumpLoader.uploadedFileProxy;
     const result = ActionResult.create();
     const finalizeExecution = () => {
-      dumpLoader.clearState();
+      this.dumpLoader.clearState();
       result.cancelIfPending();
       return result;
     };
 
     if (!get(uploadedFileProxy, 'content')) {
       try {
-        await dumpLoader.loadJsonFile();
+        await this.dumpLoader.loadJsonFile();
       } catch (e) {
         return finalizeExecution();
       }
     }
 
-    await modalManager.show('apply-atm-workflow-schema-dump-modal', {
-      initialAtmInventory: atmInventory,
+    await this.modalManager.show('apply-atm-record-dump-modal', {
+      initialAtmInventory: this.atmInventory,
+      atmModelName: this.atmModelName,
       dumpSourceType: 'upload',
       dumpSourceProxy: uploadedFileProxy,
-      onReupload: () => dumpLoader.loadJsonFile(),
+      onReupload: () => this.dumpLoader.loadJsonFile(),
       onSubmit: (data) => this.handleModalSubmit(data, result),
     }).hiddenPromise;
 
@@ -148,6 +152,12 @@ export default ApplyAtmWorkflowSchemaDumpActionBase.extend({
 });
 
 const DumpLoader = EmberObject.extend({
+  /**
+   * @virtual
+   * @type {DumpableAtmModelName}
+   */
+  atmModelName: undefined,
+
   /**
    * @virtual
    * @type {() => void}
@@ -174,7 +184,7 @@ const DumpLoader = EmberObject.extend({
 
   /**
    * @public
-   * @type {ComputedProperty<ObjectProxy<AtmWorkflowSchemaDumpSource>>}
+   * @type {ComputedProperty<ObjectProxy<AtmRecordDumpSource>>}
    */
   uploadedFileProxy: computed(() => ObjectProxy.create()),
 
@@ -254,7 +264,8 @@ const DumpLoader = EmberObject.extend({
     const _body = _document.body;
     const input = _document.createElement('input');
     input.style.display = 'none';
-    input.classList.add('upload-atm-workflow-schema-action-input');
+    input.classList.add('upload-atm-record-action-input');
+    input.classList.add(`upload-${dasherize(this.atmModelName)}-action-input`);
     input.setAttribute('type', 'file');
     input.setAttribute('accept', '.json');
     input.addEventListener('change', async () => {
@@ -354,10 +365,13 @@ const DumpLoader = EmberObject.extend({
       this.logParsingError(error);
       return null;
     }
+
+    const name = this.atmModelName === 'atmLambda' ?
+      parsedContent?.revision?.atmLambdaRevision?.name : parsedContent?.name;
     if (
-      typeof parsedContent !== 'object' || !parsedContent ||
-      typeof parsedContent.name !== 'string' ||
-      typeof parsedContent.revision !== 'object' || !parsedContent.revision
+      typeof name !== 'string' ||
+      typeof parsedContent?.revision !== 'object' ||
+      !parsedContent?.revision
     ) {
       return null;
     }
@@ -366,7 +380,7 @@ const DumpLoader = EmberObject.extend({
 
   logParsingError(error) {
     if (config.environment !== 'test') {
-      console.error('util:workflow-actions/upload-atm-workflow-schema-action', error);
+      console.error('util:workflow-actions/upload-atm-record-action', error);
     }
   },
 

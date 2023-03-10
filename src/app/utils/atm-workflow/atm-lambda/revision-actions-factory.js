@@ -32,11 +32,18 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
   onRevisionCreate: undefined,
 
   /**
+   * @virtual optional
+   * @type {(atmLambda: Models.AtmLambda, createdRevisionNumber: RevisionNumber) => void)}
+   */
+  onRevisionCreated: undefined,
+
+  /**
    * @override
    */
   createActionsForRevisionNumber(revisionNumber) {
     return [
       this.createRedesignAsNewRevisionAction(revisionNumber),
+      this.createDuplicateRevisionAction(revisionNumber),
       this.createDumpRevisionAction(revisionNumber),
     ];
   },
@@ -74,6 +81,36 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
       originRevisionNumber: revisionNumber,
       onRevisionCreate,
     });
+  },
+
+  /**
+   * @private
+   * @param {RevisionNumber} revisionNumber
+   * @returns {Utils.Action}
+   */
+  createDuplicateRevisionAction(revisionNumber) {
+    const action = this.workflowActions.createDuplicateAtmRecordRevisionAction({
+      atmModelName: 'atmLambda',
+      atmRecord: this.atmLambda,
+      revisionNumber,
+      atmInventory: this.atmInventory,
+    });
+    if (this.onRevisionCreated) {
+      action.addExecuteHook((result) => {
+        if (result?.status === 'done') {
+          const {
+            // This atm record is different than atm record from upper scope.
+            // It is a "target" atm record, where the duplicate has been saved.
+            atmRecord,
+            revisionNumber,
+          } = (result.result || {});
+          if (atmRecord && revisionNumber) {
+            this.onRevisionCreated(atmRecord, revisionNumber);
+          }
+        }
+      });
+    }
+    return action;
   },
 
   /**

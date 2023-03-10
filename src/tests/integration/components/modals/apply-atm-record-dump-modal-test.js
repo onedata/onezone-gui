@@ -19,7 +19,7 @@ import { A } from '@ember/array';
 import sinon from 'sinon';
 import ObjectProxy from '@ember/object/proxy';
 
-describe('Integration | Component | modals/apply-atm-workflow-schema-dump-modal',
+describe('Integration | Component | modals/apply-atm-record-dump-modal',
   function () {
     setupRenderingTest();
 
@@ -77,6 +77,7 @@ describe('Integration | Component | modals/apply-atm-workflow-schema-dump-modal'
         modalManager: lookupService(this, 'modal-manager'),
         modalOptions: {
           initialAtmInventory: atmInventory1,
+          atmModelName: 'atmWorkflowSchema',
           dumpSourceType: 'upload',
           dumpSourceProxy,
           onSubmit,
@@ -117,9 +118,9 @@ describe('Integration | Component | modals/apply-atm-workflow-schema-dump-modal'
         expect(modalBody.querySelector('.option-merge input'))
           .to.have.property('checked', true);
         expect(modalBody
-          .querySelector('.targetWorkflow-field .dropdown-field-trigger')
+          .querySelector('.targetAtmRecord-field .dropdown-field-trigger')
         ).to.have.trimmed.text('wf2');
-        expect(modalBody.querySelector('.newWorkflowName-field .form-control'))
+        expect(modalBody.querySelector('.newAtmRecordName-field .form-control'))
           .to.have.value('w2');
       });
 
@@ -157,7 +158,7 @@ describe('Integration | Component | modals/apply-atm-workflow-schema-dump-modal'
         expect(modalBody
           .querySelector('.targetAtmInventory-field .dropdown-field-trigger')
         ).to.have.trimmed.text('inv2');
-        expect(modalBody.querySelector('.no-target-workflow-warning')).to.exist;
+        expect(modalBody.querySelector('.no-target-atm-record-warning')).to.exist;
         expect(modalBody.querySelector('.option-create input'))
           .to.have.property('checked', true);
       });
@@ -182,15 +183,15 @@ async function showModal(testCase) {
 
   await render(hbs `{{global-modal-mounter}}`);
 
-  await modalManager.show('apply-atm-workflow-schema-dump-modal', modalOptions)
+  await modalManager.show('apply-atm-record-dump-modal', modalOptions)
     .shownPromise;
 }
 
 function itShowsModalWithContent() {
-  it('renders modal with class "apply-atm-workflow-schema-dump-modal" and correct content',
+  it('renders modal with class "apply-atm-record-dump-modal" and correct content',
     async function () {
       const isUploadMode = this.get('modalOptions.dumpSourceType') === 'upload';
-      const expectedTitle = isUploadMode ? 'Upload workflow' : 'Duplicate revision';
+      const expectedTitle = isUploadMode ? 'Upload workflow' : 'Duplicate workflow revision';
       const dump = this.get('dump');
       await showModal(this);
 
@@ -199,7 +200,7 @@ function itShowsModalWithContent() {
       const modalBody = getModalBody();
       const modalFooter = getModalFooter();
 
-      expect(modal).to.have.class('apply-atm-workflow-schema-dump-modal');
+      expect(modal).to.have.class('apply-atm-record-dump-modal');
       expect(modalHeader.querySelector('h1')).to.have.trimmed.text(expectedTitle);
       if (isUploadMode) {
         expect(modalBody.querySelector('.upload-details .filename'))
@@ -221,9 +222,9 @@ function itShowsModalWithContent() {
       expect(modalBody.querySelector('.option-merge input'))
         .to.have.property('checked', true);
       expect(modalBody
-        .querySelector('.targetWorkflow-field .dropdown-field-trigger')
+        .querySelector('.targetAtmRecord-field .dropdown-field-trigger')
       ).to.have.trimmed.text('wf1');
-      expect(modalBody.querySelector('.newWorkflowName-field .form-control'))
+      expect(modalBody.querySelector('.newAtmRecordName-field .form-control'))
         .to.have.value('w1');
       const submitBtn = modalFooter.querySelector('.submit-btn');
       const cancelBtn = modalFooter.querySelector('.cancel-btn');
@@ -257,15 +258,15 @@ function itAllowsChangingTargetWorkflow() {
     await showModal(this);
     const modalBody = getModalBody();
 
-    await clickTrigger('.targetWorkflow-field');
+    await clickTrigger('.targetAtmRecord-field');
     const options = document.querySelectorAll('.ember-power-select-option');
     expect(options).to.have.length(2);
     expect(options[0]).to.have.trimmed.text('wf1');
     expect(options[1]).to.have.trimmed.text('wf3');
-    await selectChoose('.targetWorkflow-field', 'wf3');
+    await selectChoose('.targetAtmRecord-field', 'wf3');
 
     expect(modalBody
-      .querySelector('.targetWorkflow-field .dropdown-field-trigger')
+      .querySelector('.targetAtmRecord-field .dropdown-field-trigger')
     ).to.have.trimmed.text('wf3');
     expect(modalBody.querySelector('.revision-conflict-warning')).to.exist;
   });
@@ -277,11 +278,11 @@ function itAllowsChangingOperationAndNewWorkflowName() {
     const modalBody = getModalBody();
 
     await click('.option-create');
-    await fillIn('.newWorkflowName-field .form-control', 'xyz');
+    await fillIn('.newAtmRecordName-field .form-control', 'xyz');
 
     expect(modalBody.querySelector('.option-create input'))
       .to.have.property('checked', true);
-    expect(modalBody.querySelector('.newWorkflowName-field .form-control'))
+    expect(modalBody.querySelector('.newAtmRecordName-field .form-control'))
       .to.have.value('xyz');
   });
 }
@@ -308,9 +309,9 @@ function itSubmitsMergingWorkflowDump() {
 
     expect(this.get('onSubmit')).to.be.calledOnce.and.to.be.calledWith({
       atmInventory: this.get('atmInventories.0'),
-      atmWorkflowSchemaDump: this.get('dump'),
+      atmRecordDump: this.get('dump'),
       operation: 'merge',
-      targetAtmWorkflowSchema: this.get('atmWorkflowSchemas.1'),
+      targetAtmRecord: this.get('atmWorkflowSchemas.1'),
     });
   });
 }
@@ -320,14 +321,14 @@ function itSubmitsCreatingWorkflow() {
     await showModal(this);
 
     await click('.option-create');
-    await fillIn('.newWorkflowName-field .form-control', 'xyz');
+    await fillIn('.newAtmRecordName-field .form-control', 'xyz');
     await click('.submit-btn');
 
     expect(this.get('onSubmit')).to.be.calledOnce.and.to.be.calledWith({
       atmInventory: this.get('atmInventories.0'),
-      atmWorkflowSchemaDump: this.get('dump'),
+      atmRecordDump: this.get('dump'),
       operation: 'create',
-      newAtmWorkflowSchemaName: 'xyz',
+      newAtmRecordName: 'xyz',
     });
   });
 }
@@ -337,7 +338,7 @@ function itBlocksSubmitWhenWorkflowNameEmpty() {
     await showModal(this);
 
     await click('.option-create');
-    await fillIn('.newWorkflowName-field .form-control', '');
+    await fillIn('.newAtmRecordName-field .form-control', '');
 
     expect(find('.submit-btn')).to.have.attr('disabled');
   });
@@ -349,7 +350,7 @@ function itDoesntBlockSubmitWnehWorkflowNameIsEmptyInMerge() {
       await showModal(this);
 
       await click('.option-create');
-      await fillIn('.newWorkflowName-field .form-control', '');
+      await fillIn('.newAtmRecordName-field .form-control', '');
       await click('.option-merge');
 
       expect(find('.submit-btn')).to.not.have.attr('disabled');
@@ -393,9 +394,9 @@ function itBlocksControlsAndCloseWhenSubmitting() {
         expect(find('.targetAtmInventory-field .dropdown-field-trigger'))
           .to.have.attr('aria-disabled');
       }
-      expect(find('.targetWorkflow-field .dropdown-field-trigger'))
+      expect(find('.targetAtmRecord-field .dropdown-field-trigger'))
         .to.have.attr('aria-disabled');
-      expect(find('.newWorkflowName-field .form-control')).to.have.attr('disabled');
+      expect(find('.newAtmRecordName-field .form-control')).to.have.attr('disabled');
       expect(find('.one-way-radio-group')).to.have.class('disabled');
       expect(getModalFooter().querySelector('.cancel-btn')).to.have.attr('disabled');
     });
