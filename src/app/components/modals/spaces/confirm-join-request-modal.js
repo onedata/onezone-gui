@@ -20,8 +20,10 @@ import { promise, bool, and, not } from 'ember-awesome-macros';
 
 /**
  * @typedef {Object} ConfirmJoinRequestModalOptions
- * @property {({ userId: string, spaceId: string }) => void} onGranted Callback invoked
- *   after access granting method has been successfully resolved.
+ * @property {(userId: string) => Promise} onGrant Callback that should
+ *   grant membership of the user with `userId` to the space, that the request is about.
+ * @property {() => Promise} onReject Callback that should reject the membership access
+ *   request.
  * @property {string} spaceId ID of space, for which the access will be considered.
  * @property {string} joinRequestId Space membership request ID.
  */
