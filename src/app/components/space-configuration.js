@@ -179,12 +179,12 @@ export default Component.extend(validations, I18n, {
 
   advertisedToggleLockHint: or(
     and(
-      and(not('isAdvertised'), 'areAdvertiseRequirementsNotMet'),
-      computedT('advertised.lockHint.requiredFieldsEmpty')
-    ),
-    and(
       and(not('isMarketplaceEnabled'), not('isAdvertised')),
       computedT('advertised.lockHint.marketplaceDisabled')
+    ),
+    and(
+      and(not('isAdvertised'), 'areAdvertiseRequirementsNotMet'),
+      computedT('advertised.lockHint.requiredFieldsEmpty')
     ),
     raw(''),
   ),
