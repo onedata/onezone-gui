@@ -54,6 +54,8 @@ export default Component.extend(I18n, {
    */
   contactEmail: '',
 
+  isEmailShareConfirmed: false,
+
   //#endregion
 
   space: reads('modalOptions.space'),
@@ -89,7 +91,11 @@ export default Component.extend(I18n, {
     });
   }),
 
-  areButtonsDisabled: or('isSubmitting', not('contactEmailField.isValid')),
+  areButtonsDisabled: or(
+    'isSubmitting',
+    not('rootField.isValid'),
+    not('isEmailShareConfirmed'),
+  ),
 
   async enableMarketplaceAdvertisement() {
     setProperties(this.space, {
@@ -123,6 +129,12 @@ export default Component.extend(I18n, {
       } finally {
         safeExec(this, () => this.set('isSubmitting', false));
       }
+    },
+    toggleEmailShareConfirmation(state = !this.isEmailShareConfirmed) {
+      if (this.isDisabled) {
+        return;
+      }
+      this.set('isEmailShareConfirmed', state);
     },
   },
 });

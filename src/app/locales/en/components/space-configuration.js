@@ -46,5 +46,5 @@ export default {
     disablingAdvertisement: 'disabling space advertisement',
   },
   someTagsUnsupported: 'Some of entered tags are currently not supported. Remove them to be able to save changes.',
-  emailVisibleAlert: 'Note, that the marketplace contact e-mail address will be visible to anyone who gains an access to the space.',
+  emailVisibleAlert: 'Note, that contact e-mail address will be visible to space members with "view space" privilege.',
 };

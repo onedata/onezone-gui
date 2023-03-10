@@ -1,4 +1,10 @@
 .enable-marketplace-advertisement-modal {
+  &.disabled {
+    .row-understand-notice .text-understand {
+      color: $main-text-color-disabled;
+    }
+  }
+
   .contact-form {
     margin-top: 1em;
   }
@@ -19,6 +25,13 @@
     .one-icon {
       margin-left: 0.2em;
       font-size: 120%;
+    }
+  }
+  .row-understand-notice {
+    .text-understand {
+      color: $main-text-color;
+      // make larger spacing from checkbox to text, to look like label-input spacing
+      padding-left: 34px;
     }
   }
 }

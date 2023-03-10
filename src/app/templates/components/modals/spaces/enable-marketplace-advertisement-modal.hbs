@@ -29,8 +29,19 @@
     >
       {{form-component/field-renderer field=rootField}}
     </form>
-    <div class="alert alert-warning email-visible-alert">
-      {{tt this "emailVisibleAlert"}}
+    <div class="row content-row no-border row-understand-notice">
+      {{one-checkbox
+        class="one-checkbox-understand"
+        checked=isEmailShareConfirmed
+        update=(action (mut isEmailShareConfirmed))
+        isReadOnly=isDisabled
+      }}
+      <div
+        class="text-understand clickable"
+        {{action "toggleEmailShareConfirmation"}}
+      >
+        {{tt this "emailShareCheckboxText"}}
+      </div>
     </div>
   {{/modal.body}}
 
