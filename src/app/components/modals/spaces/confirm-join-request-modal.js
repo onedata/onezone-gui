@@ -57,12 +57,19 @@ export default Component.extend(I18n, {
 
   //#endregion
 
+  isMarketplaceEnabled: bool('spaceManger.marketplaceConfig.enabled'),
+
   /**
    * @type {PromiseObject<SpaceMembershipRequesterInfo>}
    */
   requesterInfoProxy: promise.object(computed(
+    'isMarketplaceEnabled',
+    'spaceId',
     'joinRequestId',
     async function requesterInfoProxy() {
+      if (!this.isMarketplaceEnabled) {
+        return null;
+      }
       return await this.spaceManager.getSpaceMembershipRequesterInfo(
         this.spaceId,
         this.joinRequestId,
@@ -118,7 +125,7 @@ export default Component.extend(I18n, {
 
   spaceName: reads('space.name'),
 
-  isProceedButtonVisible: reads('isValid'),
+  isProceedButtonVisible: and('isMarketplaceEnabled', 'isValid'),
 
   isProceedAvailable: and('isValid', not('isProcessing')),
 

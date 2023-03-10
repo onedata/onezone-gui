@@ -106,9 +106,6 @@ export default EmberObject.extend({
     'userSpacesIdsProxy.content',
     'itemRequestInfoProxy.content.lastActivity',
     async function marketplaceSpaceStatusProxy() {
-      // FIXME: w praktyce uruchamia się wielokrotnie
-      // FIXME: może by to przerobić tak, żeby te poniższe dane były konieczne do
-      // załadowania widoku nadrzędnego
       const [
         itemRequestInfo,
         userSpacesIds,
