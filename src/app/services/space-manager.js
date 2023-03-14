@@ -60,6 +60,14 @@ export const listMarketplaceAspect = 'list_marketplace';
  * @property {number} minBackoffAfterRejection
  */
 
+/**
+ * Fallback time (24h) in seconds used if backend configuration is invalid for:
+ * - minBackoffBetweenReminders
+ * - minBackoffAfterRejection
+ * @type {number}
+ */
+const marketplaceFallbackBackoff = 60 * 60 * 24;
+
 export default Service.extend({
   store: service(),
   currentUser: service(),
@@ -85,9 +93,9 @@ export default Service.extend({
       return {
         enabled: spaceMarketplaceEnabled ?? false,
         minBackoffBetweenReminders: spaceMarketplaceMinBackoffBetweenReminders ??
-          Number.MAX_SAFE_INTEGER,
+          marketplaceFallbackBackoff,
         minBackoffAfterRejection: spaceMarketplaceMinBackoffAfterRejection ??
-          Number.MAX_SAFE_INTEGER,
+          marketplaceFallbackBackoff,
       };
     }
   ),

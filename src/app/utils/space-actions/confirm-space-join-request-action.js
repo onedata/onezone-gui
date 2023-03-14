@@ -97,26 +97,17 @@ export default Action.extend({
     if (!userId || !this.spaceId) {
       return;
     }
-    if (
-      this.navigationState.activeResource?.entityId === this.spaceId &&
-      this.navigationState.activeAspect === 'members'
-    ) {
-      this.navigationState.changeRouteAspectOptions({
-        member: userId,
-      });
-    } else {
-      await this.router.transitionTo(
-        'onedata.sidebar.content.aspect',
-        'spaces',
-        this.spaceId,
-        'members', {
-          queryParams: {
-            options: serializeAspectOptions({
-              member: userId,
-            }),
-          },
-        }
-      );
-    }
+    await this.router.transitionTo(
+      'onedata.sidebar.content.aspect',
+      'spaces',
+      this.spaceId,
+      'members', {
+        queryParams: {
+          options: serializeAspectOptions({
+            member: userId,
+          }),
+        },
+      }
+    );
   },
 });

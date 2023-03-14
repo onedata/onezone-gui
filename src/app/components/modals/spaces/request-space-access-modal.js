@@ -15,6 +15,7 @@ import TextAreaField from 'onedata-gui-common/utils/form-component/textarea-fiel
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
 import { validator } from 'ember-cp-validations';
 import { and, not } from 'ember-awesome-macros';
+import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -118,7 +119,7 @@ export default Component.extend(I18n, {
           spaceId: this.spaceId,
         });
       } finally {
-        this.set('isDisabled', false);
+        safeExec(this, 'set', 'isDisabled', false);
       }
     },
     toggleEmailShareConfirmation(state = !this.isEmailShareConfirmed) {

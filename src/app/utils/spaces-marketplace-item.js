@@ -12,14 +12,14 @@ import { promise } from 'ember-awesome-macros';
 import { all as allFulfilled } from 'rsvp';
 
 /**
- * @typedef {'visible'|'pending'|'granted'|'outdated'|'rejected'} MarketplaceSpaceStatus
+ * @typedef {'available'|'pending'|'granted'|'outdated'|'rejected'} MarketplaceSpaceStatus
  */
 
 /**
  * @type {Object<string, MarketplaceSpaceStatus>}
  */
 export const MarketplaceSpaceStatus = Object.freeze({
-  Visible: 'visible',
+  Available: 'available',
   Pending: 'pending',
   Granted: 'granted',
   Outdated: 'outdated',
@@ -79,9 +79,7 @@ export default EmberObject.extend({
         return null;
       }
 
-      /** @type {'pending'|'rejected'} */
-      let collectionName = null;
-      for (collectionName of ['pending', 'rejected']) {
+      for (const collectionName of ['pending', 'rejected']) {
         const requestInfo =
           get(spaceMembershipRequestsInfo, collectionName)?.[this.spaceId];
         if (requestInfo) {
@@ -115,28 +113,26 @@ export default EmberObject.extend({
       ]);
       if (userSpacesIds.includes(this.spaceId)) {
         return MarketplaceSpaceStatus.Granted;
-      } else if (itemRequestInfo?.collectionName === 'rejected') {
+      } else if (itemRequestInfo?.collectionName) {
         const lastActivity = itemRequestInfo.requestInfo.lastActivity ?? 0;
-        const minBackoff =
-          this.viewModel.marketplaceConfig.minBackoffAfterRejection ?? 0;
         const now = Math.floor(Date.now() / 1000);
-        if (lastActivity + minBackoff < now) {
-          return MarketplaceSpaceStatus.Visible;
-        } else {
-          return MarketplaceSpaceStatus.Rejected;
-        }
-      } else if (itemRequestInfo?.collectionName === 'pending') {
-        const lastActivity = itemRequestInfo.requestInfo.lastActivity ?? 0;
-        const minBackoff =
-          this.viewModel.marketplaceConfig.minBackoffBetweenReminders ?? 0;
-        const now = Math.floor(Date.now() / 1000);
-        if (lastActivity + minBackoff < now) {
-          return MarketplaceSpaceStatus.Outdated;
-        } else {
-          return MarketplaceSpaceStatus.Pending;
+        if (itemRequestInfo.collectionName === 'rejected') {
+          const minBackoff = this.viewModel.marketplaceConfig.minBackoffAfterRejection;
+          if (typeof minBackoff === 'number' && lastActivity + minBackoff < now) {
+            return MarketplaceSpaceStatus.Available;
+          } else {
+            return MarketplaceSpaceStatus.Rejected;
+          }
+        } else if (itemRequestInfo.collectionName === 'pending') {
+          const minBackoff = this.viewModel.marketplaceConfig.minBackoffBetweenReminders;
+          if (typeof minBackoff === 'number' && lastActivity + minBackoff < now) {
+            return MarketplaceSpaceStatus.Outdated;
+          } else {
+            return MarketplaceSpaceStatus.Pending;
+          }
         }
       } else {
-        return MarketplaceSpaceStatus.Visible;
+        return MarketplaceSpaceStatus.Available;
       }
     },
   )),

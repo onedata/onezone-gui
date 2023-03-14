@@ -40,7 +40,6 @@ export function generateGri(userId) {
  */
 
 export default Model.extend(GraphSingleModelMixin, {
-
   /**
    * @type {ComputedProperty<SpaceMembershipRequestsMap>}
    */

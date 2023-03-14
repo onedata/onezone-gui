@@ -46,7 +46,7 @@
     </div>
     {{#if spaceItem.marketplaceSpaceStatusProxy.isSettled}}
       <div class={{concat-classes "access-info-col" accessInfoColClassName}}>
-        {{#if (eq status MarketplaceSpaceStatusEnum.Visible)}}
+        {{#if (eq status MarketplaceSpaceStatusEnum.Available)}}
           {{#one-button size="sm" onClick=(action "requestAccess")}}
             {{one-icon icon="cart"}}
             <span class="text">{{tt this "requestAccess"}}</span>
