@@ -8,7 +8,7 @@
  */
 
 import Service, { inject as service } from '@ember/service';
-import { get, getProperties } from '@ember/object';
+import { get, getProperties, computed } from '@ember/object';
 import { resolve, all as allFulfilled, allSettled } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import gri from 'onedata-gui-websocket-client/utils/gri';
@@ -19,6 +19,9 @@ import {
 import {
   generateGri as generateSpaceMarketplaceInfoGri,
 } from 'onezone-gui/models/space-marketplace-info';
+import {
+  generateGri as generateSpaceMembershipRequestsInfoGri,
+} from 'onezone-gui/models/space-membership-requests-info';
 
 export const listMarketplaceAspect = 'list_marketplace';
 
@@ -31,6 +34,40 @@ export const listMarketplaceAspect = 'list_marketplace';
  * @typedef {Object} SpaceMarketplaceRawData
  */
 
+/**
+ * @typedef {Object} SpaceAccessRequestMessageData
+ * @property {string} message
+ * @property {string} contactEmail
+ * @property {string} spaceId
+ */
+
+/**
+ * Information about user requesting for space membership.
+ * It contains partial data of User model and part of additional data provided when user
+ * requested the space membership.
+ * @typedef {Object} SpaceMembershipRequesterInfo
+ * @property {string} userId The same as `user.entityId`.
+ * @property {string} fullName The same as `user.fullName`.
+ * @property {string} username The same as `user.username`.
+ * @property {string} contactEmail Contact e-mail address provided by user
+ *   when space membership has been requested.
+ */
+
+/**
+ * @typedef {Object} SpacesMarketplaceConfig
+ * @property {boolean} enabled
+ * @property {number} minBackoffBetweenReminders
+ * @property {number} minBackoffAfterRejection
+ */
+
+/**
+ * Fallback time (24h) in seconds used if backend configuration is invalid for:
+ * - minBackoffBetweenReminders
+ * - minBackoffAfterRejection
+ * @type {number}
+ */
+const marketplaceFallbackBackoff = 60 * 60 * 24;
+
 export default Service.extend({
   store: service(),
   currentUser: service(),
@@ -41,6 +78,27 @@ export default Service.extend({
   onedataGraphUtils: service(),
   recordManager: service(),
   onedataConnection: service(),
+
+  /**
+   * @type {ComputedProperty<SpacesMarketplaceConfig>}
+   */
+  marketplaceConfig: computed(
+    'onedataConnection.{spaceMarketplaceEnabled,spaceMarketplaceMinBackoffBetweenReminders,spaceMarketplaceMinBackoffAfterRejection}',
+    function marketplaceConfig() {
+      const {
+        spaceMarketplaceEnabled,
+        spaceMarketplaceMinBackoffBetweenReminders,
+        spaceMarketplaceMinBackoffAfterRejection,
+      } = this.onedataConnection;
+      return {
+        enabled: spaceMarketplaceEnabled ?? false,
+        minBackoffBetweenReminders: spaceMarketplaceMinBackoffBetweenReminders ??
+          marketplaceFallbackBackoff,
+        minBackoffAfterRejection: spaceMarketplaceMinBackoffAfterRejection ??
+          marketplaceFallbackBackoff,
+      };
+    }
+  ),
 
   /**
    * Fetches collection of all spaces
@@ -425,25 +483,6 @@ export default Service.extend({
     }
   },
 
-  // TODO: VFS-10384 mock of successful response; integrate with backend
-  /**
-   * @param {SpaceAccessRequestMessageData} requestData
-   * @returns {Promise}
-   */
-  async requestSpaceAccess( /* requestData */ ) {
-    return {};
-    // const requestGri = gri({
-    //   entityType: spaceEntityType,
-    //   entityId: requestData.spaceId,
-    //   aspect: 'request_membership',
-    // });
-    // return this.onedataGraph.request({
-    //   gri: requestGri,
-    //   operation: 'create',
-    //   subscribe: false,
-    // });
-  },
-
   /**
    * Maps: categoryName -> Array of available tags.
    * @returns {Object<string, Array<string>>}
@@ -454,18 +493,7 @@ export default Service.extend({
       availableSpaceTags : {};
   },
 
-  // TODO: VFS-10384 integrate with backend
-  async checkSpaceAccessRequest( /*requestId*/ ) {
-    return {
-      isValid: true,
-      userId: 'user0',
-      spaceId: 'space-0',
-      spaceName: 'Space 0',
-    };
-  },
-
-  // TODO: VFS-10384 integrate with backend
-  async grantSpaceAccess( /* requestId */ ) {},
+  //#region spaces marketplace
 
   /**
    * @param {InfiniteScrollListingParams} listingParams
@@ -474,7 +502,7 @@ export default Service.extend({
    */
   async fetchSpacesMarkeplaceIds(listingParams, tags) {
     const requestGri = gri({
-      entityType: 'space',
+      entityType: spaceEntityType,
       entityId: 'null',
       aspect: listMarketplaceAspect,
       scope: 'protected',
@@ -499,7 +527,7 @@ export default Service.extend({
    */
   async fetchSpacesMarkeplaceRawData(listingParams, tags) {
     const requestGri = gri({
-      entityType: 'space',
+      entityType: spaceEntityType,
       entityId: 'null',
       aspect: 'list_marketplace_with_data',
       scope: 'protected',
@@ -547,4 +575,86 @@ export default Service.extend({
       generateSpaceMarketplaceInfoGri(spaceId)
     );
   },
+
+  /**
+   * @param {SpaceAccessRequestMessageData} requestData
+   */
+  async requestSpaceAccess(requestData) {
+    const requestGri = gri({
+      entityType: spaceEntityType,
+      entityId: requestData.spaceId,
+      aspect: 'membership_request',
+    });
+    return this.onedataGraph.request({
+      gri: requestGri,
+      operation: 'create',
+      data: {
+        contactEmail: requestData.contactEmail,
+        message: requestData.message,
+      },
+      subscribe: false,
+    });
+  },
+
+  /**
+   * Get information about user requesting membership in marketplace space.
+   * @param {string} spaceId
+   * @param {string} requestId
+   * @returns {Promise<SpaceMembershipRequesterInfo>}
+   */
+  async getSpaceMembershipRequesterInfo(spaceId, requestId) {
+    const requestGri = gri({
+      entityType: spaceEntityType,
+      entityId: spaceId,
+      aspect: 'membership_requester_info',
+      aspectId: requestId,
+    });
+    return this.onedataGraph.request({
+      gri: requestGri,
+      operation: 'get',
+      subscribe: false,
+    });
+  },
+
+  /**
+   * Grant or reject membership to space for user that requested it.
+   * @param {string} spaceId
+   * @param {string} requestId
+   * @param {boolean} grantAccess If true, user will gain access to the space and request
+   *   will be resolved. If false, request will be rejected and user will receive
+   *   information about rejection via e-mail.
+   */
+  async resolveMarketplaceSpaceAccess(spaceId, requestId, grantAccess) {
+    const requestGri = gri({
+      entityType: spaceEntityType,
+      entityId: spaceId,
+      aspect: 'resolve_membership_request',
+    });
+    return this.onedataGraph.request({
+      gri: requestGri,
+      operation: 'create',
+      data: {
+        requestId,
+        grant: grantAccess,
+      },
+      subscribe: false,
+    });
+  },
+
+  /**
+   * Get subscribable information about all pending and rejected space membership requests
+   * made by current user.
+   * @returns {Promise<Models.SpaceMembershipRequestsInfo>}
+   */
+  async getSpaceMembershipRequestsInfo(reload = false) {
+    const requestGri = generateSpaceMembershipRequestsInfoGri(this.currentUser.userId);
+    return await this.store.findRecord(
+      'spaceMembershipRequestsInfo',
+      requestGri, {
+        reload,
+      }
+    );
+  },
+
+  //#endregion
 });

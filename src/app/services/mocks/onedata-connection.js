@@ -81,6 +81,9 @@ export default OnedataConnection.extend({
       'transport',
     ],
   }),
+  spaceMarketplaceEnabled: true,
+  spaceMarketplaceMinBackoffBetweenReminders: 60 * 60,
+  spaceMarketplaceMinBackoffAfterRejection: 60 * 60,
   onezoneRecord: computed(function onezoneRecord() {
     return EmberObject.create({
       name: zoneName,

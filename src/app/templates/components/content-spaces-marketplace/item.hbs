@@ -44,35 +44,70 @@
         }}
       </div>
     </div>
-    <div class="access-info-col">
-      {{#if isAccessGranted}}
-        <div class="access-granted-container">
-          {{one-icon icon="cart-checked"}}
-          <span class="text">{{tt this "accessGranted"}}</span>
-        </div>
-        <div class="access-links-container">
-          <a href={{visitSpaceHref}} class="visit-space-link space-link">
-            <span class="text">{{tt this "visitSpace"}}</span>
-            {{one-icon icon="link-external"}}
-          </a>
-          <span class="col-separator"></span>
-          <a href={{configureSpaceHref}} class="configure-space-link space-link">
-            <span class="text">{{tt this "configure"}}</span>
-            {{one-icon icon="link-external"}}
-          </a>
-        </div>
-      {{else if isRequested}}
-        {{#one-button size="sm" disabled=true}}
-          {{one-icon icon="cart"}}
-          <span class="text">{{tt this "requestSent"}}</span>
-        {{/one-button}}
-      {{else if isAccessGrantedProxy.isSettled}}
-        {{#one-button size="sm" onClick=(action "requestAccess")}}
-          {{one-icon icon="cart"}}
-          <span class="text">{{tt this "requestAccess"}}</span>
-        {{/one-button}}
-      {{/if}}
-    </div>
+    {{#if spaceItem.marketplaceSpaceStatusProxy.isSettled}}
+      <div class={{concat-classes "access-info-col" accessInfoColClassName}}>
+        {{#if (eq status MarketplaceSpaceStatusEnum.Available)}}
+          {{#one-button size="sm" onClick=(action "requestAccess")}}
+            {{one-icon icon="cart"}}
+            <span class="text">{{tt this "requestAccess"}}</span>
+          {{/one-button}}
+        {{else if (eq status MarketplaceSpaceStatusEnum.Outdated)}}
+          {{#one-icon icon="sign-warning-rounded" class="status-btn-external-icon"}}
+            {{one-tooltip
+              class="tooltip-lg tooltip-text-left"
+              title=(tt this "retryWarningTip"
+                dateText=lastActivityDateText
+                email=lastRequesterEmail
+              )
+            }}
+          {{/one-icon}}
+          {{#one-button size="sm" onClick=(action "requestAccess")}}
+            {{one-icon icon="cart"}}
+            <span class="text">{{tt this "requestAccess"}}</span>
+          {{/one-button}}
+        {{else if (eq status MarketplaceSpaceStatusEnum.Pending)}}
+          {{#one-button size="sm" disabled=true}}
+            {{one-icon icon="cart"}}
+            <span class="text">{{tt this "requestSent"}}</span>
+            {{one-tooltip
+              class="tooltip-lg tooltip-text-left"
+              title=(tt this "requestPendingTip"
+                dateText=lastActivityDateText
+                email=lastRequesterEmail
+              )
+            }}
+          {{/one-button}}
+        {{else if (eq status MarketplaceSpaceStatusEnum.Granted)}}
+          <div class="access-info-head-container access-granted-container">
+            {{one-icon icon="cart-checked"}}
+            <span class="text">{{tt this "accessGranted"}}</span>
+          </div>
+          <div class="access-links-container">
+            <a href={{visitSpaceHref}} class="visit-space-link space-link">
+              <span class="text">{{tt this "visitSpace"}}</span>
+              {{one-icon icon="link-external"}}
+            </a>
+            <span class="col-separator"></span>
+            <a href={{configureSpaceHref}} class="configure-space-link space-link">
+              <span class="text">{{tt this "configure"}}</span>
+              {{one-icon icon="link-external"}}
+            </a>
+          </div>
+        {{else if (eq status MarketplaceSpaceStatusEnum.Rejected)}}
+          <div class="access-info-head-container access-denied-container">
+            {{one-icon class="access-denied-icon" icon="warning"}}
+            <span class="text">{{tt this "accessDenied"}}</span>
+            {{one-tooltip
+              class="tooltip-lg tooltip-text-left"
+              title=(tt this "requestRejectedTip"
+                againDateText=againRequestDateText
+                email=lastRequesterEmail
+              )
+            }}
+          </div>
+        {{/if}}
+      </div>
+    {{/if}}
   </div>
   <div class="row marketplace-item-row description-row">
     {{content-spaces-marketplace/space-description

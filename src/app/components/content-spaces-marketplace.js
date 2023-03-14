@@ -7,7 +7,9 @@
  */
 
 import Component from '@ember/component';
+import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
+import { next } from '@ember/runloop';
 import SpacesMarketplaceViewModel from 'onezone-gui/utils/spaces-marketplace-view-model';
 import globalCssVariablesManager from 'onedata-gui-common/utils/global-css-variables-manager';
 
@@ -28,6 +30,8 @@ export default Component.extend({
   classNameBindings: ['viewModel.showEmptyListView:no-spaces-available'],
 
   navigationState: service(),
+  spaceManager: service(),
+  router: service(),
 
   //#region state
 
@@ -38,8 +42,14 @@ export default Component.extend({
 
   //#endregion
 
+  isMarketplaceEnabled: reads('spaceManager.marketplaceConfig.enabled'),
+
   init() {
     this._super(...arguments);
+    if (!this.isMarketplaceEnabled) {
+      next(this, () => this.router.transitionTo('index'));
+      return;
+    }
     this.set('viewModel', this.createViewModel());
   },
 

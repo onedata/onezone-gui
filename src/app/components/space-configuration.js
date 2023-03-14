@@ -104,6 +104,8 @@ export default Component.extend(validations, I18n, {
 
   //#endregion
 
+  isMarketplaceEnabled: reads('spaceManager.marketplaceConfig.enabled'),
+
   spaceId: reads('space.entityId'),
 
   isReadOnly: not('space.privileges.update'),
@@ -175,10 +177,16 @@ export default Component.extend(validations, I18n, {
     isEmpty('spaceDescription'),
   ),
 
-  advertisedToggleLockHint: conditional(
-    and(not('isAdvertised'), 'areAdvertiseRequirementsNotMet'),
-    computedT('advertised.lockHint.requiredFieldsEmpty'),
-    raw('')
+  advertisedToggleLockHint: or(
+    and(
+      and(not('isMarketplaceEnabled'), not('isAdvertised')),
+      computedT('advertised.lockHint.marketplaceDisabled')
+    ),
+    and(
+      and(not('isAdvertised'), 'areAdvertiseRequirementsNotMet'),
+      computedT('advertised.lockHint.requiredFieldsEmpty')
+    ),
+    raw(''),
   ),
 
   /**

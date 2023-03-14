@@ -26,6 +26,7 @@ export default {
     label: 'Advertise in marketplace',
     lockHint: {
       requiredFieldsEmpty: 'Advertising space in marketplace requires organization name and description to be set.',
+      marketplaceDisabled: 'Spaces marketplace is disabled in this Onezone.',
     },
   },
   contactEmail: {
@@ -46,5 +47,6 @@ export default {
     disablingAdvertisement: 'disabling space advertisement',
   },
   someTagsUnsupported: 'Some of entered tags are currently not supported. Remove them to be able to save changes.',
-  emailVisibleAlert: 'Note, that the marketplace contact e-mail address will be visible to anyone who gains an access to the space.',
+  emailVisibleAlert: 'Note, that contact e-mail address will be visible to space members with "view space" privilege.',
+  advertisedInDisabledMarketplace: 'Maketplace advertising has been enabled for this space, but currently this Onezone has spaces marketplace disabled.',
 };

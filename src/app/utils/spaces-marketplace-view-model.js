@@ -104,6 +104,8 @@ export default EmberObject.extend(OwnerInjector, {
 
   //#endregion
 
+  marketplaceConfig: reads('spaceManager.marketplaceConfig'),
+
   /**
    * True, if the current list considering search conditions, is empty.
    * @type {ComputedProperty<boolean>}
@@ -147,7 +149,18 @@ export default EmberObject.extend(OwnerInjector, {
     }
   )),
 
+  /**
+   * @type {ComputedProperty<PromiseObject<Models.SpaceMembershipRequestsInfo>>}
+   */
+  spaceMembershipRequestsInfoProxy: promise.object(computed(
+    function spaceMembershipRequestsInfoProxy() {
+      return this.spaceManager.getSpaceMembershipRequestsInfo();
+    }
+  )),
+
   selectedSpaceInfo: reads('selectedSpaceInfoProxy.content'),
+
+  spaceMembershipRequestsInfo: reads('spaceMembershipRequestsInfoProxy.content'),
 
   viewStateChanger: observer('entriesInitialLoad.isSettled', 'entries.length', function viewStateChanger() {
     const state = this.viewState;

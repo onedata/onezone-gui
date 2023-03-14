@@ -36,6 +36,9 @@ import { exampleMarkdownShort, exampleMarkdownLong } from 'onedata-gui-common/ut
 import {
   generateGri as generateSpaceMarketplaceInfoGri,
 } from 'onezone-gui/models/space-marketplace-info';
+import {
+  generateGri as generateSpaceMembershipRequestsInfoGri,
+} from 'onezone-gui/models/space-membership-requests-info';
 
 const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
@@ -349,6 +352,11 @@ export default function generateDevelopmentModel(store) {
       await attachProgressToHarvesterIndices(store, harvesters, spaces, providers);
       const marketplaceRecords = await generateMarketplaceMock(store, listRecords);
       globalDevelopmentModel.entityRecords.spaceMarketplaceInfo = marketplaceRecords;
+      const spaceMembershipRequestsInfo =
+        await generateSpaceMembershipRequestsInfo(store, user);
+      globalDevelopmentModel.entityRecords.spaceMembershipRequestsInfo = [
+        spaceMembershipRequestsInfo,
+      ];
       await addListRecordsToMainUser(user, listRecords);
       globalDevelopmentModel.listRecords = listRecords;
       return user;
@@ -1170,6 +1178,32 @@ function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
       set(atmInventory, 'atmWorkflowSchemaList', atmWorkflowSchemaList);
       return atmInventory.save();
     });
+}
+
+async function generateSpaceMembershipRequestsInfo(
+  store,
+  user,
+) {
+  const pending = {
+    'space-market-info-1': {
+      requestId: 'abcd-1',
+      contactEmail: 'the_requester@example.com',
+      // use earlier timestamp value to see "outdated" state
+      lastActivity: Math.floor(Date.now() / 1000) - 10000,
+    },
+  };
+  const rejected = {
+    'space-market-info-2': {
+      requestId: 'abcd-2',
+      contactEmail: 'rejected_requester@example.com',
+      lastActivity: Math.floor(Date.now() / 1000),
+    },
+  };
+  return store.createRecord('spaceMembershipRequestsInfo', {
+    id: generateSpaceMembershipRequestsInfoGri(get(user, 'entityId')),
+    pending,
+    rejected,
+  }).save();
 }
 
 async function generateMarketplaceMock(store, listRecords) {

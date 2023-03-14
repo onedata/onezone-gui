@@ -17,13 +17,6 @@ import { htmlSafe } from '@ember/string';
  * @property {SpaceMarketplaceModel} spaceMarketplaceData
  */
 
-/**
- * @typedef {Object} SpaceAccessRequestMessageData
- * @property {string} message
- * @property {string} email
- * @property {string} spaceId
- */
-
 export default Action.extend({
   modalManager: service(),
   router: service(),
@@ -52,6 +45,9 @@ export default Action.extend({
    */
   icon: 'cart',
 
+  /**
+   * @type {{ spaceId: string, name: string }}
+   */
   spaceMarketplaceData: reads('context.spaceMarketplaceData'),
 
   /**
@@ -62,9 +58,16 @@ export default Action.extend({
     const modalInstance = this.modalManager
       .show('spaces/request-space-access-modal', {
         hideAfterSubmit: false,
+        /** @param {SpaceAccessRequestMessageData} requestData */
         onSubmit: async (requestData) => {
           try {
             await result.interceptPromise(this.sendRequest(requestData));
+            try {
+              await this.reloadSpaceMembershipRequestsInfo();
+            } catch (error) {
+              // reloading is not critical, so just print error on console and continue
+              console.warn('Reloading SpaceMembershipRequestsInfo failed', error);
+            }
             this.showSuccessInfo(requestData);
             this.modalManager.hide(modalInstance.id);
           } catch {
@@ -93,5 +96,12 @@ export default Action.extend({
    */
   async sendRequest(requestData) {
     return this.spaceManager.requestSpaceAccess(requestData);
+  },
+
+  /**
+   * @returns {Promise<Models.SpaceMembershipRequestsInfo>}
+   */
+  async reloadSpaceMembershipRequestsInfo() {
+    return this.spaceManager.getSpaceMembershipRequestsInfo(true);
   },
 });

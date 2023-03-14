@@ -19,149 +19,115 @@ import { suppressRejections } from '../../../../helpers/suppress-rejections';
 describe('Integration | Component | modals/spaces/confirm-join-request-modal', function () {
   setupRenderingTest();
 
-  it('renders header and close button if space join request is invalid', async function () {
-    const helper = new Helper(this);
-    const joinRequestId = 'join_request_id';
-    helper.modalOptions = {
-      joinRequestId,
-    };
-    const checkSpaceAccessRequest = sinon.stub(
-      helper.spaceManager,
-      'checkSpaceAccessRequest'
-    );
-    checkSpaceAccessRequest.resolves({ isValid: false });
-
-    await helper.showModal();
-
-    expect(helper.header).to.contain.text('Invalid join space request');
-    expect(helper.cancelButton).to.exist;
-    expect(helper.cancelButton).to.contain.text('Close');
-  });
-
-  it('renders header, confirm and cancel button if space join request is valid', async function () {
-    const helper = new Helper(this);
-    const joinRequestId = 'join_request_id';
-    const userId = 'user_id';
-    const spaceId = 'space_id';
-    const spaceName = 'space_id';
-    const userName = 'Zenek';
-    helper.modalOptions = {
-      joinRequestId,
-    };
-    const checkSpaceAccessRequest = sinon.stub(
-      helper.spaceManager,
-      'checkSpaceAccessRequest'
-    );
-    checkSpaceAccessRequest.resolves({ isValid: false });
-    checkSpaceAccessRequest.withArgs(sinon.match({ joinRequestId })).resolves({
-      isValid: true,
-      userId,
-      spaceId,
-      spaceName,
-    });
-    await helper.stubUser(userId, { name: userName });
-
-    await helper.showModal();
-
-    expect(helper.header).to.contain.text('Add user to space');
-    expect(helper.body).to.contain.text(
-      `An access to ${spaceName} space has been requested by ${userName} using spaces marketplace.`
-    );
-    expect(helper.cancelButton).to.exist;
-    expect(helper.cancelButton).to.contain.text('Cancel');
-    expect(helper.proceedButton).to.exist;
-    expect(helper.proceedButton).to.contain.text('Confirm');
-  });
-
-  it('invokes grantSpaceAccess on confirm click', async function () {
-    const helper = new Helper(this);
-    const joinRequestId = 'join_request_id';
-    helper.modalOptions = {
-      joinRequestId,
-    };
-    const checkSpaceAccessRequest = sinon.stub(
-      helper.spaceManager,
-      'checkSpaceAccessRequest'
-    );
-    const grantSpaceAccess = sinon.stub(
-      helper.spaceManager,
-      'grantSpaceAccess'
-    );
-    checkSpaceAccessRequest.resolves({ isValid: true });
-
-    await helper.showModal();
-    await click(helper.proceedButton);
-
-    expect(grantSpaceAccess).to.have.been.calledOnce;
-    expect(grantSpaceAccess).to.have.been.calledWith(joinRequestId);
-  });
-
-  it('renders header and close button if space join request is invalid', async function () {
-    const helper = new Helper(this);
-    const joinRequestId = 'join_request_id';
-    helper.modalOptions = {
-      joinRequestId,
-    };
-    const checkSpaceAccessRequest = sinon.stub(
-      helper.spaceManager,
-      'checkSpaceAccessRequest'
-    );
-    checkSpaceAccessRequest.resolves({ isValid: false });
-    checkSpaceAccessRequest.withArgs(sinon.match({ joinRequestId })).resolves({
-      isValid: false,
-    });
-
-    await helper.showModal();
-
-    expect(helper.header).to.contain.text('Invalid join space request');
-    expect(helper.body).to.contain.text(
-      'The space join request is either not valid or has expired.'
-    );
-    expect(helper.cancelButton).to.exist;
-    expect(helper.cancelButton).to.contain.text('Close');
-    expect(helper.proceedButton).to.not.exist;
-  });
-
-  it('renders header, error info and close button if space join request is rejected', async function () {
+  it('renders header and close button if space join requester info fetch fails', async function () {
     suppressRejections();
     const helper = new Helper(this);
+    const spaceId = 'space_id';
     const joinRequestId = 'join_request_id';
+    await helper.stubSpace({ entityId: spaceId });
     helper.modalOptions = {
+      spaceId,
       joinRequestId,
     };
-    const checkSpaceAccessRequest = sinon.stub(
+    sinon.stub(
       helper.spaceManager,
-      'checkSpaceAccessRequest'
-    );
-    checkSpaceAccessRequest.rejects(new Error('test error'));
+      'getSpaceMembershipRequesterInfo'
+    ).rejects(new Error('mocked error'));
 
     await helper.showModal();
 
     expect(helper.header).to.contain.text('Request verification failed');
-    expect(helper.body).to.contain.text('This resource could not be loaded.');
-    expect(helper.cancelButton).to.exist;
-    expect(helper.cancelButton).to.contain.text('Close');
-    expect(helper.proceedButton).to.not.exist;
+    expect(helper.closeButton).to.exist;
+    expect(helper.closeButton).to.contain.text('Close');
+    expect(helper.grantButton).to.not.exist;
+    expect(helper.rejectButton).to.not.exist;
+  });
+
+  it('renders header, grant and reject button if space and requester info is successfully fetched',
+    async function () {
+      const helper = new Helper(this);
+      const requestId = 'join_request_id';
+      const userId = 'user_id';
+      const spaceId = 'space_id';
+      const spaceName = 'Stub space name';
+      const fullName = 'Zenek';
+      const username = 'mock_username';
+      const contactEmail = 'zenek@polo.pl';
+      helper.modalOptions = {
+        spaceId,
+        joinRequestId: requestId,
+      };
+      await helper.stubSpace({ name: spaceName, entityId: spaceId });
+      const getRequesterInfo = sinon.stub(
+        helper.spaceManager,
+        'getSpaceMembershipRequesterInfo'
+      );
+      getRequesterInfo.withArgs(sinon.match(spaceId, requestId)).resolves({
+        userId,
+        fullName,
+        username,
+        contactEmail,
+      });
+      getRequesterInfo.rejects(new Error('mocked error'));
+
+      await helper.showModal();
+
+      expect(getRequesterInfo).to.have.been.calledWith(spaceId, requestId);
+      expect(helper.header).to.contain.text('Add user to space');
+      expect(helper.body.textContent).to.match(new RegExp(
+        `An access to\\s+${spaceName}\\s+space has been requested by\\s+${fullName}\\s+\\(${contactEmail}\\)\\s+using spaces marketplace.`
+      ));
+      expect(helper.grantButton).to.exist;
+      expect(helper.grantButton).to.contain.text('Grant');
+      expect(helper.rejectButton).to.exist;
+      expect(helper.rejectButton).to.contain.text('Reject');
+      expect(helper.closeButton).to.not.exist;
+    }
+  );
+
+  it('invokes onGrant callback when clicking on grant button', async function () {
+    const helper = new Helper(this);
+    const requesterInfo = await helper.stubGetSpaceMembershipRequesterInfo();
+    const joinRequestId = 'join_request_id';
+    const spaceId = 'space_id';
+    helper.stubSpace({ entityId: spaceId });
+    const onGrant = sinon.stub();
+    onGrant.resolves();
+    helper.modalOptions = {
+      spaceId,
+      joinRequestId,
+      onGrant,
+    };
+
+    await helper.showModal();
+    await click(helper.grantButton);
+
+    expect(onGrant).to.have.been.calledOnce;
+    expect(onGrant).to.have.been.calledWith(requesterInfo.userId);
   });
 
   it('renders loading header and spinner only when verification request is being made', async function () {
     const helper = new Helper(this);
     const joinRequestId = 'join_request_id';
+    const spaceId = 'space_id';
+    helper.stubSpace({ entityId: spaceId });
+    const getRequesterInfo = sinon.stub(
+      helper.spaceManager,
+      'getSpaceMembershipRequesterInfo'
+    );
+    getRequesterInfo.returns(new Promise(() => {}));
     helper.modalOptions = {
+      spaceId,
       joinRequestId,
     };
-    const checkSpaceAccessRequest = sinon.stub(
-      helper.spaceManager,
-      'checkSpaceAccessRequest'
-    );
-    checkSpaceAccessRequest.returns(new Promise(() => {}));
 
     await helper.showModal();
 
     expect(helper.header).to.contain.text('Verifying add user request...');
     expect(helper.body).to.contain('.spin-spinner-block');
-    expect(helper.cancelButton).to.not.exist;
-    expect(helper.proceedButton).to.not.exist;
+    expect(helper.closeButton).to.not.exist;
+    expect(helper.rejectButton).to.not.exist;
+    expect(helper.grantButton).to.not.exist;
   });
 
 });
@@ -171,18 +137,30 @@ class Helper {
     assert('mochaContext is mandatory', mochaContext);
     /** @type {Mocha.Context} */
     this.mochaContext = mochaContext;
-    this.store = lookupService(this.mochaContext, 'store');
     this.modalOptions = {};
   }
 
   async createSpace(data) {
     return await createSpace(this.store, data);
   }
-  async stubUser(userId, userData) {
-    const getRecordById = sinon.stub(this.recordManager, 'getRecordById');
-    const userRecord = this.store.createRecord('user', userData);
-    await userRecord.save();
-    getRecordById.withArgs('user', userId).resolves(userRecord);
+  async stubGetSpaceMembershipRequesterInfo(data = {}) {
+    const finalData = {
+      ...data,
+      userId: 'stub_requester_id',
+      fullName: 'Stub Requester',
+      username: 'stub_requester',
+      contactEmail: 'requester@example.com',
+    };
+    sinon.stub(this.spaceManager, 'getSpaceMembershipRequesterInfo').resolves(finalData);
+    return finalData;
+  }
+  async stubSpace(data = {}) {
+    this.space = await this.createSpace({
+      name: 'Default mock space',
+      entityId: 'default_mock_space_id',
+      ...data,
+    });
+    return this.space;
   }
 
   get modal() {
@@ -198,11 +176,14 @@ class Helper {
   get footer() {
     return getModalFooter();
   }
-  get cancelButton() {
-    return this.footer?.querySelector('.cancel-btn');
+  get closeButton() {
+    return this.footer?.querySelector('.close-btn');
   }
-  get proceedButton() {
-    return this.footer?.querySelector('.proceed-btn');
+  get grantButton() {
+    return this.footer?.querySelector('.grant-btn');
+  }
+  get rejectButton() {
+    return this.footer?.querySelector('.reject-btn');
   }
 
   get modalManager() {
@@ -213,6 +194,9 @@ class Helper {
   }
   get recordManager() {
     return lookupService(this.mochaContext, 'recordManager');
+  }
+  get store() {
+    return lookupService(this.mochaContext, 'store');
   }
 
   async showModal() {

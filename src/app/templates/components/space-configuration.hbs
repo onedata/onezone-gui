@@ -180,6 +180,12 @@
       }}
     {{/render-later}}
   </div>
+  {{#if (and isAdvertised (not isMarketplaceEnabled))}}
+    <div class="field-alert marketplace-disabled-alert">
+      {{one-icon class="field-alert-icon" icon="sign-warning-rounded"}}
+      <span class="text">{{tt this "advertisedInDisabledMarketplace"}}</span>
+    </div>
+  {{/if}}
   <div class="form-group advertised-form-group">
     <label class="control-label">
       {{tt this "advertised.label"}}:
@@ -191,7 +197,7 @@
       update=(action "saveValue" "advertised")
       lockHint=(or readOnlyTip advertisedToggleLockHint)
     }}
-    {{#if isAdvertised}}
+    {{#if (and isAdvertised isMarketplaceEnabled)}}
       <a href={{viewInMarketplaceHref}} class="view-in-marketplace-link">
         <span class="text">{{tt this "viewInMarketplace"}}</span>
         {{one-icon icon="link-external"}}
@@ -224,8 +230,11 @@
           }}
         {{/if}}
       </div>
-      <div class="email-visible-alert">
-        {{one-icon class="email-visible-alert-icon" icon="sign-warning-rounded"}}
+      <div class="field-alert email-visible-alert">
+        {{one-icon
+          class="field-alert-icon email-visible-alert-icon"
+          icon="sign-info-rounded"
+        }}
         {{tt this "emailVisibleAlert"}}
       </div>
     </div>

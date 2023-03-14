@@ -16,6 +16,8 @@ import { reject } from 'rsvp';
 export default UrlActionRunner.extend({
   spaceActions: service(),
   recordManager: service(),
+  navigationState: service(),
+  router: service(),
 
   init() {
     this._super(...arguments);
@@ -51,15 +53,32 @@ export default UrlActionRunner.extend({
 
   /**
    * @param {Object} actionParams
-   * @param {String} actionParams.action_request_id
+   * @param {string} actionParams.action_spaceId
+   * @param {string} actionParams.action_requestId
+   * @param {Transition} transition
    * @returns {Promise}
    */
-  async confirmSpaceJoinRequestActionRunner(actionParams) {
-    const requestId = get(actionParams || {}, 'action_requestId');
-    if (!requestId) {
-      throw new Error();
+  async confirmSpaceJoinRequestActionRunner(actionParams, transition) {
+    const spaceId = actionParams.action_spaceId;
+    const requestId = actionParams.action_requestId;
+    if (!spaceId || !requestId) {
+      return;
     }
-
-    return this.spaceActions.createConfirmSpaceJoinRequestAction({ requestId }).execute();
+    try {
+      await transition;
+    } catch {
+      // onedata transition could fail, but it should not cause action to cancel
+    }
+    this.spaceActions.createConfirmSpaceJoinRequestAction({
+      spaceId,
+      requestId,
+    }).execute();
+    // allow transition that invoked URL action to complete its handlers
+    await this.router.transitionTo(
+      'onedata.sidebar.content.aspect',
+      'spaces',
+      spaceId,
+      'members'
+    );
   },
 });

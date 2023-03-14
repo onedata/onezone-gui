@@ -11,6 +11,7 @@ import Service, { inject as service } from '@ember/service';
 import { computed, get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { collect } from '@ember/object/computed';
+import { conditional } from 'ember-awesome-macros';
 import RemoveSpaceAction from 'onezone-gui/utils/space-actions/remove-space-action';
 import AddHarvesterToSpaceAction from 'onezone-gui/utils/space-actions/add-harvester-to-space-action';
 import RemoveHarvesterFromSpaceAction from 'onezone-gui/utils/space-actions/remove-harvester-from-space-action';
@@ -31,7 +32,11 @@ export default Service.extend(I18n, {
   /**
    * @type {Ember.Computed<Array<SidebarButtonDefinition>>}
    */
-  buttons: collect('btnCreate', 'btnMarketplace'),
+  buttons: conditional(
+    'spaceManager.marketplaceConfig.enabled',
+    collect('btnCreate', 'btnMarketplace'),
+    collect('btnCreate')
+  ),
 
   // TODO: the button should have optional link option to define a subroute
   // to go from sidebar route

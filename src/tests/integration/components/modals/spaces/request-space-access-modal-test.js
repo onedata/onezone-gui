@@ -51,12 +51,13 @@ describe('Integration | Component | modals/spaces/request-space-access-modal', f
     await helper.showModal();
     await fillIn(helper.emailInput, 'user@example.com');
     await fillIn(helper.messageTextarea, 'Hello, this is dog.');
+    await click(helper.emailShareCheckbox);
     await click(helper.proceedButton);
 
     expect(submitSpy).to.have.been.calledOnce;
     expect(submitSpy).to.have.been.calledWith(
       sinon.match({
-        email: 'user@example.com',
+        contactEmail: 'user@example.com',
         message: 'Hello, this is dog.',
         spaceId: 'space_id_1',
       })
@@ -135,6 +136,10 @@ class Helper {
   /** @type {HTMLInputElement} */
   get emailInput() {
     return this.body.querySelector('.email-field input');
+  }
+  /** @type {HTMLInputElement} */
+  get emailShareCheckbox() {
+    return this.body.querySelector('.one-checkbox-understand');
   }
   get cancelButton() {
     return this.footer.querySelector('.cancel-btn');

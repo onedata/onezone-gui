@@ -17,6 +17,7 @@ import { htmlSafe } from '@ember/string';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 import sleep from 'onedata-gui-common/utils/sleep';
 import globalCssVariablesManager from 'onedata-gui-common/utils/global-css-variables-manager';
+import { MarketplaceSpaceStatus } from 'onezone-gui/utils/spaces-marketplace-item';
 
 /**
  * Time in which the item should change attention color in milliseconds to normal
@@ -86,6 +87,8 @@ export default Component.extend(I18n, {
 
   iconifiedBlockClass: 'iconified-block-marketplace-available',
 
+  MarketplaceSpaceStatusEnum: MarketplaceSpaceStatus,
+
   //#endregion
 
   /**
@@ -114,21 +117,21 @@ export default Component.extend(I18n, {
 
   creationTime: reads('spaceItem.creationTime'),
 
+  status: reads('spaceItem.marketplaceSpaceStatusProxy.content'),
+
   creationDateText: computed('creationTime', function creationDateText() {
-    return htmlSafe(
+    return makeSpacesNonBreakable(
       dateFormat([this.creationTime], {
         format: 'date',
       })
-      .replaceAll(' ', '&nbsp;')
     );
   }),
 
   creationTimeTooltip: computed('creationTime', function creationTimeTooltip() {
-    const creationTimeText = htmlSafe(
+    const creationTimeText = makeSpacesNonBreakable(
       dateFormat([this.creationTime], {
         format: 'dateWithMinutes',
       })
-      .replaceAll(' ', '&nbsp;')
     );
     return this.t('creationTimeTooltip', { creationTimeText });
   }),
@@ -191,6 +194,47 @@ export default Component.extend(I18n, {
     }
   ),
 
+  lastActivityDateText: computed(
+    'spaceItem.itemRequestInfo.requestInfo.lastActivity',
+    function lastActivityDateText() {
+      const lastActivity = this.spaceItem?.itemRequestInfo?.requestInfo?.lastActivity;
+      if (!lastActivity) {
+        return '';
+      }
+      return makeSpacesNonBreakable(dateFormat([lastActivity], {
+        format: 'dateWithMinutes',
+      }));
+    }
+  ),
+
+  againRequestDateText: computed(
+    'spaceItem.itemRequestInfo.requestInfo.lastActivity',
+    'viewModel.marketplaceConfig.minBackoffAfterRejection',
+    function againRequestDateText() {
+      const lastActivity = this.spaceItem?.itemRequestInfo?.requestInfo?.lastActivity;
+      const minBackoff = this.viewModel.marketplaceConfig?.minBackoffAfterRejection;
+      if (
+        !lastActivity ||
+        !minBackoff ||
+        this.spaceItem.itemRequestInfo.collectionName !== 'rejected'
+      ) {
+        return '';
+      }
+      return makeSpacesNonBreakable(dateFormat([lastActivity + minBackoff], {
+        format: 'dateWithMinutes',
+      }));
+    }
+  ),
+
+  lastRequesterEmail: reads('spaceItem.itemRequestInfo.requestInfo.contactEmail'),
+
+  accessInfoColClassName: computed('status', function accessInfoColClassName() {
+    if (!this.status) {
+      return '';
+    }
+    return `access-info-col-${this.status}`;
+  }),
+
   accessColorsSetter: observer('isAccessGranted', function accessColorsSetter() {
     if (!this.isAnimating && typeof this.isAccessGranted === 'boolean') {
       this.setAccessColors();
@@ -206,7 +250,7 @@ export default Component.extend(I18n, {
     }
   },
 
-  async setAccessColors(additionalClassName = '') {
+  setAccessColors(additionalClassName = '') {
     this.set(
       'iconifiedBlockClass',
       (
@@ -246,15 +290,17 @@ export default Component.extend(I18n, {
   },
 
   actions: {
+    /**
+     * @returns {Promise}
+     */
     requestAccess() {
-      (async () => {
-        const result = await this.spaceActions.createRequestSpaceAccessAction({
-          spaceMarketplaceData: this.spaceItem.spaceMarketplaceInfo,
-        }).execute();
-        if (result.status === 'done') {
-          this.set('isRequested', true);
-        }
-      })();
+      return this.spaceActions.createRequestSpaceAccessAction({
+        spaceMarketplaceData: this.spaceItem,
+      }).execute();
     },
   },
 });
+
+function makeSpacesNonBreakable(text) {
+  return htmlSafe(text.replaceAll(' ', '&nbsp;'));
+}

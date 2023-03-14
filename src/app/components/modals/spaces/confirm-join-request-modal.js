@@ -1,6 +1,10 @@
 /**
- * Verifies, shows info and allows to confirm access request to space made by some user
- * using spaces marketplace.
+ * Shows necessary information about space membership request and allows to decide
+ * if request should be accepted (grant access) or declined (reject request).
+ *
+ * This modal provides request validation, request information and controls for making
+ * decision. Implementation of granting access or rejecting request with post-decision
+ * actions should be injected.
  *
  * @author Jakub Liput
  * @copyright (C) 2023 ACK CYFRONET AGH
@@ -12,14 +16,16 @@ import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import { promise, conditional, raw } from 'ember-awesome-macros';
+import { promise, bool, and, not } from 'ember-awesome-macros';
 
 /**
  * @typedef {Object} ConfirmJoinRequestModalOptions
- * @property {({ userId: string, spaceId: string }) => void} onConfirmed Callback invoked
- *   after access granting method has been successfully resolved.
- * @property {string} joinRequestId Request ID used in granting access to space used in
- *   `spaceManager#grantSpaceAccess`.
+ * @property {(userId: string) => Promise} onGrant Callback that should
+ *   grant membership of the user with `userId` to the space, that the request is about.
+ * @property {() => Promise} onReject Callback that should reject the membership access
+ *   request.
+ * @property {string} spaceId ID of space, for which the access will be considered.
+ * @property {string} joinRequestId Space membership request ID.
  */
 
 export default Component.extend(I18n, {
@@ -33,12 +39,6 @@ export default Component.extend(I18n, {
   globalNotify: service(),
   modalManager: service(),
 
-  closeButtonType: conditional(
-    'isValid',
-    raw('cancel'),
-    raw('close')
-  ),
-
   /**
    * @virtual
    * @type {String}
@@ -51,58 +51,113 @@ export default Component.extend(I18n, {
    */
   modalOptions: undefined,
 
-  verificationProxy: promise.object(computed(
+  //#region state
+
+  isProcessing: false,
+
+  //#endregion
+
+  isMarketplaceEnabled: bool('spaceManager.marketplaceConfig.enabled'),
+
+  /**
+   * @type {PromiseObject<SpaceMembershipRequesterInfo>}
+   */
+  requesterInfoProxy: promise.object(computed(
+    'isMarketplaceEnabled',
+    'spaceId',
     'joinRequestId',
-    async function verificationProxy() {
-      return await this.spaceManager.checkSpaceAccessRequest({
-        joinRequestId: this.joinRequestId,
-      });
+    async function requesterInfoProxy() {
+      if (!this.isMarketplaceEnabled) {
+        return null;
+      }
+      return await this.spaceManager.getSpaceMembershipRequesterInfo(
+        this.spaceId,
+        this.joinRequestId,
+      );
     }
   )),
 
   /**
-   * @type {({ userId: string, spaceId: string }) => void}
+   * @type {SpaceMembershipRequesterInfo|null}
    */
-  onConfirmed: reads('modalOptions.onConfirmed'),
+  requesterInfo: reads('requesterInfoProxy.content'),
+
+  /**
+   * Make requesterInfo compatible with `join-image` component.
+   * @type {ComputedProperty<Object>} User-like record.
+   */
+  joiningUserLikeRecord: computed('requesterInfo', function joiningUserLikeRecord() {
+    return {
+      entityId: this.requesterInfo.userId,
+      name: this.requesterInfo.fullName,
+      username: this.requesterInfo.username,
+    };
+  }),
+
+  spaceProxy: promise.object(computed(
+    'spaceId',
+    async function spaceProxy() {
+      return await this.spaceManager.getRecordById(this.spaceId);
+    }
+  )),
+
+  space: reads('spaceProxy.content'),
+
+  /**
+   * Execute implementation of granting space membership by request.
+   * @type {(userId) => Promise}}
+   */
+  onGrant: reads('modalOptions.onGrant'),
+
+  /**
+   * Execute implementation of rejecting space membership request.
+   * @type {() => Promise}
+   */
+  onReject: reads('modalOptions.onReject'),
 
   joinRequestId: reads('modalOptions.joinRequestId'),
 
-  isValid: reads('verificationProxy.content.isValid'),
+  spaceId: reads('modalOptions.spaceId'),
 
-  userId: reads('verificationProxy.content.userId'),
+  isValid: bool('requesterInfoProxy.isFulfilled'),
 
-  spaceId: reads('verificationProxy.content.spaceId'),
+  userId: reads('requesterInfo.userId'),
 
-  spaceName: reads('verificationProxy.content.spaceName'),
+  spaceName: reads('space.name'),
 
-  userName: reads('userProxy.content.name'),
+  isProceedButtonVisible: and('isMarketplaceEnabled', 'isValid'),
 
-  // TODO: VFS-10384 check if user info will be available by other user
-  userProxy: promise.object(computed('userId', async function userProxy() {
-    if (!this.userId) {
-      return null;
-    }
-    return this.recordManager.getRecordById('user', this.userId);
-  })),
+  isProceedAvailable: and('isValid', not('isProcessing')),
 
-  isProceedButtonVisible: reads('isValid'),
-
-  isProceedAvailable: reads('isValid'),
+  bodyRequiredDataProxy: promise.object(promise.all('requesterInfoProxy', 'spaceProxy')),
 
   actions: {
-    async confirm() {
+    async grant() {
       if (!this.isProceedAvailable) {
         return;
       }
+      this.set('isProcessing', true);
       try {
-        await this.spaceManager.grantSpaceAccess(this.joinRequestId);
+        await this.onGrant(this.userId);
         this.modalManager.hide(this.modalId);
-        this.onConfirmed({
-          spaceId: this.spaceId,
-          userId: this.userId,
-        });
       } catch (error) {
         this.globalNotify.backendError(this.t('grantingSpaceAccess'), error);
+      } finally {
+        this.set('isProcessing', false);
+      }
+    },
+    async reject() {
+      if (!this.isProceedAvailable) {
+        return;
+      }
+      this.set('isProcessing', true);
+      try {
+        await this.onReject();
+        this.modalManager.hide(this.modalId);
+      } catch (error) {
+        this.globalNotify.backendError(this.t('rejectingSpaceAccess'), error);
+      } finally {
+        this.set('isProcessing', false);
       }
     },
   },
