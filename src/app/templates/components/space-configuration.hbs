@@ -220,14 +220,24 @@
             <span class="static-value static-not-set">{{tt this "notSet"}}</span>
           {{/if}}
         {{else}}
-          {{one-inline-editor
+          {{#one-inline-editor
             class="contact-email"
             value=contactEmail
+            editorType="custom"
             onInputValueChanged=(action "currentEmailChanged")
             isSaveDisabled=emailValidation.error
             saveButtonTip=emailValidation.message
             onSave=(action "saveValue" "contactEmail")
+            as |editor|
           }}
+            {{evaluate-function (action registerEmailInlineEditor) editor}}
+            <form
+              class="form form-horizontal form-component marketplace-contact-email-form"
+              onsubmit={{prevent-default}}
+            >
+              {{form-component/field-renderer field=contactEmailRootField}}
+            </form>
+          {{/one-inline-editor}}
         {{/if}}
       </div>
       <div class="field-alert email-visible-alert">

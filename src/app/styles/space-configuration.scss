@@ -163,6 +163,14 @@
     @media (max-width: $screen-md-max) {
       flex-wrap: wrap;
     }
+    .marketplace-contact-email-form {
+      width: 25em;
+      margin: 0;
+      // validation message is rendered in inline editor accept tooltip
+      .field-message {
+        display: none;
+      }
+    }
   }
   .field-alert {
     display: flex;

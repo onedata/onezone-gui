@@ -89,7 +89,8 @@ export default Component.extend(I18n, {
     'currentUser.user.emails',
     'space.marketplaceContactEmail',
     function predefinedEmails() {
-      const emails = this.currentUser.user?.emails ?? [];
+      const userEmails = this.currentUser.user?.emails;
+      const emails = userEmails ? [...userEmails] : [];
       const latestUsedEmail = this.space.marketplaceContactEmail;
       if (latestUsedEmail && !emails.includes(latestUsedEmail)) {
         emails.unshift(latestUsedEmail);
