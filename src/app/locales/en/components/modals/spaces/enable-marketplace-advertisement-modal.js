@@ -9,7 +9,7 @@ export default {
   contactEmail: {
     label: 'Marketplace contact e-mail',
     customValueInputPlaceholder: 'Enter custom e-mail address...',
-    customInputOptionTextPrefix: 'Custom e-mail address...',
+    customValueOptionTextPrefix: 'Custom e-mail address...',
   },
   cancel: 'Cancel',
   proceed: 'Proceed',
