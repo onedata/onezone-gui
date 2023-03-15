@@ -403,6 +403,7 @@ function createUserRecord(store) {
     hasPassword: false,
     canInviteProviders: true,
     username: USER_LOGIN,
+    emails: ['user@example.com', 'mockuser@onedata.org'],
   });
   return userRecord.save();
 }

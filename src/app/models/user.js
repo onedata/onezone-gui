@@ -24,6 +24,7 @@ export default Model.extend(GraphSingleModelMixin, {
   basicAuthEnabled: attr('boolean'),
   hasPassword: attr('boolean'),
   canInviteProviders: attr('boolean'),
+  emails: attr('array', { defaultValue: () => [] }),
 
   /**
    * Properties:
