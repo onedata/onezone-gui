@@ -8,7 +8,8 @@ export default {
   },
   contactEmail: {
     label: 'Marketplace contact e-mail',
-    placeholder: 'Example: user@example.com',
+    customValueInputPlaceholder: 'Enter custom e-mail address...',
+    customInputOptionTextPrefix: 'Custom e-mail address...',
   },
   cancel: 'Cancel',
   proceed: 'Proceed',

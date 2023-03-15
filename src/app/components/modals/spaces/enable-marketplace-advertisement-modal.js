@@ -15,8 +15,10 @@ import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { or, not } from 'ember-awesome-macros';
 import TextField from 'onedata-gui-common/utils/form-component/text-field';
+import CustomValueDropdownField from 'onedata-gui-common/utils/form-component/custom-value-dropdown-field';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
 import { validator } from 'ember-cp-validations';
+import _ from 'lodash';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -24,6 +26,7 @@ export default Component.extend(I18n, {
   i18n: service(),
   globalNotify: service(),
   router: service(),
+  currentUser: service(),
 
   /**
    * @override
@@ -41,6 +44,17 @@ export default Component.extend(I18n, {
    * @type {String}
    */
   modalId: undefined,
+
+  //#region configuration
+
+  emailFieldName: 'contactEmail',
+
+  /**
+   * @type {Array<Validator>}
+   */
+  emailFieldValidators: undefined,
+
+  //#region
 
   //#region state
 
@@ -68,6 +82,32 @@ export default Component.extend(I18n, {
     );
   }),
 
+  /**
+   * @type {ComputedProperty<Array<string>>}
+   */
+  predefinedEmails: computed(
+    'currentUser.user.emails',
+    'space.marketplaceContactEmail',
+    function predefinedEmails() {
+      const emails = this.currentUser.user?.emails ?? [];
+      const latestUsedEmail = this.space.marketplaceContactEmail;
+      if (latestUsedEmail && !emails.includes(latestUsedEmail)) {
+        emails.unshift(latestUsedEmail);
+      }
+      return emails;
+    }
+  ),
+
+  predefinedEmailsOptions: computed(
+    'predefinedEmails',
+    function predefinedEmailsOptions() {
+      return this.predefinedEmails?.map(email => ({
+        value: email,
+        label: email,
+      })) ?? [];
+    }
+  ),
+
   rootField: computed(function rootField() {
     return FormFieldsRootGroup.create({
       ownerSource: this,
@@ -78,17 +118,32 @@ export default Component.extend(I18n, {
     });
   }),
 
-  contactEmailField: computed(function contactEmailField() {
+  emailInputField: computed(function emailInputField() {
     return TextField.create({
-      name: 'contactEmail',
-      defaultValue: this.space.marketplaceContactEmail || '',
-      customValidators: [
-        validator('format', {
-          type: 'email',
-          allowBlank: false,
-        }),
-      ],
+      name: this.emailFieldName,
+      customValidators: this.emailFieldValidators,
     });
+  }),
+
+  emailDropdownField: computed(function emailInputField() {
+    return CustomValueDropdownField
+      .extend({
+        options: reads('requestSpaceAccessModal.predefinedEmailsOptions'),
+      })
+      .create({
+        requestSpaceAccessModal: this,
+        name: this.emailFieldName,
+        defaultValue: this.space.marketplaceContactEmail,
+        customValidators: this.emailFieldValidators,
+      });
+  }),
+
+  contactEmailField: computed('predefinedEmails', function emailField() {
+    if (_.isEmpty(this.predefinedEmails)) {
+      return this.emailInputField;
+    } else {
+      return this.emailDropdownField;
+    }
   }),
 
   areButtonsDisabled: or(
@@ -96,6 +151,16 @@ export default Component.extend(I18n, {
     not('rootField.isValid'),
     not('isEmailShareConfirmed'),
   ),
+
+  init() {
+    this._super(...arguments);
+    this.set('emailFieldValidators', Object.freeze([
+      validator('format', {
+        type: 'email',
+        allowBlank: false,
+      }),
+    ]));
+  },
 
   async enableMarketplaceAdvertisement() {
     setProperties(this.space, {

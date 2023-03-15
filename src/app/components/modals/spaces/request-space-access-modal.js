@@ -75,7 +75,8 @@ export default Component.extend(I18n, {
   predefinedEmails: reads('currentUser.user.emails'),
 
   rootField: computed(function rootField() {
-    return FormFieldsRootGroup.extend({
+    return FormFieldsRootGroup
+      .extend({
         isEnabled: not('requestSpaceAccessModal.isDisabled'),
         predefinedEmails: reads('requestSpaceAccessModal.predefinedEmails'),
         messageField: reads('requestSpaceAccessModal.messageField'),

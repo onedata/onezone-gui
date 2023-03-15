@@ -538,7 +538,7 @@ function createSpacesRecords(store) {
         organizationName: 'The company',
         tags: ['EU-funded', 'energy', 'environment'],
         description: exampleMarkdownLong,
-        marketplaceContactEmail: 'user@example.com',
+        marketplaceContactEmail: 'space_user@example.com',
       } : {
         advertisedInMarketplace: false,
         organizationName: '',
