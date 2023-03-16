@@ -63,11 +63,11 @@ describe('Integration | Component | modals/apply-atm-record-dump-modal/operation
       itShowsConflictWarningWhenThereIsConflict([{
         dumpSourceType: 'upload',
         noTargetWarning: 'This operation is available if there already is a duplicate of the uploaded lambda in this inventory. It can be used to update the existing duplicate with a newer version of the original.',
-        conflictWarning: 'Selected lambda already has revision #2. As lambda revisions cannot be replaced, the revision from the uploaded file will be inserted as the last (newest) revision.',
+        conflictWarning: 'Selected lambda already has revision #2. As lambda revisions cannot be overwritten, the revision from the uploaded file will be assigned the next free number (#3).',
       }, {
         dumpSourceType: 'duplication',
         noTargetWarning: 'This operation is available if there already is a duplicate of the source lambda in this inventory. It can be used to update the existing duplicate with a newer version of the original.',
-        conflictWarning: 'Selected lambda already has revision #2. As lambda revisions cannot be replaced, the revision from the source lambda will be inserted as the last (newest) revision.',
+        conflictWarning: 'Selected lambda already has revision #2. As lambda revisions cannot be overwritten, the revision from the source lambda will be assigned the next free number (#3).',
       }]);
       itDoesNotShowOverrideWarningForNoConflict();
     });
