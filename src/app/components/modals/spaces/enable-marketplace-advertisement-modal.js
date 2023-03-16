@@ -134,7 +134,7 @@ export default Component.extend(I18n, {
       .create({
         requestSpaceAccessModal: this,
         name: this.emailFieldName,
-        defaultValue: this.space.marketplaceContactEmail,
+        defaultValue: this.space.marketplaceContactEmail || null,
         customValidators: this.emailFieldValidators,
       });
   }),
