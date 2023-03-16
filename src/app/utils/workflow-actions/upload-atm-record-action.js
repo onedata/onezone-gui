@@ -1,13 +1,11 @@
 /**
- * Uploads automation record from JSON file. Needs `atmInventory` passed
- * in context.
+ * Uploads automation record from JSON file.
  *
  * @author Michał Borzęcki
  * @copyright (C) 2021-2023 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import { dasherize } from '@ember/string';
 import ActionResult from 'onedata-gui-common/utils/action-result';
@@ -65,11 +63,6 @@ export default ApplyAtmRecordDumpActionBase.extend({
       privilegeFlag: this.missingPrivilegeFlags,
     }) : '';
   }),
-
-  /**
-   * @type {ComputedProperty<Models.AtmInventory>}
-   */
-  atmInventory: reads('context.atmInventory'),
 
   /**
    * @type {ComputedProperty<Array<string>>}

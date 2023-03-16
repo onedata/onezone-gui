@@ -23,6 +23,7 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.modals.applyAtmRecordDumpModal.dumpDetails',
 
   /**
+   * @virtual
    * @type {DumpableAtmModelName}
    */
   atmModelName: undefined,

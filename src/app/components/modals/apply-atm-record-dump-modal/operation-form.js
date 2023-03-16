@@ -23,6 +23,7 @@ import {
   bool,
   getBy,
 } from 'ember-awesome-macros';
+import getNextFreeRevisionNumber from 'onedata-gui-common/utils/revisions/get-next-free-revision-number';
 
 export default Component.extend(I18n, {
   tagName: 'form',
@@ -36,6 +37,7 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.modals.applyAtmRecordDumpModal.operationForm',
 
   /**
+   * @virtual
    * @type {DumpableAtmModelName}
    */
   atmModelName: undefined,
@@ -104,6 +106,18 @@ export default Component.extend(I18n, {
   isRevisionConflictWarningVisible: and(
     eq('selectedOperation', raw('merge')),
     bool(getBy('selectedTargetAtmRecord.revisionRegistry', 'revisionNumber'))
+  ),
+
+  /**
+   * @type {ComputedProperty<RevisionNumber>}
+   */
+  nextFreeRevisionNumber: computed(
+    'selectedTargetAtmRecord.revisionRegistry',
+    function nextFreeRevisionNumber() {
+      return getNextFreeRevisionNumber(
+        Object.keys(this.get('selectedTargetAtmRecord.revisionRegistry') || {})
+      );
+    }
   ),
 
   /**

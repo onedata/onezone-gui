@@ -34,7 +34,7 @@ describe(
 
         const atmLambdas = [{
           entityId: 'lm1id',
-          originalAtmLambdaId: 'l1id',
+          originalAtmLambdaId: atmRecordDump.originalAtmLambdaId,
           revisionRegistry: {
             1: {
               name: 'lm1',
@@ -92,7 +92,7 @@ describe(
         const atmWorkflowSchemas = [{
           entityId: 'wf1id',
           name: 'wf1',
-          originalAtmWorkflowSchemaId: 'w1id',
+          originalAtmWorkflowSchemaId: atmRecordDump.originalAtmWorkflowSchemaId,
           revisionRegistry: {
             1: {},
           },

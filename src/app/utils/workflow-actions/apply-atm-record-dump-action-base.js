@@ -14,6 +14,12 @@ import { reads } from '@ember/object/computed';
 import _ from 'lodash';
 
 /**
+ * @typedef {Object} ApplyAtmRecordDumpActionBaseContext
+ * @property {DumpableAtmModelName} atmModelName
+ * @property {Models.AtmInventory} atmInventory
+ */
+
+/**
  * @typedef {'atmLambda' | 'atmWorkflowSchema'} DumpableAtmModelName
  */
 
@@ -28,6 +34,11 @@ export default Action.extend({
 
   /**
    * @virtual
+   * @type {ApplyAtmRecordDumpActionBaseContext}
+   */
+  context: undefined,
+
+  /**
    * @type {ComputedProperty<DumpableAtmModelName>}
    */
   atmModelName: reads('context.atmModelName'),

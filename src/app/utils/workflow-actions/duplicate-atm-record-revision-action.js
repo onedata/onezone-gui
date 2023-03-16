@@ -14,6 +14,12 @@ import ActionResult from 'onedata-gui-common/utils/action-result';
 import ObjectProxy from '@ember/object/proxy';
 import ApplyAtmRecordDumpActionBase from 'onezone-gui/utils/workflow-actions/apply-atm-record-dump-action-base';
 
+/**
+ * @typedef {ApplyAtmRecordDumpActionBaseContext} DuplicateAtmRecordRevisionActionContext
+ * @property {DumpableAtmModel} atmRecord
+ * @property {RevisionNumber} revisionNumber
+ */
+
 export default ApplyAtmRecordDumpActionBase.extend({
   modalManager: service(),
 
@@ -21,6 +27,12 @@ export default ApplyAtmRecordDumpActionBase.extend({
    * @override
    */
   i18nPrefix: 'utils.workflowActions.duplicateAtmRecordRevisionAction',
+
+  /**
+   * @virtual
+   * @type {DuplicateAtmRecordRevisionActionContext}
+   */
+  context: undefined,
 
   /**
    * @override
@@ -35,8 +47,7 @@ export default ApplyAtmRecordDumpActionBase.extend({
   }),
 
   /**
-   * @virtual
-   * @type {Models.AtmWorkflowSchema | Models.AtmLambda}
+   * @type {ComputedProperty<DumpableAtmModel>}
    */
   atmRecord: reads('context.atmRecord'),
 

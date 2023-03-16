@@ -221,7 +221,8 @@ export default Component.extend(I18n, {
       atmRecords.filterBy(originalIdFieldName, originalId) : [];
     let selectedOperation = undefined;
     if (this.dump) {
-      selectedOperation = targetAtmRecords.length ? (this.selectedOperation || 'merge') : 'create';
+      selectedOperation = targetAtmRecords.length ?
+        (this.selectedOperation || 'merge') : 'create';
     }
     const selectedTargetAtmRecord =
       targetAtmRecords.includes(this.selectedTargetAtmRecord) ?
