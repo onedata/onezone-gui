@@ -45,7 +45,7 @@ export default Action.extend({
   /**
    * @type {Function}
    */
-  _downloadData: downloadData,
+  downloadData,
 
   /**
    * @type {Window}
@@ -85,11 +85,11 @@ export default Action.extend({
   downloadAtmWorkflowSchemaRevisionDump(atmWorkflowSchemaRevisionDump) {
     const {
       atmWorkflowSchema,
-      _downloadData,
+      downloadData,
       _window,
-    } = this.getProperties('atmWorkflowSchema', '_downloadData', '_window');
+    } = this.getProperties('atmWorkflowSchema', 'downloadData', '_window');
 
-    _downloadData({
+    downloadData({
       dataString: JSON.stringify(atmWorkflowSchemaRevisionDump, null, 2),
       fileName: `${get(atmWorkflowSchema, 'name')}.json`,
       mimeType: 'application/json',

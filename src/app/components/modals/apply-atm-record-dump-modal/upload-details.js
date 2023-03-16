@@ -19,11 +19,11 @@ export default Component.extend(I18n, {
   /**
    * @override
    */
-  i18nPrefix: 'components.modals.applyAtmWorkflowSchemaDumpModal.uploadDetails',
+  i18nPrefix: 'components.modals.applyAtmRecordDumpModal.uploadDetails',
 
   /**
    * @virtual
-   * @type {AtmWorkflowSchemaDumpSource}
+   * @type {AtmRecordDumpSource}
    */
   dumpSource: undefined,
 

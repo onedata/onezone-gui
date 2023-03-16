@@ -5,19 +5,20 @@ import OpenCreateAtmInventoryViewAction from 'onezone-gui/utils/workflow-actions
 import CreateAtmInventoryAction from 'onezone-gui/utils/workflow-actions/create-atm-inventory-action';
 import ModifyAtmInventoryAction from 'onezone-gui/utils/workflow-actions/modify-atm-inventory-action';
 import RemoveAtmInventoryAction from 'onezone-gui/utils/workflow-actions/remove-atm-inventory-action';
+import DuplicateAtmRecordRevisionAction from 'onezone-gui/utils/workflow-actions/duplicate-atm-record-revision-action';
+import UploadAtmRecordAction from 'onezone-gui/utils/workflow-actions/upload-atm-record-action';
 import CreateAtmLambdaAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-action';
+import DumpAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/dump-atm-lambda-revision-action';
 import CreateAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-revision-action';
 import ModifyAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/modify-atm-lambda-revision-action';
 import UnlinkAtmLambdaAction from 'onezone-gui/utils/workflow-actions/unlink-atm-lambda-action';
 import ModifyAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/modify-atm-workflow-schema-action';
 import RemoveAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-action';
 import CreateAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-action';
-import UploadAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/upload-atm-workflow-schema-action';
 import DumpAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/dump-atm-workflow-schema-revision-action';
 import ModifyAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/modify-atm-workflow-schema-revision-action';
 import CreateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-revision-action';
 import RemoveAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-revision-action';
-import DuplicateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/duplicate-atm-workflow-schema-revision-action';
 import { get } from '@ember/object';
 
 describe('Unit | Service | workflow-actions', function () {
@@ -71,6 +72,39 @@ describe('Unit | Service | workflow-actions', function () {
     expect(get(action, 'atmInventory')).to.equal(atmInventory);
   });
 
+  it('creates DuplicateAtmRecordRevisionAction instance', function () {
+    const service = this.owner.lookup('service:workflow-actions');
+
+    const atmWorkflowSchema = {};
+    const atmInventory = {};
+    const action = service.createDuplicateAtmRecordRevisionAction({
+      atmModelName: 'atmWorkflowSchema',
+      atmRecord: atmWorkflowSchema,
+      revisionNumber: 3,
+      atmInventory,
+    });
+
+    expect(action).to.be.instanceOf(DuplicateAtmRecordRevisionAction);
+    expect(action.atmModelName).to.equal('atmWorkflowSchema');
+    expect(action.atmRecord).to.equal(atmWorkflowSchema);
+    expect(action.atmInventory).to.equal(atmInventory);
+    expect(action.revisionNumber).to.equal(3);
+  });
+
+  it('creates UploadAtmRecordAction instance', function () {
+    const service = this.owner.lookup('service:workflow-actions');
+
+    const atmInventory = {};
+    const action = service.createUploadAtmRecordAction({
+      atmModelName: 'atmWorkflowSchema',
+      atmInventory,
+    });
+
+    expect(action).to.be.instanceOf(UploadAtmRecordAction);
+    expect(action.atmModelName).to.equal('atmWorkflowSchema');
+    expect(action.atmInventory).to.equal(atmInventory);
+  });
+
   it('creates CreateAtmLambdaAction instance', function () {
     const service = this.owner.lookup('service:workflow-actions');
 
@@ -84,6 +118,20 @@ describe('Unit | Service | workflow-actions', function () {
     expect(action).to.be.instanceOf(CreateAtmLambdaAction);
     expect(get(action, 'initialRevision')).to.equal(initialRevision);
     expect(get(action, 'atmInventory')).to.equal(atmInventory);
+  });
+
+  it('creates DumpAtmLambdaRevisionAction instance', function () {
+    const service = this.owner.lookup('service:workflow-actions');
+
+    const atmLambda = {};
+    const action = service.createDumpAtmLambdaRevisionAction({
+      atmLambda,
+      revisionNumber: 3,
+    });
+
+    expect(action).to.be.instanceOf(DumpAtmLambdaRevisionAction);
+    expect(get(action, 'atmLambda')).to.equal(atmLambda);
+    expect(get(action, 'revisionNumber')).to.equal(3);
   });
 
   it('creates CreateAtmLambdaRevisionAction instance', function () {
@@ -177,18 +225,6 @@ describe('Unit | Service | workflow-actions', function () {
     expect(get(action, 'atmInventory')).to.equal(atmInventory);
   });
 
-  it('creates UploadAtmWorkflowSchemaAction instance', function () {
-    const service = this.owner.lookup('service:workflow-actions');
-
-    const atmInventory = {};
-    const action = service.createUploadAtmWorkflowSchemaAction({
-      atmInventory,
-    });
-
-    expect(action).to.be.instanceOf(UploadAtmWorkflowSchemaAction);
-    expect(get(action, 'atmInventory')).to.equal(atmInventory);
-  });
-
   it('creates DumpAtmWorkflowSchemaRevisionAction instance', function () {
     const service = this.owner.lookup('service:workflow-actions');
 
@@ -244,20 +280,6 @@ describe('Unit | Service | workflow-actions', function () {
     });
 
     expect(action).to.be.instanceOf(RemoveAtmWorkflowSchemaRevisionAction);
-    expect(get(action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
-    expect(get(action, 'revisionNumber')).to.equal(3);
-  });
-
-  it('creates DuplicateAtmWorkflowSchemaRevisionAction instance', function () {
-    const service = this.owner.lookup('service:workflow-actions');
-
-    const atmWorkflowSchema = {};
-    const action = service.createDuplicateAtmWorkflowSchemaRevisionAction({
-      atmWorkflowSchema,
-      revisionNumber: 3,
-    });
-
-    expect(action).to.be.instanceOf(DuplicateAtmWorkflowSchemaRevisionAction);
     expect(get(action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
     expect(get(action, 'revisionNumber')).to.equal(3);
   });

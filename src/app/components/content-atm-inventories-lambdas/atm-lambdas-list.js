@@ -84,6 +84,12 @@ export default Component.extend(I18n, {
   onRevisionCreate: undefined,
 
   /**
+   * @virtual
+   * @type {(atmLambda: Models.AtmLambda, revisionNumber: RevisionNumber) => void}
+   */
+  onRevisionCreated: undefined,
+
+  /**
    * One of: `'thisInventory'`, `'all'`
    * @type {String}
    */

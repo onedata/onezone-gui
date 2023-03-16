@@ -1,6 +1,20 @@
 .content-atm-inventories-lambdas-editor-view {
-  .revision-number {
-    display: block;
+  .header-row {
+    h1 {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .resource-name {
+      min-width: 0;
+      padding-right: 1em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .revision-number {
+      display: block;
+    }
   }
 
   .atm-lambda-form .form {
