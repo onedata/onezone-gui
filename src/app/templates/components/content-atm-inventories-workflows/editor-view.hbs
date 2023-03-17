@@ -11,6 +11,24 @@
       </small>
     </div>
     <div class="btn-toolbar">
+      {{#if visualiserDataValidationErrors.length}}
+        <span class="validation-error-indicator">
+          <img
+            class="warning-icon"
+            src={{root-url "assets/images/sign-warning-large.svg"}}
+          />
+          {{one-tooltip
+            triggerElement=(local-selector elementId ".warning-icon")
+            title=(tt this
+              (concat
+                "validationWarning."
+                (if (gt visualiserDataValidationErrors.length 1) "multi" "single")
+              )
+              issuesCount=visualiserDataValidationErrors.length
+            )
+          }}
+        </span>
+      {{/if}}
       <span>
         {{#bs-button
           type="default"

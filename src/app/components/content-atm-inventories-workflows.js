@@ -481,6 +481,8 @@ export default Component.extend(GlobalActions, I18n, {
 
     let decision = 'keepEditing';
     await this.get('modalManager').show('unsaved-changes-question-modal', {
+      saveDisabledReason: this.editorModificationState.isValid ?
+        undefined : this.t('cannotSaveDueToIssues'),
       onSubmit: async ({ shouldSaveChanges }) => {
         if (shouldSaveChanges && executeSaveAction) {
           const saveResult = await executeSaveAction();
