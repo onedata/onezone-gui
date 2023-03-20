@@ -119,7 +119,7 @@ export default Component.extend(validations, I18n, {
   blankInlineEditors: undefined,
 
   /**
-   * @type {OneInlineCustomEditorAPI}
+   * @type {OneInlineCustomEditorApi}
    */
   emailInlineEditorApi: undefined,
 
@@ -319,7 +319,7 @@ export default Component.extend(validations, I18n, {
   },
 
   /**
-   * @param {Object} api
+   * @param {OneInlineCustomEditorApi} api
    */
   registerEmailInlineEditor(api) {
     this.set('emailInlineEditorApi', api);
