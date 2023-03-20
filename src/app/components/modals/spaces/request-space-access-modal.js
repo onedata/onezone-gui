@@ -12,13 +12,18 @@ import { reads } from '@ember/object/computed';
 import { computed } from '@ember/object';
 import TextField from 'onedata-gui-common/utils/form-component/text-field';
 import TextAreaField from 'onedata-gui-common/utils/form-component/textarea-field';
+import CustomValueDropdownField from 'onedata-gui-common/utils/form-component/custom-value-dropdown-field';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
 import { validator } from 'ember-cp-validations';
-import { and, not } from 'ember-awesome-macros';
+import { and, not, collect } from 'ember-awesome-macros';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import _ from 'lodash';
+import { inject as service } from '@ember/service';
 
 export default Component.extend(I18n, {
   tagName: '',
+
+  currentUser: service(),
 
   /**
    * @override
@@ -30,6 +35,17 @@ export default Component.extend(I18n, {
    * @type {RequestSpaceAccessActionContext}
    */
   modalOptions: undefined,
+
+  //#region configuration
+
+  emailFieldName: 'email',
+
+  /**
+   * @type {Array<Validator>}
+   */
+  emailFieldValidators: undefined,
+
+  //#region
 
   //#region state
 
@@ -53,22 +69,28 @@ export default Component.extend(I18n, {
     return classes;
   }),
 
-  rootField: computed(
-    function rootField() {
-      return FormFieldsRootGroup.extend({
-          isEnabled: not('requestSpaceAccessModal.isDisabled'),
-        })
-        .create({
-          requestSpaceAccessModal: this,
-          ownerSource: this,
-          i18nPrefix: this.i18nPrefix,
-          fields: [
-            this.messageField,
-            this.emailField,
-          ],
-        });
-    }
-  ),
+  /**
+   * @type {ComputedProperty<Array<string>>}
+   */
+  predefinedEmails: reads('currentUser.user.emails'),
+
+  rootField: computed(function rootField() {
+    return FormFieldsRootGroup
+      .extend({
+        isEnabled: not('requestSpaceAccessModal.isDisabled'),
+        messageField: reads('requestSpaceAccessModal.messageField'),
+        emailField: reads('requestSpaceAccessModal.emailField'),
+        fields: collect(
+          'messageField',
+          'emailField'
+        ),
+      })
+      .create({
+        requestSpaceAccessModal: this,
+        ownerSource: this,
+        i18nPrefix: this.i18nPrefix,
+      });
+  }),
 
   messageField: computed(function messageField() {
     return TextAreaField.create({
@@ -83,20 +105,55 @@ export default Component.extend(I18n, {
     });
   }),
 
-  emailField: computed(function emailField() {
+  emailField: computed('predefinedEmails', function emailField() {
+    if (_.isEmpty(this.predefinedEmails)) {
+      return this.emailInputField;
+    } else {
+      return this.emailDropdownField;
+    }
+  }),
+
+  emailInputField: computed(function emailInputField() {
     return TextField.create({
-      name: 'email',
+      name: this.emailFieldName,
       defaultValue: '',
-      customValidators: [
-        validator('format', {
-          type: 'email',
-          allowBlank: false,
-        }),
-      ],
+      customValidators: this.emailFieldValidators,
     });
   }),
 
+  predefinedEmailsOptions: computed(
+    'predefinedEmails',
+    function predefinedEmailsOptions() {
+      return this.predefinedEmails?.map(email => ({
+        value: email,
+        label: email,
+      })) ?? [];
+    }
+  ),
+
+  emailDropdownField: computed(function emailInputField() {
+    return CustomValueDropdownField
+      .extend({
+        options: reads('requestSpaceAccessModal.predefinedEmailsOptions'),
+      })
+      .create({
+        requestSpaceAccessModal: this,
+        name: this.emailFieldName,
+        customValidators: this.emailFieldValidators,
+      });
+  }),
+
   isProceedAvailable: and('rootField.isValid', 'isEmailShareConfirmed'),
+
+  init() {
+    this._super(...arguments);
+    this.set('emailFieldValidators', Object.freeze([
+      validator('format', {
+        type: 'email',
+        allowBlank: false,
+      }),
+    ]));
+  },
 
   actions: {
     /**

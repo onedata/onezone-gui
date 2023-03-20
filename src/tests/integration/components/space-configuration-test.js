@@ -10,6 +10,8 @@ import { get } from '@ember/object';
 import ToggleHelper from '../../helpers/toggle';
 import { clearStoreAfterEach } from '../../helpers/clear-store';
 import sinon from 'sinon';
+import CurrentUser from '../../helpers/mixins/current-user';
+import OneDropdownHelper from '../../helpers/one-dropdown';
 
 describe('Integration | Component | space-configuration', function () {
   setupRenderingTest();
@@ -160,6 +162,32 @@ describe('Integration | Component | space-configuration', function () {
     expect(tagItems[0]).to.not.have.class('tag-item-danger');
     expect(tagItems[1]).to.have.class('tag-item-danger');
   });
+
+  it('allows to enter and save custom email address if advertising is enabled', async function () {
+    const helper = new Helper(this);
+    const space = await helper.initSpace({
+      advertisedInMarketplace: true,
+      marketplaceContactEmail: 'first@example.com',
+    });
+    sinon.stub(helper.router, 'urlFor').returns('http://example.com');
+
+    await helper.render();
+    await click(helper.emailInlineEditor.querySelector('.one-label'));
+
+    const dropdown = new OneDropdownHelper(
+      helper.emailInlineEditor.querySelector('.ember-power-select-trigger')
+    );
+    await dropdown.selectOptionByText('Custom value...');
+    const input = helper.emailInlineEditor.querySelector(
+      '.ember-power-select-trigger input'
+    );
+    const saveButton = helper.emailInlineEditor.querySelector('.save-icon');
+    expect(input, 'input').to.exist;
+    expect(saveButton, 'saveButton').to.exist;
+    await fillIn(input, 'second@example.com');
+    await click(saveButton);
+    expect(space.get('marketplaceContactEmail')).to.equal('second@example.com');
+  });
 });
 
 class Helper {
@@ -168,6 +196,7 @@ class Helper {
     /** @type {Mocha.Context} */
     this.mochaContext = mochaContext;
     this.store = lookupService(this.mochaContext, 'store');
+    this.currentUser = new CurrentUser(mochaContext);
   }
 
   async createSpace(data) {
@@ -180,6 +209,7 @@ class Helper {
       },
       ...data,
     });
+    return this.space;
   }
 
   get element() {
@@ -194,6 +224,9 @@ class Helper {
   get advertisedToggle() {
     return new ToggleHelper(this.element.querySelector('.advertised-toggle'));
   }
+  get emailInlineEditor() {
+    return this.element.querySelector('.one-inline-editor.contact-email');
+  }
   get spaceTagsFormGroup() {
     return this.element.querySelector('.space-tags-form-group');
   }
@@ -204,8 +237,12 @@ class Helper {
   get spaceManager() {
     return lookupService(this.mochaContext, 'spaceManager');
   }
+  get router() {
+    return lookupService(this.mochaContext, 'router');
+  }
 
   async render() {
+    await this.currentUser.ensureStub();
     this.mochaContext.setProperties({
       space: this.space,
     });

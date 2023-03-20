@@ -13,6 +13,8 @@ import {
 } from '../../../../helpers/modal';
 import sinon from 'sinon';
 import { click, fillIn } from '@ember/test-helpers';
+import OneDropdownHelper from '../../../../helpers/one-dropdown';
+import CurrentUser from '../../../../helpers/mixins/current-user';
 
 describe('Integration | Component | modals/spaces/request-space-access-modal', function () {
   setupRenderingTest();
@@ -89,6 +91,70 @@ describe('Integration | Component | modals/spaces/request-space-access-modal', f
     await click(helper.proceedButton);
     expect(submitSpy).to.have.not.been.called;
   });
+
+  it('renders emails dropdown with user emails and custom option if user has emails specified',
+    async function () {
+      const helper = new Helper(this);
+      const emails = ['czesiek@example.com', 'janusz@example.com'];
+      await helper.currentUser.stubCurrentUser({
+        emails,
+      });
+
+      await helper.showModal();
+      const dropdownOptions = await helper.emailDropdown.getOptionsText();
+
+      expect(dropdownOptions).to.deep.equal([
+        ...emails,
+        'Custom e-mail address...',
+      ]);
+    }
+  );
+
+  it('calls onSubmit with email from predefined email selector', async function () {
+    const helper = new Helper(this);
+    const emails = ['czesiek@example.com', 'janusz@example.com'];
+    await helper.currentUser.stubCurrentUser({
+      emails,
+    });
+    const submitSpy = sinon.spy();
+    helper.modalOptions.onSubmit = submitSpy;
+
+    await helper.showModal();
+    await helper.emailDropdown.selectOptionByText('janusz@example.com');
+    await click(helper.emailShareCheckbox);
+    await click(helper.proceedButton);
+
+    expect(submitSpy).to.have.been.calledOnce;
+    expect(submitSpy).to.have.been.calledWith(
+      sinon.match({
+        contactEmail: 'janusz@example.com',
+      })
+    );
+  });
+
+  it('calls onSubmit with custom email entered to custom value email selector', async function () {
+    const helper = new Helper(this);
+    const emails = ['czesiek@example.com'];
+    await helper.currentUser.stubCurrentUser({
+      emails,
+    });
+    const submitSpy = sinon.spy();
+    helper.modalOptions.onSubmit = submitSpy;
+
+    await helper.showModal();
+    await helper.emailDropdown.selectOptionByText('Custom e-mail address...');
+    const customInput = helper.emailDropdown.getTrigger().querySelector('input');
+    await fillIn(customInput, 'test@onedata.org');
+    await click(helper.emailShareCheckbox);
+    await click(helper.proceedButton);
+
+    expect(submitSpy).to.have.been.calledOnce;
+    expect(submitSpy).to.have.been.calledWith(
+      sinon.match({
+        contactEmail: 'test@onedata.org',
+      })
+    );
+  });
 });
 
 class Helper {
@@ -96,9 +162,9 @@ class Helper {
     assert('mochaContext is mandatory', mochaContext);
     /** @type {Mocha.Context} */
     this.mochaContext = mochaContext;
-    this.store = lookupService(this.mochaContext, 'store');
     this.modalOptions = {};
     this.initDefaultSpaceMarketplaceData();
+    this.currentUser = new CurrentUser(mochaContext);
   }
 
   initDefaultSpaceMarketplaceData() {
@@ -111,6 +177,13 @@ class Helper {
   }
   setSpaceMarketplaceData(spaceMarketplaceData) {
     this.modalOptions.spaceMarketplaceData = spaceMarketplaceData;
+  }
+
+  get store() {
+    return lookupService(this.mochaContext, 'store');
+  }
+  get currentUserService() {
+    return lookupService(this.mochaContext, 'currentUser');
   }
 
   /** @type {HTMLElement} */
@@ -137,6 +210,14 @@ class Helper {
   get emailInput() {
     return this.body.querySelector('.email-field input');
   }
+  /** @type {HTMLElement} */
+  get emailDropdownFieldElement() {
+    return this.body.querySelector('.email-field');
+  }
+  /** @type {OneDropdownHelper} */
+  get emailDropdown() {
+    return new OneDropdownHelper(this.emailDropdownFieldElement);
+  }
   /** @type {HTMLInputElement} */
   get emailShareCheckbox() {
     return this.body.querySelector('.one-checkbox-understand');
@@ -156,6 +237,7 @@ class Helper {
   }
 
   async showModal() {
+    await this.currentUser.ensureStub();
     await render(hbs`{{global-modal-mounter}}`);
     return await this.modalManager
       .show('spaces/request-space-access-modal', this.modalOptions)

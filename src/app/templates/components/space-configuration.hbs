@@ -1,4 +1,4 @@
-<div class="form-horizontal space-configuration-form fill-flex-using-column">
+<div class="form form-horizontal space-configuration-form fill-flex-using-column">
   <div class={{concat-classes
     "form-group space-name-form-group"
     (if blankInlineEditors.name "has-error")
@@ -220,14 +220,20 @@
             <span class="static-value static-not-set">{{tt this "notSet"}}</span>
           {{/if}}
         {{else}}
-          {{one-inline-editor
+          {{#one-inline-editor
             class="contact-email"
             value=contactEmail
+            editorType="custom"
             onInputValueChanged=(action "currentEmailChanged")
             isSaveDisabled=emailValidation.error
             saveButtonTip=emailValidation.message
             onSave=(action "saveValue" "contactEmail")
+            onEdit=(action "handleContactEmailOnEdit")
+            onApiRegister=(action registerEmailInlineEditor)
+            as |editor|
           }}
+            {{form-component/field-renderer field=contactEmailRootField}}
+          {{/one-inline-editor}}
         {{/if}}
       </div>
       <div class="field-alert email-visible-alert">

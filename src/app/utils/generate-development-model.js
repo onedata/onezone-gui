@@ -403,6 +403,7 @@ function createUserRecord(store) {
     hasPassword: false,
     canInviteProviders: true,
     username: USER_LOGIN,
+    emails: ['user@example.com', 'mockuser@onedata.org'],
   });
   return userRecord.save();
 }
@@ -537,7 +538,7 @@ function createSpacesRecords(store) {
         organizationName: 'The company',
         tags: ['EU-funded', 'energy', 'environment'],
         description: exampleMarkdownLong,
-        marketplaceContactEmail: 'user@example.com',
+        marketplaceContactEmail: 'space_user@example.com',
       } : {
         advertisedInMarketplace: false,
         organizationName: '',

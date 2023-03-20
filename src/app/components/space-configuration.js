@@ -30,16 +30,20 @@ import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-s
 import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 import { validator } from 'ember-cp-validations';
 import { SpaceTag } from './space-configuration/space-tags-selector';
+import CustomValueDropdownField from 'onedata-gui-common/utils/form-component/custom-value-dropdown-field';
+import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
 
 /**
  * @typedef {'view'|'edit'} SpaceConfigDescriptionEditorMode
  */
 
+const contactEmailValidator = validator('format', {
+  type: 'email',
+  allowBlank: false,
+});
+
 const validations = buildValidations({
-  currentContactEmail: validator('format', {
-    type: 'email',
-    allowBlank: false,
-  }),
+  currentContactEmail: contactEmailValidator,
 });
 
 export default Component.extend(validations, I18n, {
@@ -49,6 +53,7 @@ export default Component.extend(validations, I18n, {
   router: service(),
   globalNotify: service(),
   spaceManager: service(),
+  currentUser: service(),
 
   /**
    * @override
@@ -60,6 +65,17 @@ export default Component.extend(validations, I18n, {
    * @type {Model.Space}
    */
   space: undefined,
+
+  //#region configuration
+
+  emailFieldName: 'marketplaceContactEmail',
+
+  /**
+   * @type {Array<Validator>}
+   */
+  emailFieldValidators: Object.freeze([contactEmailValidator]),
+
+  //#region
 
   //#region state
 
@@ -102,6 +118,11 @@ export default Component.extend(validations, I18n, {
    */
   blankInlineEditors: undefined,
 
+  /**
+   * @type {OneInlineCustomEditorApi}
+   */
+  emailInlineEditorApi: undefined,
+
   //#endregion
 
   isMarketplaceEnabled: reads('spaceManager.marketplaceConfig.enabled'),
@@ -109,6 +130,33 @@ export default Component.extend(validations, I18n, {
   spaceId: reads('space.entityId'),
 
   isReadOnly: not('space.privileges.update'),
+
+  /**
+   * @type {ComputedProperty<Array<string>>}
+   */
+  predefinedEmails: computed(
+    'currentUser.user.emails',
+    'space.marketplaceContactEmail',
+    function predefinedEmails() {
+      const userEmails = this.currentUser.user?.emails;
+      const emails = userEmails ? [...userEmails] : [];
+      const latestUsedEmail = this.space.marketplaceContactEmail;
+      if (latestUsedEmail && !emails.includes(latestUsedEmail)) {
+        emails.unshift(latestUsedEmail);
+      }
+      return emails;
+    }
+  ),
+
+  predefinedEmailsOptions: computed(
+    'predefinedEmails',
+    function predefinedEmailsOptions() {
+      return this.predefinedEmails?.map(email => ({
+        value: email,
+        label: email,
+      })) ?? [];
+    }
+  ),
 
   readOnlyTip: conditional(
     'isReadOnly',
@@ -227,6 +275,39 @@ export default Component.extend(validations, I18n, {
     );
   }),
 
+  contactEmailRootField: computed(function contactEmailRootField() {
+    return FormFieldsRootGroup
+      .extend({
+        onValueChange(value, field) {
+          this._super(...arguments);
+          if (field?.name === this.spaceConfigurationComponent.emailFieldName) {
+            this.spaceConfigurationComponent.emailInlineEditorApi?.onChange(value);
+          }
+        },
+      })
+      .create({
+        ownerSource: this,
+        spaceConfigurationComponent: this,
+        i18nPrefix: this.i18nPrefix,
+        fields: [
+          this.emailDropdownField,
+        ],
+      });
+  }),
+
+  emailDropdownField: computed(function emailDropdownField() {
+    return CustomValueDropdownField
+      .extend({
+        options: reads('spaceConfigurationComponent.predefinedEmailsOptions'),
+        defaultValue: reads('spaceConfigurationComponent.contactEmail'),
+      })
+      .create({
+        spaceConfigurationComponent: this,
+        name: this.emailFieldName,
+        customValidators: this.emailFieldValidators,
+      });
+  }),
+
   spaceObserver: observer('space', function spaceObserver() {
     this.setCurrentValuesFromRecord();
   }),
@@ -235,6 +316,13 @@ export default Component.extend(validations, I18n, {
     this._super(...arguments);
     this.spaceObserver();
     this.set('blankInlineEditors', {});
+  },
+
+  /**
+   * @param {OneInlineCustomEditorApi} api
+   */
+  registerEmailInlineEditor(api) {
+    this.set('emailInlineEditorApi', api);
   },
 
   /**
@@ -401,6 +489,11 @@ export default Component.extend(validations, I18n, {
     },
     inlineEditorChange(fieldId, value) {
       this.inlineEditorChange(fieldId, value);
+    },
+    handleContactEmailOnEdit(state) {
+      if (state === false) {
+        this.contactEmailRootField.reset();
+      }
     },
   },
 });
