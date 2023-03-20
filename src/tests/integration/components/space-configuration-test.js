@@ -1,4 +1,3 @@
-import sleep from 'onedata-gui-common/utils/sleep';
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';

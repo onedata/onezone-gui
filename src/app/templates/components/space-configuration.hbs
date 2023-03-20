@@ -228,6 +228,7 @@
             isSaveDisabled=emailValidation.error
             saveButtonTip=emailValidation.message
             onSave=(action "saveValue" "contactEmail")
+            onEdit=(action "handleContactEmailOnEdit")
             onApiRegister=(action registerEmailInlineEditor)
             as |editor|
           }}

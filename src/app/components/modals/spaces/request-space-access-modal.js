@@ -78,13 +78,8 @@ export default Component.extend(I18n, {
     return FormFieldsRootGroup
       .extend({
         isEnabled: not('requestSpaceAccessModal.isDisabled'),
-        predefinedEmails: reads('requestSpaceAccessModal.predefinedEmails'),
         messageField: reads('requestSpaceAccessModal.messageField'),
-        emailField: conditional(
-          'predefinedEmails.length',
-          'requestSpaceAccessModal.emailDropdownField',
-          'requestSpaceAccessModal.emailInputField'
-        ),
+        emailField: reads('requestSpaceAccessModal.emailField'),
         fields: collect(
           'messageField',
           'emailField'
