@@ -14,6 +14,7 @@ import {
 import sinon from 'sinon';
 import { click, fillIn } from '@ember/test-helpers';
 import OneDropdownHelper from '../../../../helpers/one-dropdown';
+import CurrentUser from '../../../../helpers/mixins/current-user';
 
 describe('Integration | Component | modals/spaces/request-space-access-modal', function () {
   setupRenderingTest();
@@ -95,7 +96,7 @@ describe('Integration | Component | modals/spaces/request-space-access-modal', f
     async function () {
       const helper = new Helper(this);
       const emails = ['czesiek@example.com', 'janusz@example.com'];
-      await helper.stubCurrentUser({
+      await helper.currentUser.stubCurrentUser({
         emails,
       });
 
@@ -112,7 +113,7 @@ describe('Integration | Component | modals/spaces/request-space-access-modal', f
   it('calls onSubmit with email from predefined email selector', async function () {
     const helper = new Helper(this);
     const emails = ['czesiek@example.com', 'janusz@example.com'];
-    await helper.stubCurrentUser({
+    await helper.currentUser.stubCurrentUser({
       emails,
     });
     const submitSpy = sinon.spy();
@@ -134,7 +135,7 @@ describe('Integration | Component | modals/spaces/request-space-access-modal', f
   it('calls onSubmit with custom email entered to custom value email selector', async function () {
     const helper = new Helper(this);
     const emails = ['czesiek@example.com'];
-    await helper.stubCurrentUser({
+    await helper.currentUser.stubCurrentUser({
       emails,
     });
     const submitSpy = sinon.spy();
@@ -163,13 +164,7 @@ class Helper {
     this.mochaContext = mochaContext;
     this.modalOptions = {};
     this.initDefaultSpaceMarketplaceData();
-
-    /**
-     * Use `stubCurrentUser` method to initialize manually.
-     * Will be initialized before render with default data if was not initialzed manually.
-     * @type {Models.User}
-     */
-    this.user = undefined;
+    this.currentUser = new CurrentUser(mochaContext);
   }
 
   initDefaultSpaceMarketplaceData() {
@@ -182,30 +177,6 @@ class Helper {
   }
   setSpaceMarketplaceData(spaceMarketplaceData) {
     this.modalOptions.spaceMarketplaceData = spaceMarketplaceData;
-  }
-  async stubCurrentUser(data) {
-    if (data?.id) {
-      throw new Error(
-        'Providing "id" when stubbing current user is not supported - stub entityId instead'
-      );
-    }
-    const effData = { ...data };
-    const userId = effData.entityId ?? 'stub_user_id';
-    const userGri = this.store.userGri(userId);
-    const user = await this.store.createRecord('user', {
-      id: userGri,
-      // default data
-      fullName: 'Stub user',
-      username: 'stub_user',
-      info: { creationTime: 1000000 },
-      emails: [],
-
-      ...effData,
-    }).save();
-    this.currentUserService.set('userId', userId);
-    this.user = user;
-
-    return user;
   }
 
   get store() {
@@ -266,9 +237,7 @@ class Helper {
   }
 
   async showModal() {
-    if (!this.user) {
-      await this.stubCurrentUser();
-    }
+    await this.currentUser.ensureStub();
     await render(hbs`{{global-modal-mounter}}`);
     return await this.modalManager
       .show('spaces/request-space-access-modal', this.modalOptions)
