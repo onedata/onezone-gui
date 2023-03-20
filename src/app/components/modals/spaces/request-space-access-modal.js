@@ -15,7 +15,7 @@ import TextAreaField from 'onedata-gui-common/utils/form-component/textarea-fiel
 import CustomValueDropdownField from 'onedata-gui-common/utils/form-component/custom-value-dropdown-field';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
 import { validator } from 'ember-cp-validations';
-import { and, not, conditional, collect } from 'ember-awesome-macros';
+import { and, not, collect } from 'ember-awesome-macros';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
 import { inject as service } from '@ember/service';
