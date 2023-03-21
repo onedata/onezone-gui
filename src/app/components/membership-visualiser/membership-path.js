@@ -59,6 +59,11 @@ export default Component.extend(RecognizerMixin, {
    */
   lastPanDeltaX: 0,
 
+  /**
+   * @type {boolean}
+   */
+  isCondensed: false,
+
   panStart() {
     this.set('lastPanDeltaX', 0);
   },
