@@ -2,9 +2,9 @@
 export default {
   header: {
     marketplaceDisabled: 'Marketplace not available',
-    valid: 'Add user to space',
-    loading: 'Verifying add user request...',
-    failed: 'Request verification failed',
+    valid: 'Resolve space membership request',
+    loading: 'Verifying the space membership request...',
+    failed: 'Invalid space membership request',
   },
   body: {
     marketplaceDisabled: 'Spaces marketplace is not enabled in this Onezone.',
