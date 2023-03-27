@@ -16,7 +16,7 @@ export default ClusterInfoContent.extend({
   /**
    * @override
    */
-  linkToCluster: computed('record', function linkToFileBrowser() {
+  linkToCluster: computed('record', function linkToCluster() {
     return this.router.urlFor(
       'onedata.sidebar.content.aspect',
       'clusters',
