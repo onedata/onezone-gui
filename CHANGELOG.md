@@ -7,6 +7,7 @@ CHANGELOG
 ### Latest changes
 
 * VFS-7715 Added object references checks in workflows editor
+* VFS-7873 Added automation lambdas dumping and uploading
 * VFS-8701 Removed ember-one-way-controls
 * VFS-10491 Fixed revision migration strategy in task arguments and results
 * VFS-9196 Removed @module jsdoc

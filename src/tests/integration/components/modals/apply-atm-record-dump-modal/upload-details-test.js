@@ -7,7 +7,7 @@ import sinon from 'sinon';
 
 const componentClass = 'upload-details';
 
-describe('Integration | Component | modals/apply-atm-workflow-schema-dump-modal/upload-details',
+describe('Integration | Component | modals/apply-atm-record-dump-modal/upload-details',
   function () {
     setupRenderingTest();
 
@@ -61,7 +61,7 @@ describe('Integration | Component | modals/apply-atm-workflow-schema-dump-modal/
   });
 
 async function renderComponent() {
-  await render(hbs `{{modals/apply-atm-workflow-schema-dump-modal/upload-details
+  await render(hbs `{{modals/apply-atm-record-dump-modal/upload-details
     dumpSource=dumpSource
     onReupload=onReupload
     isDisabled=isDisabled

@@ -15,7 +15,7 @@ import ModifyAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/mo
 import RemoveAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-action';
 import CopyRecordIdAction from 'onedata-gui-common/utils/clipboard-actions/copy-record-id-action';
 import CreateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-revision-action';
-import DuplicateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/duplicate-atm-workflow-schema-revision-action';
+import DuplicateAtmRecordRevisionAction from 'onezone-gui/utils/workflow-actions/duplicate-atm-record-revision-action';
 import DumpAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/dump-atm-workflow-schema-revision-action';
 import RemoveAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-revision-action';
 
@@ -79,7 +79,7 @@ describe('Integration | Component | content-atm-inventories-workflows/atm-workfl
       RemoveAtmWorkflowSchemaAction.create();
       CopyRecordIdAction.create();
       CreateAtmWorkflowSchemaRevisionAction.create();
-      DuplicateAtmWorkflowSchemaRevisionAction.create();
+      DuplicateAtmRecordRevisionAction.create();
       DumpAtmWorkflowSchemaRevisionAction.create();
       RemoveAtmWorkflowSchemaRevisionAction.create();
     });
@@ -102,7 +102,7 @@ describe('Integration | Component | content-atm-inventories-workflows/atm-workfl
         RemoveAtmWorkflowSchemaAction,
         CopyRecordIdAction,
         CreateAtmWorkflowSchemaRevisionAction,
-        DuplicateAtmWorkflowSchemaRevisionAction,
+        DuplicateAtmRecordRevisionAction,
         DumpAtmWorkflowSchemaRevisionAction,
         RemoveAtmWorkflowSchemaRevisionAction,
       ].forEach(action => {
@@ -385,10 +385,10 @@ describe('Integration | Component | content-atm-inventories-workflows/atm-workfl
     it('allows duplicating workflow revision', async function () {
       const firstWorkflowObj = this.get('collection.1');
       const executeStub = sinon.stub(
-        DuplicateAtmWorkflowSchemaRevisionAction.prototype,
+        DuplicateAtmRecordRevisionAction.prototype,
         'onExecute'
       ).callsFake(function () {
-        expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflowObj);
+        expect(this.get('context.atmRecord')).to.equal(firstWorkflowObj);
         expect(this.get('context.revisionNumber')).to.equal(1);
       });
       await renderComponent();

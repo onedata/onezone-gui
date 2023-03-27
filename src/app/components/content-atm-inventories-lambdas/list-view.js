@@ -23,6 +23,7 @@ export default Component.extend(I18n, {
 
   i18n: service(),
   workflowManager: service(),
+  workflowActions: service(),
 
   /**
    * @override
@@ -60,6 +61,12 @@ export default Component.extend(I18n, {
    * @type {(atmLambda: Models.AtmLambda, originRevisionNumber: RevisionNumber) => void}
    */
   onRevisionCreate: undefined,
+
+  /**
+   * @virtual
+   * @type {(atmLambda: Models.AtmLambda, revisionNumber: RevisionNumber) => void}
+   */
+  onRevisionCreated: undefined,
 
   /**
    * Needed when `mode` is `'selection'`
@@ -149,6 +156,7 @@ export default Component.extend(I18n, {
         action: () => this.get('onAddAtmLambda')(),
         title: this.t('addAtmLambdaButton'),
         class: 'open-add-atm-lambda-trigger',
+        buttonStyle: 'primary',
         disabled: !hasManageLambdasPrivilege,
         tip: hasManageLambdasPrivilege ? undefined : insufficientPrivilegesMessage({
           i18n,
@@ -157,6 +165,32 @@ export default Component.extend(I18n, {
         }),
         icon: 'add-filled',
       };
+    }
+  ),
+
+  /**
+   * @type {ComputedProperty<Utils.Action>}
+   */
+  uploadAtmLambdaAction: computed(
+    'atmInventory',
+    function uploadAtmLambdaAction() {
+      const action = this.workflowActions.createUploadAtmRecordAction({
+        atmModelName: 'atmLambda',
+        atmInventory: this.atmInventory,
+      });
+      action.addExecuteHook(actionResult => {
+        if (actionResult.status === 'done' && actionResult.result) {
+          const {
+            atmRecord,
+            revisionNumber,
+          } = actionResult.result;
+          if (atmRecord && revisionNumber) {
+            this.onRevisionCreated?.(atmRecord, revisionNumber);
+          }
+        }
+      });
+
+      return action;
     }
   ),
 
@@ -173,11 +207,20 @@ export default Component.extend(I18n, {
    * @override
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
-  globalActions: collect('addNewAtmLambdaAction'),
+  globalActions: collect('uploadAtmLambdaAction', 'addNewAtmLambdaAction'),
 
   init() {
     this._super(...arguments);
     this.registerViewActions();
+  },
+
+  willDestroyElement() {
+    try {
+      const uploadAtmLambdaAction = this.cacheFor('uploadAtmLambdaAction');
+      uploadAtmLambdaAction?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
   },
 
   registerViewActions() {
