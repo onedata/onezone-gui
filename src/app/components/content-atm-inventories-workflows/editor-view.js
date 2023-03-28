@@ -21,12 +21,14 @@ import {
 import { collect } from '@ember/object/computed';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import areWorkflowSchemaRevisionsEqual from 'onedata-gui-common/utils/workflow-visualiser/are-workflow-schema-revisions-equal';
-import { not, tag } from 'ember-awesome-macros';
+import { not, tag, or, notEmpty } from 'ember-awesome-macros';
 
 /**
  * @typedef {Object} WorkflowEditorViewModificationState
- * @property {Boolean} isModified
- * @property {Function} [executeSaveAction] available when `isModified` is `true`
+ * @property {boolean} isModified
+ * @property {boolean} isValid
+ * @property {function} [executeSaveAction] Available when both `isModified` and
+ *   `isValid` are `true`
  */
 
 export default Component.extend(I18n, {
@@ -91,6 +93,11 @@ export default Component.extend(I18n, {
   visualiserData: undefined,
 
   /**
+   * @type {Array<AtmWorkSchemaValidationError>|undefined}
+   */
+  visualiserDataValidationErrors: undefined,
+
+  /**
    * Contains data showed by details form. Initialized by
    * `atmWorkflowSchemaRevisionObserver`, updated by modifications.
    * @type {Object}
@@ -152,11 +159,12 @@ export default Component.extend(I18n, {
   modificationState: computed(
     'isRevisionModified',
     function modificationState() {
-      const isRevisionModified = this.get('isRevisionModified');
+      const isValid = (this.visualiserDataValidationErrors?.length ?? 0) === 0;
       const state = {
-        isModified: isRevisionModified,
+        isModified: this.isRevisionModified,
+        isValid,
       };
-      if (isRevisionModified) {
+      if (this.isRevisionModified && isValid) {
         state.executeSaveAction = async () => await this.save();
       }
       return state;
@@ -166,14 +174,16 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Boolean>}
    */
-  isSaveBtnDisabled: not('isRevisionModified'),
+  isSaveBtnDisabled: or(not('isRevisionModified'), notEmpty('visualiserDataValidationErrors')),
 
   /**
    * @type {ComputedProperty<String|undefined>}
    */
   saveBtnTip: computed('isRevisionModified', function isSaveBtnDisabled() {
-    if (!this.get('isRevisionModified')) {
+    if (!this.isRevisionModified) {
       return this.t('noChangesToSave');
+    } else if (this.visualiserDataValidationErrors?.length) {
+      return this.t('schemaIsInvalid');
     }
   }),
 
@@ -244,6 +254,7 @@ export default Component.extend(I18n, {
       };
       this.setProperties({
         visualiserData,
+        visualiserDataValidationErrors: [],
         detailsData,
         unchangedVisualiserData: visualiserData,
         unchangedDetailsData: detailsData,
@@ -331,8 +342,11 @@ export default Component.extend(I18n, {
     backSlide() {
       this.get('onBackSlide')();
     },
-    visualiserDataChange(newVisualiserData) {
-      this.set('visualiserData', newVisualiserData);
+    visualiserDataChange(visualiserData, visualiserDataValidationErrors) {
+      this.setProperties({
+        visualiserData,
+        visualiserDataValidationErrors,
+      });
     },
     detailsDataChange({ data }) {
       this.set('detailsData', data);
