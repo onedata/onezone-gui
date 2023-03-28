@@ -7,6 +7,7 @@ CHANGELOG
 ### Latest changes
 
 * VFS-7715 Added object references checks in workflows editor
+* VFS-9309 Removed usages of `:contains` jQuery selector
 * VFS-7873 Added automation lambdas dumping and uploading
 * VFS-8701 Removed ember-one-way-controls
 * VFS-10491 Fixed revision migration strategy in task arguments and results
