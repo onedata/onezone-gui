@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-8647 Moved component styles into dedicated directory
 * VFS-7715 Added object references checks in workflows editor
 * VFS-9309 Removed usages of `:contains` jQuery selector
 * VFS-7873 Added automation lambdas dumping and uploading
