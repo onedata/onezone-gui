@@ -27,6 +27,15 @@
         margin-left: 0.5em;
       }
     }
+
+    .validation-error-indicator {
+      margin-right: 0.5em;
+
+      .warning-icon {
+        height: 1.3em;
+        vertical-align: -0.3em;
+      }
+    }
   }
 
   .bs-tab-onedata,
