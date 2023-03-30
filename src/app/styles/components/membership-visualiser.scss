@@ -6,6 +6,16 @@
   position: relative;
   min-height: 100px;
 
+  .flippable-icons, .type-icon {
+    font-size: 1.2em;
+    --flippable-icons-width: 0.6em;
+    --flippable-icons-height: 0.6em;
+  }
+
+  .record-info-with-icon .record-name-general {
+    padding-left: 0.8em;
+  }
+
   &.loading {
     pointer-events: none;
     .membership-row {
@@ -15,6 +25,11 @@
 
   &.condensed {
     font-size: 0.9em;
+
+    .membership-block {
+      padding-left: 3em;
+    }
+
     .membership-relation {
       width: 10px;
       pointer-events: none;
@@ -22,6 +37,7 @@
         display: none;
       }
     }
+
     .long-path .membership-block {
       &:first-child, &:last-child {
         .record-name {
@@ -54,7 +70,7 @@
   }
   .membership-block {
     position: relative;
-    padding-left: 3em;
+    padding-left: 1em;
     max-width: 250px;
     .record-name {
       margin-right: 0.8em;
@@ -72,14 +88,20 @@
         opacity: 0;
       }
     }
-    &.record-group .type-icon {
-      color: $color-one-yellow;
+    &.record-group {
+      .type-icon, .flippable-front {
+        color: $color-one-yellow;
+      }
     }
-    &.record-space .type-icon {
-      color: $color-one-azure;
+    &.record-space {
+      .type-icon, .flippable-front {
+        color: $color-one-azure;
+      }
     }
-    &.record-provider .type-icon {
-      color: $color-one-mint;
+    &.record-provider {
+      .type-icon, .flippable-front {
+        color: $color-one-mint;
+      }
     }
     .type-icon:hover, &.actions-opened .type-icon {
       cursor: pointer;
@@ -147,7 +169,7 @@
         z-index: -1;
       }
     }
-    
+
     .arrow-text {
       margin-top: 0;
       opacity: 0;

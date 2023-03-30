@@ -112,6 +112,11 @@ export default Component.extend(I18n, {
   scrollRightButton: true,
 
   /**
+   * @type {boolean}
+   */
+  isCondensed: false,
+
+  /**
    * @type {Ember.ComputedProperty<string>}
    */
   currentUserId: reads('currentUser.userId'),

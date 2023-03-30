@@ -9,7 +9,8 @@
         modifyPrivileges=(action (mut relationPrivilegesToChange))
         searchString=searchString
         visibleBlocks=visibleBlocks
-        showDescription=showDescription}}
+        showDescription=showDescription
+        isCondensed=isCondensed}}
     {{/each}}
     {{#if (and (gte paths.length maxPathsNumber) (not isCondensed))}}
       <div class="membership-row limit-info collapse-animation collapse-medium {{if searchString "collapse-hidden"}}">
