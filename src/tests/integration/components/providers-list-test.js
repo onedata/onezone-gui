@@ -9,7 +9,7 @@ import _ from 'lodash';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { Promise } from 'rsvp';
 
-describe('Integration | Component | providers list', function () {
+describe('Integration | Component | providers-list', function () {
   setupRenderingTest();
 
   beforeEach(function () {

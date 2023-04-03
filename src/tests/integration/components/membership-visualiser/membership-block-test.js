@@ -16,7 +16,7 @@ const icons = {
 };
 
 describe(
-  'Integration | Component | membership visualiser/membership block',
+  'Integration | Component | membership-visualiser/membership-block',
   function () {
     setupRenderingTest();
 

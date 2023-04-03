@@ -1,7 +1,6 @@
 /**
  * A support page for space
  *
- * @module components/content-spaces-support
  * @author Jakub Liput, Michał Borzęcki
  * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

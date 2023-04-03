@@ -7,7 +7,7 @@ import sinon from 'sinon';
 import { resolve } from 'rsvp';
 import { find } from '@ember/test-helpers';
 
-describe('Integration | Component | login box/social box list', function () {
+describe('Integration | Component | login-box/social-box-list', function () {
   setupRenderingTest();
 
   it('shows spinner when loading', async function () {

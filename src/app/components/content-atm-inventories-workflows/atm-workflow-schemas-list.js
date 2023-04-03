@@ -1,7 +1,6 @@
 /**
  * Shows list of workflow schemas (passed via `collection` property).
  *
- * @module components/content-atm-inventories-workflows/atm-workflow-schemas-list
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -23,6 +22,12 @@ export default Component.extend(I18n, {
    * @override
    */
   i18nPrefix: 'components.contentAtmInventoriesWorkflows.atmWorkflowSchemasList',
+
+  /**
+   * @virtual
+   * @type {Models.AtmInventory}
+   */
+  atmInventory: undefined,
 
   /**
    * @virtual

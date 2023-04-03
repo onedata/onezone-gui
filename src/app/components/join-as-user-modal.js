@@ -1,8 +1,7 @@
 /**
  * Shows modal asking about joining to some model.
  *
- * @module components/join-as-user-modal
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

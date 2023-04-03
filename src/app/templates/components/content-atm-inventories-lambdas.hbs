@@ -6,6 +6,7 @@
         onAddAtmLambda=(action "showCreatorView")
         onRevisionClick=(action "showEditorView")
         onRevisionCreate=(action "showRevisionCreatorView")
+        onRevisionCreated=(action "showEditorView")
         onRegisterViewActions=(action "registerViewActions" "list")
       }}
     {{/carousel.slide}}
@@ -23,6 +24,7 @@
             visible=(eq effectiveActiveSlide "editor")
             onBackSlide=(action "showListView")
             onAtmLambdaRevisionSaved=(action "showListView")
+            onRegisterViewActions=(action "registerViewActions" "editor")
           }}
         {{else}}
           {{content-atm-inventories-lambdas/loading-view

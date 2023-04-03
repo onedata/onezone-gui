@@ -2,7 +2,7 @@
  * Extends appModel to inject current user record,
  * thus the onedata route will be in loading state until we got current user
  * record
- * @module onezone-gui/routes/onedata
+ *
  * @author Jakub Liput
  * @copyright (C) 2017-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

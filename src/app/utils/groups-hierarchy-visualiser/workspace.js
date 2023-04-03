@@ -1,9 +1,8 @@
 /**
  * Workspace implementation for groups hierarchy visualiser. It contains values,
  * that are related to environment only.
- * 
- * @module utils/groups-hierarchy-visualiser/workspace
- * @author Michal Borzecki
+ *
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

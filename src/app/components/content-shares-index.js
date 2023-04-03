@@ -1,7 +1,6 @@
 /**
  * Global share view - show single share accessible from shares > share menu.
- * 
- * @module components/content-shares-index
+ *
  * @author Jakub Liput
  * @copyright (C) 2020-2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

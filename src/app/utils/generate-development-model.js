@@ -1,7 +1,6 @@
 /**
  * Create and save example records for onezone-gui using store
  *
- * @module utils/generate-development-model
  * @author Jakub Liput
  * @copyright (C) 2017-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -529,7 +528,8 @@ function createSpacesRecords(store) {
       currentUserEffPrivileges: spacePrivilegesFlags,
       directMembership: true,
       info: {
-        creatorType: 'root',
+        creatorType: 'user',
+        creatorId: USER_ID,
         creationTime: 1540995468,
         sharedDirectories: 0,
       },
@@ -1030,6 +1030,28 @@ function attachAtmLambdasToAtmInventory(store, atmInventory) {
                     }],
                   },
                 },
+              }],
+              configParameterSpecs: [{
+                name: 'configParam1',
+                dataSpec: {
+                  type: 'string',
+                },
+                isOptional: true,
+                defaultValue: 'some value',
+              }, {
+                name: 'configParam2',
+                dataSpec: {
+                  type: 'boolean',
+                },
+                isOptional: true,
+                defaultValue: true,
+              }, {
+                name: 'configParam3',
+                dataSpec: {
+                  type: 'number',
+                },
+                isOptional: true,
+                defaultValue: null,
               }],
               resourceSpec: {
                 cpuRequested: 2,

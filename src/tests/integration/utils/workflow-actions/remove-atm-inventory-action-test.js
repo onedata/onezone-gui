@@ -16,7 +16,7 @@ import {
 } from '../../../helpers/modal';
 
 describe(
-  'Integration | Utility | workflow actions/remove atm inventory action',
+  'Integration | Utility | workflow-actions/remove-atm-inventory-action',
   function () {
     setupRenderingTest();
 

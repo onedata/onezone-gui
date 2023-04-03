@@ -2,7 +2,6 @@
  * Modifies existing workflow schema. Needs `atmWorkflowSchema` (model) and
  * `atmWorkflowSchemaDiff` (changed fields) passed in context.
  *
- * @module utils/workflow-actions/modify-atm-workflow-schema-action
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

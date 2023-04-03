@@ -6,7 +6,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 
 describe(
-  'Integration | Component | token template selector/identity template',
+  'Integration | Component | token-template-selector/identity-template',
   function () {
     setupRenderingTest();
 

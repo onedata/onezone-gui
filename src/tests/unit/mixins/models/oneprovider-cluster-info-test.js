@@ -11,7 +11,7 @@ function genResource(entityId, aspectType) {
   };
 }
 
-describe('Unit | Mixin | models/oneprovider cluster info', function () {
+describe('Unit | Mixin | models/oneprovider-cluster-info', function () {
   it('fetches spaces list using graph', function () {
     const oneproviderEntityId = 'opeid';
     const onedataGraph = {

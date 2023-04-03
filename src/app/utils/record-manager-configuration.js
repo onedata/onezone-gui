@@ -1,7 +1,6 @@
 /**
  * Provides project-specific, custom logic to record-manager service.
  *
- * @module utils/record-manager-configuration
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

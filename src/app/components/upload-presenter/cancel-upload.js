@@ -1,7 +1,6 @@
 /**
  * Button used to cancel upload
  *
- * @module components/upload-presenter/cancel-upload
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

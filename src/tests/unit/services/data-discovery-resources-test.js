@@ -22,7 +22,7 @@ const CurrentUserService = Service.extend({
   getCurrentUserRecord() {},
 });
 
-describe('Unit | Service | data discovery resources', function () {
+describe('Unit | Service | data-discovery-resources', function () {
   setupTest();
 
   beforeEach(function () {

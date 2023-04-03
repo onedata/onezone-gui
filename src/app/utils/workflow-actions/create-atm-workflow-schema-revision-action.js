@@ -4,7 +4,6 @@
  * based on a pointed revision instead of the last one. Passes (via result) a number
  * of the created revision.
  *
- * @module utils/workflow-actions/create-atm-workflow-schema-revision-action
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

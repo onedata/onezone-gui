@@ -4,7 +4,7 @@ import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 
-describe('Integration | Component | remove token modal', function () {
+describe('Integration | Component | remove-token-modal', function () {
   setupRenderingTest();
 
   beforeEach(function () {

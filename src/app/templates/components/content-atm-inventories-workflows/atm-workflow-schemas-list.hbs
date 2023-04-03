@@ -9,6 +9,7 @@
 <ul class="list-entries">
   {{#each sortedCollection as |atmWorkflowSchema|}}
     {{content-atm-inventories-workflows/atm-workflow-schemas-list-entry
+      atmInventory=atmInventory
       atmWorkflowSchema=atmWorkflowSchema
       onRevisionCreated=onRevisionCreated
       onRevisionClick=onRevisionClick

@@ -14,7 +14,7 @@ import {
 } from '../../../helpers/modal';
 import TestComponent from 'onedata-gui-common/components/test-component';
 
-describe('Integration | Utility | token actions/generate invite token action', function () {
+describe('Integration | Utility | token-actions/generate-invite-token-action', function () {
   setupRenderingTest();
 
   beforeEach(function () {

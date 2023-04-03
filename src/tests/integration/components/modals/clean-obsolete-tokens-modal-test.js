@@ -13,7 +13,7 @@ import {
 import { Promise } from 'rsvp';
 import sinon from 'sinon';
 
-describe('Integration | Component | modals/clean obsolete tokens modal', function () {
+describe('Integration | Component | modals/clean-obsolete-tokens-modal', function () {
   setupRenderingTest();
 
   beforeEach(function () {

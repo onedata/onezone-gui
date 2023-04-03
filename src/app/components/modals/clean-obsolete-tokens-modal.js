@@ -5,7 +5,6 @@
  * * selectedTokensToRemove - [optional] a list of preselected tokens (must be a
  *   subset of tokensToRemove). If not provided, then all tokens will be preselected.
  *
- * @module components/modals/clean-obsolete-tokens-modal
  * @author Michał Borzęcki
  * @copyright (C) 2019-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

@@ -1,7 +1,7 @@
 /**
  * Renders buttons for supported login providers. A container for social-boxes.
- * @module components/login-box/social-box-list
- * @author Jakub Liput, Michal Borzecki
+ *
+ * @author Jakub Liput, Michał Borzęcki
  * @copyright (C) 2016-2017 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

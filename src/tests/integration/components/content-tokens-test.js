@@ -7,7 +7,7 @@ import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import { Promise } from 'rsvp';
 
-describe('Integration | Component | content tokens', function () {
+describe('Integration | Component | content-tokens', function () {
   setupRenderingTest();
 
   beforeEach(function () {

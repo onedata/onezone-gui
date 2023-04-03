@@ -6,7 +6,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 
-describe('Integration | Component | content atm inventories new', function () {
+describe('Integration | Component | content-atm-inventories-new', function () {
   setupRenderingTest();
 
   it('has class "content-atm-inventories-new', async function () {

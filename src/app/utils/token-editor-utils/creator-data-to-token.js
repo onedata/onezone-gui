@@ -4,7 +4,6 @@
 /**
  * Converts data from token-editor to model-compatible token object.
  *
- * @module utils/token-editor-utils/creator-data-to-token
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

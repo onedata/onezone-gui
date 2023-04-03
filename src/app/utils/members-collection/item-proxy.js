@@ -1,9 +1,8 @@
 /**
  * Object used internally by members-collection component. Acts as a container
  * for member record.
- * 
- * @module utils/members-collection/item-proxy
- * @author Michal Borzecki
+ *
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
