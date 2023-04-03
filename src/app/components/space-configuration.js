@@ -32,7 +32,6 @@ import { validator } from 'ember-cp-validations';
 import { SpaceTag } from './space-configuration/space-tags-selector';
 import CustomValueDropdownField from 'onedata-gui-common/utils/form-component/custom-value-dropdown-field';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
-import TextField from 'onedata-gui-common/utils/form-component/text-field';
 
 /**
  * @typedef {'view'|'edit'} SpaceConfigDescriptionEditorMode

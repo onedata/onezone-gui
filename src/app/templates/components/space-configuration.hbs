@@ -51,6 +51,7 @@
   }}>
     <label class="control-label">
       {{tt this "spaceTags.label"}}:
+      {{one-label-tip title=(tt this "spaceTags.tip")}}
     </label>
     {{#if isReadOnly}}
       {{#if areSpaceTagsEmpty}}
@@ -73,6 +74,7 @@
   <div class="form-group description-form-group">
     <label class="control-label">
       {{tt this "description.label"}}:
+      {{one-label-tip title=(tt this "description.tip")}}
     </label>
     {{#bs-button-group
       value=descriptionEditorMode
@@ -212,6 +214,7 @@
       }}>
         <label class="control-label">
           {{tt this "contactEmail.label"}}:
+          {{one-label-tip title=(tt this "contactEmail.tip")}}
         </label>
         {{#if isReadOnly}}
           {{#if contactEmail}}

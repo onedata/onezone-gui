@@ -127,15 +127,6 @@ export default Component.extend(I18n, {
     );
   }),
 
-  creationTimeTooltip: computed('creationTime', function creationTimeTooltip() {
-    const creationTimeText = makeSpacesNonBreakable(
-      dateFormat([this.creationTime], {
-        format: 'dateWithMinutes',
-      })
-    );
-    return this.t('creationTimeTooltip', { creationTimeText });
-  }),
-
   tags: computed('spaceItem.tags', function tags() {
     return this.spaceItem.tags?.map(tagName => ({
       label: tagName,

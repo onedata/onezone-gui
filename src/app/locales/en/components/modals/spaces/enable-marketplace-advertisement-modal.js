@@ -1,18 +1,18 @@
-// TODO: VFS-10252 consult i18n
 export default {
-  header: 'Advertise space in marketplace',
+  header: 'Advertise space in the Marketplace',
   body: {
-    textIntro: 'Advertising space will make it\'s name, organization name, tags and description visible in',
-    spacesMarketplace: 'the spaces marketplace',
-    textExtended: 'Once space is advertised, every user of this Onezone can see it in the marketplace and request an access token using contact e-mail address specified below. The space can be dismissed from the marketplace at any time by space member having proper privileges. The contact e-mail as well as other space properties can be modified in the space configuration view.',
+    // FIXME: do konsultacji łącznik między tekstem a linkiem
+    textIntro: 'The space will be publicly advertised in {{spacesMarketplace}} along with the following information: name, organization name, tags, description, creation time, provider names and total support size in',
+    spacesMarketplace: 'the space Marketplace',
+    textExtended: 'Once the space is advertised, anyone will be able to find it in the Marketplace and request access. Requests will be sent to the operator contact e-mail address by means of an automated mailing system. The operator decides upon acceptance or rejection of received requests. At any time, the space can be withdrawn from the Marketplace.',
   },
   contactEmail: {
-    label: 'Marketplace contact e-mail',
-    customValueInputPlaceholder: 'Enter custom e-mail address...',
+    label: 'Operator contact e-mail',
+    customValueInputPlaceholder: 'Enter a custom e-mail address...',
     customValueOptionTextPrefix: 'Custom e-mail address...',
   },
   cancel: 'Cancel',
   proceed: 'Proceed',
   enablingAdvertisement: 'enabling space advertisement',
-  emailShareCheckboxText: 'I understand, that above contact e-mail address will be visible to space members with "view space" privilege.',
+  emailShareCheckboxText: 'I accept that the above contact e-mail address will be visible to the space members with "manage marketplace" privilege. The address is not displayed publicly in the Marketplace.',
 };

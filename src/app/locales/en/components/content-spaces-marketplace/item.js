@@ -8,10 +8,11 @@ export default {
   visitSpace: 'Visit space',
   configure: 'Configure',
   requestAccess: 'Request access',
-  requestSent: 'Request sent',
-  creationTimeTooltip: 'The space was created at {{creationTimeText}}',
+  requestSent: 'Request submitted',
+  creationTimeTooltip: 'The creation time of the space',
   moreTags: '...and {{count}} more tags',
-  retryWarningTip: `<p>${requestPendingGeneral}</p><p>You can send a request reminder to the space maintainer.</p>`,
-  requestPendingTip: `<p>${requestPendingGeneral}</p><p>Please wait for the request consideration.</p>`,
-  requestRejectedTip: '<p>Your membership request sent for this space using <strong>{{email}}</strong> e-mail address has been rejected.</p><p>You will be able to request the membership again after <strong>{{againDateText}}</strong>.</p>',
+  retryWarningTip: `<p>${requestPendingGeneral}</p><p>Your request has not been considered yet; you may send a reminder to the space maintainer.</p>`,
+  // FIXME: do konsultacji, czy potrzebne jest to "Please wait fot the request...", sprawdzić na backendzie
+  requestPendingTip: `<p>${requestPendingGeneral}</p><p>Please wait for the request to be considered by the space maintainer.</p>`,
+  requestRejectedTip: '<p>Your membership request for this space has been rejected and a notification has been sent to <strong>{{email}}</strong>.</p><p>You may request membership again not sooner than <strong>{{againDateText}}</strong>.</p>',
 };

@@ -13,9 +13,11 @@ export default {
   },
   spaceTags: {
     label: 'Tags',
+    tip: 'Short keywords or phrases that help to understand the purpose of a space and can be used for filtering',
   },
   description: {
     label: 'Description',
+    tip: 'Description of the space in Markdown format and the stored dataset(s)',
     radio: {
       view: 'Preview',
       edit: 'Editor',
@@ -23,30 +25,31 @@ export default {
     emptyText: 'Not set. Click here to edit...',
   },
   advertised: {
-    label: 'Advertise in marketplace',
+    label: 'Advertise in Marketplace',
     lockHint: {
-      requiredFieldsEmpty: 'Advertising space in marketplace requires organization name and description to be set.',
-      marketplaceDisabled: 'Spaces marketplace is disabled in this Onezone.',
+      requiredFieldsEmpty: 'Requires a non-empty organization name and description.',
+      marketplaceDisabled: 'Space Marketplace is disabled in this Onezone.',
     },
   },
   contactEmail: {
-    label: 'Marketplace contact e-mail',
+    label: 'Marketplace contact e-mail address',
+    tip: 'This address will be used for notifying about new membership requests. The person controlling this address must have "manage marketplace" and "add user" privileges in the space to be able to process access requests.',
   },
-  viewInMarketplace: 'View in marketplace',
+  viewInMarketplace: 'View in Marketplace',
   save: 'Save',
   discard: 'Discard changes',
-  fieldCannotBeEmptyWhenAdvertising: 'This field cannot be blank when space is advertised in marketplace',
+  fieldCannotBeEmptyWhenAdvertising: 'This field cannot be blank when the space is advertised in the Marketplace',
   fieldCannotBeEmpty: 'This field cannot be blank',
   confirmAdvertisementDisable: {
-    header: 'Turn off advertising of this space',
+    header: 'Disable space advertisement',
     body: {
-      text: 'You are about to withdraw the space from marketplace. It will become unavailable in marketplace spaces list, but it will not affect access to spaces already granted using the marketplace. Space properties, like organization name or description are left untouched and you can edit it in space configuration view.',
+      text: 'You are about to withdraw the space from the Marketplace and stop its public advertisement. It will not affect the memberships already granted using the Marketplace.',
     },
     cancel: 'Cancel',
     proceed: 'Proceed',
     disablingAdvertisement: 'disabling space advertisement',
   },
-  someTagsUnsupported: 'Some of entered tags are currently not supported. Remove them to be able to save changes.',
-  emailVisibleAlert: 'Note, that contact e-mail address will be visible to space members with "view space" privilege.',
-  advertisedInDisabledMarketplace: 'Maketplace advertising has been enabled for this space, but currently this Onezone has spaces marketplace disabled.',
+  someTagsUnsupported: 'Some of the entered tags are no longer allowed. Remove them to be able to save changes.',
+  emailVisibleAlert: 'The e-mail address will be visible to all space members with the "manage marketplace" privilege.',
+  advertisedInDisabledMarketplace: 'Space advertisement has been enabled for this space, but currently the space Marketplace is disabled in this Onezone.',
 };

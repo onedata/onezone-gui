@@ -536,7 +536,8 @@ function createSpacesRecords(store) {
       ...(index === 0 ? {
         advertisedInMarketplace: true,
         organizationName: 'The company',
-        tags: ['EU-funded', 'energy', 'environment'],
+        // FIXME: testing tag
+        tags: ['EU-funded', 'energy', 'environment', 'FIXME'],
         description: exampleMarkdownLong,
         marketplaceContactEmail: 'space_user@example.com',
       } : {
@@ -1190,7 +1191,7 @@ async function generateSpaceMembershipRequestsInfo(
       requestId: 'abcd-1',
       contactEmail: 'the_requester@example.com',
       // use earlier timestamp value to see "outdated" state
-      lastActivity: Math.floor(Date.now() / 1000) - 10000,
+      lastActivity: Math.floor(Date.now() / 1000) - 10,
     },
   };
   const rejected = {

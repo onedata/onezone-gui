@@ -1,4 +1,4 @@
 export default {
   noMatchingResults: 'No matching results.',
-  noSpacesAvailable: 'No spaces available.',
+  noSpacesAvailable: 'The Marketplace is empty.',
 };

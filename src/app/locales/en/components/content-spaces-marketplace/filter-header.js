@@ -1,4 +1,4 @@
 export default {
-  searchPlaceholder: 'Search spaces by name, organization or description...',
-  tagsFilterPlaceholder: 'Filter spaces by tags...',
+  searchPlaceholder: 'Search by name, organization or description...',
+  tagsFilterPlaceholder: 'Filter by tags...',
 };
