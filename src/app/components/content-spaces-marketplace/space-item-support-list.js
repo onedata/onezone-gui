@@ -9,10 +9,21 @@
 import Component from '@ember/component';
 import { reads } from '@ember/object/computed';
 import ContentOverflowDetector from 'onedata-gui-common/mixins/content-overflow-detector';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
 
-export default Component.extend(ContentOverflowDetector, {
+const mixins = [
+  I18n,
+  ContentOverflowDetector,
+];
+
+export default Component.extend(...mixins, {
   classNames: ['space-item-support-list'],
   classNameBindings: ['hasOverflow:has-overflow'],
+
+  /**
+   * @override
+   */
+  i18nPrefix: 'components.contentSpacesMarketplace.spaceItemSupportList',
 
   /**
    * @virtual

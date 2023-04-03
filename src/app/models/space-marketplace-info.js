@@ -38,7 +38,7 @@ export default Model.extend(GraphSingleModelMixin, {
   /**
    * Note that it may be 0 if the space is not supported at all.
    */
-  totalSupportSize: attr('number'),
+  totalSupportSize: attr('number', { defaultValue: 0 }),
 
   /**
    * Note that it may be an empty array if the space is not supported at all.
