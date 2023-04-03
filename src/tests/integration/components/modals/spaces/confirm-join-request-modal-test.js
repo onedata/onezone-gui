@@ -36,7 +36,7 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
 
     await helper.showModal();
 
-    expect(helper.header).to.contain.text('Request verification failed');
+    expect(helper.header).to.contain.text('Invalid membership request');
     expect(helper.closeButton).to.exist;
     expect(helper.closeButton).to.contain.text('Close');
     expect(helper.grantButton).to.not.exist;
@@ -73,9 +73,9 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
       await helper.showModal();
 
       expect(getRequesterInfo).to.have.been.calledWith(spaceId, requestId);
-      expect(helper.header).to.contain.text('Add user to space');
+      expect(helper.header).to.contain.text('Resolve membership request');
       expect(helper.body.textContent).to.match(new RegExp(
-        `An access to\\s+${spaceName}\\s+space has been requested by\\s+${fullName}\\s+\\(${contactEmail}\\)\\s+using spaces marketplace.`
+        `A membership request to space\\s+${spaceName}\\s+has been submitted by\\s+${fullName}\\s+\\(${contactEmail}\\)\\s+via the Space Marketplace\\.`
       ));
       expect(helper.grantButton).to.exist;
       expect(helper.grantButton).to.contain.text('Grant');
@@ -123,7 +123,7 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
 
     await helper.showModal();
 
-    expect(helper.header).to.contain.text('Verifying add user request...');
+    expect(helper.header).to.contain.text('Verifying the membership request...');
     expect(helper.body).to.contain('.spin-spinner-block');
     expect(helper.closeButton).to.not.exist;
     expect(helper.rejectButton).to.not.exist;

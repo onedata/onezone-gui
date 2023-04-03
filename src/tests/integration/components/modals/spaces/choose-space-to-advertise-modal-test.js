@@ -75,13 +75,13 @@ describe('Integration | Component | modals/spaces/choose-space-to-advertise-moda
 
       expectGenericHeader(helper);
       expect(helper.body).to.contain.text(
-        'Choose space to configure its advertising settings from selector below.'
+        'Choose a space to be configured for Marketplace advertisement.'
       );
       expect(helper.cancelButton).to.exist;
       expect(helper.cancelButton).to.contain.text('Cancel');
       expect(helper.proceedButton).to.exist;
       expect(helper.proceedButton).to.have.attr('disabled');
-      expect(helper.proceedButton).to.contain.text('Proceed');
+      expect(helper.proceedButton).to.contain.text('Configure...');
     }
   );
 
