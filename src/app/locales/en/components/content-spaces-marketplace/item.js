@@ -1,4 +1,3 @@
-// TODO: VFS-10252 consult i18n
 const requestPendingGeneral =
   'You have sent the membership request for this space at <strong>{{dateText}}</strong> using <strong>{{email}}</strong> e-mail address.';
 
