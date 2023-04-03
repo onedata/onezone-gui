@@ -536,8 +536,7 @@ function createSpacesRecords(store) {
       ...(index === 0 ? {
         advertisedInMarketplace: true,
         organizationName: 'The company',
-        // FIXME: testing tag
-        tags: ['EU-funded', 'energy', 'environment', 'FIXME'],
+        tags: ['EU-funded', 'energy', 'environment', 'old-tag'],
         description: exampleMarkdownLong,
         marketplaceContactEmail: 'space_user@example.com',
       } : {

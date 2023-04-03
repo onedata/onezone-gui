@@ -16,8 +16,7 @@ export default {
   },
   description: {
     label: 'Description',
-    // FIXME: dyskusja
-    tip: 'Description of the space in Markdown format and the stored dataset(s)',
+    tip: 'Description of the space and its contents in Markdown format',
     radio: {
       view: 'Preview',
       edit: 'Editor',
@@ -51,5 +50,5 @@ export default {
   },
   someTagsUnsupported: 'Some of the entered tags are no longer allowed. Remove them to be able to save changes.',
   emailVisibleAlert: 'The e-mail address will be visible to all space members with the "manage marketplace" privilege.',
-  advertisedInDisabledMarketplace: 'Space advertisement has been enabled for this space, but currently the space Marketplace is disabled in this Onezone.',
+  advertisedInDisabledMarketplace: 'Space advertisement has been enabled for this space, but currently the Space Marketplace is disabled in this Onezone.',
 };

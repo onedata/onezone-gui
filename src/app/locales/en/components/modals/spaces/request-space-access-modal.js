@@ -6,7 +6,6 @@ export default {
   cancel: 'Cancel',
   proceed: 'Submit',
   message: {
-    // FIXME: konsultacja
     label: 'Message to the space maintainer',
     placeholder: 'Optional; explain why do you wish to access the space.',
   },

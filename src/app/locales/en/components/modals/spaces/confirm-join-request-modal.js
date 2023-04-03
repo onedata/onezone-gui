@@ -10,7 +10,7 @@ export default {
     valid: {
       accessTo: 'A membership request to space',
       spaceRequestedBy: 'has been submitted by',
-      usingMarketplace: 'via the space Marketplace.',
+      usingMarketplace: 'via the Space Marketplace.',
       info: 'Upon granting access, the user will be added to the space with default privileges, which can be adjusted afterward.',
       question: 'Do you want to grant access for the user?',
     },

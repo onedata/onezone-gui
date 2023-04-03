@@ -1,13 +1,13 @@
 export default {
   header: 'Advertise space in the Marketplace',
   body: {
-    // FIXME: do konsultacji łącznik między tekstem a linkiem
-    textIntro: 'The space will be publicly advertised in {{spacesMarketplace}} along with the following information: name, organization name, tags, description, creation time, provider names and total support size in',
-    spacesMarketplace: 'the space Marketplace',
-    textExtended: 'Once the space is advertised, anyone will be able to find it in the Marketplace and request access. Requests will be sent to the operator contact e-mail address by means of an automated mailing system. The operator decides upon acceptance or rejection of received requests. At any time, the space can be withdrawn from the Marketplace.',
+    textIntro: 'The space will be publicly advertised in',
+    spacesMarketplace: 'the Space Marketplace',
+    textIntroFields: 'along with the following information: name, organization name, tags, description, creation time, provider names and total support size.',
+    textExtended: 'Once the space is advertised, anyone will be able to find it in the Marketplace and request access. Requests will be sent to the maintainer contact e-mail address by means of an automated mailing system. The maintainer decides upon acceptance or rejection of received requests. At any time, the space can be withdrawn from the Marketplace.',
   },
   contactEmail: {
-    label: 'Operator contact e-mail',
+    label: 'Maintainer contact e-mail',
     customValueInputPlaceholder: 'Enter a custom e-mail address...',
     customValueOptionTextPrefix: 'Custom e-mail address...',
   },
