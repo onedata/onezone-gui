@@ -3,7 +3,6 @@
  * - `rawAtmWorkflowSchema` - will be used to create new workflow schema record,
  * - `atmInventory` - parent inventory for newly created workflow schema.
  *
- * @module utils/workflow-actions/create-atm-workflow-schema-action
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

@@ -1,4 +1,4 @@
-<div class="form-horizontal space-configuration-form fill-flex-using-column">
+<div class="form form-horizontal space-configuration-form fill-flex-using-column">
   <div class={{concat-classes
     "form-group space-name-form-group"
     (if blankInlineEditors.name "has-error")
@@ -231,15 +231,11 @@
             isSaveDisabled=emailValidation.error
             saveButtonTip=emailValidation.message
             onSave=(action "saveValue" "contactEmail")
+            onEdit=(action "handleContactEmailOnEdit")
+            onApiRegister=(action registerEmailInlineEditor)
             as |editor|
           }}
-            {{evaluate-function (action registerEmailInlineEditor) editor}}
-            <form
-              class="form form-horizontal form-component marketplace-contact-email-form"
-              onsubmit={{prevent-default}}
-            >
-              {{form-component/field-renderer field=contactEmailRootField}}
-            </form>
+            {{form-component/field-renderer field=contactEmailRootField}}
           {{/one-inline-editor}}
         {{/if}}
       </div>

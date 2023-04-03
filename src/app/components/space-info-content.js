@@ -26,7 +26,7 @@ export default SpaceInfoContent.extend({
 
   async onOpenRestApiModal() {
     return await this.modalManager.show('api-samples-modal', {
-      record: this.space,
+      record: this.record,
       apiSubject: 'space',
     }).hiddenPromise;
   },
@@ -34,11 +34,11 @@ export default SpaceInfoContent.extend({
   /**
    * @override
    */
-  linkToFileBrowser: computed('space', function linkToFileBrowser() {
+  linkToFileBrowser: computed('record', function linkToFileBrowser() {
     return this.router.urlFor(
       'onedata.sidebar.content.aspect',
       'spaces',
-      this.guiUtils.getRoutableIdFor(this.space),
+      this.guiUtils.getRoutableIdFor(this.record),
       'data'
     );
   }),

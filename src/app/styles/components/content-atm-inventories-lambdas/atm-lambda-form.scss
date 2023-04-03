@@ -1,0 +1,183 @@
+@use 'sass:math';
+
+.atm-lambda-form {
+  $padding-right: 15em;
+  $space-for-remove-entry: 1em;
+  $entry-toggle-container-width: ($padding-right - $space-for-remove-entry) * 0.5;
+  $nested-fields-indent: 2em;
+
+  .form .one-way-toggle {
+    display: inline-flex;
+  }
+
+  .input-output-data-collection {
+    > .field-component > .collapse {
+      > .collection-item {
+        position: relative;
+        border: 1px solid $main-border-color;
+        border-radius: $border-radius-base;
+        padding: $form-group-margin-bottom;
+        padding-bottom: 0;
+        background-color: rgba($color-one-semiwhite, 0.2);
+
+        ~ * {
+          margin-top: $form-group-margin-bottom;
+        }
+      }
+    }
+
+    .entryName-field,
+    .entryDataSpec-field {
+      > .control-label {
+        display: none;
+      }
+    }
+  }
+
+  .entry-field {
+    min-width: 0;
+  }
+
+  .entryDefaultValue-field {
+    flex-wrap: wrap;
+    min-width: 0;
+    .control-label {
+      padding-top: 0;
+      margin-bottom: 0.4em;
+      width: 100%;
+    }
+  }
+
+  .mountSpaceOptions-field {
+    margin-left: $nested-fields-indent;
+  }
+
+  .resources-field {
+    flex-wrap: wrap;
+
+    > .control-label {
+      @include font-semibold();
+      padding-top: $padding-large-vertical;
+      margin-bottom: 0.7em;
+      flex-basis: 100%;
+      max-width: initial;
+      border-top: 1px solid $main-border-color;
+      text-transform: uppercase;
+    }
+  }
+
+  .form .footer-buttons {
+    float: none;
+    text-align: left;
+    .btn {
+      margin-left: $padding-small-horizontal;
+    }
+  }
+
+  @media (max-width: $screen-xs-max) {
+    .input-output-data-collection {
+      > .control-label {
+        margin-bottom: $form-group-margin-bottom * 0.5;
+      }
+    }
+  }
+
+  @media (min-width: $screen-sm-min) {
+    .control-label {
+      width: 9em;
+      text-align: left;
+    }
+
+    .input-output-data-collection {
+      flex-wrap: nowrap;
+
+      .entry-children {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: $screen-sm-max) {
+      .entryName-field,
+      .entryDataSpec-field,
+      .entryDefaultValue-field {
+        flex: 1 1 100%;
+      }
+
+      .right-floating-toggle {
+        .control-label {
+          width: initial;
+          min-width: initial;
+        }
+      }
+    }
+  }
+
+  @media (min-width: $screen-md-min) {
+    $x-offset-to-center-toggles: math.div($entry-toggle-container-width - $toggle-width, 6);
+
+    .control-label {
+      width: 12em;
+    }
+
+    .atm-lambda-root-children {
+      > * {
+        margin-right: $padding-right;
+      }
+
+      .input-output-data-collection {
+        margin-right: 0;
+      }
+    }
+
+    .input-output-data-collection {
+      .entryName-field {
+        flex: 0 1 calc(50% - #{$padding-right * 0.5});
+      }
+
+      .entryDataSpec-field {
+        flex: 0 1 calc(50% - #{$padding-right * 0.5} - #{$padding-base-vertical});
+        min-width: 13em;
+        margin-left: $padding-base-vertical;
+      }
+
+      .right-floating-toggle {
+        flex: 0 1 $entry-toggle-container-width;
+        height: $input-height-base;
+
+        .control-label {
+          position: absolute;
+          min-width: initial;
+          width: initial;
+          max-width: initial;
+          padding: 0;
+          bottom: 90%;
+          left: 50%;
+          transform: translateX(-50%);
+          white-space: nowrap;
+        }
+
+        .field-component {
+          text-align: center;
+        }
+      }
+
+      .entryIsOptional-field,
+      .entryIsViaFile-field {
+        transform: translateX(#{$x-offset-to-center-toggles});
+      }
+
+      .entryDefaultValue-field {
+        margin-right: $padding-right;
+      }
+
+      .entry-field + .remove-field-button-container {
+        position: absolute;
+        right: 0.1em;
+        top: 0.35em;
+        display: initial;
+      }
+    }
+  }
+}

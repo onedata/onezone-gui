@@ -8,7 +8,7 @@ import I18nStub from '../../../helpers/i18n-stub';
 import { registerService } from '../../../helpers/stub-service';
 
 describe(
-  'Integration | Component | groups hierarchy visualiser/group box line',
+  'Integration | Component | groups-hierarchy-visualiser/group-box-line',
   function () {
     setupRenderingTest();
 

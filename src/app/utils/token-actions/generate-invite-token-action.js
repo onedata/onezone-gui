@@ -1,7 +1,6 @@
 /**
  * Allows to generate invite tokens for groups, spaces, harvesters etc.
  *
- * @module utils/token-actions/generate-invite-token-action
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

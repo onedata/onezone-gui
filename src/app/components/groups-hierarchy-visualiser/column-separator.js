@@ -1,9 +1,8 @@
 /**
  * Draws column separator in groups hierarchy visualise using data available
- * through `separator` property. 
+ * through `separator` property.
  *
- * @module components/groups-hierarchy-visualiser/column-separator
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

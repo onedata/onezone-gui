@@ -6,6 +6,27 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10697 Fixed invalid state of automation store content editor during initalization
+* VFS-10285 Added info popovers to membership
+* VFS-8647 Moved component styles into dedicated directory
+* VFS-7715 Added object references checks in workflows editor
+* VFS-9309 Removed usages of `:contains` jQuery selector
+* VFS-7873 Added automation lambdas dumping and uploading
+* VFS-8701 Removed ember-one-way-controls
+* VFS-10491 Fixed revision migration strategy in task arguments and results
+* VFS-9196 Removed @module jsdoc
+* VFS-10531 Added allowedValues constraint to atm number and atm string
+* VFS-10452 Added integersOnly constraint to atm number
+* VFS-10372 Added harvester popover in spaces harvesters list
+* VFS-10289 Added group popover in members
+* VFS-10148 Removed redundant done() from tests
+* VFS-10333 Unified naming of test suites
+* VFS-9688 Removed arrow placement from one-tooltip
+* VFS-10118 Added support for lambda configuration parameters
+* VFS-9305 Refactored one-tab-bar to not use jQuery
+* VFS-10103 Changed showing clipboard in popovers info
+* VFS-10367 Updated gui common
+* VFS-10365 Improved editor of automation store default value
 * VFS-10499 Improved editor of automation task argument constant value
 * VFS-10366 Improved editor of lambda argument default value
 * VFS-9999 Added detailed space details popovers with space information in various views

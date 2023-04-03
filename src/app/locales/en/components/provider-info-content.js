@@ -1,5 +1,5 @@
 export default {
-  title: 'Provider details',
+  title: 'Provider info',
   name: 'Name',
   domain: 'Domain',
   version: 'Version',

@@ -1,8 +1,7 @@
 /**
  * Provides gui actions related to privileges.
  *
- * @module services/privilege-actions
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

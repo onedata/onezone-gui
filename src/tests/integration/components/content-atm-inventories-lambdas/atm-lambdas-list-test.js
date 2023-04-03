@@ -15,6 +15,8 @@ import { resolve } from 'rsvp';
 import { set } from '@ember/object';
 import CopyRecordIdAction from 'onedata-gui-common/utils/clipboard-actions/copy-record-id-action';
 import UnlinkAtmLambdaAction from 'onezone-gui/utils/workflow-actions/unlink-atm-lambda-action';
+import DuplicateAtmRecordRevisionAction from 'onezone-gui/utils/workflow-actions/duplicate-atm-record-revision-action';
+import DumpAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/dump-atm-lambda-revision-action';
 import { lookupService } from '../../../helpers/stub-service';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
@@ -34,6 +36,14 @@ const revisionActionsSpec = [{
   className: 'create-atm-lambda-revision-action-trigger',
   label: 'Redesign as new revision',
   icon: 'plus',
+}, {
+  className: 'duplicate-atm-lambda-revision-action-trigger',
+  label: 'Duplicate to...',
+  icon: 'browser-copy',
+}, {
+  className: 'dump-atm-lambda-revision-action-trigger',
+  label: 'Download (json)',
+  icon: 'browser-download',
 }];
 
 const lambdaSelectionActionsSpec = [lambdaPresentationActionsSpec[1]];
@@ -54,7 +64,7 @@ function generateLambda(testCase, name, content) {
 }
 
 describe(
-  'Integration | Component | content atm inventories lambdas/atm lambdas list',
+  'Integration | Component | content-atm-inventories-lambdas/atm-lambdas-list',
   function () {
     setupRenderingTest();
 
@@ -63,6 +73,8 @@ describe(
       // mocking.
       CopyRecordIdAction.create();
       UnlinkAtmLambdaAction.create();
+      DuplicateAtmRecordRevisionAction.create();
+      DumpAtmLambdaRevisionAction.create();
     });
 
     beforeEach(function () {
@@ -119,6 +131,8 @@ describe(
       [
         CopyRecordIdAction,
         UnlinkAtmLambdaAction,
+        DuplicateAtmRecordRevisionAction,
+        DumpAtmLambdaRevisionAction,
       ].forEach(action => {
         if (action.prototype.onExecute.restore) {
           action.prototype.onExecute.restore();
@@ -331,6 +345,46 @@ describe(
             'Creating new revision of a lambda with engine "Onedata function" is not allowed.'
           );
         });
+
+      it('allows duplicating lambda revision', async function () {
+        const firstLambdaObj = this.get('collection.1');
+        const executeStub = sinon.stub(
+          DuplicateAtmRecordRevisionAction.prototype,
+          'onExecute'
+        ).callsFake(function () {
+          expect(this.get('context.atmRecord')).to.equal(firstLambdaObj);
+          expect(this.get('context.revisionNumber')).to.equal(1);
+        });
+        await renderComponent();
+        const firstLambda = find('.atm-lambdas-list-entry');
+
+        await click(firstLambda.querySelector('.revision-actions-trigger'));
+        await click(document.querySelector(
+          '.webui-popover.in .duplicate-atm-lambda-revision-action-trigger'
+        ));
+
+        expect(executeStub).to.be.calledOnce;
+      });
+
+      it('allows downloading lambda revision dump', async function () {
+        const firstLambdaObj = this.get('collection.1');
+        const executeStub = sinon.stub(
+          DumpAtmLambdaRevisionAction.prototype,
+          'onExecute'
+        ).callsFake(function () {
+          expect(this.get('context.atmLambda')).to.equal(firstLambdaObj);
+          expect(this.get('context.revisionNumber')).to.equal(1);
+        });
+        await renderComponent();
+        const firstLambda = find('.atm-lambdas-list-entry');
+
+        await click(firstLambda.querySelector('.revision-actions-trigger'));
+        await click(document.querySelector(
+          '.webui-popover.in .dump-atm-lambda-revision-action-trigger'
+        ));
+
+        expect(executeStub).to.be.calledOnce;
+      });
 
       it('does not have "add to workflow" button', async function () {
         await renderComponent();

@@ -105,7 +105,7 @@ import oneproviderAuthenticationError from './components/alerts/oneprovider-auth
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
 import generateInviteTokenModal from './components/modals/generate-invite-token-modal';
 import unlinkAtmLambdaModal from './components/modals/unlink-atm-lambda-modal';
-import applyAtmWorkflowSchemaDumpModal from './components/modals/apply-atm-workflow-schema-dump-modal';
+import applyAtmRecordDumpModal from './components/modals/apply-atm-record-dump-modal';
 import providerInfoContent from './components/provider-info-content';
 import providersList from './components/providers-list';
 import shareNotFound from './components/errors/share-not-found';
@@ -145,19 +145,21 @@ import openCreateAtmInventoryViewAction from './utils/workflow-actions/open-crea
 import createAtmInventoryAction from './utils/workflow-actions/create-atm-inventory-action';
 import modifyAtmInventoryAction from './utils/workflow-actions/modify-atm-inventory-action';
 import removeAtmInventoryAction from './utils/workflow-actions/remove-atm-inventory-action';
+import applyAtmRecordDumpActionBase from './utils/workflow-actions/apply-atm-record-dump-action-base';
+import duplicateAtmRecordRevisionAction from './utils/workflow-actions/duplicate-atm-record-revision-action';
+import uploadAtmRecordAction from './utils/workflow-actions/upload-atm-record-action';
 import createAtmLambdaAction from './utils/workflow-actions/create-atm-lambda-action';
+import dumpAtmLambdaRevisionAction from './utils/workflow-actions/dump-atm-lambda-revision-action';
 import createAtmLambdaRevisionAction from './utils/workflow-actions/create-atm-lambda-revision-action';
 import modifyAtmLambdaRevisionAction from './utils/workflow-actions/modify-atm-lambda-revision-action';
 import unlinkAtmLambdaAction from './utils/workflow-actions/unlink-atm-lambda-action';
 import modifyAtmWorkflowSchemaAction from './utils/workflow-actions/modify-atm-workflow-schema-action';
 import removeAtmWorkflowSchemaAction from './utils/workflow-actions/remove-atm-workflow-schema-action';
 import createAtmWorkflowSchemaAction from './utils/workflow-actions/create-atm-workflow-schema-action';
-import uploadAtmWorkflowSchemaAction from './utils/workflow-actions/upload-atm-workflow-schema-action';
 import dumpAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/dump-atm-workflow-schema-revision-action';
 import modifyAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/modify-atm-workflow-schema-revision-action';
 import createAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/create-atm-workflow-schema-revision-action';
 import removeAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/remove-atm-workflow-schema-revision-action';
-import duplicateAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/duplicate-atm-workflow-schema-revision-action';
 
 const translations = {
   tabs: {
@@ -183,7 +185,7 @@ const translations = {
       cleanObsoleteTokensModal,
       generateInviteTokenModal,
       unlinkAtmLambdaModal,
-      applyAtmWorkflowSchemaDumpModal,
+      applyAtmRecordDumpModal,
       apiSamplesModal,
       spaces: spacesModals,
     },
@@ -327,19 +329,21 @@ const translations = {
       createAtmInventoryAction,
       modifyAtmInventoryAction,
       removeAtmInventoryAction,
+      applyAtmRecordDumpActionBase,
+      duplicateAtmRecordRevisionAction,
+      uploadAtmRecordAction,
       createAtmLambdaAction,
+      dumpAtmLambdaRevisionAction,
       createAtmLambdaRevisionAction,
       modifyAtmLambdaRevisionAction,
       unlinkAtmLambdaAction,
       modifyAtmWorkflowSchemaAction,
       removeAtmWorkflowSchemaAction,
       createAtmWorkflowSchemaAction,
-      uploadAtmWorkflowSchemaAction,
       dumpAtmWorkflowSchemaRevisionAction,
       modifyAtmWorkflowSchemaRevisionAction,
       createAtmWorkflowSchemaRevisionAction,
       removeAtmWorkflowSchemaRevisionAction,
-      duplicateAtmWorkflowSchemaRevisionAction,
     },
   },
 };

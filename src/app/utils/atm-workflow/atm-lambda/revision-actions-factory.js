@@ -1,7 +1,6 @@
 /**
  * Generates actions for specific atm lambda revision.
  *
- * @module utils/atm-workflow/atm-lambda/revision-actions-factory
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -33,11 +32,19 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
   onRevisionCreate: undefined,
 
   /**
+   * @virtual optional
+   * @type {(atmLambda: Models.AtmLambda, createdRevisionNumber: RevisionNumber) => void)}
+   */
+  onRevisionCreated: undefined,
+
+  /**
    * @override
    */
   createActionsForRevisionNumber(revisionNumber) {
     return [
       this.createRedesignAsNewRevisionAction(revisionNumber),
+      this.createDuplicateRevisionAction(revisionNumber),
+      this.createDumpRevisionAction(revisionNumber),
     ];
   },
 
@@ -73,6 +80,48 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
       atmLambda,
       originRevisionNumber: revisionNumber,
       onRevisionCreate,
+    });
+  },
+
+  /**
+   * @private
+   * @param {RevisionNumber} revisionNumber
+   * @returns {Utils.Action}
+   */
+  createDuplicateRevisionAction(revisionNumber) {
+    const action = this.workflowActions.createDuplicateAtmRecordRevisionAction({
+      atmModelName: 'atmLambda',
+      atmRecord: this.atmLambda,
+      revisionNumber,
+      atmInventory: this.atmInventory,
+    });
+    if (this.onRevisionCreated) {
+      action.addExecuteHook((result) => {
+        if (result?.status === 'done') {
+          const {
+            // This atm record is different than atm record from upper scope.
+            // It is a "target" atm record, where the duplicate has been saved.
+            atmRecord,
+            revisionNumber,
+          } = (result.result || {});
+          if (atmRecord && revisionNumber) {
+            this.onRevisionCreated(atmRecord, revisionNumber);
+          }
+        }
+      });
+    }
+    return action;
+  },
+
+  /**
+   * @private
+   * @param {RevisionNumber} revisionNumber
+   * @returns {Utils.Action}
+   */
+  createDumpRevisionAction(revisionNumber) {
+    return this.workflowActions.createDumpAtmLambdaRevisionAction({
+      atmLambda: this.atmLambda,
+      revisionNumber: revisionNumber,
     });
   },
 });

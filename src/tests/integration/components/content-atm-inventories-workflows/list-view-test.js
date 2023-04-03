@@ -15,7 +15,7 @@ import { resolve } from 'rsvp';
 import sinon from 'sinon';
 import CreateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-revision-action';
 
-describe('Integration | Component | content atm inventories workflows/list view',
+describe('Integration | Component | content-atm-inventories-workflows/list-view',
   function () {
     setupRenderingTest();
 

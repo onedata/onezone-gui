@@ -26,7 +26,7 @@ const Router = Service.extend({
   },
 });
 
-describe('Integration | Component | content spaces harvesters', function () {
+describe('Integration | Component | content-spaces-harvesters', function () {
   setupRenderingTest();
 
   beforeEach(function () {
@@ -34,9 +34,15 @@ describe('Integration | Component | content spaces harvesters', function () {
       list: promiseArray(resolve([{
         name: 'harvester1',
         id: 'harvester.harvester1id.instance:auto',
+        constructor: {
+          modelName: 'harvester',
+        },
       }, {
         name: 'harvester2',
         id: 'harvester.harvester2id.instance:auto',
+        constructor: {
+          modelName: 'harvester',
+        },
       }])),
     })));
     this.set('space', EmberObject.create({

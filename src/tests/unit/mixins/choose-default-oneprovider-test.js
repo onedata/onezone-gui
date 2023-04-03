@@ -4,7 +4,7 @@ import chooseDefaultOneprovider from 'onezone-gui/mixins/choose-default-oneprovi
 import { resolve, reject } from 'rsvp';
 import EmberObject from '@ember/object';
 
-describe('Unit | Mixin | choose default oneprovider', function () {
+describe('Unit | Mixin | choose-default-oneprovider', function () {
   beforeEach(function beforeEach() {
     this.versionReject = reject(new Error('cannot fetch version'));
     this.versionReject.catch(() => {});

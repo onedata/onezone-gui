@@ -1,8 +1,7 @@
 /**
  * Content for message when despite of valid session, some Oneprovider cannot
  * authenticate and keeps redirecting to Onezone.
- * 
- * @module components/alerts/oneprovider-authentication-error
+ *
  * @author Jakub Liput
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

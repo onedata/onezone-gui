@@ -6,7 +6,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 
 describe(
-  'Integration | Component | token template selector/onezone rest template',
+  'Integration | Component | token-template-selector/onezone-rest-template',
   function () {
     setupRenderingTest();
 

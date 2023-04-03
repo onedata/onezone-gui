@@ -1,7 +1,6 @@
 /**
  * Shows modal asking about space deletion from harvester.
  *
- * @module components/content-harvesters-spaces/remove-space-modal
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

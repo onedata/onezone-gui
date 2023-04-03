@@ -1,7 +1,6 @@
 /**
  * Allows to remove disabled tokens from passed list of tokens.
  *
- * @module utils/token-actions/clean-obsolete-tokens-action
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

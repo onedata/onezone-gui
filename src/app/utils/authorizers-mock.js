@@ -1,12 +1,11 @@
 /**
  * Note: this is now only for mocking purposes as authorizers data is sent from
  * backend!
- * 
- * Provides list of predefined authorization providers with neccessary 
+ *
+ * Provides list of predefined authorization providers with neccessary
  * data to display them (name, logo - icon or image).
- * 
- * @module utils/authorizers-mock
- * @author Michal Borzecki, Jakub Liput
+ *
+ * @author Michał Borzęcki, Jakub Liput
  * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
@@ -18,7 +17,7 @@ import { onezoneAbbrev } from 'onedata-gui-common/utils/onedata-urls';
  * @property {string} type
  * @property {string} name authorizer name to display
  * @property {string} iconType 'oneicon' or any image file extension
- * @property {string} iconName oneicon character name of file name 
+ * @property {string} iconName oneicon character name of file name
  * (without extension)
  */
 

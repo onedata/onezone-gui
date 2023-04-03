@@ -10,7 +10,7 @@ import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 
 describe(
-  'Integration | Component | token template selector/readonly data for user template',
+  'Integration | Component | token-template-selector/readonly-data-for-user-template',
   function () {
     setupRenderingTest();
 

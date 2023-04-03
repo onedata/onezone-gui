@@ -7,7 +7,7 @@ import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { resolve, reject } from 'rsvp';
 import moment from 'moment';
 
-describe('Unit | Utility | token editor utils/token to editor default data', function () {
+describe('Unit | Utility | token-editor-utils/token-to-editor-default-data', function () {
   it('converts name', function () {
     return tokenToEditorDefaultData({ name: 't1' })
       .then(result => expect(get(result, 'name')).to.equal('t1'));

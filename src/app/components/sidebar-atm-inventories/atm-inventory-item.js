@@ -1,7 +1,6 @@
 /**
  * A first-level item component for automation inventories sidebar.
  *
- * @module components/sidebar-inventories/atm-inventory-item
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

@@ -2,7 +2,6 @@
  * Controller for global provider redirection route.
  * Implemented just for reading query params.
  *
- * @module controllers/onedata/provider-redirect
  * @author Jakub Liput
  * @copyright (C) 2018-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

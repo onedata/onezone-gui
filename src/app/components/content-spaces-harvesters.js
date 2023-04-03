@@ -1,7 +1,6 @@
 /**
  * Manages harvesters of specified space
  *
- * @module components/content-spaces-harvesters
  * @author Michał Borzęcki, Agnieszka Warchoł
  * @copyright (C) 2020-2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -12,12 +11,11 @@ import { ResourceListItem } from 'onedata-gui-common/components/resources-list';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import { inject as service } from '@ember/service';
 import { computed, get } from '@ember/object';
-import { reads, collect } from '@ember/object/computed';
+import { collect } from '@ember/object/computed';
 import { resolve } from 'rsvp';
 import { promise } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
-import recordIcon from 'onedata-gui-common/utils/record-icon';
 
 export default Component.extend(I18n, GlobalActions, {
   classNames: ['content-spaces-harvesters'],
@@ -57,7 +55,7 @@ export default Component.extend(I18n, GlobalActions, {
     return harvesters.map(harvester => HarvesterListItem.create({
       ownerSource: this,
       parentSpace: space,
-      harvester,
+      record: harvester,
     }));
   }),
 
@@ -105,41 +103,21 @@ const HarvesterListItem = ResourceListItem.extend(OwnerInjector, {
   /**
    * @virtual
    */
-  harvester: undefined,
-
-  /**
-   * @virtual
-   */
   parentSpace: undefined,
 
   /**
    * @override
    */
-  label: reads('harvester.name'),
-
-  /**
-   * @override
-   */
-  conflictingLabelSource: reads('harvester'),
-
-  /**
-   * @override
-   */
-  icon: recordIcon('harvester'),
-
-  /**
-   * @override
-   */
-  link: computed('harvester', function link() {
+  link: computed('record', function link() {
     const {
       router,
-      harvester,
+      record,
       guiUtils,
-    } = this.getProperties('router', 'harvester', 'guiUtils');
+    } = this.getProperties('router', 'record', 'guiUtils');
     return router.urlFor(
       'onedata.sidebar.content.aspect',
       'harvesters',
-      guiUtils.getRoutableIdFor(harvester),
+      guiUtils.getRoutableIdFor(record),
       'plugin'
     );
   }),
@@ -147,15 +125,15 @@ const HarvesterListItem = ResourceListItem.extend(OwnerInjector, {
   /**
    * @override
    */
-  actions: computed('parentSpace', 'harvester', function actions() {
+  actions: computed('parentSpace', 'record', function actions() {
     const {
       spaceActions,
       parentSpace,
-      harvester,
-    } = this.getProperties('spaceActions', 'parentSpace', 'harvester');
+      record,
+    } = this.getProperties('spaceActions', 'parentSpace', 'record');
     return [spaceActions.createRemoveHarvesterFromSpaceAction({
       space: parentSpace,
-      harvester,
+      harvester: record,
     })];
   }),
 });

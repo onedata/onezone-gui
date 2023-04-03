@@ -1,7 +1,6 @@
 /**
  * A first-level item component for harvesters sidebar
  *
- * @module components/sidebar-groups/harvester-item
  * @author Michał Borzęcki, Agnieszka Warchoł
  * @copyright (C) 2019-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

@@ -1,6 +1,6 @@
 /**
  * Proxy component for Oneprovider's `content-space-shares`.
- * @module components/embedded-content-space-shares
+ *
  * @author Jakub Liput
  * @copyright (C) 2019-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

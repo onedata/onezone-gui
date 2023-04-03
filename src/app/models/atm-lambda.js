@@ -1,7 +1,6 @@
 /**
  * Lambda definition (for automation inventory).
  *
- * @module models/atm-lambda
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -17,62 +16,17 @@ import sortRevisionNumbers from 'onedata-gui-common/utils/revisions/sort-revisio
 import { getBy } from 'ember-awesome-macros';
 
 /**
- * @typedef {Object} AtmLambdaRevision
- * @property {String} name
- * @property {'draft'|'stable'|'deprecated'} state
- * @property {String} summary
- * @property {String} description
- * @property {AtmLambdaOperationSpec} operationSpec
- * @property {Number} preferredBatchSize
- * @property {Array<AtmLambdaArgumentSpec>} argumentSpecs
- * @property {Array<AtmLambdaResultSpec>} resultSpecs
- * @property {AtmResourceSpec} resourceSpec
- */
-
-/**
- * @typedef {Object} AtmLambdaOperationSpec
- * @property {String} engine one of:
- *   `'onedataFunction'`, `'openfaas'`, `'atmWorkflow'`, `'userForm'`
- * @property {String} [functionId] available when `engine` == `'onedataFunction'`
- * @property {String} [dockerImage] available when `engine` == `'openfaas'`
- * @property {String} [workflowId] available when `engine` == `'atmWorkflow'`
- * @property {String} [userFormId] available when `engine` == `'userForm'`
- * @property {AtmLambdaDockerExecutionOptions} dockerExecutionOptions
- *   available when `engine` == `'openfaas'`
- */
-
-/**
- * @typedef {Object} AtmLambdaDockerExecutionOptions
- * @property {Boolean} readonly
- * @property {Boolean} mountOneclient
- * @property {String} [oneclientMountPoint] available when `mountOneclient` is `true`
- * @property {String} [oneclientOptions] available when `mountOneclient` is `true`
- */
-
-/**
- * @typedef {Object} AtmLambdaArgumentSpec
- * @property {String} name
- * @property {AtmDataSpec} dataSpec
- * @property {Boolean} isOptional
- * @property {String} defaultValue
- */
-
-/**
- * @typedef {Object} AtmLambdaResultSpec
- * @property {String} name
- * @property {AtmDataSpec} dataSpec
- * @property {'returnValue'|'filePipe'} relayMethod
- */
-
-/**
  * @type {String}
  */
 export const entityType = 'atm_lambda';
 
+/**
+ * @implements {AtmLambda}
+ */
 export default Model.extend(GraphSingleModelMixin, {
   /**
    * Keys are revision numbers.
-   * @type {ComputedProperty<Object<String,AtmLambdaRevision>>}
+   * @type {ComputedProperty<AtmLambda['revisionRegistry']>}
    */
   revisionRegistry: attr('object'),
 

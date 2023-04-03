@@ -6,7 +6,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import { get } from '@ember/object';
 import { selectChoose } from 'ember-power-select/test-support/helpers';
 
-describe('Integration | Component | sidebar tokens', function () {
+describe('Integration | Component | sidebar-tokens', function () {
   setupRenderingTest();
 
   beforeEach(function () {

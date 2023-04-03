@@ -2,7 +2,8 @@
   {{#if (eq pathElement.type "block")}}
     {{membership-visualiser/membership-block
       record=pathElement.record
-      view=(action view pathElement.record)}}
+      view=(action view pathElement.record)
+      isCondensed=isCondensed}}
   {{else if (eq pathElement.type "relation")}}
     {{membership-visualiser/membership-relation
       relation=pathElement.relation

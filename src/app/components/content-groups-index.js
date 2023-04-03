@@ -1,8 +1,7 @@
 /**
  * Group overview page
  *
- * @module components/content-groups-index
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

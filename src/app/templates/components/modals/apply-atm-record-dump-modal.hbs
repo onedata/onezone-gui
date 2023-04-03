@@ -1,0 +1,73 @@
+{{#global-modal
+  classNames="apply-atm-record-dump-modal"
+  allowClose=(not isSubmitting)
+  modalId=modalId
+  as |modal|
+}}
+  {{#modal.header}}
+    <h1>{{tt this (concat "header." dumpSourceType "." atmModelName)}}</h1>
+  {{/modal.header}}
+
+  {{#modal.body}}
+    {{#if (eq dumpSourceType "upload")}}
+      {{modals/apply-atm-record-dump-modal/upload-details
+        class="modal-section"
+        dumpSource=dumpSource
+        onReupload=onReupload
+        isDisabled=isSubmitting
+      }}
+    {{/if}}
+    {{modals/apply-atm-record-dump-modal/dump-details
+      class="modal-section"
+      atmModelName=atmModelName
+      dump=dump
+    }}
+    {{#if dump}}
+      {{#promise-proxy-container proxy=targetAtmInventoriesProxy}}
+        {{#if (eq dumpSourceType "duplication")}}
+          {{modals/apply-atm-record-dump-modal/inventory-selector
+            class="modal-section"
+            atmInventories=targetAtmInventoriesProxy
+            selectedAtmInventory=selectedTargetAtmInventory
+            onChange=(action "targetAtmInventoryChanged")
+            isDisabled=isSubmitting
+          }}
+        {{/if}}
+        {{#promise-proxy-container proxy=atmRecordsProxy}}
+          {{modals/apply-atm-record-dump-modal/operation-form
+            class="modal-section"
+            atmModelName=atmModelName
+            dump=dump
+            dumpSourceType=dumpSourceType
+            targetAtmRecords=targetAtmRecords
+            selectedOperation=selectedOperation
+            selectedTargetAtmRecord=selectedTargetAtmRecord
+            newAtmRecordName=newAtmRecordName
+            onValueChange=(action "operationValueChanged")
+            isDisabled=isSubmitting
+          }}
+        {{/promise-proxy-container}}
+      {{/promise-proxy-container}}
+    {{/if}}
+  {{/modal.body}}
+
+  {{#modal.footer class="btn-toolbar"}}
+    {{#bs-button
+      type="default"
+      class="cancel-btn"
+      onClick=modal.close
+      disabled=isSubmitting
+    }}
+      {{tt this "buttons.cancel"}}
+    {{/bs-button}}
+    {{#one-button
+      type="primary"
+      buttonType="submit"
+      class="submit-btn"
+      onClick=(action "submit" modal.submit)
+      disabled=(not dataToSubmit)
+    }}
+      {{tt this "buttons.submit"}}
+    {{/one-button}}
+  {{/modal.footer}}
+{{/global-modal}}

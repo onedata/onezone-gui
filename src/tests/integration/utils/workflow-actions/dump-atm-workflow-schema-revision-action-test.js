@@ -12,7 +12,7 @@ import { suppressRejections } from '../../../helpers/suppress-rejections';
 const atmWorkflowSchemaId = 'wfkId';
 
 describe(
-  'Integration | Utility | workflow actions/dump atm workflow schema revision action',
+  'Integration | Utility | workflow-actions/dump-atm-workflow-schema-revision-action',
   function () {
     setupRenderingTest();
 
@@ -27,7 +27,7 @@ describe(
             },
             revisionNumber: 3,
           },
-          _downloadData: downloadSpy,
+          downloadData: downloadSpy,
         }),
         downloadSpy,
       });
@@ -44,23 +44,20 @@ describe(
       expect(String(title)).to.equal('Download (json)');
     });
 
-    it(
-      'executes removing workflow on submit (success scenario)',
-      async function () {
-        const dumpStub = sinon
-          .stub(lookupService(this, 'workflow-manager'), 'getAtmWorkflowSchemaDump')
-          .resolves(123);
+    it('executes dumping workflow (success scenario)', async function () {
+      const dumpStub = sinon
+        .stub(lookupService(this, 'workflow-manager'), 'getAtmWorkflowSchemaDump')
+        .resolves(123);
 
-        const actionResultPromise = this.get('action').execute();
-        const actionResult = await actionResultPromise;
+      const actionResultPromise = this.get('action').execute();
+      const actionResult = await actionResultPromise;
 
-        expect(dumpStub).to.be.calledOnce
-          .and.to.be.calledWith(atmWorkflowSchemaId, 3);
-        expect(this.get('downloadSpy')).to.be.calledOnce
-          .and.to.be.calledWith(sinon.match({ dataString: '123' }));
-        expect(get(actionResult, 'status')).to.equal('done');
-      }
-    );
+      expect(dumpStub).to.be.calledOnce
+        .and.to.be.calledWith(atmWorkflowSchemaId, 3);
+      expect(this.get('downloadSpy')).to.be.calledOnce
+        .and.to.be.calledWith(sinon.match({ dataString: '123' }));
+      expect(get(actionResult, 'status')).to.equal('done');
+    });
 
     it('executes dumping workflow revision (failure scenario)', async function () {
       suppressRejections();

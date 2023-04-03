@@ -8,6 +8,7 @@
   {{#if atmWorkflowSchemasProxy.content.length}}
     <div class="row content-row">
       {{content-atm-inventories-workflows/atm-workflow-schemas-list
+        atmInventory=atmInventory
         collection=atmWorkflowSchemasProxy.content
         onRevisionClick=onOpenAtmWorkflowSchemaRevision
         onRevisionCreated=onCreatedAtmWorkflowSchemaRevision

@@ -3,7 +3,6 @@
  * - atmInventory - inventory, where the unlink operation should take place,
  * - atmLambda - lambda to unlink.
  *
- * @module components/modals/unlink-atm-lambda-modal
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

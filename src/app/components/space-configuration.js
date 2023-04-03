@@ -119,7 +119,7 @@ export default Component.extend(validations, I18n, {
   blankInlineEditors: undefined,
 
   /**
-   * @type {OneInlineCustomEditorAPI}
+   * @type {OneInlineCustomEditorApi}
    */
   emailInlineEditorApi: undefined,
 
@@ -299,11 +299,11 @@ export default Component.extend(validations, I18n, {
     return CustomValueDropdownField
       .extend({
         options: reads('spaceConfigurationComponent.predefinedEmailsOptions'),
+        defaultValue: reads('spaceConfigurationComponent.contactEmail'),
       })
       .create({
         spaceConfigurationComponent: this,
         name: this.emailFieldName,
-        defaultValue: this.contactEmail,
         customValidators: this.emailFieldValidators,
       });
   }),
@@ -319,7 +319,7 @@ export default Component.extend(validations, I18n, {
   },
 
   /**
-   * @param {Object} api
+   * @param {OneInlineCustomEditorApi} api
    */
   registerEmailInlineEditor(api) {
     this.set('emailInlineEditorApi', api);
@@ -489,6 +489,11 @@ export default Component.extend(validations, I18n, {
     },
     inlineEditorChange(fieldId, value) {
       this.inlineEditorChange(fieldId, value);
+    },
+    handleContactEmailOnEdit(state) {
+      if (state === false) {
+        this.contactEmailRootField.reset();
+      }
     },
   },
 });

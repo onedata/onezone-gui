@@ -2,7 +2,6 @@
  * For given space let user select the Oneprovider and give a place where
  * some component (typically remote component from Oneprovider) will be rendered.
  *
- * @module components/oneprovider-view-container
  * @author Jakub Liput
  * @copyright (C) 2019-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

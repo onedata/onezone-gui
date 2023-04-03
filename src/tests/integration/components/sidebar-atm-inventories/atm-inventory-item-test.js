@@ -16,7 +16,7 @@ import sinon from 'sinon';
 import { resolve } from 'rsvp';
 
 describe(
-  'Integration | Component | sidebar atm inventories/atm inventory item',
+  'Integration | Component | sidebar-atm-inventories/atm-inventory-item',
   function () {
     setupRenderingTest();
 
