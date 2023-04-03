@@ -1,8 +1,7 @@
 /**
  * Provides data for routes and components associated with providers tab
  *
- * @module services/provider-manager
- * @author Jakub Liput, Michal Borzecki
+ * @author Jakub Liput, Michał Borzęcki
  * @copyright (C) 2017-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

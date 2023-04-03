@@ -16,7 +16,7 @@ import {
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 
-describe('Integration | Utility | workflow actions/unlink atm lambda action',
+describe('Integration | Utility | workflow-actions/unlink-atm-lambda-action',
   function () {
     setupRenderingTest();
 

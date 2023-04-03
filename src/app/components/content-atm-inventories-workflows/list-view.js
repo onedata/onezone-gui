@@ -2,7 +2,6 @@
  * Lists workflow schemas. It is a whole view component - may be used for
  * a full page carousel.
  *
- * @module components/content-atm-inventories-workflows/list-view
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -122,18 +121,9 @@ export default Component.extend(I18n, {
     'atmInventory',
     'onOpenAtmWorkflowSchemaRevision',
     function uploadAtmWorkflowSchemaAction() {
-      const {
-        workflowActions,
-        atmInventory,
-        onOpenAtmWorkflowSchemaRevision,
-      } = this.getProperties(
-        'workflowActions',
-        'atmInventory',
-        'onOpenAtmWorkflowSchemaRevision'
-      );
-
-      const action = workflowActions.createUploadAtmWorkflowSchemaAction({
-        atmInventory,
+      const action = this.workflowActions.createUploadAtmRecordAction({
+        atmModelName: 'atmWorkflowSchema',
+        atmInventory: this.atmInventory,
       });
       // After successful workflow schema upload, open it
       action.addExecuteHook(actionResult => {
@@ -143,11 +133,11 @@ export default Component.extend(I18n, {
         } = getProperties(actionResult, 'status', 'result');
         if (status === 'done' && result) {
           const {
-            atmWorkflowSchema,
+            atmRecord,
             revisionNumber,
           } = result;
-          if (atmWorkflowSchema && revisionNumber) {
-            onOpenAtmWorkflowSchemaRevision(atmWorkflowSchema, revisionNumber);
+          if (atmRecord && revisionNumber) {
+            this.onOpenAtmWorkflowSchemaRevision?.(atmRecord, revisionNumber);
           }
         }
       });

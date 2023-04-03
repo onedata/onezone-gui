@@ -2,7 +2,6 @@
  * Allows to consume invite token and then redirects to target record.
  * Needs joiningRecord, targetModelName and token passed via context.
  *
- * @module utils/token-actions/consume-invite-token-action
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

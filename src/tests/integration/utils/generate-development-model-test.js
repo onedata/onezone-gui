@@ -6,7 +6,7 @@ import { lookupService } from '../../helpers/stub-service';
 import { setupTest } from 'ember-mocha';
 import { clearStoreAfterEach } from '../../helpers/clear-store';
 
-describe('Unit | Utility | generate development model', function () {
+describe('Integration | Utility | generate-development-model', function () {
   setupTest();
   clearStoreAfterEach();
 

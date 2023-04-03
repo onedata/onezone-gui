@@ -1,5 +1,4 @@
 /**
- * @module models/atm-workflow-schema
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -84,73 +83,6 @@ export const entityType = 'atm_workflow_schema';
  * @property {String} id
  * @property {String} name
  * @property {Array<AtmTaskSchema>} tasks
- */
-
-/**
- * @typedef {Object} AtmTaskSchema
- * @property {String} id
- * @property {String} name
- * @property {String} lambdaId
- * @property {RevisionNumber} lambdaRevisionNumber
- * @property {AtmTaskArgumentMapping} argumentMappings
- * @property {AtmTaskResultMapping} resultMappings
- * @property {AtmTimeSeriesStoreConfig|null} timeSeriesStoreConfig
- * @property {AtmResourceSpec|null} resourceSpecOverride
- */
-
-/**
- * @typedef {Object} AtmTaskArgumentMapping
- * @property {String} argumentName
- * @property {AtmTaskArgumentMappingValueBuilder} valueBuilder
- */
-
-/**
- * @typedef {Object} AtmTaskArgumentMappingValueBuilder
- * @property {'iteratedItem'|'const'|'singleValueStoreContent'} valueBuilderType
- * @property {any} valueBuilderRecipe has different meaning depending on `valueBuilderType`:
- *  - JSON value for `'const'`,
- *  - store schema id for `'singleValueStoreContent'`
- */
-
-/**
- * @typedef {Object} AtmTaskResultMapping
- * @property {String} resultName
- * @property {String} storeSchemaId
- * @property {AtmStoreContentUpdateOptions} storeContentUpdateOptions
- */
-
-/**
- * @typedef {AtmAuditLogStoreContentUpdateOptions|AtmListStoreContentUpdateOptions|AtmRangeStoreContentUpdateOptions|AtmSingleValueStoreContentUpdateOptions|AtmTreeForestStoreContentUpdateOptions} AtmStoreContentUpdateOptions
- */
-
-/**
- * @typedef {Object} AtmListLikeStoreContentUpdateOptions
- * @property {'append'|'extend'} function
- */
-
-/**
- * @typedef {AtmListLikeStoreContentUpdateOptions} AtmAuditLogStoreContentUpdateOptions
- * @property {'auditLogStoreContentUpdateOptions'} type
- */
-
-/**
- * @typedef {AtmListLikeStoreContentUpdateOptions} AtmListStoreContentUpdateOptions
- * @property {'listStoreContentUpdateOptions'} type
- */
-
-/**
- * @typedef {Object} AtmRangeStoreContentUpdateOptions
- * @property {'singleValueStoreContentUpdateOptions'} type
- */
-
-/**
- * @typedef {Object} AtmSingleValueStoreContentUpdateOptions
- * @property {'singleValueStoreContentUpdateOptions'} type
- */
-
-/**
- * @typedef {AtmListLikeStoreContentUpdateOptions} AtmTreeForestStoreContentUpdateOptions
- * @property {'treeForestStoreContentUpdateOptions'} type
  */
 
 export default Model.extend(GraphSingleModelMixin, {

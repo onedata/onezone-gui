@@ -15,7 +15,7 @@ import sinon from 'sinon';
 import TestComponent from 'onedata-gui-common/components/test-component';
 import { get } from '@ember/object';
 
-describe('Integration | Component | modals/generate invite token modal', function () {
+describe('Integration | Component | modals/generate-invite-token-modal', function () {
   setupRenderingTest();
 
   beforeEach(function () {

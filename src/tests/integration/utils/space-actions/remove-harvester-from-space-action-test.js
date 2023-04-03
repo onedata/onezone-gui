@@ -17,7 +17,7 @@ import {
 import { suppressRejections } from '../../../helpers/suppress-rejections';
 
 describe(
-  'Integration | Utility | space actions/remove harvester from space action',
+  'Integration | Utility | space-actions/remove-harvester-from-space-action',
   function () {
     setupRenderingTest();
 

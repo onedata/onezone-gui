@@ -1,7 +1,6 @@
 /**
  * Redirect to some provider (URL got from backend).
- * 
- * @module routes/onezone/provider-redirect
+ *
  * @author Jakub Liput
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

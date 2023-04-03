@@ -2,7 +2,6 @@
  * Read-only data token template for specific user. Sets token readonly caveat
  * and narrows allowed consumers to a single user selected from a list.
  *
- * @module components/token-template-selector/readonly-data-for-user-template
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

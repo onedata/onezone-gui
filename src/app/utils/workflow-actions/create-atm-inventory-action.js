@@ -2,7 +2,6 @@
  * Creates new automation inventory. Needs `rawAtmInventory` - it will be used
  * to create new automation inventory record.
  *
- * @module utils/workflow-actions/create-atm-inventory-action
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

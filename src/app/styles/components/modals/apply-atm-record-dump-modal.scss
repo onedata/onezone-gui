@@ -1,0 +1,96 @@
+.apply-atm-record-dump-modal {
+  .modal-section {
+    + .modal-section {
+      margin-top: 1.2em;
+      padding-top: 1.2em;
+      border-top: 1px solid $main-border-color;
+    }
+
+    h2 {
+      @include font-semibold();
+      margin: 0;
+      font-size: 100%;
+      margin-bottom: 0.8em;
+    }
+  }
+
+  .upload-details {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) min-content;
+    grid-template-areas:
+      'header header'
+      'detail upload';
+
+    h2 {
+      grid-area: header;
+    }
+
+    .detail {
+      grid-area: detail;
+    }
+
+    .upload-btn {
+      grid-area: upload;
+      margin-left: 1em;
+    }
+  }
+
+  .detail {
+    display: flex;
+    align-items: center;
+
+    &.wrap-value {
+      display: initial;
+      word-wrap: break-word;
+
+      .detail-value {
+        margin: 0;
+      }
+    }
+  }
+
+  .detail-label {
+    @include font-semibold();
+  }
+
+  .detail-value {
+    margin-left: 0.25em;
+    flex-grow: 1;
+
+    &.unknown {
+      font-style: italic;
+      color: $main-text-color-disabled;
+    }
+  }
+
+  .one-way-radio-group {
+    width: 100%;
+  }
+
+  .radio-inline {
+    display: flex;
+    align-items: center;
+  }
+
+  .radio-option-subcontent {
+    padding: 1em 0 1em 1.4em;
+
+    .form-group {
+      margin: 0;
+    }
+
+    .alert {
+      margin: 0;
+    }
+
+    .revision-conflict-warning {
+      margin-top: 1em;
+    }
+
+    .control-label {
+      text-align: left;
+      width: initial;
+      min-width: 5em;
+    }
+  }
+}

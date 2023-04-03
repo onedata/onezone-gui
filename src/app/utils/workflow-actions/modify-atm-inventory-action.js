@@ -2,7 +2,6 @@
  * Modifies existing automation inventory. Needs `atmInventory` (model) and
  * `atmInventoryDiff` (changed fields) passed in context.
  *
- * @module utils/workflow-actions/modify-atm-inventory-action
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

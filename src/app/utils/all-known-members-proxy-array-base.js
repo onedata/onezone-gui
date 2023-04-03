@@ -1,7 +1,6 @@
 /**
  * Base class for array promise proxies, which contain all known records of user/group type.
  *
- * @module utils/all-known-members-proxy-array-base
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

@@ -1,7 +1,6 @@
 /**
  * Asks for token, display info about it and allows to consume an invite token.
  *
- * @module components/token-consumer
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

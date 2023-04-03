@@ -25,7 +25,7 @@ const GuiMessageManagerStub = Service.extend({
   termsOfUseUrl: undefined,
 });
 
-describe('Integration | Component | user account button', function () {
+describe('Integration | Component | user-account-button', function () {
   setupRenderingTest();
 
   beforeEach(function () {

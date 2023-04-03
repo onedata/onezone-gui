@@ -1,7 +1,6 @@
 /**
  * Shows single workflow schema details.
  *
- * @module components/content-atm-inventories-workflows/atm-workflow-schemas-list-entry
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -27,6 +26,12 @@ export default Component.extend(I18n, {
    * @override
    */
   i18nPrefix: 'components.contentAtmInventoriesWorkflows.atmWorkflowSchemasListEntry',
+
+  /**
+   * @virtual
+   * @type {Models.AtmInventory}
+   */
+  atmInventory: undefined,
 
   /**
    * @virtual
@@ -141,17 +146,15 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.AtmWorkflow.AtmWorkflowSchema.RevisionActionsFactory>}
    */
   revisionActionsFactory: computed(
+    'atmInventory',
     'atmWorkflowSchema',
     'onRevisionCreated',
     function revisionActionsFactory() {
-      const {
-        atmWorkflowSchema,
-        onRevisionCreated,
-      } = this.getProperties('atmWorkflowSchema', 'onRevisionCreated');
       return RevisionActionsFactory.create({
         ownerSource: this,
-        atmWorkflowSchema,
-        onRevisionCreated,
+        atmInventory: this.atmInventory,
+        atmWorkflowSchema: this.atmWorkflowSchema,
+        onRevisionCreated: this.onRevisionCreated,
       });
     }
   ),

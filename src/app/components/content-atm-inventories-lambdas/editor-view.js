@@ -2,7 +2,6 @@
  * Creates new lambda. It is a whole view component - may be used for
  * a full page carousel.
  *
- * @module components/content-atm-inventories-lambdas/editor-view
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -72,6 +71,12 @@ export default Component.extend(I18n, {
   onBackSlide: notImplementedIgnore,
 
   /**
+   * @virtual
+   * @type {(actions: Array<Action>) => void)}
+   */
+  onRegisterViewActions: notImplementedIgnore,
+
+  /**
    * @type {(atmLambda: Models.AtmLambda, revisionNumber: RevisionNumber) => void}
    */
   onAtmLambdaRevisionSaved: notImplementedIgnore,
@@ -101,7 +106,7 @@ export default Component.extend(I18n, {
    */
   activeRevision: getBy(
     'atmLambda',
-    tag `revisionRegistry.${'activeRevisionNumber'}`
+    tag`revisionRegistry.${'activeRevisionNumber'}`
   ),
 
   /**
@@ -109,7 +114,7 @@ export default Component.extend(I18n, {
    */
   atmLambdaRevision: getBy(
     'atmLambda',
-    tag `revisionRegistry.${'atmLambdaRevisionNumber'}`
+    tag`revisionRegistry.${'atmLambdaRevisionNumber'}`
   ),
 
   /**
@@ -129,6 +134,31 @@ export default Component.extend(I18n, {
     const modeForHeader = activeViewType === 'creator' && atmLambda ?
       'revisionCreator' : activeViewType;
     return this.t(`header.${modeForHeader}`);
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.Action>}
+   */
+  dumpAction: computed(
+    'atmLambda',
+    'atmLambdaRevisionNumber',
+    function dumpAction() {
+      return this.workflowActions.createDumpAtmLambdaRevisionAction({
+        atmLambda: this.atmLambda,
+        revisionNumber: this.atmLambdaRevisionNumber,
+      });
+    }
+  ),
+
+  /**
+   * @override
+   */
+  globalActions: computed('dumpAction', 'activeViewType', function globalActions() {
+    return this.activeViewType !== 'creator' ? [this.dumpAction] : [];
+  }),
+
+  globalActionsObserver: observer('globalActions.[]', function globalActionsObserver() {
+    this.registerViewActions();
   }),
 
   activePropsUpdater: observer(
@@ -172,7 +202,20 @@ export default Component.extend(I18n, {
 
   init() {
     this._super(...arguments);
+    this.globalActionsObserver();
     scheduleOnce('afterRender', this, 'updateActiveProps');
+  },
+
+  willDestroyElement() {
+    try {
+      this.registerViewActions(true);
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
+  registerViewActions(clear = false) {
+    this.onRegisterViewActions(clear ? [] : this.globalActions);
   },
 
   updateActiveProps() {

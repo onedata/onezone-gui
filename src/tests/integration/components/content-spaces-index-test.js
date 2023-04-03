@@ -17,7 +17,7 @@ const TestCurrentUser = CurrentUser.extend({
   })),
 });
 
-describe('Integration | Component | content spaces index', function () {
+describe('Integration | Component | content-spaces-index', function () {
   setupRenderingTest();
 
   beforeEach(function () {

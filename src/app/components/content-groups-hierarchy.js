@@ -1,8 +1,7 @@
 /**
  * A content page for group hierarchy
  *
- * @module components/content-groups-hierarchy
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
@@ -55,13 +54,13 @@ export default Component.extend(I18n, GlobalActions, {
   }),
 
   /**
-   * @override 
+   * @override
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
   globalActions: collect('resetViewAction'),
 
   /**
-   * @override 
+   * @override
    * @type {Ember.ComputedProperty<string>}
    */
   globalActionsTitle: computed(function globalActionsTitle() {

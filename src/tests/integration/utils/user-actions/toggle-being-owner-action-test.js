@@ -8,7 +8,7 @@ import { lookupService } from '../../../helpers/stub-service';
 import { reject } from 'rsvp';
 import { A } from '@ember/array';
 
-describe('Integration | Utility | user actions/toggle-being-owner-action', function () {
+describe('Integration | Utility | user-actions/toggle-being-owner-action', function () {
   setupRenderingTest();
 
   beforeEach(function () {

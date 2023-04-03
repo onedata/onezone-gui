@@ -9,7 +9,7 @@ import { registerService } from '../../../helpers/stub-service';
 import { resolve } from 'rsvp';
 
 describe(
-  'Integration | Component | groups hierarchy visualiser/group box',
+  'Integration | Component | groups-hierarchy-visualiser/group-box',
   function () {
     setupRenderingTest();
 

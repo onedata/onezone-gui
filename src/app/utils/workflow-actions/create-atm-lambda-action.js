@@ -3,7 +3,6 @@
  * - `initialRevision` - will be used to create new lambda record,
  * - `atmInventory` - parent inventory for newly created lambda.
  *
- * @module utils/workflow-actions/create-atm-lambda-action
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

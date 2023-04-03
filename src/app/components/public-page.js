@@ -1,7 +1,6 @@
 /**
  * A component that shows public page.
- * 
- * @module components/public-page
+ *
  * @author Agnieszka Warchoł
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -13,7 +12,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 export default Component.extend(I18n, {
   classNames: ['public-page'],
-  
+
   router: service(),
 
   /**

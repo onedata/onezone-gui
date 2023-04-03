@@ -1,0 +1,132 @@
+.members-aspect-base {
+  .user-list-row {
+    margin-top: 2 * $padding-large-vertical;
+  }
+
+  .one-tree-root {
+    background-color: $main-content-hover-background;
+  }
+
+  .one-collapsible-list-item-content {
+    position: relative;
+    &.opened {
+      min-height: 150px;
+    }
+  }
+
+  .member-item .one-collapsible-list-item-header {
+    padding-right: 190px;
+    .btn-toolbar {
+      margin-right: 140px;
+    }
+  }
+
+  .right-container {
+    @include vertical-align-middle();
+    right: 50px;
+  }
+
+  .privileges-of-owner-warning {
+    margin: $padding-large-horizontal;
+  }
+
+  .privileges-tree-editor {
+    margin: $padding-large-horizontal;
+    margin-left: 65px;
+  }
+
+  .membership-visualiser {
+    margin: $padding-large-horizontal;
+    .membership:last-child {
+      border-bottom: 0;
+    }
+  }
+
+  .member-item .item-modified-header {
+    @media (min-width: $screen-sm-min) {
+      padding-right: 370px;
+    }
+    .one-label {
+      @include font-bold();
+    }
+  }
+
+  .show-descriptions-toggle {
+    display: inline-block;
+    white-space: nowrap;
+    .one-way-toggle {
+      margin-right: $padding-xs-horizontal;
+    }
+    label {
+      margin-bottom: 0;
+    }
+  }
+
+  .view-tools-toggle {
+    position: relative;
+    top: -2px;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    transform: none;
+    background-image: url($root-url + 'images/arrow-circle-down.svg');
+    background-size: 30px;
+    font-size: 1.7em;
+    vertical-align: middle;
+    transition: transition-linear(transform);
+    &.active {
+      transform: rotate(180deg);
+    }
+  }
+
+  // override default "disabled" style of the tree field labels
+  .one-dynamic-tree .one-tree .one-tree-list > li .one-tree-item-content .node-text.disabled {
+    opacity: 1;
+  }
+
+  .header-content-container {
+    .record-info-with-icon {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      margin-left: 9px;
+      padding-right: 210px;
+      width: 100%;
+
+      .record-name {
+        padding-left: 18px;
+      }
+    }
+  }
+
+  @media (min-width: $screen-sm-min) {
+    .item-modified-header {
+      padding-right: 230px;
+    }
+    .view-mode-selector {
+      margin-right: $padding-base-horizontal;
+    }
+    .view-tools {
+      line-height: 35px;
+      > * {
+        vertical-align: bottom;
+      }
+      > .btn-group {
+        vertical-align: middle;
+      }
+    }
+  }
+
+  @media (max-width: $screen-xs-max) {
+    .privileges-tree-editor {
+      margin-left: $padding-large-horizontal;
+      margin-top: 0;
+    }
+    .view-mode-selector {
+      margin-bottom: $padding-base-vertical;
+    }
+    .view-tools {
+      margin: 0 $padding-small-horizontal;
+    }
+  }
+}

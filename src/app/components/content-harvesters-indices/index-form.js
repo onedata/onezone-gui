@@ -1,7 +1,6 @@
 /**
  * Allows to create and view harvester index.
  *
- * @module components/content-harvesters-indices/index-form
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

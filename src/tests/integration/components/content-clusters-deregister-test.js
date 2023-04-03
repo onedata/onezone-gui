@@ -13,7 +13,7 @@ const OnedataGraph = Service.extend({
   request: notImplementedReject,
 });
 
-describe('Integration | Component | content clusters deregister', function () {
+describe('Integration | Component | content-clusters-deregister', function () {
   setupRenderingTest();
 
   beforeEach(function () {

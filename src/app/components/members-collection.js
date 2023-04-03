@@ -2,8 +2,7 @@
  * Renders list of members with additional features specified by `aspect` property.
  * Yields list when there are no items to present.
  *
- * @module components/members-collection
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

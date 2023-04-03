@@ -1,7 +1,6 @@
 /**
  * Provides data and operations for routes and components associated with clusters tab.
  *
- * @module services/cluster-manager
  * @author Jakub Liput
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

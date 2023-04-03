@@ -2,7 +2,6 @@
  * Oneprovider REST token template. Sets token API to "rest" and narrows allowed services
  * to any Oneprovider.
  *
- * @module components/token-template-selector/oneprovider-rest-template
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

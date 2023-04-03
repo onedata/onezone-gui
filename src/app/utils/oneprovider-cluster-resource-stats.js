@@ -1,7 +1,6 @@
 /**
  * Creates object with count of various resources of Oneprovider cluster
- * 
- * @module utils/oneprovider-cluster-resource-stats
+ *
  * @author Jakub Liput
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

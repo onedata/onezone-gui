@@ -1,8 +1,7 @@
 /**
  * Shows modal asking for invitation token, that will be used to join a group.
  *
- * @module components/group-join-using-token-modal
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

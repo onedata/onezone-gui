@@ -1,8 +1,7 @@
 /**
  * A sidebar for providers (extension of ``one-sidebar``)
  *
- * @module components/sidebar-spaces
- * @author Jakub Liput, Michal Borzecki
+ * @author Jakub Liput, Michał Borzęcki
  * @copyright (C) 2017-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

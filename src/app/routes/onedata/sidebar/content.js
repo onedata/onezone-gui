@@ -3,8 +3,7 @@
  * It is an extended version of the same route from onedata-gui-common.
  * It adds support for GRI.
  *
- * @module routes/onedata/sidebar/content
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

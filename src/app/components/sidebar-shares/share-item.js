@@ -1,7 +1,6 @@
 /**
  * A first-level item component for shares sidebar
  *
- * @module components/sidebar-shares/share-item
  * @author Jakub Liput
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -17,7 +16,7 @@ import { computedRelationProxy } from 'onedata-gui-websocket-client/mixins/model
 
 export default Component.extend(I18n, {
   tagName: '',
-  
+
   i18n: service(),
   spaceManager: service(),
   clipboardActions: service(),

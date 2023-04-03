@@ -1,7 +1,6 @@
 /**
  * Redirects to token creation page on execute.
  *
- * @module utils/token-actions/open-create-token-view-action
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

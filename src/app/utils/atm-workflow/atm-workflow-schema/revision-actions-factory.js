@@ -1,7 +1,6 @@
 /**
  * Generates actions for specific atm workflow schema revision.
  *
- * @module utils/atm-workflow/atm-workflow-schema/revision-actions-factory
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -14,6 +13,12 @@ import { get } from '@ember/object';
 
 export default RevisionActionsFactory.extend(OwnerInjector, {
   workflowActions: service(),
+
+  /**
+   * @virtual
+   * @type {Models.AtmInventory}
+   */
+  atmInventory: undefined,
 
   /**
    * @virtual
@@ -94,27 +99,23 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
    * @returns {Utils.Action}
    */
   createDuplicateRevisionAction(revisionNumber) {
-    const {
-      workflowActions,
-      atmWorkflowSchema,
-      onRevisionCreated,
-    } = this.getProperties('workflowActions', 'atmWorkflowSchema', 'onRevisionCreated');
-
-    const action = workflowActions.createDuplicateAtmWorkflowSchemaRevisionAction({
-      atmWorkflowSchema,
+    const action = this.workflowActions.createDuplicateAtmRecordRevisionAction({
+      atmModelName: 'atmWorkflowSchema',
+      atmRecord: this.atmWorkflowSchema,
       revisionNumber,
+      atmInventory: this.atmInventory,
     });
-    if (onRevisionCreated) {
+    if (this.onRevisionCreated) {
       action.addExecuteHook((result) => {
         if (result && get(result, 'status') === 'done') {
           const {
-            // This workflow schema is different than workflow schema from upper scope.
-            // It is a "target" workflow schema, where the duplicate has been saved.
-            atmWorkflowSchema,
+            // This atm record is different than atm record from upper scope.
+            // It is a "target" atm record, where the duplicate has been saved.
+            atmRecord,
             revisionNumber,
           } = get(result, 'result') || {};
-          if (atmWorkflowSchema && revisionNumber) {
-            onRevisionCreated(atmWorkflowSchema, revisionNumber);
+          if (atmRecord && revisionNumber) {
+            this.onRevisionCreated(atmRecord, revisionNumber);
           }
         }
       });

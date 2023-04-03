@@ -2,7 +2,6 @@
  * Modifies existing lambda revision. Needs `atmLambda`, `revisionNumber`
  * and `revisionDiff` (changed fields) passed in context.
  *
- * @module utils/workflow-actions/modify-atm-lambda-revision-action
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

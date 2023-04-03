@@ -6,7 +6,6 @@
  * were marked to upload in the same operation). May be floating over the content
  * or an element in the standard list (depending on `floatingMode` value).
  *
- * @module components/upload-presenter/single-upload
  * @author Michał Borzęcki
  * @copyright (C) 2019-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

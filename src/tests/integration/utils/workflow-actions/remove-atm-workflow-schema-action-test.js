@@ -16,7 +16,7 @@ import {
 } from '../../../helpers/modal';
 
 describe(
-  'Integration | Utility | workflow actions/remove atm workflow schema action',
+  'Integration | Utility | workflow-actions/remove-atm-workflow-schema-action',
   function () {
     setupRenderingTest();
 

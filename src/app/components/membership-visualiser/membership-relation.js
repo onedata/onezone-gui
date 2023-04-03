@@ -2,7 +2,6 @@
  * A component, that render line between two blocks in a path. Is used internally by
  * membership-visualiser component.
  *
- * @module components/membership-visualiser/membership-relation
  * @author Michał Borzęcki
  * @copyright (C) 2018-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

@@ -1,7 +1,6 @@
 /**
  * Provides data for routes and components associated with spaces tab
  *
- * @module services/space-manager
  * @author Jakub Liput
  * @copyright (C) 2018-2022 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

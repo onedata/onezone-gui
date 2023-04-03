@@ -6,13 +6,13 @@ import RevisionActionsFactory from 'onezone-gui/utils/atm-workflow/atm-workflow-
 import DumpAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/dump-atm-workflow-schema-revision-action';
 import RemoveAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-revision-action';
 import CreateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-revision-action';
-import DuplicateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/duplicate-atm-workflow-schema-revision-action';
+import DuplicateAtmRecordRevisionAction from 'onezone-gui/utils/workflow-actions/duplicate-atm-record-revision-action';
 
 const revisionActionsClasses = [{
   classDef: CreateAtmWorkflowSchemaRevisionAction,
   revisionNumberField: 'originRevisionNumber',
 }, {
-  classDef: DuplicateAtmWorkflowSchemaRevisionAction,
+  classDef: DuplicateAtmRecordRevisionAction,
   revisionNumberField: 'revisionNumber',
 }, {
   classDef: DumpAtmWorkflowSchemaRevisionAction,
@@ -22,7 +22,7 @@ const revisionActionsClasses = [{
   revisionNumberField: 'revisionNumber',
 }];
 
-describe('Integration | Utility | atm workflow/atm workflow schema/revision actions factory',
+describe('Integration | Utility | atm-workflow/atm-workflow-schema/revision-actions-factory',
   function () {
     setupRenderingTest();
 
@@ -36,9 +36,9 @@ describe('Integration | Utility | atm workflow/atm workflow schema/revision acti
       expect(revisionActions).to.have.length(revisionActionsClasses.length);
       revisionActions.forEach((action, idx) => {
         expect(action).to.be.instanceOf(revisionActionsClasses[idx].classDef);
-        expect(get(action, revisionActionsClasses[idx].revisionNumberField))
+        expect(action[revisionActionsClasses[idx].revisionNumberField])
           .to.equal(3);
-        expect(get(action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
+        expect(action.atmWorkflowSchema || action.atmRecord).to.equal(atmWorkflowSchema);
       });
     });
 

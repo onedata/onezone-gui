@@ -26,7 +26,7 @@ const AlertStub = Service.extend({
   error() {},
 });
 
-describe('Integration | Component | content provider redirect', function () {
+describe('Integration | Component | content-provider-redirect', function () {
   setupRenderingTest();
 
   beforeEach(function () {

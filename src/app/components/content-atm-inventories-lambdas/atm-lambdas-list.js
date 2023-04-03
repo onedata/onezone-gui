@@ -6,7 +6,6 @@
  *     in workflow and shows lambdas from other inventories, does not allow any
  *     modifications.
  *
- * @module components/content-atm-inventories-lambdas/atm-lambdas-list
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -83,6 +82,12 @@ export default Component.extend(I18n, {
    * @type {(atmLambda: Models.AtmLambda, originRevisionNumber: RevisionNumber) => void}
    */
   onRevisionCreate: undefined,
+
+  /**
+   * @virtual
+   * @type {(atmLambda: Models.AtmLambda, revisionNumber: RevisionNumber) => void}
+   */
+  onRevisionCreated: undefined,
 
   /**
    * One of: `'thisInventory'`, `'all'`
