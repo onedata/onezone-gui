@@ -19,7 +19,7 @@ import { itemSpacing } from 'onezone-gui/components/content-spaces-marketplace';
  * Height of single item in px.
  * @type {number}
  */
-export const itemHeight = 300;
+export const itemHeight = 310;
 
 export const rowHeight = itemHeight + itemSpacing;
 
