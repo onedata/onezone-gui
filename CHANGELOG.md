@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10543 Updated spaces support (Oneprovider deployment) page
 * VFS-10697 Fixed invalid state of automation store content editor during initalization
 * VFS-10285 Added info popovers to membership
 * VFS-8647 Moved component styles into dedicated directory
