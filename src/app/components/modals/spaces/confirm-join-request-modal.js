@@ -62,27 +62,82 @@ export default Component.extend(I18n, {
   isMarketplaceEnabled: bool('spaceManager.marketplaceConfig.enabled'),
 
   /**
-   * @type {PromiseObject<SpaceMembershipRequesterInfo>}
+   * @typedef {Object} JoinRequestVerificationInfo
+   * @property {'spaceNotFound'} [errorId]
+   * @property {any} [error]
    */
-  requesterInfoProxy: promise.object(computed(
-    'isMarketplaceEnabled',
+
+  /**
+   * @type {ComputedProperty<PromiseObject<JoinRequestVerificationInfo>>}
+   */
+  dataVerificationInfoProxy: promise.object(computed(
     'spaceId',
     'joinRequestId',
-    async function requesterInfoProxy() {
+    'isMarketplaceEnabled',
+    async function dataVerificationInfoProxy() {
+      // this modal should be never opened when marketplace is disabled, but adding
+      // check for unexpected situations
       if (!this.isMarketplaceEnabled) {
-        return null;
+        throw new Error('marketplace disabled');
       }
-      return await this.spaceManager.getSpaceMembershipRequesterInfo(
+      const spacePromise = this.spaceManager.getRecordById(this.spaceId);
+      const requesterInfoPromise = this.spaceManager.getSpaceMembershipRequesterInfo(
         this.spaceId,
         this.joinRequestId,
       );
+      let space;
+      try {
+        space = await spacePromise;
+      } catch (spaceGetError) {
+        switch (spaceGetError?.id) {
+          case 'notFound':
+            return {
+              errorId: 'spaceNotFound',
+                error: spaceGetError,
+            };
+          case 'forbidden':
+            return {
+              errorId: 'spaceForbidden',
+                error: spaceGetError,
+            };
+          default:
+            throw spaceGetError;
+        }
+      }
+      let requesterInfo;
+      try {
+        requesterInfo = await requesterInfoPromise;
+      } catch (requesterInfoGetError) {
+        switch (requesterInfoGetError?.id) {
+          case 'notFound':
+            return {
+              errorId: 'requesterInfoNotFound',
+                error: requesterInfoGetError,
+            };
+          case 'forbidden':
+            return {
+              errorId: 'requesterInfoForbidden',
+                error: requesterInfoGetError,
+            };
+          default:
+            throw requesterInfoGetError;
+        }
+      }
+      return {
+        space,
+        requesterInfo,
+      };
     }
   )),
+
+  dataVerificationInfo: reads('dataVerificationInfoProxy.content'),
 
   /**
    * @type {SpaceMembershipRequesterInfo|null}
    */
-  requesterInfo: reads('requesterInfoProxy.content'),
+  requesterInfo: reads('dataVerificationInfoProxy.content.requesterInfo'),
+
+  space: reads('dataVerificationInfoProxy.content.space'),
 
   /**
    * Make requesterInfo compatible with `join-image` component.
@@ -103,8 +158,6 @@ export default Component.extend(I18n, {
     }
   )),
 
-  space: reads('spaceProxy.content'),
-
   /**
    * Execute implementation of granting space membership by request.
    * @type {(userId) => Promise}}
@@ -121,7 +174,10 @@ export default Component.extend(I18n, {
 
   spaceId: reads('modalOptions.spaceId'),
 
-  isValid: bool('requesterInfoProxy.isFulfilled'),
+  isValid: and(
+    'dataVerificationInfoProxy.isFulfilled',
+    not('dataVerificationInfo.errorId')
+  ),
 
   userId: reads('requesterInfo.userId'),
 
@@ -130,8 +186,6 @@ export default Component.extend(I18n, {
   isProceedButtonVisible: and('isMarketplaceEnabled', 'isValid'),
 
   isProceedAvailable: and('isValid', not('isProcessing')),
-
-  bodyRequiredDataProxy: promise.object(promise.all('requesterInfoProxy', 'spaceProxy')),
 
   actions: {
     async grant() {

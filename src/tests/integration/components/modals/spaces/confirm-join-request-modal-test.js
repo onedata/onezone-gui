@@ -37,12 +37,123 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
 
     await helper.showModal();
 
-    expect(helper.header).to.contain.text('Invalid membership request');
+    helper.expectInvalidRequestHeader();
+    helper.expectActionButtonsToNotExist();
     expect(helper.closeButton).to.exist;
     expect(helper.closeButton).to.contain.text('Close');
-    expect(helper.grantButton).to.not.exist;
-    expect(helper.rejectButton).to.not.exist;
-    expect(helper.decideLaterButton).to.not.exist;
+  });
+
+  it('renders generic error info when space request fails with non-supported error', async function () {
+    suppressRejections();
+    const helper = new Helper(this);
+    const spaceId = 'not_existing_space_id';
+    const joinRequestId = 'join_request_id';
+    helper.modalOptions = {
+      spaceId,
+      joinRequestId,
+    };
+    sinon.stub(
+      helper.spaceManager,
+      'getRecordById'
+    ).rejects({ id: 'other_error' });
+
+    await helper.showModal();
+
+    helper.expectInvalidRequestHeader();
+    helper.expectActionButtonsToNotExist();
+    expect(helper.body.querySelector('.resource-load-error')).to.exist;
+  });
+
+  it('renders "space not found" info when space request fails with notFound', async function () {
+    suppressRejections();
+    const helper = new Helper(this);
+    const spaceId = 'not_existing_space_id';
+    const joinRequestId = 'join_request_id';
+    helper.modalOptions = {
+      spaceId,
+      joinRequestId,
+    };
+    sinon.stub(
+      helper.spaceManager,
+      'getRecordById'
+    ).rejects({ id: 'notFound' });
+
+    await helper.showModal();
+
+    helper.expectInvalidRequestHeader();
+    helper.expectActionButtonsToNotExist();
+    expect(helper.body).to.contain.text(
+      'The space concerned by this membership request does not exist. It may have been deleted or the link is invalid.'
+    );
+  });
+
+  it('renders "forbidden space" info when space request fails with forbidden', async function () {
+    suppressRejections();
+    const helper = new Helper(this);
+    const spaceId = 'not_existing_space_id';
+    const joinRequestId = 'join_request_id';
+    helper.modalOptions = {
+      spaceId,
+      joinRequestId,
+    };
+    sinon.stub(
+      helper.spaceManager,
+      'getRecordById'
+    ).rejects({ id: 'forbidden' });
+
+    await helper.showModal();
+
+    helper.expectInvalidRequestHeader();
+    helper.expectActionButtonsToNotExist();
+    expect(helper.body).to.contain.text(
+      'You don\'t have access to the space concerned by this membership request.'
+    );
+  });
+
+  it('renders "request not found" info when requesterInfo request fails with notFound', async function () {
+    suppressRejections();
+    const helper = new Helper(this);
+    const spaceId = 'not_existing_space_id';
+    const joinRequestId = 'join_request_id';
+    helper.modalOptions = {
+      spaceId,
+      joinRequestId,
+    };
+    sinon.stub(
+      helper.spaceManager,
+      'getSpaceMembershipRequesterInfo'
+    ).rejects({ id: 'notFound' });
+
+    await helper.showModal();
+
+    helper.expectInvalidRequestHeader();
+    helper.expectActionButtonsToNotExist();
+    expect(helper.body).to.contain.text(
+      'This is not a valid membership request. It may have been already resolved or the link is invalid.'
+    );
+  });
+
+  it('renders "request forbidden" info when requesterInfo request fails with forbidden', async function () {
+    suppressRejections();
+    const helper = new Helper(this);
+    const spaceId = 'not_existing_space_id';
+    const joinRequestId = 'join_request_id';
+    helper.modalOptions = {
+      spaceId,
+      joinRequestId,
+    };
+    sinon.stub(
+      helper.spaceManager,
+      'getSpaceMembershipRequesterInfo'
+    ).rejects({ id: 'forbidden' });
+
+    await helper.showModal();
+
+    helper.expectInvalidRequestHeader();
+    helper.expectActionButtonsToNotExist();
+    expect(helper.body).to.contain.text(
+      'You have insufficient privileges to view this membership request.'
+    );
   });
 
   it('renders header, grant and reject button if space and requester info is successfully fetched',
@@ -50,7 +161,7 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
       const helper = new Helper(this);
       const requestId = 'join_request_id';
       const userId = 'user_id';
-      const spaceId = 'space_id';
+      const spaceId = 'not_existing_space_id';
       const spaceName = 'Stub space name';
       const fullName = 'Zenek';
       const username = 'mock_username';
@@ -79,9 +190,9 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
       expect(helper.body.textContent).to.match(new RegExp(
         `A membership request to space\\s+${spaceName}\\s+has been submitted by\\s+${fullName}\\s+\\(${contactEmail}\\)\\s+via the Space Marketplace\\.`
       ));
-      expect(helper.grantButton).to.exist;
+      expect(helper.grantButton, 'grant').to.exist;
       expect(helper.grantButton).to.contain.text('Grant');
-      expect(helper.rejectButton).to.exist;
+      expect(helper.rejectButton, 'reject').to.exist;
       expect(helper.rejectButton).to.contain.text('Reject');
       expect(helper.closeButton).to.not.exist;
     }
@@ -249,6 +360,15 @@ class Helper {
 
   isOpened() {
     return isModalOpened('confirm-join-request-modal');
+  }
+
+  expectInvalidRequestHeader() {
+    expect(this.header).to.contain.text('Invalid membership request');
+  }
+  expectActionButtonsToNotExist() {
+    expect(this.grantButton).to.not.exist;
+    expect(this.rejectButton).to.not.exist;
+    expect(this.decideLaterButton).to.not.exist;
   }
 
   async showModal() {
