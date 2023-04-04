@@ -29,6 +29,7 @@ export default {
     spaceNotFound: 'The space concerned by this membership request does not exist. It may have been deleted or the link is invalid.',
     spaceForbidden: 'You don\'t have access to the space concerned by this membership request.',
     requesterInfoNotFound: 'This is not a valid membership request. It may have been already resolved or the link is invalid.',
+    requesterInfoRelationAlreadyExist: 'This membership request is obsolete; the user is already a member of this space.',
     requesterInfoForbidden: 'You have insufficient privileges to view this membership request.',
   },
 };

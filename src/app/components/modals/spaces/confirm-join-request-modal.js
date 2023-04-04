@@ -119,6 +119,11 @@ export default Component.extend(I18n, {
               errorId: 'requesterInfoForbidden',
                 error: requesterInfoGetError,
             };
+          case 'relationAlreadyExists':
+            return {
+              errorId: 'requesterInfoRelationAlreadyExist',
+                error: requesterInfoGetError,
+            };
           default:
             throw requesterInfoGetError;
         }
@@ -150,13 +155,6 @@ export default Component.extend(I18n, {
       username: this.requesterInfo.username,
     };
   }),
-
-  spaceProxy: promise.object(computed(
-    'spaceId',
-    async function spaceProxy() {
-      return await this.spaceManager.getRecordById(this.spaceId);
-    }
-  )),
 
   /**
    * Execute implementation of granting space membership by request.

@@ -156,6 +156,30 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
     );
   });
 
+  it('renders "membership already exist" info when requesterInfo request fails with relationAlreadyExists',
+    async function () {
+      suppressRejections();
+      const helper = new Helper(this);
+      const spaceId = 'not_existing_space_id';
+      const joinRequestId = 'join_request_id';
+      helper.modalOptions = {
+        spaceId,
+        joinRequestId,
+      };
+      sinon.stub(
+        helper.spaceManager,
+        'getSpaceMembershipRequesterInfo'
+      ).rejects({ id: 'relationAlreadyExists' });
+
+      await helper.showModal();
+
+      helper.expectInvalidRequestHeader();
+      helper.expectActionButtonsToNotExist();
+      expect(helper.body).to.contain.text(
+        'This membership request is obsolete; the user is already a member of this space.'
+      );
+    });
+
   it('renders header, grant and reject button if space and requester info is successfully fetched',
     async function () {
       const helper = new Helper(this);
