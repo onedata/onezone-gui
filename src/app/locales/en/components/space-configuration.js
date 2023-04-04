@@ -30,9 +30,12 @@ export default {
       marketplaceDisabled: 'Space Marketplace is disabled in this Onezone.',
     },
   },
-  contactEmail: {
-    label: 'Marketplace contact e-mail address',
-    tip: 'This address will be used for notifying about new membership requests. The person controlling this address must have "manage marketplace" and "add user" privileges in the space to be able to process access requests.',
+  marketplaceContactEmail: {
+    customValueInputPlaceholder: 'Enter a custom e-mail address...',
+    customValueOptionTextPrefix: 'Custom e-mail address...',
+    // label and tip is not rendered by form-renderer but by custom code
+    customLabel: 'Marketplace contact e-mail address',
+    customTip: 'This address will be used for notifying about new membership requests. The person controlling this address must have "manage marketplace" and "add user" privileges in the space to be able to process access requests.',
   },
   viewInMarketplace: 'View in Marketplace',
   save: 'Save',
