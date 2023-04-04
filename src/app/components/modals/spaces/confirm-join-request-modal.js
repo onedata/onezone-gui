@@ -17,6 +17,7 @@ import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import { promise, bool, and, not } from 'ember-awesome-macros';
+import { htmlSafe } from '@ember/string';
 
 /**
  * @typedef {Object} ConfirmJoinRequestModalOptions
@@ -38,6 +39,7 @@ export default Component.extend(I18n, {
   recordManager: service(),
   globalNotify: service(),
   modalManager: service(),
+  alert: service(),
 
   /**
    * @virtual
@@ -159,6 +161,13 @@ export default Component.extend(I18n, {
       } finally {
         this.set('isProcessing', false);
       }
+    },
+    decideLater() {
+      this.modalManager.hide(this.modalId);
+      const text = this.t('decideLaterModal.bodyText');
+      this.alert.info(htmlSafe(`<p>${text}</p>`), {
+        header: this.t('decideLaterModal.header'),
+      });
     },
   },
 });

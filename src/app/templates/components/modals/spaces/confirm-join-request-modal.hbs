@@ -64,6 +64,13 @@
     {{#modal.footer class="btn-toolbar"}}
       {{#if isProceedButtonVisible}}
         {{#one-button
+          class="decide-later-btn"
+          disabled=isProcessing
+          onClick=(action "decideLater")
+        }}
+          {{tt this "decideLaterBtn"}}
+        {{/one-button}}
+        {{#one-button
           type="warning"
           class="reject-btn"
           disabled=(not isProceedAvailable)

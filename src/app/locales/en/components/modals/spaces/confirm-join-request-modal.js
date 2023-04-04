@@ -15,9 +15,14 @@ export default {
       question: 'Do you want to grant access for the user?',
     },
   },
+  decideLaterModal: {
+    header: 'Information',
+    bodyText: 'You may go back to this request by visiting the same link. Please make your decision without undue delay.',
+  },
   grantingSpaceAccess: 'granting access',
   rejectingSpaceAccess: 'rejecting the request',
   close: 'Close',
   rejectBtn: 'Reject request',
   grantBtn: 'Grant access',
+  decideLaterBtn: 'Decide later',
 };

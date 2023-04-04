@@ -11,6 +11,7 @@ import {
   getModalHeader,
   getModalBody,
   getModalFooter,
+  isModalOpened,
 } from '../../../../helpers/modal';
 import sinon from 'sinon';
 import { Promise } from 'rsvp';
@@ -19,7 +20,7 @@ import { suppressRejections } from '../../../../helpers/suppress-rejections';
 describe('Integration | Component | modals/spaces/confirm-join-request-modal', function () {
   setupRenderingTest();
 
-  it('renders header and close button if space join requester info fetch fails', async function () {
+  it('renders header and close button only if space join requester info fetch fails', async function () {
     suppressRejections();
     const helper = new Helper(this);
     const spaceId = 'space_id';
@@ -41,6 +42,7 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
     expect(helper.closeButton).to.contain.text('Close');
     expect(helper.grantButton).to.not.exist;
     expect(helper.rejectButton).to.not.exist;
+    expect(helper.decideLaterButton).to.not.exist;
   });
 
   it('renders header, grant and reject button if space and requester info is successfully fetched',
@@ -130,6 +132,46 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
     expect(helper.grantButton).to.not.exist;
   });
 
+  it('has "Decide later" button and closes the modal and opens "decide later" info modal after it is',
+    async function () {
+      const helper = new Helper(this);
+      const requestId = 'join_request_id';
+      const userId = 'user_id';
+      const spaceId = 'space_id';
+      const spaceName = 'Stub space name';
+      const fullName = 'Zenek';
+      const username = 'mock_username';
+      const contactEmail = 'zenek@polo.pl';
+      helper.modalOptions = {
+        spaceId,
+        joinRequestId: requestId,
+      };
+      await helper.stubSpace({ name: spaceName, entityId: spaceId });
+      const getRequesterInfo = sinon.stub(
+        helper.spaceManager,
+        'getSpaceMembershipRequesterInfo'
+      );
+      getRequesterInfo.withArgs(sinon.match(spaceId, requestId)).resolves({
+        userId,
+        fullName,
+        username,
+        contactEmail,
+      });
+
+      await helper.showModal();
+
+      expect(helper.decideLaterButton).to.exist;
+      expect(helper.decideLaterButton).to.have.class('btn-default');
+      expect(helper.decideLaterButton).to.contain.text('Decide later');
+
+      await click(helper.decideLaterButton);
+      expect(helper.isOpened()).to.be.false;
+      expect(helper.alertModal).to.exist;
+      expect(helper.alertModal).to.contain.text(
+        'You may go back to this request by visiting the same link. Please make your decision without undue delay.'
+      );
+    }
+  );
 });
 
 class Helper {
@@ -164,7 +206,7 @@ class Helper {
   }
 
   get modal() {
-    return getModal();
+    return getModal('confirm-join-request-modal');
   }
   /** @type {HTMLElement} */
   get body() {
@@ -185,6 +227,12 @@ class Helper {
   get rejectButton() {
     return this.footer?.querySelector('.reject-btn');
   }
+  get decideLaterButton() {
+    return this.footer?.querySelector('.decide-later-btn');
+  }
+  get alertModal() {
+    return document.querySelector('.alert-global .modal-dialog');
+  }
 
   get modalManager() {
     return lookupService(this.mochaContext, 'modalManager');
@@ -199,8 +247,12 @@ class Helper {
     return lookupService(this.mochaContext, 'store');
   }
 
+  isOpened() {
+    return isModalOpened('confirm-join-request-modal');
+  }
+
   async showModal() {
-    await render(hbs`{{global-modal-mounter}}`);
+    await render(hbs`{{alert-global}}{{global-modal-mounter}}`);
     return await this.modalManager
       .show('spaces/confirm-join-request-modal', this.modalOptions)
       .shownPromise;
