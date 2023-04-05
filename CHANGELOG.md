@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10698 Fixed ember ace resizing mechanism
 * VFS-10543 Updated spaces support (Oneprovider deployment) page
 * VFS-10697 Fixed invalid state of automation store content editor during initalization
 * VFS-10285 Added info popovers to membership
