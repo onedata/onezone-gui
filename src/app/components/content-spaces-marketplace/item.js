@@ -89,6 +89,13 @@ export default Component.extend(I18n, {
 
   MarketplaceSpaceStatusEnum: MarketplaceSpaceStatus,
 
+  /**
+   * Timestamp in milliseconds when parent component requests space-description component
+   * to recompute its overflow.
+   * @type {number}
+   */
+  descriptionRerenderTriggeredAt: 0,
+
   //#endregion
 
   /**
@@ -230,6 +237,10 @@ export default Component.extend(I18n, {
     if (!this.isAnimating && typeof this.isAccessGranted === 'boolean') {
       this.setAccessColors();
     }
+  }),
+
+  statusObserver: observer('status', function statusObserver() {
+    this.set('descriptionRerenderTriggeredAt', Date.now());
   }),
 
   init() {

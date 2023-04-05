@@ -12,6 +12,8 @@ import Component from '@ember/component';
 import ContentOverflowDetector from 'onedata-gui-common/mixins/content-overflow-detector';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
+import { observer } from '@ember/object';
+import { scheduleOnce } from '@ember/runloop';
 
 const mixins = [
   I18n,
@@ -46,6 +48,17 @@ export default Component.extend(...mixins, {
    * @override
    */
   overflowDimension: 'height',
+
+  /**
+   * Timestamp in milliseconds when parent component requests this component to recompute
+   * its overflow.
+   * @type {number}
+   */
+  rerenderTriggeredAt: 0,
+
+  rerenderObserver: observer('rerenderTriggeredAt', async function rerenderObserver() {
+    scheduleOnce('afterRender', this, 'detectOverflow');
+  }),
 
   didInsertElement() {
     this._super(...arguments);
