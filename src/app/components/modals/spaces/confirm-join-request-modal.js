@@ -92,15 +92,15 @@ export default Component.extend(I18n, {
       } catch (spaceGetError) {
         switch (spaceGetError?.id) {
           case 'notFound':
-            return {
+            return ({
               errorId: 'spaceNotFound',
-                error: spaceGetError,
-            };
+              error: spaceGetError,
+            });
           case 'forbidden':
-            return {
+            return ({
               errorId: 'spaceForbidden',
-                error: spaceGetError,
-            };
+              error: spaceGetError,
+            });
           default:
             throw spaceGetError;
         }
@@ -111,20 +111,20 @@ export default Component.extend(I18n, {
       } catch (requesterInfoGetError) {
         switch (requesterInfoGetError?.id) {
           case 'notFound':
-            return {
+            return ({
               errorId: 'requesterInfoNotFound',
-                error: requesterInfoGetError,
-            };
+              error: requesterInfoGetError,
+            });
           case 'forbidden':
-            return {
+            return ({
               errorId: 'requesterInfoForbidden',
-                error: requesterInfoGetError,
-            };
+              error: requesterInfoGetError,
+            });
           case 'relationAlreadyExists':
-            return {
+            return ({
               errorId: 'requesterInfoRelationAlreadyExist',
-                error: requesterInfoGetError,
-            };
+              error: requesterInfoGetError,
+            });
           default:
             throw requesterInfoGetError;
         }

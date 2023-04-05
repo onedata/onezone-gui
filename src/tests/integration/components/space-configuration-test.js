@@ -177,7 +177,7 @@ describe('Integration | Component | space-configuration', function () {
     const dropdown = new OneDropdownHelper(
       helper.emailInlineEditor.querySelector('.ember-power-select-trigger')
     );
-    await dropdown.selectOptionByText('Custom value...');
+    await dropdown.selectOptionByText('Custom e-mail address...');
     const input = helper.emailInlineEditor.querySelector(
       '.ember-power-select-trigger input'
     );

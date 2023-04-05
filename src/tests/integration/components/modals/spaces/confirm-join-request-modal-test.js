@@ -119,6 +119,7 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
       spaceId,
       joinRequestId,
     };
+    await helper.stubSpace({ entityId: spaceId });
     sinon.stub(
       helper.spaceManager,
       'getSpaceMembershipRequesterInfo'
@@ -142,6 +143,7 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
       spaceId,
       joinRequestId,
     };
+    await helper.stubSpace({ entityId: spaceId });
     sinon.stub(
       helper.spaceManager,
       'getSpaceMembershipRequesterInfo'
@@ -166,6 +168,7 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
         spaceId,
         joinRequestId,
       };
+      await helper.stubSpace({ entityId: spaceId });
       sinon.stub(
         helper.spaceManager,
         'getSpaceMembershipRequesterInfo'
@@ -335,7 +338,10 @@ class Helper {
     this.space = await this.createSpace({
       name: 'Default mock space',
       entityId: 'default_mock_space_id',
-      currentUserIsOwner: true,
+      privileges: {
+        manageMarketplace: true,
+        addUser: true,
+      },
       ...data,
     });
     return this.space;
