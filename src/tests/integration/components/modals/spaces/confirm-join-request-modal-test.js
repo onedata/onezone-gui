@@ -335,6 +335,7 @@ class Helper {
     this.space = await this.createSpace({
       name: 'Default mock space',
       entityId: 'default_mock_space_id',
+      currentUserIsOwner: true,
       ...data,
     });
     return this.space;

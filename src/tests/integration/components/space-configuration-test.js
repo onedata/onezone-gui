@@ -206,6 +206,7 @@ class Helper {
     this.space = await this.createSpace({
       privileges: {
         update: true,
+        manageMarketplace: true,
       },
       ...data,
     });
