@@ -281,11 +281,8 @@ export default Component.extend(I18n, {
   },
 
   actions: {
-    /**
-     * @returns {Promise}
-     */
     requestAccess() {
-      return this.spaceActions.createRequestSpaceAccessAction({
+      this.spaceActions.createRequestSpaceAccessAction({
         spaceMarketplaceData: this.spaceItem,
       }).execute();
     },

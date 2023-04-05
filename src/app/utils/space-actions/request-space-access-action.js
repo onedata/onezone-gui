@@ -53,6 +53,13 @@ export default Action.extend({
   /**
    * @override
    */
+  notifyResult() {
+    // failure will be notified in onExecute -> onSubmit; no need to notify success
+  },
+
+  /**
+   * @override
+   */
   async onExecute() {
     const result = ActionResult.create();
     const modalInstance = this.modalManager
@@ -77,6 +84,7 @@ export default Action.extend({
         spaceMarketplaceData: this.spaceMarketplaceData,
       });
     await modalInstance.hiddenPromise;
+    result.cancelIfPending();
     return result;
   },
 
