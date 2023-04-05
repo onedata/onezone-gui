@@ -194,10 +194,10 @@
     </label>
     {{one-way-toggle
       class="form-control advertised-toggle"
-      isReadOnly=(or isReadOnly isAdvertisedToggleDisabled)
+      isReadOnly=(or marketplaceReadOnlyTip advertisedToggleLockHint)
       checked=isAdvertised
       update=(action "saveValue" "advertised")
-      lockHint=(or readOnlyTip advertisedToggleLockHint)
+      lockHint=(or marketplaceReadOnlyTip advertisedToggleLockHint)
     }}
     {{#if (and isAdvertised isMarketplaceEnabled)}}
       <a href={{viewInMarketplaceHref}} class="view-in-marketplace-link">
@@ -206,7 +206,7 @@
       </a>
     {{/if}}
   </div>
-  {{#if isAdvertised}}
+  {{#if (and isAdvertised space.privileges.manageMarketplace)}}
     <div class="contact-email-form-container">
       <div class={{concat-classes
         "form-group contact-email-form-group"

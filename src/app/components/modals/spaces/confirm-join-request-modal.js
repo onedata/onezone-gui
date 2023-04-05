@@ -18,6 +18,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import { promise, bool, and, not } from 'ember-awesome-macros';
 import { htmlSafe } from '@ember/string';
+import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 
 /**
  * @typedef {Object} ConfirmJoinRequestModalOptions
@@ -184,6 +185,38 @@ export default Component.extend(I18n, {
   isProceedButtonVisible: and('isMarketplaceEnabled', 'isValid'),
 
   isProceedAvailable: and('isValid', not('isProcessing')),
+
+  grantButtonDisabledTip: computed(
+    'space.privileges.{manageMarketplace,addUser}',
+    function grantButtonDisabledTip() {
+      if (!this.space) {
+        return;
+      }
+      if (!this.space.privileges.manageMarketplace || !this.space.privileges.addUser) {
+        return insufficientPrivilegesMessage({
+          i18n: this.i18n,
+          modelName: 'space',
+          privilegeFlag: ['space_manage_marketplace', 'space_add_user'],
+        });
+      }
+    }
+  ),
+
+  rejectButtonDisabledTip: computed(
+    'space.privileges.manageMarketplace',
+    function rejectButtonDisabledTip() {
+      if (!this.space) {
+        return;
+      }
+      if (!this.space.privileges.manageMarketplace) {
+        return insufficientPrivilegesMessage({
+          i18n: this.i18n,
+          modelName: 'space',
+          privilegeFlag: 'space_manage_marketplace',
+        });
+      }
+    }
+  ),
 
   actions: {
     async grant() {

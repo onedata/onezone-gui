@@ -74,22 +74,32 @@
         }}
           {{tt this "decideLaterBtn"}}
         {{/one-button}}
-        {{#one-button
-          type="warning"
-          class="reject-btn"
-          disabled=(not isProceedAvailable)
-          onClick=(action "reject")
-        }}
-          {{tt this "rejectBtn"}}
-        {{/one-button}}
-        {{#one-button
-          type="primary"
-          class="grant-btn"
-          disabled=(not isProceedAvailable)
-          onClick=(action "grant")
-        }}
-          {{tt this "grantBtn"}}
-        {{/one-button}}
+        <div class="btn-tooltip-container">
+          {{#one-button
+            type="warning"
+            class="reject-btn"
+            disabled=(or (not isProceedAvailable) rejectButtonDisabledTip)
+            onClick=(action "reject")
+          }}
+            {{tt this "rejectBtn"}}
+          {{/one-button}}
+          {{#if rejectButtonDisabledTip}}
+            {{one-tooltip title=rejectButtonDisabledTip}}
+          {{/if}}
+        </div>
+        <div class="btn-tooltip-container">
+          {{#one-button
+            type="primary"
+            class="grant-btn"
+            disabled=(or (not isProceedAvailable) grantButtonDisabledTip)
+            onClick=(action "grant")
+          }}
+            {{tt this "grantBtn"}}
+          {{/one-button}}
+          {{#if grantButtonDisabledTip}}
+            {{one-tooltip title=grantButtonDisabledTip}}
+          {{/if}}
+        </div>
       {{else}}
         {{#one-button
           type="default"

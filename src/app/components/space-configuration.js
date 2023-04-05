@@ -170,6 +170,20 @@ export default Component.extend(validations, I18n, {
     raw('')
   ),
 
+  marketplaceReadOnlyTip: computed(
+    'space.privileges.{update,manageMarketplace}',
+    function marketplaceReadOnlyTip() {
+      const privileges = this.space?.privileges;
+      if (!privileges || !privileges.update || !privileges.manageMarketplace) {
+        return insufficientPrivilegesMessage({
+          i18n: this.i18n,
+          modelName: 'space',
+          privilegeFlag: ['space_update', 'space_manage_marketplace'],
+        });
+      }
+    }
+  ),
+
   /**
    * Space tags ready to use in component.
    * @type {ComputedProperty<Array<Tag>>}
