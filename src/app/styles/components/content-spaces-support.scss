@@ -9,7 +9,7 @@
   margin-bottom: 16px;
   width: 140px;
   @media (max-width: $screen-sm-max) {
-    width: 130px; 
+    width: 130px;
   }
   @media (min-width: $screen-lg-min) {
     width: 150px;
@@ -21,6 +21,7 @@
   }
   .support-os-name {
     display: block;
+    @include font-semibold;
   }
 }
 .image-support {
@@ -31,7 +32,7 @@
     width: 500px;
     height: 88px;
   }
-} 
+}
 .insufficient-privileges {
   text-align: center;
 }

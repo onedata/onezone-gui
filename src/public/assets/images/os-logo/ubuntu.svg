@@ -1,59 +1,88 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Generator: Adobe Illustrator 16.0.4, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="Layer_1"
+   viewBox="0 0 21 32"
    version="1.1"
-   id="circle_of_friends__x5F__orange"
-   x="0px"
-   y="0px"
-   width="283.46399"
-   height="283.46301"
-   viewBox="0 0 283.46399 283.46301"
-   enable-background="new 0 0 425.197 425.197"
-   xml:space="preserve"
-   inkscape:version="0.91 r13725"
-   sodipodi:docname="ubuntu.svg"><metadata
-     id="metadata13"><rdf:RDF><cc:Work
-         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
-     id="defs11" /><sodipodi:namedview
+   sodipodi:docname="ubuntu.svg"
+   width="21"
+   height="32"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview57"
      pagecolor="#ffffff"
      bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
+     borderopacity="1.0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1280"
-     inkscape:window-height="1000"
-     id="namedview9"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
      showgrid="false"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:zoom="0.55503685"
-     inkscape:cx="148.09451"
-     inkscape:cy="148.03505"
+     inkscape:zoom="7.2566845"
+     inkscape:cx="93.431098"
+     inkscape:cy="17.018791"
+     inkscape:window-width="2560"
+     inkscape:window-height="1376"
      inkscape:window-x="0"
-     inkscape:window-y="24"
+     inkscape:window-y="27"
      inkscape:window-maximized="1"
-     inkscape:current-layer="circle_of_friends__x5F__orange" /><g
-     id="g3"
-     transform="matrix(0.86016917,0,0,0.86016917,-41.139111,-41.139169)"><path
-       d="m 354.331,212.595 c 0,78.279 -63.45,141.735 -141.729,141.735 -78.279,0 -141.735,-63.456 -141.735,-141.735 0,-78.274 63.457,-141.728 141.735,-141.728 78.279,0 141.729,63.453 141.729,141.728 z"
-       id="path5"
-       inkscape:connector-curvature="0"
-       style="fill:#e95420" /><path
-       d="m 139.043,212.595 c 0,10.064 -8.159,18.225 -18.23,18.225 -10.059,0 -18.218,-8.16 -18.218,-18.225 0,-10.06 8.159,-18.219 18.218,-18.219 10.071,0 18.23,8.159 18.23,18.219 z m 103.674,88.606 c 5.033,8.709 16.173,11.696 24.889,6.67 8.715,-5.033 11.701,-16.179 6.669,-24.895 -5.032,-8.715 -16.173,-11.695 -24.888,-6.663 -8.716,5.033 -11.702,16.173 -6.67,24.888 z m 31.557,-158.982 c 5.032,-8.717 2.052,-19.86 -6.669,-24.887 -8.71,-5.032 -19.855,-2.046 -24.889,6.667 -5.032,8.715 -2.046,19.857 6.67,24.889 8.716,5.032 19.862,2.046 24.888,-6.669 z m -61.672,18.413 c 27.153,0 49.434,20.814 51.761,47.364 l 26.372,-0.416 c -1.252,-19.727 -9.809,-37.469 -22.995,-50.551 -6.98,2.693 -15.079,2.327 -22.066,-1.71 -6.992,-4.037 -11.359,-10.871 -12.514,-18.275 -6.554,-1.78 -13.448,-2.733 -20.558,-2.733 -12.471,0 -24.259,2.916 -34.727,8.103 l 12.832,23.043 c 6.65,-3.09 14.077,-4.825 21.895,-4.825 z m -51.969,51.963 c 0,-17.577 8.734,-33.121 22.097,-42.52 l -13.54,-22.634 c -15.684,10.474 -27.367,26.451 -32.296,45.183 5.833,4.697 9.57,11.897 9.57,19.972 0,8.08 -3.738,15.28 -9.57,19.978 4.929,18.731 16.612,34.708 32.296,45.188 l 13.54,-22.634 c -13.363,-9.406 -22.097,-24.944 -22.097,-42.533 z m 51.969,51.973 c -7.817,0 -15.244,-1.734 -21.895,-4.83 l -12.832,23.043 c 10.468,5.191 22.255,8.104 34.727,8.104 7.109,0 14.004,-0.946 20.558,-2.729 1.154,-7.409 5.521,-14.243 12.514,-18.273 6.987,-4.037 15.086,-4.404 22.066,-1.711 13.187,-13.088 21.743,-30.83 22.995,-50.557 l -26.372,-0.409 c -2.328,26.543 -24.608,47.362 -51.761,47.362 z"
-       id="path7"
-       inkscape:connector-curvature="0"
-       style="fill:#ffffff" /></g></svg>
+     inkscape:current-layer="Layer_1" />
+  <defs
+     id="defs4">
+    <style
+       id="style2">.cls-1{fill:none;}.cls-2{fill:#e95420;}.cls-3{fill:#fff;}</style>
+  </defs>
+  <g
+     id="g52">
+    <rect
+       class="cls-2"
+       width="21"
+       height="32"
+       id="rect38"
+       x="0"
+       y="0" />
+    <circle
+       class="cls-3"
+       cx="4.8000002"
+       cy="21.15"
+       r="2.1700001"
+       id="circle40" />
+    <circle
+       class="cls-3"
+       cx="13.86"
+       cy="16.389999"
+       r="2.1700001"
+       id="circle42" />
+    <path
+       class="cls-3"
+       d="M 9.7,26.75 C 8.13,26.41 6.83,25.41 6.09,24 c -0.58,0.26 -1.23,0.34 -1.86,0.23 0.89,2.19 2.78,3.77 5.1,4.27 0.51,0.11 1.03,0.16 1.54,0.16 C 10.47,28.14 10.25,27.5 10.23,26.84 10.05,26.82 9.87,26.79 9.7,26.75 Z"
+       id="path44" />
+    <circle
+       class="cls-3"
+       cx="13.37"
+       cy="26.76"
+       r="2.1700001"
+       id="circle46" />
+    <path
+       class="cls-3"
+       d="m 16.39,25.96 c 0.68,-0.85 1.15,-1.86 1.38,-2.93 0.4,-1.87 0.03,-3.83 -1.03,-5.42 -0.25,0.59 -0.68,1.09 -1.22,1.43 0.59,1.11 0.77,2.38 0.5,3.61 -0.13,0.6 -0.36,1.17 -0.68,1.68 0.51,0.42 0.87,0.98 1.04,1.62 z"
+       id="path48" />
+    <path
+       class="cls-3"
+       d="m 4.63,18.04 c 0.06,0 0.11,0 0.17,0 0.22,0 0.44,0.02 0.66,0.07 0.35,0.08 0.69,0.21 0.99,0.4 0.98,-1.41 2.56,-2.25 4.27,-2.28 0,-0.16 0.03,-0.33 0.07,-0.49 0.1,-0.47 0.3,-0.9 0.59,-1.27 -2.73,-0.22 -5.39,1.19 -6.74,3.58 z"
+       id="path50" />
+  </g>
+  <rect
+     class="cls-1"
+     x="2.5"
+     y="14"
+     width="16"
+     height="16"
+     id="rect54" />
+</svg>
