@@ -50,15 +50,31 @@ export default Component.extend(...mixins, {
   overflowDimension: 'height',
 
   /**
-   * Timestamp in milliseconds when parent component requests this component to recompute
-   * its overflow.
-   * @type {number}
+   * @type {ResizeObserver}
    */
-  rerenderTriggeredAt: 0,
+  resizeObserver: null,
 
-  rerenderObserver: observer('rerenderTriggeredAt', async function rerenderObserver() {
-    scheduleOnce('afterRender', this, 'detectOverflow');
-  }),
+  initResizeObserver() {
+    const element = this.element;
+    if (!this.element || this.resizeObserver) {
+      return;
+    }
+    /** @type {ResizeObserver} */
+    const resizeObserver = new ResizeObserver((entries) => {
+      /** @type {ResizeObserverEntry} */
+      const entry = entries.find(entry => entry.target === element);
+      if (entry) {
+        this.detectOverflow();
+      }
+    });
+    resizeObserver.observe(element);
+    this.set('resizeObserver', resizeObserver);
+  },
+
+  destroyResizeObserver() {
+    this.resizeObserver?.disconnect();
+    this.set('resizeObserver', null);
+  },
 
   didInsertElement() {
     this._super(...arguments);
@@ -67,11 +83,14 @@ export default Component.extend(...mixins, {
       overflowParentElement: this.element,
     });
     this.addOverflowDetectionListener();
+    this.detectOverflow();
+    this.initResizeObserver();
   },
 
   willDestroyElement() {
     this._super(...arguments);
     this.removeOverflowDetectionListener();
+    this.destroyResizeObserver();
   },
 
   showDescriptionModal() {
