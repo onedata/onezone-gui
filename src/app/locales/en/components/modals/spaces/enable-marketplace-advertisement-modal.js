@@ -1,3 +1,5 @@
+import privileges from '../../../onedata-gui-common/common/privileges';
+
 export default {
   header: 'Advertise space in the Marketplace',
   body: {
@@ -14,5 +16,6 @@ export default {
   cancel: 'Cancel',
   proceed: 'Proceed',
   enablingAdvertisement: 'enabling space advertisement',
-  emailShareCheckboxText: 'I accept that the above contact e-mail address will be visible to the space members with "manage marketplace" privilege. The address is not displayed publicly in the Marketplace.',
+  // NOTE: using non-breaking hyphen Unicode character
+  emailShareCheckboxText: `I accept that the above contact e‑mail address will be visible to the space members with "${privileges.space.space_manage_marketplace}" privilege. The address is not displayed publicly in the Marketplace.`,
 };

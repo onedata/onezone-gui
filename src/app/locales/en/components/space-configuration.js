@@ -1,4 +1,5 @@
 import spaceTagsSelector from './space-configuration/space-tags-selector';
+import privileges from '../onedata-gui-common/common/privileges';
 
 export default {
   spaceTagsSelector,
@@ -34,8 +35,9 @@ export default {
     customValueInputPlaceholder: 'Enter a custom e-mail address...',
     customValueOptionTextPrefix: 'Custom e-mail address...',
     // label and tip is not rendered by form-renderer but by custom code
-    customLabel: 'Marketplace contact e-mail address',
-    customTip: 'This address will be used for notifying about new membership requests. The person controlling this address must have "manage marketplace" and "add user" privileges in the space to be able to process access requests.',
+    // NOTE: using non-breaking hyphen Unicode character
+    customLabel: 'Marketplace contact e‑mail address',
+    customTip: `This address will be used for notifying about new membership requests. The person controlling this address must have "${privileges.space.space_manage_marketplace}" and "${privileges.space.space_add_user}" privileges in the space to be able to process access requests.`,
   },
   viewInMarketplace: 'View in Marketplace',
   save: 'Save',
@@ -52,6 +54,6 @@ export default {
     disablingAdvertisement: 'disabling space advertisement',
   },
   someTagsUnsupported: 'Some of the entered tags are no longer allowed. Remove them to be able to save changes.',
-  emailVisibleAlert: 'The e-mail address will be visible to all space members with the "manage marketplace" privilege.',
+  emailVisibleAlert: `The e-mail address will be visible to all space members with the "${privileges.space.space_manage_marketplace}" privilege.`,
   advertisedInDisabledMarketplace: 'Space advertisement has been enabled for this space, but currently the Space Marketplace is disabled in this Onezone.',
 };

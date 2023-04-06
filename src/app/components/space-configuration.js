@@ -174,7 +174,7 @@ export default Component.extend(validations, I18n, {
     'space.privileges.{update,manageMarketplace}',
     function marketplaceReadOnlyTip() {
       const privileges = this.space?.privileges;
-      if (!privileges || !privileges.update || !privileges.manageMarketplace) {
+      if (!privileges?.update || !privileges?.manageMarketplace) {
         return insufficientPrivilegesMessage({
           i18n: this.i18n,
           modelName: 'space',

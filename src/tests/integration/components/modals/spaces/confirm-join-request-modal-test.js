@@ -270,7 +270,7 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
     expect(helper.grantButton).to.not.exist;
   });
 
-  it('has "Decide later" button and closes the modal and opens "decide later" info modal after it is',
+  it('has "Decide later" button that closes the modal and opens "decide later" info modal',
     async function () {
       const helper = new Helper(this);
       const requestId = 'join_request_id';

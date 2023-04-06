@@ -30,6 +30,22 @@ import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insuffi
  * @property {string} joinRequestId Space membership request ID.
  */
 
+/**
+ * @typedef {Object} JoinRequestVerificationInfo
+ * @property {Models.Space} [space] If requests complete successfully, the space that
+ *   the request is about.
+ * @property { SpaceMembershipRequesterInfo } [requesterInfo] If requests complete
+ *   successfully, info about user requesting membership.
+ * @property {
+ *   'spaceNotFound' |
+ *   'spaceForbidden' |
+ *   'requesterInfoNotFound' |
+ *   'requesterInfoForbidden' |
+ *   'requesterInfoRelationAlreadyExist'
+ * } [errorId] One of known request errors to show special message.
+ * @property {any} [error] Error object if the known error is catched.
+ */
+
 export default Component.extend(I18n, {
   tagName: '',
 
@@ -61,12 +77,6 @@ export default Component.extend(I18n, {
   //#endregion
 
   isMarketplaceEnabled: bool('spaceManager.marketplaceConfig.enabled'),
-
-  /**
-   * @typedef {Object} JoinRequestVerificationInfo
-   * @property {'spaceNotFound'} [errorId]
-   * @property {any} [error]
-   */
 
   /**
    * @type {ComputedProperty<PromiseObject<JoinRequestVerificationInfo>>}
@@ -141,9 +151,9 @@ export default Component.extend(I18n, {
   /**
    * @type {SpaceMembershipRequesterInfo|null}
    */
-  requesterInfo: reads('dataVerificationInfoProxy.content.requesterInfo'),
+  requesterInfo: reads('dataVerificationInfo.requesterInfo'),
 
-  space: reads('dataVerificationInfoProxy.content.space'),
+  space: reads('dataVerificationInfo.space'),
 
   /**
    * Make requesterInfo compatible with `join-image` component.
