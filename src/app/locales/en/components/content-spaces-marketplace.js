@@ -4,6 +4,7 @@ import filterHeader from './content-spaces-marketplace/filter-header';
 import list from './content-spaces-marketplace/list';
 import item from './content-spaces-marketplace/item';
 import spaceDescription from './content-spaces-marketplace/space-description';
+import spaceItemSupportList from './content-spaces-marketplace/space-item-support-list';
 
 export default {
   empty,
@@ -12,4 +13,5 @@ export default {
   spaceDescription,
   contentHeader,
   filterHeader,
+  spaceItemSupportList,
 };

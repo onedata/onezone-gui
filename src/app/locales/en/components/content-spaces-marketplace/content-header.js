@@ -1,5 +1,5 @@
 export default {
-  header: 'Spaces marketplace',
+  header: 'Space Marketplace',
   refreshAdvertisedSpacesListAction: {
     title: 'Refresh',
   },

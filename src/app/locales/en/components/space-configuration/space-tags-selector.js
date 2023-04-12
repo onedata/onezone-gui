@@ -1,14 +1,13 @@
-// TODO: VFS-10252 consult i18n
 export default {
-  allCategoryTagsUsed: 'All tags of selected category are already used.',
-  noTagsForFilter: 'No unused tags in selected category found for given search.',
-  noTagsInOnezone: 'No space tags available in this Onezone.',
+  allCategoryTagsUsed: 'All tags within the category are already used.',
+  noTagsForFilter: 'No matching tags in this category.',
+  noTagsInOnezone: 'No tags available in this Onezone.',
   category: {
     general: 'General',
     domains: 'Domains',
   },
-  searchPlaceholder: 'Search tags...',
+  searchPlaceholder: 'Search for tags...',
   spaceTag: {
-    unsupported: 'This tag is not supported in this Onezone. It is recommended to remove it from tags list.',
+    unsupported: 'This tag is no longer allowed.',
   },
 };

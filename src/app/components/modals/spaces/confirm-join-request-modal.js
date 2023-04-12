@@ -17,6 +17,8 @@ import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import { promise, bool, and, not } from 'ember-awesome-macros';
+import { htmlSafe } from '@ember/string';
+import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 
 /**
  * @typedef {Object} ConfirmJoinRequestModalOptions
@@ -26,6 +28,22 @@ import { promise, bool, and, not } from 'ember-awesome-macros';
  *   request.
  * @property {string} spaceId ID of space, for which the access will be considered.
  * @property {string} joinRequestId Space membership request ID.
+ */
+
+/**
+ * @typedef {Object} JoinRequestVerificationInfo
+ * @property {Models.Space} [space] If requests complete successfully, the space that
+ *   the request is about.
+ * @property { SpaceMembershipRequesterInfo } [requesterInfo] If requests complete
+ *   successfully, info about user requesting membership.
+ * @property {
+ *   'spaceNotFound' |
+ *   'spaceForbidden' |
+ *   'requesterInfoNotFound' |
+ *   'requesterInfoForbidden' |
+ *   'requesterInfoRelationAlreadyExist'
+ * } [errorId] One of known request errors to show special message.
+ * @property {any} [error] Error object if the known error is catched.
  */
 
 export default Component.extend(I18n, {
@@ -38,6 +56,7 @@ export default Component.extend(I18n, {
   recordManager: service(),
   globalNotify: service(),
   modalManager: service(),
+  alert: service(),
 
   /**
    * @virtual
@@ -60,27 +79,81 @@ export default Component.extend(I18n, {
   isMarketplaceEnabled: bool('spaceManager.marketplaceConfig.enabled'),
 
   /**
-   * @type {PromiseObject<SpaceMembershipRequesterInfo>}
+   * @type {ComputedProperty<PromiseObject<JoinRequestVerificationInfo>>}
    */
-  requesterInfoProxy: promise.object(computed(
-    'isMarketplaceEnabled',
+  dataVerificationInfoProxy: promise.object(computed(
     'spaceId',
     'joinRequestId',
-    async function requesterInfoProxy() {
+    'isMarketplaceEnabled',
+    async function dataVerificationInfoProxy() {
+      // this modal should be never opened when marketplace is disabled, but adding
+      // check for unexpected situations
       if (!this.isMarketplaceEnabled) {
-        return null;
+        throw new Error('marketplace disabled');
       }
-      return await this.spaceManager.getSpaceMembershipRequesterInfo(
+      const spacePromise = this.spaceManager.getRecordById(this.spaceId);
+      const requesterInfoPromise = this.spaceManager.getSpaceMembershipRequesterInfo(
         this.spaceId,
         this.joinRequestId,
       );
+      let space;
+      try {
+        space = await spacePromise;
+      } catch (spaceGetError) {
+        switch (spaceGetError?.id) {
+          case 'notFound':
+            return ({
+              errorId: 'spaceNotFound',
+              error: spaceGetError,
+            });
+          case 'forbidden':
+            return ({
+              errorId: 'spaceForbidden',
+              error: spaceGetError,
+            });
+          default:
+            throw spaceGetError;
+        }
+      }
+      let requesterInfo;
+      try {
+        requesterInfo = await requesterInfoPromise;
+      } catch (requesterInfoGetError) {
+        switch (requesterInfoGetError?.id) {
+          case 'notFound':
+            return ({
+              errorId: 'requesterInfoNotFound',
+              error: requesterInfoGetError,
+            });
+          case 'forbidden':
+            return ({
+              errorId: 'requesterInfoForbidden',
+              error: requesterInfoGetError,
+            });
+          case 'relationAlreadyExists':
+            return ({
+              errorId: 'requesterInfoRelationAlreadyExist',
+              error: requesterInfoGetError,
+            });
+          default:
+            throw requesterInfoGetError;
+        }
+      }
+      return {
+        space,
+        requesterInfo,
+      };
     }
   )),
+
+  dataVerificationInfo: reads('dataVerificationInfoProxy.content'),
 
   /**
    * @type {SpaceMembershipRequesterInfo|null}
    */
-  requesterInfo: reads('requesterInfoProxy.content'),
+  requesterInfo: reads('dataVerificationInfo.requesterInfo'),
+
+  space: reads('dataVerificationInfo.space'),
 
   /**
    * Make requesterInfo compatible with `join-image` component.
@@ -93,15 +166,6 @@ export default Component.extend(I18n, {
       username: this.requesterInfo.username,
     };
   }),
-
-  spaceProxy: promise.object(computed(
-    'spaceId',
-    async function spaceProxy() {
-      return await this.spaceManager.getRecordById(this.spaceId);
-    }
-  )),
-
-  space: reads('spaceProxy.content'),
 
   /**
    * Execute implementation of granting space membership by request.
@@ -119,7 +183,10 @@ export default Component.extend(I18n, {
 
   spaceId: reads('modalOptions.spaceId'),
 
-  isValid: bool('requesterInfoProxy.isFulfilled'),
+  isValid: and(
+    'dataVerificationInfoProxy.isFulfilled',
+    not('dataVerificationInfo.errorId')
+  ),
 
   userId: reads('requesterInfo.userId'),
 
@@ -129,7 +196,37 @@ export default Component.extend(I18n, {
 
   isProceedAvailable: and('isValid', not('isProcessing')),
 
-  bodyRequiredDataProxy: promise.object(promise.all('requesterInfoProxy', 'spaceProxy')),
+  grantButtonDisabledTip: computed(
+    'space.privileges.{manageInMarketplace,addUser}',
+    function grantButtonDisabledTip() {
+      if (!this.space) {
+        return;
+      }
+      if (!this.space.privileges.manageInMarketplace || !this.space.privileges.addUser) {
+        return insufficientPrivilegesMessage({
+          i18n: this.i18n,
+          modelName: 'space',
+          privilegeFlag: ['space_manage_in_marketplace', 'space_add_user'],
+        });
+      }
+    }
+  ),
+
+  rejectButtonDisabledTip: computed(
+    'space.privileges.manageInMarketplace',
+    function rejectButtonDisabledTip() {
+      if (!this.space) {
+        return;
+      }
+      if (!this.space.privileges.manageInMarketplace) {
+        return insufficientPrivilegesMessage({
+          i18n: this.i18n,
+          modelName: 'space',
+          privilegeFlag: 'space_manage_in_marketplace',
+        });
+      }
+    }
+  ),
 
   actions: {
     async grant() {
@@ -159,6 +256,13 @@ export default Component.extend(I18n, {
       } finally {
         this.set('isProcessing', false);
       }
+    },
+    decideLater() {
+      this.modalManager.hide(this.modalId);
+      const text = this.t('decideLaterModal.bodyText');
+      this.alert.info(htmlSafe(`<p>${text}</p>`), {
+        header: this.t('decideLaterModal.header'),
+      });
     },
   },
 });

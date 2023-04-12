@@ -577,6 +577,7 @@ export default Service.extend({
 
   /**
    * @param {SpaceAccessRequestMessageData} requestData
+   * @returns {Promise<{ requestId: string }>} ID of space membership request
    */
   async requestSpaceAccess(requestData) {
     const requestGri = gri({
@@ -628,13 +629,13 @@ export default Service.extend({
       entityType: spaceEntityType,
       entityId: spaceId,
       aspect: 'resolve_membership_request',
+      aspectId: requestId,
     });
     return this.onedataGraph.request({
       gri: requestGri,
       operation: 'create',
       data: {
-        requestId,
-        grant: grantAccess,
+        decision: grantAccess ? 'grant' : 'reject',
       },
       subscribe: false,
     });

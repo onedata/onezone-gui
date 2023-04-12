@@ -1,8 +1,7 @@
-// TODO: VFS-10252 consult i18n
 export default {
-  failureNotificationActionName: 'sending request',
+  failureNotificationActionName: 'request submission',
   requestSuccess: {
-    header: 'Request sent successfully',
-    text: 'Space access request has been sent successfully – now it will be considered by space mainainer. When your request will be approved, you will receive a notification e-mail sent to <strong>{{email}}</strong> address and space will become available on the spaces list.',
+    header: 'Request submitted',
+    text: 'The space access request has been submitted successfully and awaits the consideration of the space maintainer. Upon approval or rejection, you will receive a notification e-mail.',
   },
 };

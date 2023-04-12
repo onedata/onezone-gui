@@ -36,7 +36,7 @@
           <span class="creation-time-text">
             {{creationDateText}}
           </span>
-          {{one-tooltip title=creationTimeTooltip}}
+          {{one-tooltip title=(tt this "creationTimeTooltip")}}
         </div>
         <span class="col-separator"></span>
         {{content-spaces-marketplace/space-item-support-list
@@ -66,9 +66,11 @@
             <span class="text">{{tt this "requestAccess"}}</span>
           {{/one-button}}
         {{else if (eq status MarketplaceSpaceStatusEnum.Pending)}}
-          {{#one-button size="sm" disabled=true}}
-            {{one-icon icon="cart"}}
-            <span class="text">{{tt this "requestSent"}}</span>
+          <div class="btn-tooltip-container">
+            {{#one-button class="request-pending-btn" size="sm" disabled=true}}
+              {{one-icon icon="cart"}}
+              <span class="text">{{tt this "requestSent"}}</span>
+            {{/one-button}}
             {{one-tooltip
               class="tooltip-lg tooltip-text-left"
               title=(tt this "requestPendingTip"
@@ -76,7 +78,7 @@
                 email=lastRequesterEmail
               )
             }}
-          {{/one-button}}
+          </div>
         {{else if (eq status MarketplaceSpaceStatusEnum.Granted)}}
           <div class="access-info-head-container access-granted-container">
             {{one-icon icon="cart-checked"}}

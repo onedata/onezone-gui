@@ -10,12 +10,12 @@
       {{#if (not isMarketplaceEnabled)}}
         {{one-icon icon="sign-warning-rounded"}}
         <span class="one-label">{{tt this "header.marketplaceDisabled"}}</span>
-      {{else if requesterInfoProxy.isFulfilled}}
-        {{one-icon icon="sign-info-rounded"}}
-        <span class="one-label">{{tt this "header.valid"}}</span>
-      {{else if requesterInfoProxy.isPending}}
+      {{else if dataVerificationInfoProxy.isPending}}
         {{one-icon icon="sign-info-rounded"}}
         <span class="one-label">{{tt this "header.loading"}}</span>
+      {{else if isValid}}
+        {{one-icon icon="sign-info-rounded"}}
+        <span class="one-label">{{tt this "header.valid"}}</span>
       {{else}}
         {{one-icon icon="sign-error-rounded"}}
         <span class="one-label">{{tt this "header.failed"}}</span>
@@ -27,58 +27,79 @@
     {{#if isMarketplaceEnabled}}
       {{#promise-proxy-container
         tagName="div"
-        class=(if bodyRequiredDataProxy.isPending "loadable-row")
-        proxy=bodyRequiredDataProxy
+        class=(if dataVerificationInfoProxy.isPending "loadable-row")
+        proxy=dataVerificationInfoProxy
       }}
-        <p>
-          {{tt this "body.valid.accessTo"}}
-          <strong class="space-name">{{name-conflict item=spaceProxy.content}}</strong>
-          {{tt this "body.valid.spaceRequestedBy"}}
-          <strong class="user-full-name">{{requesterInfo.fullName}}</strong>
-          {{#if requesterInfo.contactEmail}}
-            {{!-- do not break all lines to avoid spaces --}}
-            (<a
-              class="azure user-email"
-              href={{concat "mailto:" requesterInfo.contactEmail}}
-            >{{requesterInfo.contactEmail}}</a>)
-          {{/if}}
-          {{tt this "body.valid.usingMarketplace"}}
-        </p>
-        <p>{{tt this "body.valid.info"}}</p>
-        {{join-image
-          class="user-join-space-image hidden-xs"
-          joiningModelName="user"
-          joiningRecord=joiningUserLikeRecord
-          inviteTargetModelName="space"
-          inviteTargetId=spaceId
-          inviteTargetName=spaceName
-        }}
-        <p>{{tt this "body.valid.question"}}</p>
+        {{#if dataVerificationInfo.errorId}}
+          <p>{{tt this (concat "verificationError." dataVerificationInfo.errorId)}}</p>
+        {{else}}
+          <p>
+            {{tt this "body.valid.accessTo"}}
+            <strong class="space-name">{{name-conflict item=space}}</strong>
+            {{tt this "body.valid.spaceRequestedBy"}}
+            <strong class="user-full-name">{{requesterInfo.fullName}}</strong>
+            {{#if requesterInfo.contactEmail}}
+              {{!-- do not break all lines to avoid spaces --}}
+              (<a
+                class="azure user-email"
+                href={{concat "mailto:" requesterInfo.contactEmail}}
+              >{{requesterInfo.contactEmail}}</a>)
+            {{/if}}
+            {{tt this "body.valid.usingMarketplace"}}
+          </p>
+          <p>{{tt this "body.valid.info"}}</p>
+          {{join-image
+            class="user-join-space-image hidden-xs"
+            joiningModelName="user"
+            joiningRecord=joiningUserLikeRecord
+            inviteTargetModelName="space"
+            inviteTargetId=spaceId
+            inviteTargetName=spaceName
+          }}
+          <p>{{tt this "body.valid.question"}}</p>
+        {{/if}}
       {{/promise-proxy-container}}
     {{else}}
       <p>{{tt this "body.marketplaceDisabled"}}</p>
     {{/if}}
   {{/modal.body}}
 
-  {{#if requesterInfoProxy.isSettled}}
+  {{#if dataVerificationInfoProxy.isSettled}}
     {{#modal.footer class="btn-toolbar"}}
       {{#if isProceedButtonVisible}}
         {{#one-button
-          type="warning"
-          class="reject-btn"
-          disabled=(not isProceedAvailable)
-          onClick=(action "reject")
+          class="decide-later-btn"
+          disabled=isProcessing
+          onClick=(action "decideLater")
         }}
-          {{tt this "rejectBtn"}}
+          {{tt this "decideLaterBtn"}}
         {{/one-button}}
-        {{#one-button
-          type="primary"
-          class="grant-btn"
-          disabled=(not isProceedAvailable)
-          onClick=(action "grant")
-        }}
-          {{tt this "grantBtn"}}
-        {{/one-button}}
+        <div class="btn-tooltip-container">
+          {{#one-button
+            type="warning"
+            class="reject-btn"
+            disabled=(or (not isProceedAvailable) rejectButtonDisabledTip)
+            onClick=(action "reject")
+          }}
+            {{tt this "rejectBtn"}}
+          {{/one-button}}
+          {{#if rejectButtonDisabledTip}}
+            {{one-tooltip title=rejectButtonDisabledTip}}
+          {{/if}}
+        </div>
+        <div class="btn-tooltip-container">
+          {{#one-button
+            type="primary"
+            class="grant-btn"
+            disabled=(or (not isProceedAvailable) grantButtonDisabledTip)
+            onClick=(action "grant")
+          }}
+            {{tt this "grantBtn"}}
+          {{/one-button}}
+          {{#if grantButtonDisabledTip}}
+            {{one-tooltip title=grantButtonDisabledTip}}
+          {{/if}}
+        </div>
       {{else}}
         {{#one-button
           type="default"

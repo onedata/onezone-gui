@@ -29,7 +29,7 @@ describe('Integration | Component | modals/spaces/request-space-access-modal', f
 
     expect(helper.header).to.contain.text('Request space access');
     expect(helper.body).to.contain.text(
-      'You are about to request access to Foo bar space.'
+      'You are requesting access to space Foo bar.'
     );
   });
 

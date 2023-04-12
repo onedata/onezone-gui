@@ -17,9 +17,9 @@ describe('Integration | Component | content-spaces-marketplace', function () {
       await helper.render();
 
       expect(helper.element).to.exist;
-      expect(helper.element).to.contain.text('No spaces in the marketplace');
+      expect(helper.element).to.contain.text('Empty Marketplace');
       expect(helper.element).to.contain.text(
-        'There are no spaces added to the marketplace. You can add your space.'
+        'There are no spaces advertised in the Marketplace. Feel encouraged to add your spaces.'
       );
       const buttons = [...helper.headerElement.querySelectorAll('button')];
       expect(buttons).to.have.lengthOf(1);

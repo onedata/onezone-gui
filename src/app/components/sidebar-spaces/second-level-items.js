@@ -179,7 +179,6 @@ export default SecondLevelItems.extend(I18n, {
 
   spaceSecondLevelItems: collect(
     'itemIndex',
-    'itemConfiguration',
     'itemData',
     'itemShares',
     'itemTransfers',
@@ -188,6 +187,7 @@ export default SecondLevelItems.extend(I18n, {
     'itemMembers',
     'itemHarvesters',
     'itemAutomation',
+    'itemConfiguration',
   ),
 
   init() {

@@ -4,7 +4,6 @@ export default {
     leave: 'Leave',
     totalStorageHint: 'Total size of the space: {{{size}}}',
     supportCountHint: 'Number of supporting providers: {{{count}}}',
-    // TODO: VFS-10252 consult i18n
     advertisedInMarketplace: 'This space is advertised in the marketplace',
     spacePersistence: 'space persistence',
   },

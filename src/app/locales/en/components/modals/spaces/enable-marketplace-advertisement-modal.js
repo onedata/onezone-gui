@@ -1,18 +1,21 @@
-// TODO: VFS-10252 consult i18n
+import privileges from '../../../onedata-gui-common/common/privileges';
+
 export default {
-  header: 'Advertise space in marketplace',
+  header: 'Advertise space in the Marketplace',
   body: {
-    textIntro: 'Advertising space will make it\'s name, organization name, tags and description visible in',
-    spacesMarketplace: 'the spaces marketplace',
-    textExtended: 'Once space is advertised, every user of this Onezone can see it in the marketplace and request an access token using contact e-mail address specified below. The space can be dismissed from the marketplace at any time by space member having proper privileges. The contact e-mail as well as other space properties can be modified in the space configuration view.',
+    textIntro: 'The space will be publicly advertised in',
+    spacesMarketplace: 'the Space Marketplace',
+    textIntroFields: 'along with the following information: name, organization name, tags, description, creation time, provider names and total support size.',
+    textExtended: 'Once the space is advertised, anyone will be able to find it in the Marketplace and request access. Requests will be sent to the maintainer contact e-mail address by means of an automated mailing system. The maintainer decides upon acceptance or rejection of received requests. At any time, the space can be withdrawn from the Marketplace.',
   },
   contactEmail: {
-    label: 'Marketplace contact e-mail',
-    customValueInputPlaceholder: 'Enter custom e-mail address...',
+    label: 'Maintainer contact e-mail',
+    customValueInputPlaceholder: 'Enter a custom e-mail address...',
     customValueOptionTextPrefix: 'Custom e-mail address...',
   },
   cancel: 'Cancel',
   proceed: 'Proceed',
   enablingAdvertisement: 'enabling space advertisement',
-  emailShareCheckboxText: 'I understand, that above contact e-mail address will be visible to space members with "view space" privilege.',
+  // NOTE: using non-breaking hyphen Unicode character
+  emailShareCheckboxText: `I accept that the above contact e‑mail address will be visible to the space members with "${privileges.space.space_manage_in_marketplace}" privilege. The address is not displayed publicly in the Marketplace.`,
 };

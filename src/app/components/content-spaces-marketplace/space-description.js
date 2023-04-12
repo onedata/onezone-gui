@@ -47,6 +47,29 @@ export default Component.extend(...mixins, {
    */
   overflowDimension: 'height',
 
+  /**
+   * @type {ResizeObserver}
+   */
+  resizeObserver: null,
+
+  initResizeObserver() {
+    const element = this.element;
+    if (!this.element || this.resizeObserver) {
+      return;
+    }
+    /** @type {ResizeObserver} */
+    const resizeObserver = new ResizeObserver(() => {
+      this.detectOverflow();
+    });
+    resizeObserver.observe(element);
+    this.set('resizeObserver', resizeObserver);
+  },
+
+  destroyResizeObserver() {
+    this.resizeObserver?.disconnect();
+    this.set('resizeObserver', null);
+  },
+
   didInsertElement() {
     this._super(...arguments);
     this.setProperties({
@@ -54,11 +77,14 @@ export default Component.extend(...mixins, {
       overflowParentElement: this.element,
     });
     this.addOverflowDetectionListener();
+    this.detectOverflow();
+    this.initResizeObserver();
   },
 
   willDestroyElement() {
     this._super(...arguments);
     this.removeOverflowDetectionListener();
+    this.destroyResizeObserver();
   },
 
   showDescriptionModal() {

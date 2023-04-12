@@ -8,8 +8,7 @@ export default {
   p3a: 'join a group',
   p3t1: 'If you have a group invitation token,',
   p3t2: 'to gain access to spaces of that group.',
-  // TODO: VFS-10252 consult i18n
   pMarketPrefix: 'Visit',
   pMarketAnchor: 'spaces marketplace',
-  pMarketSuffix: 'to browse and request access to spaces advertised in this Onezone.',
+  pMarketSuffix: 'to request access to publicly advertised spaces.',
 };
