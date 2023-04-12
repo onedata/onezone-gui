@@ -339,7 +339,7 @@ class Helper {
       name: 'Default mock space',
       entityId: 'default_mock_space_id',
       privileges: {
-        manageMarketplace: true,
+        manageInMarketplace: true,
         addUser: true,
       },
       ...data,

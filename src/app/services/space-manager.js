@@ -577,6 +577,7 @@ export default Service.extend({
 
   /**
    * @param {SpaceAccessRequestMessageData} requestData
+   * @returns {Promise<{ requestId: string }>} ID of space membership request
    */
   async requestSpaceAccess(requestData) {
     const requestGri = gri({

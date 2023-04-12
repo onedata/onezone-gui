@@ -17,5 +17,5 @@ export default {
   proceed: 'Proceed',
   enablingAdvertisement: 'enabling space advertisement',
   // NOTE: using non-breaking hyphen Unicode character
-  emailShareCheckboxText: `I accept that the above contact e‑mail address will be visible to the space members with "${privileges.space.space_manage_marketplace}" privilege. The address is not displayed publicly in the Marketplace.`,
+  emailShareCheckboxText: `I accept that the above contact e‑mail address will be visible to the space members with "${privileges.space.space_manage_in_marketplace}" privilege. The address is not displayed publicly in the Marketplace.`,
 };

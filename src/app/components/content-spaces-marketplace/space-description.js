@@ -12,8 +12,6 @@ import Component from '@ember/component';
 import ContentOverflowDetector from 'onedata-gui-common/mixins/content-overflow-detector';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import { observer } from '@ember/object';
-import { scheduleOnce } from '@ember/runloop';
 
 const mixins = [
   I18n,

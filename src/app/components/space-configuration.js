@@ -171,14 +171,14 @@ export default Component.extend(validations, I18n, {
   ),
 
   marketplaceReadOnlyTip: computed(
-    'space.privileges.{update,manageMarketplace}',
+    'space.privileges.{update,manageInMarketplace}',
     function marketplaceReadOnlyTip() {
       const privileges = this.space?.privileges;
-      if (!privileges?.update || !privileges?.manageMarketplace) {
+      if (!privileges?.update || !privileges?.manageInMarketplace) {
         return insufficientPrivilegesMessage({
           i18n: this.i18n,
           modelName: 'space',
-          privilegeFlag: ['space_update', 'space_manage_marketplace'],
+          privilegeFlag: ['space_update', 'space_manage_in_marketplace'],
         });
       }
     }

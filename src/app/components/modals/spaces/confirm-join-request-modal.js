@@ -197,32 +197,32 @@ export default Component.extend(I18n, {
   isProceedAvailable: and('isValid', not('isProcessing')),
 
   grantButtonDisabledTip: computed(
-    'space.privileges.{manageMarketplace,addUser}',
+    'space.privileges.{manageInMarketplace,addUser}',
     function grantButtonDisabledTip() {
       if (!this.space) {
         return;
       }
-      if (!this.space.privileges.manageMarketplace || !this.space.privileges.addUser) {
+      if (!this.space.privileges.manageInMarketplace || !this.space.privileges.addUser) {
         return insufficientPrivilegesMessage({
           i18n: this.i18n,
           modelName: 'space',
-          privilegeFlag: ['space_manage_marketplace', 'space_add_user'],
+          privilegeFlag: ['space_manage_in_marketplace', 'space_add_user'],
         });
       }
     }
   ),
 
   rejectButtonDisabledTip: computed(
-    'space.privileges.manageMarketplace',
+    'space.privileges.manageInMarketplace',
     function rejectButtonDisabledTip() {
       if (!this.space) {
         return;
       }
-      if (!this.space.privileges.manageMarketplace) {
+      if (!this.space.privileges.manageInMarketplace) {
         return insufficientPrivilegesMessage({
           i18n: this.i18n,
           modelName: 'space',
-          privilegeFlag: 'space_manage_marketplace',
+          privilegeFlag: 'space_manage_in_marketplace',
         });
       }
     }
