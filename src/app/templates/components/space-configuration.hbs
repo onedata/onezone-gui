@@ -1,0 +1,251 @@
+<div class="form form-horizontal space-configuration-form fill-flex-using-column">
+  <div class={{concat-classes
+    "form-group space-name-form-group"
+    (if blankInlineEditors.name "has-error")
+  }}>
+    <label class="control-label">{{tt this "spaceName.label"}}:</label>
+    {{#if isReadOnly}}
+      <span class="static-value">{{spaceName}}</span>
+    {{else}}
+      {{one-inline-editor
+        class="space-name"
+        value=spaceName
+        onSave=(action "saveValue" "name")
+        onInputValueChanged=(action "inlineEditorChange" "name")
+        isSaveDisabled=blankInlineEditors.name
+        saveButtonTip=(if blankInlineEditors.name (tt this "fieldCannotBeEmpty"))
+      }}
+    {{/if}}
+  </div>
+  <div class={{concat-classes
+    "form-group organization-name-form-group"
+    (if blankInlineErrors.organizationName "has-error")
+  }}>
+    <label class="control-label">
+      {{tt this "organizationName.label"}}:
+      {{one-label-tip title=(tt this "organizationName.tip")}}
+    </label>
+    {{#if isReadOnly}}
+      {{#if organizationName}}
+        <span class="static-value">{{organizationName}}</span>
+      {{else}}
+        <span class="static-value static-not-set">{{tt this "notSet"}}</span>
+      {{/if}}
+    {{else}}
+      {{one-inline-editor
+        class="organization-name"
+        value=organizationName
+        onInputValueChanged=(action "inlineEditorChange" "organizationName")
+        isSaveDisabled=blankInlineErrors.organizationName
+        saveButtonTip=(if
+          blankInlineErrors.organizationName
+          (tt this "fieldCannotBeEmptyWhenAdvertising")
+        )
+        onSave=(action "saveValue" "organizationName")
+      }}
+    {{/if}}
+  </div>
+  <div class={{concat-classes
+    "form-group space-tags-form-group"
+    (if tagsInputErrorMessage "has-error")
+  }}>
+    <label class="control-label">
+      {{tt this "spaceTags.label"}}:
+      {{one-label-tip title=(tt this "spaceTags.tip")}}
+    </label>
+    {{#if isReadOnly}}
+      {{#if areSpaceTagsEmpty}}
+        <span class="static-value static-not-set">{{tt this "notSet"}}</span>
+      {{else}}
+        {{tags-input class="space-tags static-value" tags=spaceTags readonly=true}}
+      {{/if}}
+    {{else}}
+      {{one-inline-editor
+        class="space-tags"
+        editorSettings=spaceTagsEditorSettings
+        value=spaceTags
+        isSaveDisabled=(bool tagsInputErrorMessage)
+        saveButtonTip=tagsInputErrorMessage
+        onInputValueChanged=(action "currentSpaceTagsChanged")
+        onSave=(action "saveValue" "tags")
+      }}
+    {{/if}}
+  </div>
+  <div class="form-group description-form-group">
+    <label class="control-label">
+      {{tt this "description.label"}}:
+      {{one-label-tip title=(tt this "description.tip")}}
+    </label>
+    {{#bs-button-group
+      value=descriptionEditorMode
+      class="description-editor-mode-selector flex-aligned"
+      type="radio"
+      onChange=(action (mut descriptionEditorMode)) as |bg|
+    }}
+      <div class="btn-group" role="group">
+        {{#bg.button type="default" class="btn-sm btn-description-view" value="view"}}
+          {{one-icon
+            class="tab-icon"
+            icon="view"
+          }}
+          <div class="tab-name">{{tt this "description.radio.view"}}</div>
+        {{/bg.button}}
+      </div>
+      <div class="btn-group" role="group">
+        {{#bg.button type="default" class="btn-sm btn-description-edit" value="edit"}}
+          {{one-icon
+            class="tab-icon"
+            icon="markdown"
+          }}
+          <div class="tab-name">{{tt this "description.radio.edit"}}</div>
+        {{/bg.button}}
+      </div>
+    {{/bs-button-group}}
+    {{#if isDescriptionModified}}
+      <div class="description-submit-buttons">
+        {{#one-button
+          type="warning"
+          size="sm"
+          onClick=(action "discardValue" "description")
+        }}
+          {{tt this "discard"}}
+        {{/one-button}}
+        <div class="btn-tooltip-container">
+          {{#one-button
+            type="primary"
+            size="sm"
+            disabled=blankInlineErrors.description
+            onClick=(action "saveValue" "description" currentDescription)
+          }}
+            {{tt this "save"}}
+          {{/one-button}}
+          {{#if blankInlineErrors.description}}
+            {{one-tooltip title=(tt this "fieldCannotBeEmptyWhenAdvertising")}}
+          {{/if}}
+        </div>
+      </div>
+    {{/if}}
+    <hr class="description-separator">
+  </div>
+  <div class={{concat-classes
+    "form-group description-content-form-group"
+    (if (eq descriptionEditorMode "edit") "fill-flex-using-column")
+    (if
+      (and (eq descriptionEditorMode "view") isCurrentDescriptionEmpty)
+      "description-empty"
+    )
+  }}
+  >
+    {{#if (eq descriptionEditorMode "view")}}
+      {{#perfect-scrollbar-element
+        class="markdown-container"
+      }}
+        {{#unless isCurrentDescriptionEmpty}}
+          {{one-markdown-to-html
+            class="markdown-view space-description-markdown-view"
+            markdown=currentDescription
+          }}
+        {{else}}
+          {{#if isReadOnly}}
+            <div class="description-empty-message">
+              <span class="description-empty-text">{{tt this "notSet"}}</span>
+            </div>
+          {{else}}
+            <div
+              class="description-empty-message"
+              onclick={{action (mut descriptionEditorMode) "edit"}}
+            >
+              <span class="description-empty-text">{{tt this "description.emptyText"}}</span>
+              {{one-icon icon="rename" class="description-empty-icon"}}
+            </div>
+          {{/if}}
+        {{/unless}}
+      {{/perfect-scrollbar-element}}
+    {{/if}}
+    {{#render-later triggerRender=(eq descriptionEditorMode "edit")}}
+      {{ember-ace
+        class=(concat-classes
+          "fill-flex-using-column"
+          (unless (eq descriptionEditorMode "edit") "hidden")
+        )
+        editorClass="fill-flex-using-column"
+        value=currentDescription
+        mode="ace/mode/markdown"
+        theme="ace/theme/textmate"
+        tabSize=2
+        useWrapMode=true
+        highlightActiveLine=true
+        showLineNumbers=true
+        showPrintMargin=false
+        readOnly=isReadOnly
+        update=(action "currentDescriptionChanged")
+      }}
+    {{/render-later}}
+  </div>
+  {{#if (and isAdvertised (not isMarketplaceEnabled))}}
+    <div class="field-alert marketplace-disabled-alert">
+      {{one-icon class="field-alert-icon" icon="sign-warning-rounded"}}
+      <span class="text">{{tt this "advertisedInDisabledMarketplace"}}</span>
+    </div>
+  {{/if}}
+  <div class="form-group advertised-form-group">
+    <label class="control-label">
+      {{tt this "advertised.label"}}:
+    </label>
+    {{one-way-toggle
+      class="form-control advertised-toggle"
+      isReadOnly=(or marketplaceReadOnlyTip advertisedToggleLockHint)
+      checked=isAdvertised
+      update=(action "saveValue" "advertised")
+      lockHint=(or marketplaceReadOnlyTip advertisedToggleLockHint)
+    }}
+    {{#if (and isAdvertised isMarketplaceEnabled)}}
+      <a href={{viewInMarketplaceHref}} class="view-in-marketplace-link">
+        <span class="text">{{tt this "viewInMarketplace"}}</span>
+        {{one-icon icon="link-external"}}
+      </a>
+    {{/if}}
+  </div>
+  {{#if (and isAdvertised space.privileges.manageInMarketplace)}}
+    <div class="contact-email-form-container">
+      <div class={{concat-classes
+        "form-group contact-email-form-group"
+        (if emailValidation.error "has-error")
+      }}>
+        <label class="control-label">
+          {{tt this "marketplaceContactEmail.customLabel"}}:
+          {{one-label-tip title=(tt this "marketplaceContactEmail.customTip")}}
+        </label>
+        {{#if isReadOnly}}
+          {{#if contactEmail}}
+            <span class="static-value">{{contactEmail}}</span>
+          {{else}}
+            <span class="static-value static-not-set">{{tt this "notSet"}}</span>
+          {{/if}}
+        {{else}}
+          {{#one-inline-editor
+            class="contact-email"
+            value=contactEmail
+            editorType="custom"
+            onInputValueChanged=(action "currentEmailChanged")
+            isSaveDisabled=emailValidation.error
+            saveButtonTip=emailValidation.message
+            onSave=(action "saveValue" "contactEmail")
+            onEdit=(action "handleContactEmailOnEdit")
+            onApiRegister=(action registerEmailInlineEditor)
+            as |editor|
+          }}
+            {{form-component/field-renderer field=contactEmailRootField}}
+          {{/one-inline-editor}}
+        {{/if}}
+      </div>
+      <div class="field-alert email-visible-alert">
+        {{one-icon
+          class="field-alert-icon email-visible-alert-icon"
+          icon="sign-info-rounded"
+        }}
+        {{tt this "emailVisibleAlert"}}
+      </div>
+    </div>
+  {{/if}}
+</div>

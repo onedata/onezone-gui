@@ -3,6 +3,9 @@ export default {
     title: 'Create new space',
     hint: 'Create new empty space without initial support',
   },
+  btnMarketplace: {
+    title: 'Marketplace',
+  },
   spaceCreateSuccess: 'New space created successfully',
   spaceCreation: 'creating space',
   removeGroupSuccess: 'Group "{{groupName}}" has been removed from space ' +

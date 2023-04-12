@@ -13,5 +13,6 @@ export default {
     harvesters: 'Harvesters, Discovery',
     automation: 'Automation Workflows',
     notFound: 'Space not found',
+    configuration: 'Space configuration',
   },
 };

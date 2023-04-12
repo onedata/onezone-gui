@@ -24,6 +24,12 @@
       outerText=_providersCount
       hint=(tt this "supportCountHint" count=_providersCount)
     }}
+    {{#if isInMarketplace}}
+      {{toolbar.icon
+        icon="cart-checked"
+        hint=(tt this "advertisedInMarketplace")
+      }}
+    {{/if}}
   {{/status-toolbar}}
 {{/if}}
 
@@ -33,7 +39,7 @@
     dropdownPlacement="auto"
     actionsArray=itemActions
   }}
-  
+
   {{#render-later triggerRender=leaveSpaceModalOpen as |renderLater|}}
     {{leave-modal
       opened=leaveSpaceModalOpen

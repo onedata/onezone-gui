@@ -21,7 +21,6 @@ import {
   notEqual,
   isEmpty,
   not,
-  getBy,
 } from 'ember-awesome-macros';
 import RecordOptionsArrayProxy from 'onedata-gui-common/utils/record-options-array-proxy';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
@@ -33,15 +32,6 @@ import config from 'ember-get-config';
 import trimToken from 'onedata-gui-common/utils/trim-token';
 import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
-
-const recordImages = {
-  user: 'assets/images/consume-token/user.svg',
-  group: 'assets/images/consume-token/group.svg',
-  space: 'assets/images/consume-token/space.svg',
-  harvester: 'assets/images/consume-token/harvester.svg',
-  cluster: 'assets/images/consume-token/cluster.svg',
-  atmInventory: 'assets/images/consume-token/atm-inventory.svg',
-};
 
 export default Component.extend(I18n, {
   classNames: ['token-consumer'],
@@ -211,16 +201,6 @@ export default Component.extend(I18n, {
   joiningId: computed('selectedJoiningRecordOption', function joiningId() {
     return this.get('selectedJoiningRecordOption.value.entityId');
   }),
-
-  /**
-   * @type {ComputedProperty<String>}
-   */
-  invitedModelImagePath: getBy(raw(recordImages), 'joiningModelName'),
-
-  /**
-   * @type {ComputedProperty<String>}
-   */
-  inviteTargetModelImagePath: getBy(raw(recordImages), 'inviteTargetModelName'),
 
   /**
    * @type {ComputedProperty<String>}

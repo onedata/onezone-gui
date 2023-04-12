@@ -1,0 +1,120 @@
+<div class="icon-section">
+  {{one-icon icon="space"}}
+</div>
+<div class="content-section">
+  <div class="basic-info-row">
+    <div class="basic-info-col">
+      <div class="row marketplace-item-row title-row">
+        {{name-conflict tagName="div" class="space-name" item=spaceItem}}
+        <div class="tags-container">
+          {{#tags-input readonly=true tags=limitedTags}}
+            {{#if moreTags.length}}
+              <li class="tag-item tag-item-plaintext more-tag clickable">
+                <div class="tag-label more-tag-text">
+                  {{tt this "moreTags" count=moreTags.length}}
+                </div>
+                {{#one-tooltip class="tooltip-with-tags"}}
+                  <ul class="tags-input">
+                    {{#each moreTags as |tag|}}
+                      {{!-- using .tag-label element is not necessary here --}}
+                      <li class="tag-item">{{tag.label}}</li>
+                    {{/each}}
+                  </ul>
+                {{/one-tooltip}}
+              </li>
+            {{/if}}
+          {{/tags-input}}
+        </div>
+      </div>
+      <div class="row marketplace-item-row secondary-row">
+        {{#truncated-string class="organization-name"}}
+          {{organizationName}}
+        {{/truncated-string}}
+        <span class="col-separator hidden-xs hidden-sm"></span>
+        <div class="creation-time hidden-xs hidden-sm">
+          {{one-icon icon="create-time" class="creation-time-icon"}}
+          <span class="creation-time-text">
+            {{creationDateText}}
+          </span>
+          {{one-tooltip title=(tt this "creationTimeTooltip")}}
+        </div>
+        <span class="col-separator"></span>
+        {{content-spaces-marketplace/space-item-support-list
+          spaceItem=spaceItem
+        }}
+      </div>
+    </div>
+    {{#if spaceItem.marketplaceSpaceStatusProxy.isSettled}}
+      <div class={{concat-classes "access-info-col" accessInfoColClassName}}>
+        {{#if (eq status MarketplaceSpaceStatusEnum.Available)}}
+          {{#one-button size="sm" onClick=(action "requestAccess")}}
+            {{one-icon icon="cart"}}
+            <span class="text">{{tt this "requestAccess"}}</span>
+          {{/one-button}}
+        {{else if (eq status MarketplaceSpaceStatusEnum.Outdated)}}
+          {{#one-icon icon="sign-warning-rounded" class="status-btn-external-icon"}}
+            {{one-tooltip
+              class="tooltip-lg tooltip-text-left"
+              title=(tt this "retryWarningTip"
+                dateText=lastActivityDateText
+                email=lastRequesterEmail
+              )
+            }}
+          {{/one-icon}}
+          {{#one-button size="sm" onClick=(action "requestAccess")}}
+            {{one-icon icon="cart"}}
+            <span class="text">{{tt this "requestAccess"}}</span>
+          {{/one-button}}
+        {{else if (eq status MarketplaceSpaceStatusEnum.Pending)}}
+          <div class="btn-tooltip-container">
+            {{#one-button class="request-pending-btn" size="sm" disabled=true}}
+              {{one-icon icon="cart"}}
+              <span class="text">{{tt this "requestSent"}}</span>
+            {{/one-button}}
+            {{one-tooltip
+              class="tooltip-lg tooltip-text-left"
+              title=(tt this "requestPendingTip"
+                dateText=lastActivityDateText
+                email=lastRequesterEmail
+              )
+            }}
+          </div>
+        {{else if (eq status MarketplaceSpaceStatusEnum.Granted)}}
+          <div class="access-info-head-container access-granted-container">
+            {{one-icon icon="cart-checked"}}
+            <span class="text">{{tt this "accessGranted"}}</span>
+          </div>
+          <div class="access-links-container">
+            <a href={{visitSpaceHref}} class="visit-space-link space-link">
+              <span class="text">{{tt this "visitSpace"}}</span>
+              {{one-icon icon="link-external"}}
+            </a>
+            <span class="col-separator"></span>
+            <a href={{configureSpaceHref}} class="configure-space-link space-link">
+              <span class="text">{{tt this "configure"}}</span>
+              {{one-icon icon="link-external"}}
+            </a>
+          </div>
+        {{else if (eq status MarketplaceSpaceStatusEnum.Rejected)}}
+          <div class="access-info-head-container access-denied-container">
+            {{one-icon class="access-denied-icon" icon="warning"}}
+            <span class="text">{{tt this "accessDenied"}}</span>
+            {{one-tooltip
+              class="tooltip-lg tooltip-text-left"
+              title=(tt this "requestRejectedTip"
+                againDateText=againRequestDateText
+                email=lastRequesterEmail
+              )
+            }}
+          </div>
+        {{/if}}
+      </div>
+    {{/if}}
+  </div>
+  <div class="row marketplace-item-row description-row">
+    {{content-spaces-marketplace/space-description
+      spaceItem=spaceItem
+    }}
+  </div>
+</div>
+{{yield}}

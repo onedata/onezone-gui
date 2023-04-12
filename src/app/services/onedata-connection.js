@@ -2,7 +2,7 @@
  * Exports a real onedata-connection service or its mock.
  *
  * @author Jakub Liput, Michał Borzęcki
- * @copyright (C) 2018-2020 ACK CYFRONET AGH
+ * @copyright (C) 2018-2022 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -55,6 +55,35 @@ const OnezoneConnection = ProductionSymbol.extend({
    * @type {ComputedProperty<AtmResourceSpec>}
    */
   defaultAtmResourceSpec: reads('attributes.defaultAtmResourceSpec'),
+
+  /**
+   * Maps: category -> array of available tags to use in spaces
+   * @type {Object<string, Array<string>>}
+   */
+  availableSpaceTags: reads('attributes.availableSpaceTags'),
+
+  /**
+   * @type {boolean}
+   */
+  spaceMarketplaceEnabled: reads('attributes.spaceMarketplaceEnabled'),
+
+  /**
+   * Time in seconds in which user can request for markeplace space membership after the
+   * previous request was sent and it was nor accepted or rejected.
+   * @type {number}
+   */
+  spaceMarketplaceMinBackoffBetweenReminders: reads(
+    'attributes.spaceMarketplaceMinBackoffBetweenReminders'
+  ),
+
+  /**
+   * Time in seconds in which user can request for markeplace space membership after the
+   * previous request was rejected.
+   * @type {number}
+   */
+  spaceMarketplaceMinBackoffAfterRejection: reads(
+    'attributes.spaceMarketplaceMinBackoffAfterRejection'
+  ),
 
   /**
    * @type {ComputedProperty<EmberObject>}

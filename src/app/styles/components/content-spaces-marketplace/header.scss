@@ -1,0 +1,22 @@
+.spaces-marketplace-header {
+  @mixin eat-content-col-padding($padding) {
+    margin-left: -$padding;
+    padding-left: $padding;
+    margin-right: -$padding;
+    padding-right: $padding;
+  }
+
+  position: sticky;
+  z-index: 1;
+  margin-top: -$content-col-padding;
+  padding-top: $content-col-padding;
+  @include eat-content-col-padding($content-col-padding);
+  @media (max-width: $screen-sm-max) {
+    @include eat-content-col-padding($content-col-padding-tablet);
+  }
+  top: -$content-col-padding;
+  background-color: white;
+  padding-bottom: calc(var(--spaces-marketplace-item-spacing, #{$fallback-spaces-marketplace-item-spacing}) * 0.5);
+
+  @include before-bottom-shadow;
+}

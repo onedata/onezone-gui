@@ -1,0 +1,214 @@
+.space-configuration {
+  @media (max-width: $screen-xs-max) {
+    padding-left: 1em;
+    padding-right: 1em;
+  }
+  .space-configuration-form {
+    // margins specially adjusted to fit spacing between form labels
+    padding-top: 1em;
+    display: flex;
+    flex-direction: column;
+    .static-value {
+      padding: $padding-base-vertical $padding-base-horizontal;
+    }
+    .static-not-set {
+      font-style: italic;
+      color: $main-text-color-disabled;
+    }
+    .control-label {
+      width: 14em;
+      min-width: 14em;
+      text-align: left;
+      padding-top: 0;
+      margin-bottom: 0;
+      @media (max-width: $screen-xs-max) {
+        width: 8em;
+        min-width: 8em;
+      }
+    }
+    .one-way-toggle {
+      padding: 0 $padding-base-horizontal;
+    }
+    .form-group {
+      display: flex;
+      align-items: center;
+      &:last-child {
+        margin-bottom: 0;
+      }
+      .one-inline-editor {
+        overflow: hidden;
+        // Overflow hidden, which is used for limiting input size cuts input shadows.
+        // Below code gives some margin for visibility of overflown shadows.
+        // Right margin is not modified, because it contains buttons and space for shadow.
+        $overflow-visible-margin: 1em;
+        @each $direction in top bottom left {
+          padding-#{$direction}: $overflow-visible-margin;
+          margin-#{$direction}: -$overflow-visible-margin;
+        }
+      }
+    }
+    .advertised-form-group {
+      display: flex;
+      align-items: center;
+      @media (max-width: $screen-xs-max) {
+        // flex-wrap: wrap;
+      }
+      .view-in-marketplace-link {
+        display: inline-flex;
+        align-items: center;
+        margin-left: $padding-base-horizontal;
+        @media (max-width: $screen-xs-max) {
+          margin-left: 0;
+        }
+        .one-icon {
+          font-size: 150%;
+        }
+        .text + .one-icon {
+          margin-left: 0.2em;
+        }
+      }
+    }
+    .description-form-group {
+      flex-wrap: wrap;
+      @media (max-width: $screen-xs-max) {
+        margin-bottom: 0.5em;
+      }
+    }
+    .description-content-form-group {
+      margin-bottom: 2em;
+      align-items: stretch;
+    }
+  }
+  .one-inline-editor.editor {
+    flex-grow: 1;
+    max-width: 50em;
+  }
+  .btn-group.description-editor-mode-selector {
+    flex-grow: 0;
+    display: flex;
+    padding: $padding-base-vertical * 0.5 $padding-base-horizontal;
+    // experimental style for fine-align btn-group with button with icons
+    &.flex-aligned {
+      button {
+        display: flex;
+        align-items: center;
+        .tab-icon, .tab-name {
+          line-height: 1.2;
+        }
+        .tab-icon.one-icon {
+          top: auto;
+          margin-right: 0;
+        }
+      }
+    }
+    @media (max-width: $screen-xs-max) {
+      button {
+        min-height: 2.4em;
+      }
+      .one-icon {
+        display: none;
+      }
+    }
+  }
+  .description-submit-buttons {
+    white-space: nowrap;
+    .btn + .btn {
+      margin-left: 0.5em;
+    }
+  }
+  .markdown-container {
+    width: 100%;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-bottom: 1em;
+    .space-description-markdown-view {
+      margin: 1em 1.3em;
+    }
+  }
+  .description-content-form-group {
+    min-height: 10em;
+    &.description-empty {
+      min-height: auto;
+      .markdown-container {
+        padding: 1em;
+        padding-top: 0.8em;
+        padding-left: 1.2em;
+      }
+    }
+    .description-empty-message {
+      display: inline-flex;
+      align-items: flex-end;
+      cursor: pointer;
+      color: $main-text-color-disabled;
+      .description-empty-icon {
+        font-size: 170%;
+        margin-left: 1em;
+      }
+      &:hover {
+        .description-empty-icon {
+          color: $color-one-success;
+        }
+      }
+    }
+  }
+  hr.description-separator {
+    margin-left: 1em;
+    flex-grow: 1;
+    @media (max-width: $screen-xs-max) {
+      display: none;
+    }
+  }
+  .contact-email-form-container {
+    display: flex;
+    @media (max-width: $screen-md-max) {
+      flex-wrap: wrap;
+    }
+    .contact-email {
+      .form-group {
+        margin: 0;
+      }
+    }
+    .marketplaceContactEmail-field {
+      width: 25em;
+      margin: 0;
+      .field-component {
+        width: 100%;
+      }
+      // validation message is rendered in inline editor accept tooltip
+      .field-message {
+        display: none;
+      }
+    }
+  }
+  .field-alert {
+    display: flex;
+    align-items: center;
+    padding-bottom: 1.5em;
+
+    &.email-visible-alert {
+      padding-left: 3em;
+    }
+  }
+  @media (max-width: $screen-md-max) {
+    .field-alert.email-visible-alert {
+      min-width: 100%;
+      padding-left: 0;
+      padding-bottom: 0;
+    }
+  }
+  .field-alert-icon {
+    color: $color-one-warning;
+    margin-right: 0.5em;
+    font-size: 150%;
+  }
+  .email-visible-alert-icon {
+    color: $color-one-info;
+  }
+  .marketplace-disabled-alert {
+    .text {
+      @include font-semibold;
+    }
+  }
+}
+
+@import './space-configuration/space-tags-selector';

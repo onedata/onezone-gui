@@ -31,6 +31,13 @@ import {
   generateSpaceEntityId,
   generateShareEntityId,
 } from 'onedata-gui-websocket-client/utils/development-model-common';
+import { exampleMarkdownShort, exampleMarkdownLong } from 'onedata-gui-common/utils/mock-data';
+import {
+  generateGri as generateSpaceMarketplaceInfoGri,
+} from 'onezone-gui/models/space-marketplace-info';
+import {
+  generateGri as generateSpaceMembershipRequestsInfoGri,
+} from 'onezone-gui/models/space-membership-requests-info';
 
 const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
@@ -97,11 +104,24 @@ export default function generateDevelopmentModel(store) {
   let spaces;
   let providers;
   let harvesters;
+  let user;
+
+  // Current workaround for lack of development model generator state.
+  // TODO: VFS-10515 Refactor onezone-gui data mock to be like oneprovider-gui
+  // mock-backend
+  const globalDevelopmentModel = set(store, 'developmentModel', {
+    listRecords: [],
+    entityRecords: {},
+  });
 
   return createGuiMessages(store)
-    // create users
+    // create main user record
+    .then(async () => {
+      user = await createUserRecord(store);
+    })
+    // create other users
     .then(() => createUsersRecords(store))
-    .then(u => users = u)
+    .then(otherUsers => users = [user, ...otherUsers])
     // create main resources lists
     .then(() => hashFulfilled(
       types.reduce((promiseHash, type) => {
@@ -236,7 +256,7 @@ export default function generateDevelopmentModel(store) {
         allFulfilled(groups.map(record =>
           allFulfilled([
             attachUsersGroupsToModel(
-              store, record, 'group', false, users.slice(0, 2), groups.slice(0, 2)
+              store, record, 'group', false, users.slice(0, 3), groups.slice(0, 3)
             ),
             attachUsersGroupsToModel(
               store, record, 'group', true, users, groups
@@ -252,12 +272,12 @@ export default function generateDevelopmentModel(store) {
           allFulfilled(spaces.map(record =>
             allFulfilled([
               attachUsersGroupsToModel(
-                store, record, 'space', false, users.slice(0, 2), groups.slice(0, 2)
+                store, record, 'space', false, users.slice(0, 3), groups.slice(0, 3)
               ),
               attachUsersGroupsToModel(
                 store, record, 'space', true, users, groups
               ),
-              attachOwnersToModel(store, record, users.slice(1, 2)),
+              attachOwnersToModel(store, record, users.slice(0, 1)),
               attachMembershipsToModel(
                 store, record, 'space', groups
               ),
@@ -327,11 +347,19 @@ export default function generateDevelopmentModel(store) {
       })))
       .then(() => listRecords)
     )
-    .then(listRecords =>
-      attachProgressToHarvesterIndices(store, harvesters, spaces, providers)
-      .then(() => listRecords)
-    )
-    .then(listRecords => createUserRecord(store, listRecords));
+    .then(async listRecords => {
+      await attachProgressToHarvesterIndices(store, harvesters, spaces, providers);
+      const marketplaceRecords = await generateMarketplaceMock(store, listRecords);
+      globalDevelopmentModel.entityRecords.spaceMarketplaceInfo = marketplaceRecords;
+      const spaceMembershipRequestsInfo =
+        await generateSpaceMembershipRequestsInfo(store, user);
+      globalDevelopmentModel.entityRecords.spaceMembershipRequestsInfo = [
+        spaceMembershipRequestsInfo,
+      ];
+      await addListRecordsToMainUser(user, listRecords);
+      globalDevelopmentModel.listRecords = listRecords;
+      return user;
+    });
 }
 
 function createGuiMessages(store) {
@@ -366,7 +394,7 @@ function createGuiMessages(store) {
   }));
 }
 
-function createUserRecord(store, listRecords) {
+function createUserRecord(store) {
   const userRecord = store.createRecord('user', {
     id: store.userGri(USER_ID),
     fullName: USERNAME,
@@ -374,7 +402,12 @@ function createUserRecord(store, listRecords) {
     hasPassword: false,
     canInviteProviders: true,
     username: USER_LOGIN,
+    emails: ['user@example.com', 'mockuser@onedata.org'],
   });
+  return userRecord.save();
+}
+
+function addListRecordsToMainUser(userRecord, listRecords) {
   Object.values(listRecords).forEach(lr =>
     userRecord.set(camelize(lr.constructor.modelName), lr)
   );
@@ -500,6 +533,19 @@ function createSpacesRecords(store) {
         creationTime: 1540995468,
         sharedDirectories: 0,
       },
+      ...(index === 0 ? {
+        advertisedInMarketplace: true,
+        organizationName: 'The company',
+        tags: ['EU-funded', 'energy', 'environment', 'old-tag'],
+        description: exampleMarkdownLong,
+        marketplaceContactEmail: 'space_user@example.com',
+      } : {
+        advertisedInMarketplace: false,
+        organizationName: '',
+        tags: [],
+        description: '',
+        marketplaceContactEmail: '',
+      }),
     }).save();
   }));
 }
@@ -703,6 +749,7 @@ function createAtmInventoryRecords(store) {
 function createUsersRecords(store) {
   return allFulfilled(_.range(NUMBER_OF_SHARED_USERS).map((index) => {
     return store.createRecord('user', {
+      id: store.userGri(`user${index}`),
       name: `user${index}`,
       username: `username${index}`,
     }).save();
@@ -1154,4 +1201,85 @@ function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
       set(atmInventory, 'atmWorkflowSchemaList', atmWorkflowSchemaList);
       return atmInventory.save();
     });
+}
+
+async function generateSpaceMembershipRequestsInfo(
+  store,
+  user,
+) {
+  const pending = {
+    'space-market-info-1': {
+      requestId: 'abcd-1',
+      contactEmail: 'the_requester@example.com',
+      // use earlier timestamp value to see "outdated" state
+      lastActivity: Math.floor(Date.now() / 1000) - 10,
+    },
+  };
+  const rejected = {
+    'space-market-info-2': {
+      requestId: 'abcd-2',
+      contactEmail: 'rejected_requester@example.com',
+      lastActivity: Math.floor(Date.now() / 1000),
+    },
+  };
+  return store.createRecord('spaceMembershipRequestsInfo', {
+    id: generateSpaceMembershipRequestsInfoGri(get(user, 'entityId')),
+    pending,
+    rejected,
+  }).save();
+}
+
+async function generateMarketplaceMock(store, listRecords) {
+  const spaceInfoRecords = [];
+
+  const spaceList = Object.values(listRecords).find(lr =>
+    lr.constructor.modelName === 'space-list'
+  );
+  const providerList = Object.values(listRecords).find(lr =>
+    lr.constructor.modelName === 'provider-list'
+  );
+  // NOTE: this mock is basic - it adds some spaces to marketplace no matter,
+  // if they are currently advertised or not
+  const firstSpace = get(spaceList, 'list').toArray()[0];
+  const providerNames = get(providerList, 'list').toArray().map(provider =>
+    get(provider, 'name')
+  );
+  const ownedSpaceMarketplaceInfo = store.createRecord('spaceMarketplaceInfo', {
+    id: generateSpaceMarketplaceInfoGri('space-0'),
+    index: 'Space 0@space-0',
+    name: get(firstSpace, 'name'),
+    organizationName: get(firstSpace, 'organizationName'),
+    description: get(firstSpace, 'description'),
+    tags: get(firstSpace, 'tags'),
+    creationTime: Math.floor((new Date().getTime() / 1000) - 100000),
+    totalSupportSize: get(firstSpace, 'totalSize'),
+    providerNames,
+  });
+  spaceInfoRecords.push(ownedSpaceMarketplaceInfo);
+  const additionalSpaceInfoCount = 10;
+  for (let i = 0; i < additionalSpaceInfoCount; ++i) {
+    const name = `Space ${String(i).padStart(2, '0')}`;
+    const entityId = `space-market-info-${i}`;
+    const record = store.createRecord('spaceMarketplaceInfo', {
+      id: generateSpaceMarketplaceInfoGri(entityId),
+      index: `${name}@${entityId}`,
+      name,
+      organizationName: 'ACK Cyfronet AGH',
+      description: exampleMarkdownShort,
+      tags: [
+        'multidimensional-data',
+        'international-issues',
+        'regions-and-cities',
+        'society',
+        'technology',
+        'transport',
+      ],
+      creationTime: (new Date().getTime() / 1000) - 200000,
+      totalSupportSize: 3 * Math.pow(1024, 4),
+      providerNames: providerNames.slice(1, 2),
+    });
+    spaceInfoRecords.push(record);
+  }
+
+  return await allFulfilled(spaceInfoRecords.map(record => record.save()));
 }

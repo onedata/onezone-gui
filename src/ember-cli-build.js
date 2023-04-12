@@ -82,7 +82,7 @@ module.exports = function (defaults) {
     },
     'ace': {
       themes: ['textmate'],
-      modes: ['json', 'xml'],
+      modes: ['json', 'xml', 'markdown'],
       workers: ['json', 'xml'],
       exts: ['searchbox'],
       workerPath: './assets/ace',

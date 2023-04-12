@@ -1,0 +1,38 @@
+{{#global-modal
+  classNames="spaces-description-modal"
+  modalId=modalId
+  size="lg"
+  as |modal|
+}}
+  {{#modal.header}}
+    <h1>
+      <span class="one-label">{{tt this "header"}}</span>
+    </h1>
+    <h2 class="normal-case">
+      {{#truncated-string class="space-name"}}
+        <div class="inline-icon-container">
+          {{record-icon modelName="space"}}
+        </div>
+        {{name-conflict item=spaceData}}
+      {{/truncated-string}}
+    </h2>
+  {{/modal.header}}
+
+  {{#modal.body}}
+    {{one-markdown-to-html
+      class="description-markdown-view markdown-view"
+      markdown=spaceData.description
+    }}
+  {{/modal.body}}
+
+  {{#modal.footer class="btn-toolbar"}}
+    {{#one-button
+      type="default"
+      class="close-btn"
+      onClick=modal.close
+    }}
+      {{tt this "close"}}
+    {{/one-button}}
+  {{/modal.footer}}
+
+{{/global-modal}}

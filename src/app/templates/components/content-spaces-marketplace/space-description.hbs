@@ -1,0 +1,12 @@
+{{one-markdown-to-html
+  class="markdown-view"
+  markdown=spaceItem.description
+}}
+{{#if hasOverflow}}
+  <div class="toggle-expand-btn expand-btn">
+    <a class="toggle-expand-anchor navy" onclick={{action "expand"}}>
+      {{one-icon icon="info-modal" class="expand-icon"}}
+      <span class="text">{{tt this "expand"}}</span>
+    </a>
+  </div>
+{{/if}}

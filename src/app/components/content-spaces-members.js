@@ -22,7 +22,6 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
   classNames: ['members-aspect-base', 'content-spaces-members'],
 
   i18n: service(),
-  navigationState: service(),
   spaceActions: service(),
   spaceManager: service(),
   globalNotify: service(),

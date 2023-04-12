@@ -1,0 +1,73 @@
+.spaces-marketplace-list {
+  $fallback-refresh-transition-duration: 80ms;
+  // If show spinner delay is the same as refresh transition duration,
+  // the spinner will start to fade in right after backround ends to fade.
+  // If there is need to delay spinner show further (eg. if you don't want to
+  // show spinner if loading time is very short) then add some time to the value.
+  $show-spinner-delay: var(--spaces-marketplace-refresh-transition-duration, #{$fallback-refresh-transition-duration});
+  position: relative;
+  opacity: 1;
+  transition: opacity $show-spinner-delay ease-out;
+  &.is-refreshing {
+    transition: opacity $show-spinner-delay ease-in;
+    opacity: 0.25;
+    pointer-events: none;
+    min-height: 420px;
+    .refresh-spinner {
+      transition: opacity $show-spinner-delay ease-in;
+      transition-delay: $show-spinner-delay;
+      opacity: 1;
+    }
+  }
+
+  .refresh-spinner {
+    position: sticky;
+    top: 380px;
+    opacity: 0;
+    transition: opacity $show-spinner-delay ease-out;
+    // do not take place in view
+    height: 0;
+    width: 0;
+  }
+  .no-spaces-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: $disabled-opacity;
+    margin-top: 50px;
+    .no-spaces-icon {
+      font-size: 200%;
+      font-weight: bold;
+    }
+    .no-spaces-icon + .no-spaces-text {
+      margin-left: 0.8em;
+    }
+    .no-spaces-icon.oneicon-search,
+    .no-spaces-icon.oneicon-space-empty {
+      margin-bottom: -0.1em;
+    }
+    .no-spaces-text {
+      font-size: 120%;
+    }
+  }
+  .first-row, .table-start-row {
+    height: 0;
+  }
+  .special-row {
+    // reset default browser styles for li
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+  }
+  .loading-row {
+    position: relative;
+    height: 100px;
+  }
+  .no-matching-results {
+    padding-top: var(--spaces-marketplace-item-spacing, #{$fallback-spaces-marketplace-item-spacing});
+  }
+  .list-entries {
+    padding-left: 0;
+    padding-bottom: calc(var(--spaces-marketplace-item-spacing, #{$fallback-spaces-marketplace-item-spacing}) * 3);
+  }
+}
