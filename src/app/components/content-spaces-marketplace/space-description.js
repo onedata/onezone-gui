@@ -58,12 +58,8 @@ export default Component.extend(...mixins, {
       return;
     }
     /** @type {ResizeObserver} */
-    const resizeObserver = new ResizeObserver((entries) => {
-      /** @type {ResizeObserverEntry} */
-      const entry = entries.find(entry => entry.target === element);
-      if (entry) {
-        this.detectOverflow();
-      }
+    const resizeObserver = new ResizeObserver(() => {
+      this.detectOverflow();
     });
     resizeObserver.observe(element);
     this.set('resizeObserver', resizeObserver);
