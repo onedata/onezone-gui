@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10767 Refactored stacked modals styles
 * VFS-10126 Added space Marketplace with space configuration and requests management
 * VFS-10389 Moved provider info popover to common
 * VFS-10543 Updated spaces support (Oneprovider deployment) page
