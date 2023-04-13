@@ -14,6 +14,7 @@ import { resolve } from 'rsvp';
 import { get, getProperties } from '@ember/object';
 import { inject as service } from '@ember/service';
 import _ from 'lodash';
+import { listMarketplaceAspect } from 'onezone-gui/services/space-manager';
 
 const spaceHandlers = {
   provider(operation) {
@@ -90,6 +91,55 @@ const spaceHandlers = {
         }],
         apiRoot: 'https://dev-onezone.default.svc.cluster.local/api/v3/onezone',
       },
+    };
+  },
+  [listMarketplaceAspect](operation, entityId, data) {
+    const store = this.store;
+    if (operation !== 'create') {
+      throw messageNotSupported;
+    }
+    const emptyResponse = Object.freeze({
+      list: [],
+      isLast: true,
+    });
+    const {
+      index,
+      limit,
+    } = data;
+    // NOTE: this mock is basic
+    // - it resolves marketplace spaces data no matter, if their spaces are currently
+    //   advertised or not
+    // - currently it supports only listing from beginning (null index)
+    if (index) {
+      return emptyResponse;
+    }
+    if (!store.developmentModel) {
+      console.warn(
+        `To use mock of onedataGraph space ${listMarketplaceAspect} you need to turn on \`clearOnReload\` for developmentModel.`
+      );
+      return emptyResponse;
+    }
+    const marketplaceInfos = store.developmentModel
+      .entityRecords['spaceMarketplaceInfo'];
+    return {
+      list: marketplaceInfos.slice(0, limit).map(info => ({
+        spaceId: get(info, 'entityId'),
+        index: get(info, 'index'),
+      })),
+      isLast: true,
+    };
+  },
+  // example URL to use in mocked app (space-0 is first mocked spaceId)
+  // http://localhost:4200/#/onedata?action_name=confirmJoinSpaceRequest&action_spaceId=space-0&action_requestId=fb50b5c1e09b3910e89ab35327671e19ch18d4-a2647bf5
+  membership_requester_info(operation) {
+    if (operation !== 'get') {
+      throw messageNotSupported;
+    }
+    return {
+      userId: 'requesting_user_id',
+      fullName: 'John Doe',
+      username: 'joe',
+      contactEmail: 'joe@example.com',
     };
   },
 };
@@ -326,6 +376,7 @@ const tokenHandlers = {
 
 export default OnedataGraphMock.extend({
   recordManager: service(),
+  store: service(),
 
   init() {
     this._super(...arguments);

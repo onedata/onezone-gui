@@ -1,0 +1,69 @@
+{{#global-modal
+  classNames="enable-marketplace-advertisement-modal"
+  size="lg"
+  allowClose=(not isSubmitting)
+  modalId=modalId
+  as |modal|
+}}
+
+  {{#modal.header}}
+    <h1>
+      {{one-icon icon="sign-info-rounded"}}
+      <span class="one-label">{{tt this "header"}}</span>
+    </h1>
+  {{/modal.header}}
+
+  {{#modal.body}}
+    <p>
+      {{tt this "body.textIntro"}}
+      <a class="marketplace-link navy" href={{marketplaceHref}}>
+        <span class="text">{{tt this "body.spacesMarketplace"}}</span>
+        {{one-icon icon="link-external"}}
+      </a>
+      {{tt this "body.textIntroFields"}}
+    </p>
+    <p>
+      {{tt this "body.textExtended"}}
+    </p>
+    <form
+      class="form form-horizontal form-component contact-form"
+      onsubmit={{prevent-default}}
+    >
+      {{form-component/field-renderer field=rootField}}
+    </form>
+    <div class="row content-row no-border row-understand-notice">
+      {{one-checkbox
+        class="one-checkbox-understand"
+        checked=isEmailShareConfirmed
+        update=(action (mut isEmailShareConfirmed))
+        isReadOnly=isDisabled
+      }}
+      <div
+        class="text-understand clickable"
+        {{action "toggleEmailShareConfirmation"}}
+      >
+        {{tt this "emailShareCheckboxText"}}
+      </div>
+    </div>
+  {{/modal.body}}
+
+  {{#modal.footer class="btn-toolbar"}}
+    {{#one-button
+      type="default"
+      class="cancel-btn"
+      onClick=modal.close
+    }}
+      {{tt this "cancel"}}
+    {{/one-button}}
+    {{#one-button
+      type="primary"
+      buttonType="submit"
+      class="proceed-btn"
+      onClick=(action "submit" modal.submit)
+      disabled=areButtonsDisabled
+    }}
+      {{tt this "proceed"}}
+    {{/one-button}}
+  {{/modal.footer}}
+
+{{/global-modal}}

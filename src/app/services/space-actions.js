@@ -10,9 +10,13 @@ import Service, { inject as service } from '@ember/service';
 import { computed, get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { collect } from '@ember/object/computed';
+import { conditional } from 'ember-awesome-macros';
 import RemoveSpaceAction from 'onezone-gui/utils/space-actions/remove-space-action';
 import AddHarvesterToSpaceAction from 'onezone-gui/utils/space-actions/add-harvester-to-space-action';
 import RemoveHarvesterFromSpaceAction from 'onezone-gui/utils/space-actions/remove-harvester-from-space-action';
+import ChooseSpaceToAdvertiseAction from 'onezone-gui/utils/space-actions/choose-space-to-advertise-action';
+import RequestSpaceAccessAction from 'onezone-gui/utils/space-actions/request-space-access-action';
+import ConfirmSpaceJoinRequestAction from 'onezone-gui/utils/space-actions/confirm-space-join-request-action';
 
 export default Service.extend(I18n, {
   router: service(),
@@ -27,7 +31,11 @@ export default Service.extend(I18n, {
   /**
    * @type {Ember.Computed<Array<SidebarButtonDefinition>>}
    */
-  buttons: collect('btnCreate'),
+  buttons: conditional(
+    'spaceManager.marketplaceConfig.enabled',
+    collect('btnCreate', 'btnMarketplace'),
+    collect('btnCreate')
+  ),
 
   // TODO: the button should have optional link option to define a subroute
   // to go from sidebar route
@@ -42,6 +50,20 @@ export default Service.extend(I18n, {
     };
   }),
 
+  btnMarketplace: computed(function btnMarketplace() {
+    return {
+      icon: 'cart',
+      title: this.t('btnMarketplace.title'),
+      sidebarTitle: this.t('btnMarketplace.title'),
+      class: 'marketplace-btn',
+      action: () => this.router.transitionTo(
+        'onedata.sidebar.content',
+        'spaces',
+        'join'
+      ),
+    };
+  }),
+
   createRemoveSpaceAction(context) {
     return RemoveSpaceAction.create({ ownerSource: this, context });
   },
@@ -52,6 +74,29 @@ export default Service.extend(I18n, {
 
   createRemoveHarvesterFromSpaceAction(context) {
     return RemoveHarvesterFromSpaceAction.create({ ownerSource: this, context });
+  },
+
+  /**
+   * @returns {Utils.SpaceActions.ChooseSpaceToAdvertiseAction}
+   */
+  createChooseSpaceToAdvertiseAction() {
+    return ChooseSpaceToAdvertiseAction.create({ ownerSource: this });
+  },
+
+  /**
+   * @param {RequestSpaceAccessActionContext} context
+   * @returns {Utils.SpaceActions.RequestSpaceAccessAction}
+   */
+  createRequestSpaceAccessAction(context) {
+    return RequestSpaceAccessAction.create({ ownerSource: this, context });
+  },
+
+  /**
+   * @param {ConfirmSpaceJoinRequestActionContext} context
+   * @returns {Utils.SpaceActions.ConfirmSpaceJoinRequestAction}
+   */
+  createConfirmSpaceJoinRequestAction(context) {
+    return ConfirmSpaceJoinRequestAction.create({ ownerSource: this, context });
   },
 
   /**
@@ -82,7 +127,7 @@ export default Service.extend(I18n, {
           'onedata.sidebar.content.aspect',
           'spaces',
           guiUtils.getRoutableIdFor(space),
-          'index',
+          'configuration',
         );
       });
   },

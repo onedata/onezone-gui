@@ -1,0 +1,38 @@
+{{#if providerNames.length}}
+  <div class="list-container">
+    <div class="support-item">
+      {{one-icon icon="support"}}
+      <div class="text">
+        {{bytes-to-string supportSize}}
+      </div>
+    </div>
+    {{#each providerNames as |providerName|}}
+      <div class="support-item">
+        {{record-icon modelName="provider"}}
+        <div class="text">{{providerName}}</div>
+      </div>
+    {{/each}}
+    {{yield}}
+  </div>
+  {{#if hasOverflow}}
+    {{#one-tooltip class="tooltip-with-tags"}}
+      <div class="tags-input">
+        {{#each providerNames as |providerName|}}
+          <div class="tag-item">
+            {{record-icon modelName="provider" class="tag-icon"}}
+            {{!-- prevent inserting space at the end --}}
+            <div class="tag-label">{{providerName}}</div></div>
+        {{/each}}
+      </div>
+    {{/one-tooltip}}
+  {{/if}}
+{{else}}
+  <div class="list-container">
+    <div class="support-item">
+      {{one-icon icon="support"}}
+      <div class="text no-support-text">
+        {{tt this "noSupport"}}
+      </div>
+    </div>
+  </div>
+{{/if}}

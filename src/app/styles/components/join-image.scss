@@ -1,0 +1,108 @@
+.join-image {
+  text-align: center;
+  $mobile-view-breakpoint: $screen-sm-min + 180;
+
+  display: flex;
+  color: #303e51;
+  justify-content: center;
+  padding-bottom: 6 * $padding-base-vertical;
+  .subject-image-label {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+    max-width: 300px;
+  }
+  .select-below-label {
+    font-style: italic;
+  }
+
+  .subject-name {
+    font-weight: bold;
+  }
+
+
+  @media (min-width: $mobile-view-breakpoint) {
+    .arrow {
+      width: 210px;
+    }
+    .arrow::after, .arrow::before {
+      width: 10%;
+    }
+    .join-arrow-image {
+      width: 217px;
+    }
+  }
+  @media (max-width: $mobile-view-breakpoint) {
+    .arrow {
+      width: 130px;
+    }
+    .arrow::after, .arrow::before {
+      width: 15%;
+    }
+    .join-arrow-image {
+      width: 136px;
+    }
+    .subject-image-label {
+      max-width: 200px;
+    }
+  }
+
+  .arrow {
+    position: absolute;
+    height: 5px;
+    background-color: #303e51;
+    max-width: 100%;
+  }
+
+  .arrow::after, .arrow::before {
+    content: '';
+    position: absolute;
+    height: 5px;
+    right: -6px;
+    background-color: #303e51;
+  }
+
+  .arrow::after {
+    top: -6px;
+    transform: rotate(45deg);
+  }
+
+  .arrow::before {
+    top: 6px;
+    transform: rotate(-45deg);
+  }
+
+  .join-arrow-image {
+    display: inline-block;
+    vertical-align: top;
+    padding-top: $padding-base-vertical + 31px;
+  }
+
+  .arrow-label {
+    padding-bottom: $padding-xs-horizontal;
+    font-weight: bold;
+    color: #303e51;
+  }
+
+  .subject-image {
+    display: block;
+    padding: $padding-base-vertical;
+    width: 150px;
+  }
+
+  .invite-subject-image, .invite-target-image {
+    position: relative;
+    max-width: 200px;
+  }
+
+  .subject-description {
+    display: flex;
+    padding-left: 5px;
+  }
+
+  .id-trigger {
+    font-size: 150%;
+    color: $color-one-light-gray;
+    vertical-align: text-bottom;
+  }
+}

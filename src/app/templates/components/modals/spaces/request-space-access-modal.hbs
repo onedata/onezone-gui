@@ -1,0 +1,59 @@
+{{#global-modal
+  classNames=modalClassNames
+  modalId=modalId
+  allowClose=false
+  size="lg"
+  as |modal|
+}}
+
+  {{#modal.header}}
+    <h1>
+      {{one-icon icon="sign-info-rounded"}}
+      <span class="one-label">{{tt this "header"}}</span>
+    </h1>
+  {{/modal.header}}
+
+  {{#modal.body}}
+    <p>{{tt this "body.intro" spaceName=spaceName}}</p>
+    <form
+      class="form form-horizontal form-component request-access-form"
+      onsubmit={{prevent-default}}
+    >
+      {{form-component/field-renderer field=rootField}}
+    </form>
+    <div class="row content-row no-border row-understand-notice">
+      {{one-checkbox
+        class="one-checkbox-understand"
+        checked=isEmailShareConfirmed
+        update=(action (mut isEmailShareConfirmed))
+        isReadOnly=isDisabled
+      }}
+      <div
+        class="text-understand clickable"
+        {{action "toggleEmailShareConfirmation"}}
+      >
+        {{tt this "emailShareCheckboxText"}}
+      </div>
+    </div>
+  {{/modal.body}}
+
+  {{#modal.footer class="btn-toolbar"}}
+    {{#one-button
+      type="default"
+      class="cancel-btn"
+      disabled=isDisabled
+      onClick=modal.close
+    }}
+      {{tt this "cancel"}}
+    {{/one-button}}
+    {{#one-button
+      type="primary"
+      class="proceed-btn"
+      disabled=(or isDisabled (not isProceedAvailable))
+      onClick=(if isProceedAvailable (action "submit" modal.submit))
+    }}
+      {{tt this "proceed"}}
+    {{/one-button}}
+  {{/modal.footer}}
+
+{{/global-modal}}

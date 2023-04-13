@@ -1,0 +1,10 @@
+{{#if isMarketplaceEnabled}}
+  {{content-spaces-marketplace/header viewModel=viewModel}}
+  {{#promise-proxy-container proxy=viewModel.entriesInitialLoad}}
+    {{#if viewModel.showEmptyListView}}
+      {{content-spaces-marketplace/empty viewModel=viewModel}}
+    {{else}}
+      {{content-spaces-marketplace/list viewModel=viewModel}}
+    {{/if}}
+  {{/promise-proxy-container}}
+{{/if}}

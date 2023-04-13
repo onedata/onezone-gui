@@ -23,10 +23,12 @@ import sidebarProviders from './components/sidebar-providers';
 import sidebarGroups from './components/sidebar-groups';
 import contentSpacesEmpty from './components/content-spaces-empty';
 import contentSpacesIndex from './components/content-spaces-index';
+import contentSpacesConfiguration from './components/content-spaces-configuration';
 import contentSpacesNew from './components/content-spaces-new';
 import contentSpacesNoSupport from './components/content-spaces-no-support';
 import contentSpacesSupport from './components/content-spaces-support';
 import contentSpacesProviders from './components/content-spaces-providers';
+import contentSpacesMarketplace from './components/content-spaces-marketplace';
 import spacesProvidersOverview from './components/spaces-providers-overview';
 import contentSpacesData from './components/content-spaces-data';
 import contentSpacesDatasets from './components/content-spaces-datasets';
@@ -96,18 +98,20 @@ import contentAtmInventoriesWorkflows from './components/content-atm-inventories
 import emptyCollectionSidebar from './components/empty-collection-sidebar';
 import providerTabLi from './components/provider-tab-li';
 import apiSamples from './components/api-samples';
+import spaceConfiguration from './components/space-configuration';
+import joinImage from './components/join-image';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
 import generateInviteTokenModal from './components/modals/generate-invite-token-modal';
 import unlinkAtmLambdaModal from './components/modals/unlink-atm-lambda-modal';
 import applyAtmRecordDumpModal from './components/modals/apply-atm-record-dump-modal';
-import providerInfoContent from './components/provider-info-content';
 import providersList from './components/providers-list';
 import shareNotFound from './components/errors/share-not-found';
 import openShareFailed from './components/errors/open-share-failed';
 import offlineProviders from './components/errors/offline-providers';
 import apiSamplesModal from './components/modals/api-samples-modal';
+import spacesModals from './components/modals/spaces';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
@@ -126,6 +130,8 @@ import removeSpaceFromHarvesterAction from './utils/harvester-actions/remove-spa
 import addHarvesterToSpaceAction from './utils/space-actions/add-harvester-to-space-action';
 import removeHarvesterFromSpaceAction from './utils/space-actions/remove-harvester-from-space-action';
 import removeSpaceAction from './utils/space-actions/remove-space-action';
+import chooseSpaceToAdvertiseAction from './utils/space-actions/choose-space-to-advertise-action';
+import requestSpaceAccessAction from './utils/space-actions/request-space-access-action';
 import cleanObsoleteTokensAction from './utils/token-actions/clean-obsolete-tokens-action';
 import createTokenAction from './utils/token-actions/create-token-action';
 import openCreateTokenViewAction from './utils/token-actions/open-create-token-view-action';
@@ -180,6 +186,7 @@ const translations = {
       unlinkAtmLambdaModal,
       applyAtmRecordDumpModal,
       apiSamplesModal,
+      spaces: spacesModals,
     },
     errors: {
       shareNotFound,
@@ -196,11 +203,13 @@ const translations = {
     sidebarGroups,
     contentSpacesEmpty,
     contentSpacesIndex,
+    contentSpacesConfiguration,
     contentSpacesNew,
     contentProviderEmpty,
     contentSpacesNoSupport,
     contentSpacesSupport,
     contentSpacesProviders,
+    contentSpacesMarketplace,
     spacesProvidersOverview,
     contentSpacesData,
     contentSpacesDatasets,
@@ -268,10 +277,11 @@ const translations = {
     contentAtmInventoriesLambdas,
     contentAtmInventoriesWorkflows,
     emptyCollectionSidebar,
-    providerInfoContent,
     providersList,
     providerTabLi,
     apiSamples,
+    spaceConfiguration,
+    joinImage,
   },
   services: {
     tokenActions,
@@ -297,6 +307,8 @@ const translations = {
       addHarvesterToSpaceAction,
       removeHarvesterFromSpaceAction,
       removeSpaceAction,
+      chooseSpaceToAdvertiseAction,
+      requestSpaceAccessAction,
     },
     tokenActions: {
       cleanObsoleteTokensAction,

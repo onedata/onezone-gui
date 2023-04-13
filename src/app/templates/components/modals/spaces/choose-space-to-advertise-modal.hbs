@@ -1,0 +1,60 @@
+{{#global-modal
+  classNames="choose-space-to-advertise-modal"
+  modalId=modalId
+  as |modal|
+}}
+
+  {{#modal.header}}
+    <h1>
+      {{one-icon icon="sign-info-rounded"}}
+      <span class="one-label">{{tt this "header"}}</span>
+    </h1>
+  {{/modal.header}}
+
+  {{#modal.body}}
+    {{#promise-proxy-container proxy=allSpacesProxy}}
+      {{#if noSpaces}}
+        <p>{{tt this "noSpacesText"}}</p>
+      {{else if areAllSpacesAdvertised}}
+        <p>{{tt this "allAdvertisedText"}}</p>
+      {{else}}
+        <p>{{tt this "introText"}}</p>
+        {{#one-dropdown
+          triggerClass="spaces-dropdown-trigger"
+          options=nonAdvertisedSpaces
+          selected=selectedSpace
+          placeholder=(tt this "dropdownPlaceholder")
+          onchange=(action "spaceChanged")
+          as |space|
+        }}
+          <div class="option-container">
+            {{#truncated-string class="text"}}
+              {{name-conflict item=space}}
+            {{/truncated-string}}
+          </div>
+        {{/one-dropdown}}
+      {{/if}}
+    {{/promise-proxy-container}}
+  {{/modal.body}}
+
+  {{#modal.footer class="btn-toolbar"}}
+    {{#one-button
+      type="default"
+      class="cancel-btn"
+      onClick=modal.close
+    }}
+      {{tt this closeButtonType}}
+    {{/one-button}}
+    {{#if isProceedButtonVisible}}
+      {{#one-button
+        type="primary"
+        class="proceed-btn"
+        disabled=(not isProceedAvailable)
+        onClick=(if isProceedAvailable (action modal.submit selectedSpace.entityId))
+      }}
+        {{tt this "proceed"}}
+      {{/one-button}}
+    {{/if}}
+  {{/modal.footer}}
+
+{{/global-modal}}

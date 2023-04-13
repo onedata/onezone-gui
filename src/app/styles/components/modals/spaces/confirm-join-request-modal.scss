@@ -1,0 +1,14 @@
+.confirm-join-request-modal {
+  .user-join-space-image {
+    margin-top: 2em;
+    padding-bottom: 4em;
+  }
+  .modal-footer.btn-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    .decide-later-btn {
+      margin-right: auto;
+      margin-left: 0;
+    }
+  }
+}

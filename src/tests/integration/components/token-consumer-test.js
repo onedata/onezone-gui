@@ -553,6 +553,32 @@ describe('Integration | Component | token-consumer', function () {
       expect(find('.confirm-btn [role="progressbar"]')).to.not.exist;
     }
   );
+
+  it('shows join image with user, arrow and space for "user join space"', async function () {
+    stubExamine(this, 'token', resolve({
+      type: {
+        inviteToken: {
+          inviteType: 'userJoinSpace',
+        },
+      },
+    }));
+    await render(hbs `{{token-consumer}}`);
+
+    await fillIn('.token-string', 'token');
+    const consumeTokenImage = find('.consume-token-image');
+    expect(consumeTokenImage).to.exist;
+    expect(
+      consumeTokenImage.querySelector('.invite-subject-image .subject-image')
+      .getAttribute('src')
+    ).to.match(/user.*svg/);
+    expect(
+      consumeTokenImage.querySelector('.join-arrow-image .arrow-label')
+    ).to.contain.text('join');
+    expect(
+      consumeTokenImage.querySelector('.invite-target-image .subject-image')
+      .getAttribute('src')
+    ).to.match(/space.*svg/);
+  });
 });
 
 function stubExamine(testSuite, token, response) {

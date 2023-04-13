@@ -1,0 +1,24 @@
+.request-space-access-modal {
+  &.disabled {
+    .row-understand-notice .text-understand {
+      color: $main-text-color-disabled;
+    }
+  }
+
+  p + .request-access-form {
+    margin-top: 1em;
+  }
+  .message-field {
+    textarea {
+      min-height: 10em;
+    }
+  }
+  .row-understand-notice {
+    .text-understand {
+      color: $main-text-color;
+      // make larger spacing from checkbox to text, to look like label-input spacing
+      padding-left: 34px;
+    }
+  }
+}
+

@@ -11,6 +11,8 @@
 @import './components/content-spaces-index';
 @import './components/content-spaces-datasets';
 @import './components/content-spaces-no-support';
+@import './components/content-spaces-marketplace';
+@import './components/content-spaces-configuration';
 @import './components/content-groups-hierarchy';
 @import './components/public-page';
 @import './components/oneprovider-view-container';
@@ -52,3 +54,5 @@
 @import './components/provider-info-name';
 @import './components/providers-list';
 @import './components/api-samples-modal';
+@import './components/space-configuration';
+@import './components/join-image';

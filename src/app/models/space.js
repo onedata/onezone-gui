@@ -43,6 +43,11 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   currentUserEffPrivileges: attr('array', { defaultValue: () => [] }),
   currentUserIsOwner: attr('boolean'),
   directMembership: attr('boolean', { defaultValue: false }),
+  advertisedInMarketplace: attr('boolean', { defaultValue: false }),
+  organizationName: attr('string'),
+  description: attr('string'),
+  tags: attr('array', { defaultValue: () => [] }),
+  marketplaceContactEmail: attr('string'),
 
   /**
    * Maps: provider name => capacity in bytes provided for this space
