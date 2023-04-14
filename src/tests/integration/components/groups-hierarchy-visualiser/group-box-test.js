@@ -7,6 +7,7 @@ import EmberObject, { set } from '@ember/object';
 import I18nStub from '../../../helpers/i18n-stub';
 import { registerService } from '../../../helpers/stub-service';
 import { resolve } from 'rsvp';
+import globals from 'onedata-gui-common/utils/globals';
 
 describe(
   'Integration | Component | groups-hierarchy-visualiser/group-box',
@@ -52,7 +53,7 @@ describe(
 
       const groupBoxElem = find('.group-box');
       await click(groupBoxElem.querySelector('.group-actions-trigger'));
-      await click(document.querySelector('.webui-popover.in .rename-group-action'));
+      await click(globals.document.querySelector('.webui-popover.in .rename-group-action'));
       const editor = groupBoxElem.querySelector('.one-inline-editor');
       expect(editor).to.exist;
       await fillIn(editor.querySelector('input'), 'newname');
@@ -174,9 +175,9 @@ describe(
 
         const groupBoxElem = find('.group-box');
         await click(groupBoxElem.querySelector('.group-actions-trigger'));
-        expect(document.querySelector('.webui-popover.in .leave-group-action'))
+        expect(globals.document.querySelector('.webui-popover.in .leave-group-action'))
           .to.not.exist;
-        expect(document.querySelector('.webui-popover.in .join-group-action'))
+        expect(globals.document.querySelector('.webui-popover.in .join-group-action'))
           .to.exist;
       }
     );
@@ -199,9 +200,9 @@ describe(
 
         const groupBoxElem = find('.group-box');
         await click(groupBoxElem.querySelector('.group-actions-trigger'));
-        expect(document.querySelector('.webui-popover.in .leave-group-action'))
+        expect(globals.document.querySelector('.webui-popover.in .leave-group-action'))
           .to.exist;
-        expect(document.querySelector('.webui-popover.in .join-group-action'))
+        expect(globals.document.querySelector('.webui-popover.in .join-group-action'))
           .to.not.exist;
       }
     );
@@ -241,7 +242,7 @@ describe(
           leaveGroup=(action leaveGroup)}}
       `);
       await click(find('.group-box .group-actions-trigger'));
-      const popover = document.querySelector('.webui-popover.in');
+      const popover = globals.document.querySelector('.webui-popover.in');
       await click(popover.querySelector('.leave-group-action'));
       expect(popover).to.not.have.class('in');
     });

@@ -19,6 +19,7 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import $ from 'jquery';
 import dom from 'onedata-gui-common/utils/dom';
+import globals from 'onedata-gui-common/utils/globals';
 
 const minimizeAfterFinishDelay = 10000;
 
@@ -235,7 +236,7 @@ export default Component.extend({
         if (!isMinimized && minimizeTargetSelector) {
           this.cancelScheduledMinimalization();
 
-          const target = document.querySelector(minimizeTargetSelector);
+          const target = globals.document.querySelector(minimizeTargetSelector);
           if (this.element && target) {
             const {
               top: targetTop,

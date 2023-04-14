@@ -6,6 +6,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import EmberObject, { set } from '@ember/object';
 import I18nStub from '../../../helpers/i18n-stub';
 import { registerService } from '../../../helpers/stub-service';
+import globals from 'onedata-gui-common/utils/globals';
 
 describe(
   'Integration | Component | groups-hierarchy-visualiser/group-box-line',
@@ -54,9 +55,9 @@ describe(
       await settled();
       const actionsTrigger = lineElem.querySelector('.actions-trigger');
       expect(actionsTrigger).to.exist;
-      expect(document.querySelector('.webui-popover')).to.not.exist;
+      expect(globals.document.querySelector('.webui-popover')).to.not.exist;
       await click(actionsTrigger);
-      expect(document.querySelector('.webui-popover.in')).to.exist;
+      expect(globals.document.querySelector('.webui-popover.in')).to.exist;
     });
 
     it('does not render actions if actionsEnabled is false', async function () {
@@ -92,7 +93,7 @@ describe(
         this.set('line', line);
         await render(hbs `{{groups-hierarchy-visualiser/group-box-line line=line}}`);
         await click(find('.group-box-line .actions-trigger'));
-        const popover = document.querySelector('.webui-popover.in');
+        const popover = globals.document.querySelector('.webui-popover.in');
         expect(popover.querySelector('.disabled > .modify-privileges-action')).to.exist;
       }
     );
@@ -119,7 +120,7 @@ describe(
           modifyPrivileges=dummyCallback}}
       `);
       await click(find('.group-box-line .actions-trigger'));
-      const popover = document.querySelector('.webui-popover.in');
+      const popover = globals.document.querySelector('.webui-popover.in');
       await click(popover.querySelector('.modify-privileges-action'));
       expect(popover).to.not.have.class('in');
     });

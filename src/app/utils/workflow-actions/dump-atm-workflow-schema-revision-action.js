@@ -48,11 +48,6 @@ export default Action.extend({
   downloadData,
 
   /**
-   * @type {Window}
-   */
-  _window: window,
-
-  /**
    * @override
    */
   onExecute() {
@@ -86,14 +81,12 @@ export default Action.extend({
     const {
       atmWorkflowSchema,
       downloadData,
-      _window,
-    } = this.getProperties('atmWorkflowSchema', 'downloadData', '_window');
+    } = this.getProperties('atmWorkflowSchema', 'downloadData');
 
     downloadData({
       dataString: JSON.stringify(atmWorkflowSchemaRevisionDump, null, 2),
       fileName: `${get(atmWorkflowSchema, 'name')}.json`,
       mimeType: 'application/json',
-      _window,
     });
   },
 });

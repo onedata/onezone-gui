@@ -3,6 +3,7 @@ import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render, click, find } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
+import globals from 'onedata-gui-common/utils/globals';
 
 describe('Integration | Component | sidebar-harvesters/harvester-item', function () {
   setupRenderingTest();
@@ -34,7 +35,7 @@ describe('Integration | Component | sidebar-harvesters/harvester-item', function
     await render(hbs `{{sidebar-harvesters/harvester-item item=harvester}}`);
 
     await click('.collapsible-toolbar-toggle');
-    await click(document.querySelector('.webui-popover.in .rename-harvester-action'));
+    await click(globals.document.querySelector('.webui-popover.in .rename-harvester-action'));
     expect(find('input[type="text"]')).to.exist;
   });
 
@@ -49,8 +50,8 @@ describe('Integration | Component | sidebar-harvesters/harvester-item', function
       await render(hbs `{{sidebar-harvesters/harvester-item item=harvester}}`);
 
       await click('.collapsible-toolbar-toggle');
-      await click(document.querySelector(`.webui-popover.in .${operation}-harvester-action`));
-      expect(document.querySelector(`.${modalClass}.in`)).to.exist;
+      await click(globals.document.querySelector(`.webui-popover.in .${operation}-harvester-action`));
+      expect(globals.document.querySelector(`.${modalClass}.in`)).to.exist;
     });
   });
 });

@@ -18,6 +18,7 @@ import CreateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-ac
 import DuplicateAtmRecordRevisionAction from 'onezone-gui/utils/workflow-actions/duplicate-atm-record-revision-action';
 import DumpAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/dump-atm-workflow-schema-revision-action';
 import RemoveAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-revision-action';
+import globals from 'onedata-gui-common/utils/globals';
 
 const workflowActionsSpec = [{
   className: 'change-details-action-trigger',
@@ -150,7 +151,7 @@ describe('Integration | Component | content-atm-inventories-workflows/atm-workfl
       await click(actionsTrigger);
 
       const actions =
-        document.querySelectorAll('.webui-popover.in .actions-popover-content a');
+        globals.document.querySelectorAll('.webui-popover.in .actions-popover-content a');
       expect(actions).to.have.length(workflowActionsSpec.length);
       workflowActionsSpec.forEach(({ className, label, icon }, index) => {
         const action = actions[index];
@@ -168,11 +169,11 @@ describe('Integration | Component | content-atm-inventories-workflows/atm-workfl
 
       await click(firstWorkflow.querySelector('.workflow-actions-trigger'));
       await click(
-        document.querySelector('.webui-popover.in .change-details-action-trigger')
+        globals.document.querySelector('.webui-popover.in .change-details-action-trigger')
       );
       await click(firstWorkflow.querySelector('.workflow-actions-trigger'));
 
-      expect(document.querySelector(
+      expect(globals.document.querySelector(
         '.webui-popover.in .change-details-action-trigger'
       ).parentElement).to.have.class('disabled');
       expect(firstWorkflow.querySelector('.field-edit-mode')).to.exist;
@@ -198,7 +199,7 @@ describe('Integration | Component | content-atm-inventories-workflows/atm-workfl
       const firstWorkflowElem = workflows[0];
 
       await click(firstWorkflowElem.querySelector('.workflow-actions-trigger'));
-      await click(document.querySelector(
+      await click(globals.document.querySelector(
         '.webui-popover.in .change-details-action-trigger'
       ));
       await fillIn('.name-field .form-control', 'newName');
@@ -216,7 +217,7 @@ describe('Integration | Component | content-atm-inventories-workflows/atm-workfl
       const firstWorkflow = workflows[0];
 
       await click(firstWorkflow.querySelector('.workflow-actions-trigger'));
-      await click(document.querySelector(
+      await click(globals.document.querySelector(
         '.webui-popover.in .change-details-action-trigger'
       ));
       await click('.btn-save');
@@ -230,7 +231,7 @@ describe('Integration | Component | content-atm-inventories-workflows/atm-workfl
       const firstWorkflow = workflows[0];
 
       await click(firstWorkflow.querySelector('.workflow-actions-trigger'));
-      await click(document.querySelector(
+      await click(globals.document.querySelector(
         '.webui-popover.in .change-details-action-trigger'
       ));
       await fillIn('.name-field .form-control', 'newName');
@@ -247,7 +248,7 @@ describe('Integration | Component | content-atm-inventories-workflows/atm-workfl
       const workflows = findAll('.atm-workflow-schemas-list-entry');
       const firstWorkflow = workflows[0];
       await click(firstWorkflow.querySelector('.workflow-actions-trigger'));
-      await click(document.querySelector(
+      await click(globals.document.querySelector(
         '.webui-popover.in .change-details-action-trigger'));
       const saveBtn = find('.btn-save');
 
@@ -272,7 +273,7 @@ describe('Integration | Component | content-atm-inventories-workflows/atm-workfl
       const firstWorkflow = workflows[0];
 
       await click(firstWorkflow.querySelector('.workflow-actions-trigger'));
-      await click(document.querySelector(
+      await click(globals.document.querySelector(
         '.webui-popover.in .remove-atm-workflow-schema-action-trigger'
       ));
 
@@ -293,7 +294,7 @@ describe('Integration | Component | content-atm-inventories-workflows/atm-workfl
       const firstWorkflow = workflows[0];
 
       await click(firstWorkflow.querySelector('.workflow-actions-trigger'));
-      await click(document.querySelector(
+      await click(globals.document.querySelector(
         '.webui-popover.in .copy-record-id-action-trigger'
       ));
 
@@ -351,7 +352,7 @@ describe('Integration | Component | content-atm-inventories-workflows/atm-workfl
       await click(actionsTrigger);
 
       const actions =
-        document.querySelectorAll('.webui-popover.in .actions-popover-content a');
+        globals.document.querySelectorAll('.webui-popover.in .actions-popover-content a');
       expect(actions).to.have.length(revisionActionsSpec.length);
       revisionActionsSpec.forEach(({ className, label, icon }, index) => {
         const action = actions[index];
@@ -375,7 +376,7 @@ describe('Integration | Component | content-atm-inventories-workflows/atm-workfl
       const firstWorkflow = workflows[0];
 
       await click(firstWorkflow.querySelector('.revision-actions-trigger'));
-      await click(document.querySelector(
+      await click(globals.document.querySelector(
         '.webui-popover.in .create-atm-workflow-schema-revision-action-trigger'
       ));
 
@@ -396,7 +397,7 @@ describe('Integration | Component | content-atm-inventories-workflows/atm-workfl
       const firstWorkflow = workflows[0];
 
       await click(firstWorkflow.querySelector('.revision-actions-trigger'));
-      await click(document.querySelector(
+      await click(globals.document.querySelector(
         '.webui-popover.in .duplicate-atm-workflow-schema-revision-action-trigger'
       ));
 
@@ -417,7 +418,7 @@ describe('Integration | Component | content-atm-inventories-workflows/atm-workfl
       const firstWorkflow = workflows[0];
 
       await click(firstWorkflow.querySelector('.revision-actions-trigger'));
-      await click(document.querySelector(
+      await click(globals.document.querySelector(
         '.webui-popover.in .dump-atm-workflow-schema-revision-action-trigger'
       ));
 
@@ -438,7 +439,7 @@ describe('Integration | Component | content-atm-inventories-workflows/atm-workfl
       const firstWorkflow = workflows[0];
 
       await click(firstWorkflow.querySelector('.revision-actions-trigger'));
-      await click(document.querySelector(
+      await click(globals.document.querySelector(
         'body .webui-popover.in .remove-atm-workflow-schema-revision-action-trigger'
       ));
 

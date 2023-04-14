@@ -19,6 +19,7 @@ import GenerateInviteTokenAction from 'onezone-gui/utils/token-actions/generate-
 import EmberObject from '@ember/object';
 import { registerService, lookupService } from '../../helpers/stub-service';
 import Service from '@ember/service';
+import globals from 'onedata-gui-common/utils/globals';
 
 const Router = Service.extend({
   urlFor() {
@@ -148,7 +149,7 @@ describe('Integration | Component | content-spaces-harvesters', function () {
       });
 
     await click('.resource-item:first-child .btn-menu-toggle');
-    await click(document.querySelector('.remove-harvester-from-space-trigger'));
+    await click(globals.document.querySelector('.remove-harvester-from-space-trigger'));
     expect(executeStub).to.be.calledOnce;
   });
 
@@ -187,7 +188,7 @@ describe('Integration | Component | content-spaces-harvesters', function () {
   it('executes adding harvester from list view', async function () {
     await testAddingHarvester(async () => {
       await click('h1 .collapsible-toolbar-toggle');
-      await click(document.querySelector(
+      await click(globals.document.querySelector(
         '.dropdown-menu .add-harvester-to-space-trigger'
       ));
     });
@@ -196,7 +197,7 @@ describe('Integration | Component | content-spaces-harvesters', function () {
   it('executes inviting harvester using token from list view', async function () {
     await testInvitingHarvesterUsingToken(async () => {
       await click('h1 .collapsible-toolbar-toggle');
-      await click(document.querySelector(
+      await click(globals.document.querySelector(
         '.dropdown-menu .generate-invite-token-action'
       ));
     });

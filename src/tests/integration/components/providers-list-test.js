@@ -8,6 +8,7 @@ import sinon from 'sinon';
 import _ from 'lodash';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { Promise } from 'rsvp';
+import globals from 'onedata-gui-common/utils/globals';
 
 describe('Integration | Component | providers-list', function () {
   setupRenderingTest();
@@ -129,7 +130,7 @@ describe('Integration | Component | providers-list', function () {
       providerActions=actions
     }}`);
     await click('.one-collapsible-list-item:nth-child(2) .provider-menu-toggle');
-    await click(document.querySelector('.webui-popover.in .action-trigger'));
+    await click(globals.document.querySelector('.webui-popover.in .action-trigger'));
     expect(actionSpy).to.be.calledOnce;
     expect(actionSpy).to.be.calledWith(this.get('providersData')[0].provider);
   });

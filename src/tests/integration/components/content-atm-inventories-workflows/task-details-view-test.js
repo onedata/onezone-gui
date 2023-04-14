@@ -8,6 +8,7 @@ import _ from 'lodash';
 import { clickTrigger } from 'ember-power-select/test-support/helpers';
 import { Promise } from 'rsvp';
 import Store from 'onedata-gui-common/utils/workflow-visualiser/store';
+import globals from 'onedata-gui-common/utils/globals';
 
 const exampleAtmLambdaRevision = {
   name: 'function1',
@@ -226,7 +227,7 @@ function itProvidesStoresInTaskForm() {
     await click('.singleResultMappings-add-field-button');
     await clickTrigger('.targetStore-field');
 
-    const options = document.querySelectorAll('.ember-power-select-option');
+    const options = globals.document.querySelectorAll('.ember-power-select-option');
 
     expect(options[1]).to.have.trimmed.text('listStringStore');
     expect(options[2]).to.have.trimmed.text('singleValueStringStore');

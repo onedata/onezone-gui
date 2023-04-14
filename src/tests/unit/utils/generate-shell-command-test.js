@@ -1,10 +1,11 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import generateShellCommand from 'onezone-gui/utils/generate-shell-command';
+import globals from 'onedata-gui-common/utils/globals';
 
 describe('Unit | Utility | generate-shell-command', function () {
   it('generates command for onedatify', function () {
-    const host = window.location.host;
+    const host = globals.location.host;
     const supportToken = 'jdisdfg7fgr36t67f';
     const onezoneRegistrationToken = 'some_reg_token';
 

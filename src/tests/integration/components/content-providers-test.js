@@ -7,6 +7,7 @@ import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { resolve } from 'rsvp';
 import sinon from 'sinon';
 import { lookupService } from '../../helpers/stub-service';
+import globals from 'onedata-gui-common/utils/globals';
 
 function po(val) {
   return PromiseObject.create({ promise: resolve(val) });
@@ -25,12 +26,11 @@ describe('Integration | Component | content-providers', function () {
       const router = lookupService(this, 'router');
       const exampleUrl = 'https://example.com';
       sinon.stub(router, 'urlFor').returns(exampleUrl);
-      const _window = {
+      globals.mock('window', {
         open: sinon.stub(),
         on() {},
         dispatchEvent() {},
-      };
-      this.set('_window', _window);
+      });
       const providerGri = 'provider.id1.instance:auto';
       const list = [
         po({
@@ -58,13 +58,12 @@ describe('Integration | Component | content-providers', function () {
       });
 
       await render(hbs `{{content-providers
-        _window=_window
         providerList=providerList
         transitionToProviderRedirect=transitionToProviderRedirect
       }}`);
 
       await doubleClick('.provider-place-id1');
-      expect(_window.open).to.be.calledOnce;
-      expect(_window.open).to.be.calledWith(exampleUrl);
+      expect(globals.window.open).to.be.calledOnce;
+      expect(globals.window.open).to.be.calledWith(exampleUrl);
     });
 });

@@ -20,6 +20,7 @@ import CreateAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/cr
 import ModifyAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/modify-atm-lambda-revision-action';
 import { set, setProperties, get } from '@ember/object';
 import { clearStoreAfterEach } from '../../helpers/clear-store';
+import globals from 'onedata-gui-common/utils/globals';
 
 describe('Integration | Component | content-atm-inventories-lambdas', function () {
   setupRenderingTest();
@@ -237,7 +238,7 @@ describe('Integration | Component | content-atm-inventories-lambdas', function (
         await click(
           getSlide('list').querySelectorAll('.revision-actions-trigger')[1]
         );
-        await click(document.querySelector(
+        await click(globals.document.querySelector(
           '.webui-popover.in .create-atm-lambda-revision-action-trigger'
         ));
 

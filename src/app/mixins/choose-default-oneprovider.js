@@ -12,6 +12,7 @@ import { resolve, allSettled } from 'rsvp';
 import isStandaloneGuiOneprovider from 'onedata-gui-common/utils/is-standalone-gui-oneprovider';
 import createPropertyComparator from 'onedata-gui-common/utils/create-property-comparator';
 import { assert } from '@ember/debug';
+import globals from 'onedata-gui-common/utils/globals';
 
 const storageOneproviderIdKey = 'chooseDefaultOneproviderMixin.oneproviderId';
 
@@ -20,19 +21,15 @@ export function getStorageOneproviderKey(spaceId) {
 }
 
 export default Mixin.create({
-  /**
-   * @type {Storage}
-   */
-  _localStorage: localStorage,
 
   getStorageOneproviderKey,
 
   getBrowserDefaultOneproviderId(spaceId) {
-    return this.get('_localStorage').getItem(this.getStorageOneproviderKey(spaceId));
+    return globals.localStorage.getItem(this.getStorageOneproviderKey(spaceId));
   },
 
   setBrowserDefaultOneproviderId(oneproviderId, spaceId = this.get('space.entityId')) {
-    return this.get('_localStorage')
+    return globals.localStorage
       .setItem(this.getStorageOneproviderKey(spaceId), oneproviderId);
   },
 

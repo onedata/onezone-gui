@@ -12,6 +12,7 @@ import { inject as service } from '@ember/service';
 import { Promise } from 'rsvp';
 import { getOneproviderPath } from 'onedata-gui-common/utils/onedata-urls';
 import isStandaloneGuiOneprovider from 'onedata-gui-common/utils/is-standalone-gui-oneprovider';
+import globals from 'onedata-gui-common/utils/globals';
 
 export default Route.extend({
   shareManager: service(),
@@ -35,7 +36,7 @@ export default Route.extend({
       throw { isOnedataCustomError: true, type: 'offline-providers' };
     } else if (isStandaloneGuiOneprovider(chosenProviderVersion)) {
       return new Promise(() => {
-        window.location = getOneproviderPath(
+        globals.window.location = getOneproviderPath(
           get(model, 'chosenProviderId'),
           `public/shares/${get(model, 'entityId')}`
         );

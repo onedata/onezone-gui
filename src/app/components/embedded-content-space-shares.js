@@ -14,6 +14,7 @@ import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-s
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import EmbeddedContentShareActions from 'onezone-gui/mixins/embedded-content-share-actions';
 import EmbeddedBrowserCommon from 'onezone-gui/mixins/embedded-browser-common';
+import globals from 'onedata-gui-common/utils/globals';
 
 const mixins = [
   EmbeddedBrowserCommon,
@@ -38,8 +39,6 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
    * @type {Function}
    */
   onShowShareList: notImplementedThrow,
-
-  _location: location,
 
   /**
    * @type {ComputedProperty<string|undefined>}
@@ -97,11 +96,10 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
     },
     getShareUrl({ shareId, dirId = null } = {}) {
       const {
-        _location,
         router,
         navigationState,
-      } = this.getProperties('_location', 'router', 'navigationState');
-      return _location.origin + _location.pathname + router.urlFor(
+      } = this.getProperties('router', 'navigationState');
+      return globals.location.origin + globals.location.pathname + router.urlFor(
         'onedata.sidebar.content.aspect',
         'shares', {
           queryParams: {

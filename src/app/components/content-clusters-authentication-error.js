@@ -11,6 +11,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import ErrorCheckViewMixin from 'onedata-gui-common/mixins/error-check-view';
+import globals from 'onedata-gui-common/utils/globals';
 
 export default Component.extend(I18n, ErrorCheckViewMixin, {
   classNames: ['content-clusters-authentication-error'],
@@ -44,8 +45,8 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
    * @override
    */
   checkError() {
-    const authRedirect = sessionStorage.getItem('authRedirect');
-    sessionStorage.removeItem('authRedirect');
+    const authRedirect = globals.sessionStorage.getItem('authRedirect');
+    globals.sessionStorage.removeItem('authRedirect');
     return Boolean(authRedirect);
   },
 

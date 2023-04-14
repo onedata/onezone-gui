@@ -16,6 +16,7 @@ import {
 import sinon from 'sinon';
 import { Promise } from 'rsvp';
 import { suppressRejections } from '../../../../helpers/suppress-rejections';
+import globals from 'onedata-gui-common/utils/globals';
 
 describe('Integration | Component | modals/spaces/confirm-join-request-modal', function () {
   setupRenderingTest();
@@ -373,7 +374,7 @@ class Helper {
     return this.footer?.querySelector('.decide-later-btn');
   }
   get alertModal() {
-    return document.querySelector('.alert-global .modal-dialog');
+    return globals.document.querySelector('.alert-global .modal-dialog');
   }
 
   get modalManager() {

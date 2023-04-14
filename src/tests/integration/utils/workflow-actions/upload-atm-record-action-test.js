@@ -17,6 +17,7 @@ import sinon from 'sinon';
 import { suppressRejections } from '../../../helpers/suppress-rejections';
 import { dasherize } from '@ember/string';
 import _ from 'lodash';
+import globals from 'onedata-gui-common/utils/globals';
 
 const atmInventoryId = 'invid';
 
@@ -393,7 +394,7 @@ function generateDump(atmModelName) {
 }
 
 export async function triggerUploadInputChange(filename, fileContent) {
-  const uploadInput = document.querySelector('.upload-atm-record-action-input');
+  const uploadInput = globals.document.querySelector('.upload-atm-record-action-input');
   await triggerFileInputChange(
     uploadInput,
     [{ name: filename, content: fileContent, mimeType: 'application/json' }]

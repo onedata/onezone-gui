@@ -5,6 +5,7 @@ import { render, find } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import { clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
 import sinon from 'sinon';
+import globals from 'onedata-gui-common/utils/globals';
 
 const componentClass = 'inventory-selector';
 
@@ -48,7 +49,7 @@ describe('Integration | Component | modals/apply-atm-record-dump-modal/inventory
 
       await clickTrigger('.targetAtmInventory-field');
 
-      const options = document.querySelectorAll('.ember-power-select-option');
+      const options = globals.document.querySelectorAll('.ember-power-select-option');
       expect(options).to.have.length(atmInventories.length);
       atmInventories.sortBy('name').forEach(({ name }, idx) =>
         expect(options[idx]).to.have.trimmed.text(name)

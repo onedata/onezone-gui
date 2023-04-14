@@ -21,6 +21,7 @@ import { lookupService } from '../../../helpers/stub-service';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import OneTooltipHelper from '../../../helpers/one-tooltip';
+import globals from 'onedata-gui-common/utils/globals';
 
 const lambdaPresentationActionsSpec = [{
   className: 'unlink-atm-lambda-action-trigger',
@@ -239,7 +240,7 @@ describe(
         const firstAtmLambda = find('.atm-lambdas-list-entry');
 
         await click(firstAtmLambda.querySelector('.atm-lambda-actions-trigger'));
-        await click(document.querySelector(
+        await click(globals.document.querySelector(
           '.webui-popover.in .unlink-atm-lambda-action-trigger'
         ));
 
@@ -258,7 +259,7 @@ describe(
 
         await renderComponent();
         await click('.atm-lambda-actions-trigger');
-        await click(document.querySelector(
+        await click(globals.document.querySelector(
           '.webui-popover.in .copy-record-id-action-trigger'
         ));
 
@@ -305,7 +306,7 @@ describe(
         await click(actionsTrigger);
 
         const actions =
-          document.querySelectorAll('.webui-popover.in .actions-popover-content a');
+          globals.document.querySelectorAll('.webui-popover.in .actions-popover-content a');
         expect(actions).to.have.length(revisionActionsSpec.length);
         revisionActionsSpec.forEach(({ className, label, icon }, index) => {
           const action = actions[index];
@@ -322,7 +323,7 @@ describe(
         const lambdas = findAll('.atm-lambdas-list-entry');
 
         await click(lambdas[1].querySelector('.revision-actions-trigger'));
-        await click(document.querySelector(
+        await click(globals.document.querySelector(
           '.webui-popover.in .create-atm-lambda-revision-action-trigger'
         ));
 
@@ -336,7 +337,7 @@ describe(
           const firstLambda = find('.atm-lambdas-list-entry');
 
           await click(firstLambda.querySelector('.revision-actions-trigger'));
-          const actionTrigger = document.querySelector(
+          const actionTrigger = globals.document.querySelector(
             '.webui-popover.in .create-atm-lambda-revision-action-trigger'
           );
           expect(actionTrigger.parentElement).to.have.class('disabled');
@@ -359,7 +360,7 @@ describe(
         const firstLambda = find('.atm-lambdas-list-entry');
 
         await click(firstLambda.querySelector('.revision-actions-trigger'));
-        await click(document.querySelector(
+        await click(globals.document.querySelector(
           '.webui-popover.in .duplicate-atm-lambda-revision-action-trigger'
         ));
 
@@ -379,7 +380,7 @@ describe(
         const firstLambda = find('.atm-lambdas-list-entry');
 
         await click(firstLambda.querySelector('.revision-actions-trigger'));
-        await click(document.querySelector(
+        await click(globals.document.querySelector(
           '.webui-popover.in .dump-atm-lambda-revision-action-trigger'
         ));
 
@@ -511,7 +512,7 @@ function itAllowsToChooseLambdaActions(actionsSpec) {
 
     await click(actionsTrigger);
 
-    const actions = document.querySelectorAll(
+    const actions = globals.document.querySelectorAll(
       '.webui-popover.in .actions-popover-content a'
     );
     expect(actions).to.have.length(actionsSpec.length);

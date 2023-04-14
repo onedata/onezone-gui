@@ -5,6 +5,7 @@ import { render, click, find } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import { onezoneDefaultRootPath } from 'onedata-gui-common/utils/onedata-urls';
+import globals from 'onedata-gui-common/utils/globals';
 
 describe('Integration | Component | login-box/social-box-list/social-box',
   function () {
@@ -37,19 +38,15 @@ describe('Integration | Component | login-box/social-box-list/social-box',
     it('handles click like a standard anchor if link property is specified',
       async function () {
         const link = 'http://test.com';
-        const windowMock = {
+        globals.mock('window', {
           location: undefined,
-        };
-        this.setProperties({
-          link,
-          windowMock,
         });
+        this.set('link', link);
         await render(hbs `{{login-box/social-box-list/social-box
           link="http://test.com"
-          _window=windowMock}}
-        `);
+        }}`);
         await click('.login-icon-box');
-        expect(windowMock.location).to.be.equal(link);
+        expect(globals.window.location).to.be.equal(link);
       }
     );
 
