@@ -24,6 +24,7 @@ export const MarketplaceSpaceStatus = Object.freeze({
   Granted: 'granted',
   Outdated: 'outdated',
   Rejected: 'rejected',
+  AvailableAfterReject: 'availableAfterReject',
 });
 
 export default EmberObject.extend({
@@ -119,7 +120,7 @@ export default EmberObject.extend({
         if (itemRequestInfo.collectionName === 'rejected') {
           const minBackoff = this.viewModel.marketplaceConfig.minBackoffAfterRejection;
           if (typeof minBackoff === 'number' && lastActivity + minBackoff < now) {
-            return MarketplaceSpaceStatus.Available;
+            return MarketplaceSpaceStatus.AvailableAfterReject;
           } else {
             return MarketplaceSpaceStatus.Rejected;
           }

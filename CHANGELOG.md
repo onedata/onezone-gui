@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10794 Added message about last membership request reject when requesting becomes available
 * VFS-10698 Fixed ember ace resizing mechanism
 * VFS-10767 Refactored stacked modals styles
 * VFS-10126 Added space Marketplace with space configuration and requests management

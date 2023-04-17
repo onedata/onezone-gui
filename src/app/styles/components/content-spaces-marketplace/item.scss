@@ -129,7 +129,8 @@
     flex-direction: column;
     align-items: flex-end;
 
-    &.access-info-col-outdated {
+    &.access-info-col-outdated,
+    &.access-info-col-availableAfterReject {
       flex-direction: row;
       align-items: center;
     }
