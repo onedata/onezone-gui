@@ -37,6 +37,7 @@ import {
 import { resolve } from 'rsvp';
 import _ from 'lodash';
 import { scheduleOnce } from '@ember/runloop';
+import globals from 'onedata-gui-common/utils/globals';
 
 export default Component.extend(I18n, {
   classNames: ['harvester-configuration-general'],
@@ -67,11 +68,6 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   disabled: false,
-
-  /**
-   * @type {Location}
-   */
-  _location: location,
 
   /**
    * @type {ComputedProperty<String>}
@@ -312,18 +308,8 @@ export default Component.extend(I18n, {
   publicUrlValue: computed('harvester.entityId', function publicUrlValue() {
     const harvesterEntityId = this.get('harvester.entityId');
     if (harvesterEntityId) {
-      const {
-        router,
-        _location,
-      } = this.getProperties('router', '_location');
-
-      const {
-        origin,
-        pathname,
-      } = getProperties(_location, 'origin', 'pathname');
-
-      return origin + pathname +
-        router.urlFor('public.harvesters', harvesterEntityId);
+      return globals.location.origin + globals.location.pathname +
+        this.router.urlFor('public.harvesters', harvesterEntityId);
     } else {
       return null;
     }

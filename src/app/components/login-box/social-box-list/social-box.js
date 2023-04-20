@@ -19,6 +19,7 @@ import {
   lightFgColor,
 } from 'onezone-gui/utils/auth-box-config';
 import Color from 'color';
+import globals from 'onedata-gui-common/utils/globals';
 
 export default Component.extend({
   tagName: 'div',
@@ -70,12 +71,6 @@ export default Component.extend({
    * @returns {undefined}
    */
   action: notImplementedIgnore,
-
-  /**
-   * Property only for testing purposes.
-   * @type {Window}
-   */
-  _window: window,
 
   /**
    * @type {Ember.ComputedProperty<string>}
@@ -133,13 +128,12 @@ export default Component.extend({
       const {
         disabled,
         link,
-        _window,
         action,
-      } = this.getProperties('disabled', 'link', '_window', 'action');
+      } = this.getProperties('disabled', 'link', 'action');
       this.element.dispatchEvent(new Event('mouseleave'));
       if (!disabled) {
         if (link) {
-          _window.location = link;
+          globals.window.location = link;
         } else {
           action(this);
         }

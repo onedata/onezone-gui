@@ -16,17 +16,13 @@ import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import cdmiObjectIdToGuid from 'onedata-gui-common/utils/cdmi-object-id-to-guid';
 import { getSpaceIdFromFileId } from 'onedata-gui-common/utils/file-id-parsers';
+import globals from 'onedata-gui-common/utils/globals';
 
 export default Service.extend({
   navigationState: service(),
   harvesterManager: service(),
   currentUser: service(),
   router: service(),
-
-  /**
-   * @type {Location}
-   */
-  _location: window.location,
 
   /**
    * Actual harvester, that should be used as a context for all data discovery
@@ -199,13 +195,7 @@ export default Service.extend({
    * @returns {Promise<String>}
    */
   getOnezoneUrl() {
-    const _location = this.get('_location');
-    const {
-      origin,
-      pathname,
-    } = getProperties(_location, 'origin', 'pathname');
-
-    const url = origin + pathname;
+    const url = globals.location.origin + globals.location.pathname;
     return resolve(url);
   },
 

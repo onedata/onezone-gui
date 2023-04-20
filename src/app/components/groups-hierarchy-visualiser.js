@@ -192,6 +192,7 @@ import { groupedFlags } from 'onedata-gui-websocket-client/utils/group-privilege
 import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
 import { getOwner } from '@ember/application';
 import dom from 'onedata-gui-common/utils/dom';
+import globals from 'onedata-gui-common/utils/globals';
 
 export default Component.extend(I18n, {
   classNames: ['groups-hierarchy-visualiser'],
@@ -332,12 +333,6 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   isSavingRelationPrivileges: false,
-
-  /**
-   * Window object (for testing purposes).
-   * @type {Window}
-   */
-  _window: window,
 
   /**
    * Workspace definition
@@ -556,18 +551,10 @@ export default Component.extend(I18n, {
   didInsertElement() {
     this._super(...arguments);
 
-    const {
-      windowResizeHandler,
-      _window,
-    } = this.getProperties(
-      'windowResizeHandler',
-      '_window'
-    );
-
-    _window.addEventListener('resize', windowResizeHandler);
+    globals.window.addEventListener('resize', this.windowResizeHandler);
 
     // Detect initial size of the component
-    windowResizeHandler();
+    this.windowResizeHandler();
 
     // Initialize graph
     this.resetObserver();
@@ -575,15 +562,7 @@ export default Component.extend(I18n, {
 
   willDestroyElement() {
     try {
-      const {
-        windowResizeHandler,
-        _window,
-      } = this.getProperties(
-        'windowResizeHandler',
-        '_window'
-      );
-
-      _window.removeEventListener('resize', windowResizeHandler);
+      globals.window.removeEventListener('resize', this.windowResizeHandler);
     } finally {
       this._super(...arguments);
     }

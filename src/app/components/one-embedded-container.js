@@ -17,6 +17,7 @@ import EmbeddedIframe from 'onedata-gui-common/utils/embedded-iframe';
 import { A } from '@ember/array';
 import { getOwner } from '@ember/application';
 import { array } from 'ember-awesome-macros';
+import globals from 'onedata-gui-common/utils/globals';
 
 export default Component.extend({
   classNames: ['one-embedded-container'],
@@ -69,11 +70,6 @@ export default Component.extend({
    * @type {string}
    */
   iframeType: undefined,
-
-  /**
-   * @type {Location}
-   */
-  _location: location,
 
   /**
    * Any data, that should be passed along with iframe. Usually will be
@@ -324,14 +320,13 @@ export default Component.extend({
         recordManager,
         router,
         guiUtils,
-        _location,
-      } = this.getProperties('recordManager', 'router', 'guiUtils', '_location');
+      } = this.getProperties('recordManager', 'router', 'guiUtils');
       return recordManager.getUserRecordList('cluster')
         .then(clusterList => get(clusterList, 'list'))
         .then(list => {
           const cluster = list.findBy('entityId', clusterId);
           if (cluster) {
-            return _location.origin + _location.pathname + router.urlFor(
+            return globals.location.origin + globals.location.pathname + router.urlFor(
               'onedata.sidebar.content',
               'clusters',
               guiUtils.getRoutableIdFor(cluster),

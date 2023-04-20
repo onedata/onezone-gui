@@ -22,6 +22,7 @@ import { defer } from 'rsvp';
 import {
   onepanelAbbrev,
 } from 'onedata-gui-common/utils/onedata-urls';
+import globals from 'onedata-gui-common/utils/globals';
 
 export const entityType = 'cluster';
 
@@ -182,7 +183,7 @@ export default Model.extend(
 
     fetchRemoteGuiContext() {
       const guiContextPath =
-        `${location.origin}/${onepanelAbbrev}/${this.get('entityId')}/gui-context`;
+        `${globals.location.origin}/${onepanelAbbrev}/${this.get('entityId')}/gui-context`;
       return resolve($.get(guiContextPath));
     },
 

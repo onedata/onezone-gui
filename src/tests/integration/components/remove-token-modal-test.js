@@ -3,6 +3,7 @@ import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
+import globals from 'onedata-gui-common/utils/globals';
 
 describe('Integration | Component | remove-token-modal', function () {
   setupRenderingTest();
@@ -16,7 +17,7 @@ describe('Integration | Component | remove-token-modal', function () {
   it('renders token name inside message', async function () {
     await render(hbs `{{remove-token-modal opened=true token=token}}`);
 
-    expect(document.querySelector('.remove-token-modal.in'))
+    expect(globals.document.querySelector('.remove-token-modal.in'))
       .to.contain.text(this.get('token.name'));
   });
 });

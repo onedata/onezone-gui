@@ -20,6 +20,7 @@ import OneTooltipHelper from '../../helpers/one-tooltip';
 import { dasherize, underscore } from '@ember/string';
 import { suppressRejections } from '../../helpers/suppress-rejections';
 import { findInElementsByText } from '../../helpers/find';
+import globals from 'onedata-gui-common/utils/globals';
 
 const tokenInviteTypes = [{
   inviteType: 'userJoinGroup',
@@ -2528,7 +2529,7 @@ describe('Integration | Component | token-editor', function () {
 });
 
 function getTagsSelector() {
-  return document.querySelector('.webui-popover.in .tags-selector');
+  return globals.document.querySelector('.webui-popover.in .tags-selector');
 }
 
 const basicFieldNameToFieldPath = {

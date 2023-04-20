@@ -6,8 +6,10 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-function _onezoneUrl(windowLocation = window.location) {
-  return windowLocation.origin.toString();
+import globals from 'onedata-gui-common/utils/globals';
+
+function _onezoneUrl() {
+  return globals.location.origin.toString();
 }
 
 function escapeCommandString(string) {

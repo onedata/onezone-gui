@@ -18,6 +18,7 @@ import { clickTrigger, selectChoose } from 'ember-power-select/test-support/help
 import { A } from '@ember/array';
 import sinon from 'sinon';
 import ObjectProxy from '@ember/object/proxy';
+import globals from 'onedata-gui-common/utils/globals';
 
 describe('Integration | Component | modals/apply-atm-record-dump-modal',
   function () {
@@ -149,7 +150,7 @@ describe('Integration | Component | modals/apply-atm-record-dump-modal',
         const modalBody = getModalBody();
 
         await clickTrigger('.targetAtmInventory-field');
-        const options = document.querySelectorAll('.ember-power-select-option');
+        const options = globals.document.querySelectorAll('.ember-power-select-option');
         expect(options).to.have.length(2);
         expect(options[0]).to.have.trimmed.text('inv1');
         expect(options[1]).to.have.trimmed.text('inv2');
@@ -259,7 +260,7 @@ function itAllowsChangingTargetWorkflow() {
     const modalBody = getModalBody();
 
     await clickTrigger('.targetAtmRecord-field');
-    const options = document.querySelectorAll('.ember-power-select-option');
+    const options = globals.document.querySelectorAll('.ember-power-select-option');
     expect(options).to.have.length(2);
     expect(options[0]).to.have.trimmed.text('wf1');
     expect(options[1]).to.have.trimmed.text('wf3');

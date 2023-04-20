@@ -8,6 +8,7 @@ import sinon from 'sinon';
 import { Promise } from 'rsvp';
 import { registerService } from '../../../helpers/stub-service';
 import Service from '@ember/service';
+import globals from 'onedata-gui-common/utils/globals';
 
 const states = [{
   value: 'draft',
@@ -117,7 +118,7 @@ describe(
 
         await clickTrigger('.state-field');
 
-        const options = document.querySelectorAll('.ember-power-select-option');
+        const options = globals.document.querySelectorAll('.ember-power-select-option');
         expect(options).to.have.length(3);
         states.forEach(({ label }, idx) =>
           expect(options[idx]).to.have.trimmed.text(label)
@@ -158,7 +159,7 @@ describe(
 
         await clickTrigger('.engine-field');
 
-        const options = document.querySelectorAll('.ember-power-select-option');
+        const options = globals.document.querySelectorAll('.ember-power-select-option');
         expect(options).to.have.length(1);
         expect(options[0]).to.have.trimmed.text('OpenFaaS');
       });
@@ -395,7 +396,7 @@ describe(
 
         await clickTrigger('.data-spec-editor');
 
-        const options = document.querySelectorAll('.ember-power-select-option');
+        const options = globals.document.querySelectorAll('.ember-power-select-option');
         expect(options).to.have.length(resultTypes.length);
         resultTypes.forEach((type, i) =>
           expect(options[i]).to.have.trimmed.text(type)

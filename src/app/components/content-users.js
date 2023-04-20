@@ -22,6 +22,7 @@ import Action from 'onedata-gui-common/utils/action';
 import { tag } from 'ember-awesome-macros';
 import moment from 'moment';
 import $ from 'jquery';
+import globals from 'onedata-gui-common/utils/globals';
 
 const animationTimeout = 333;
 
@@ -333,7 +334,7 @@ export default Component.extend(...mixins, {
       return this.get('onezoneServer').getLoginEndpoint(
           authorizer.id,
           true,
-          window.location.toString(),
+          globals.location.toString(),
         ).then(data =>
           handleLoginEndpoint(data, () =>
             this._authEndpointError({

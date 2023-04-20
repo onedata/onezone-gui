@@ -9,6 +9,7 @@ import { resolve } from 'rsvp';
 import { registerService, lookupService } from '../../helpers/stub-service';
 import CurrentUser from 'onedata-gui-websocket-client/services/current-user';
 import sinon from 'sinon';
+import globals from 'onedata-gui-common/utils/globals';
 
 const TestCurrentUser = CurrentUser.extend({
   userProxy: promiseObject(resolve({
@@ -73,21 +74,18 @@ describe('Integration | Component | content-spaces-index', function () {
     sinon.stub(lookupService(this, 'store'), 'findRecord')
       .withArgs('user', sinon.match(/user_id/))
       .resolves(user);
-    const _localStorage = {
+    globals.mock('localStorage', {
+      values: {},
       getItem(id) {
-        return this[id];
+        return this.values[id];
       },
       setItem(id, value) {
-        this[id] = value;
+        this.values[id] = value;
       },
-    };
-    this.setProperties({
-      space,
-      _localStorage,
     });
+    this.set('space', space);
 
     await render(hbs `{{content-spaces-index
-      _localStorage=_localStorage
       space=space
       showResourceMembershipTile=false
     }}`);

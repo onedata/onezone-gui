@@ -3,11 +3,12 @@ import { describe, it, beforeEach } from 'mocha';
 import { setupTest } from 'ember-mocha';
 import { registerService, lookupService } from '../../helpers/stub-service';
 import Service from '@ember/service';
-import { set, setProperties } from '@ember/object';
+import { setProperties } from '@ember/object';
 import { resolve, reject } from 'rsvp';
 import sinon from 'sinon';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { suppressRejections } from '../../helpers/suppress-rejections';
+import globals from 'onedata-gui-common/utils/globals';
 
 const HarvesterManager = Service.extend({
   getGuiPluginConfig() {},
@@ -147,7 +148,7 @@ describe('Unit | Service | data-discovery-resources', function () {
 
   it('injects info about onezone url into appProxy', function () {
     const service = this.owner.lookup('service:data-discovery-resources');
-    set(service, '_location', {
+    globals.mock('location', {
       origin: 'https://abcdef.com',
       pathname: '/ghi',
     });
@@ -180,7 +181,7 @@ describe('Unit | Service | data-discovery-resources', function () {
         .returns('#browser');
 
       const service = this.owner.lookup('service:data-discovery-resources');
-      set(service, '_location', {
+      globals.mock('location', {
         origin: 'https://abcdef.com',
         pathname: '/ghi',
       });

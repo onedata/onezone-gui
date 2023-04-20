@@ -9,22 +9,18 @@
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import HarvesterInfoContent from 'onedata-gui-common/components/harvester-info-content';
+import globals from 'onedata-gui-common/utils/globals';
 
 export default HarvesterInfoContent.extend({
   router: service(),
   guiUtils: service(),
 
   /**
-   * @type {Location}
-   */
-  _location: location,
-
-  /**
    * @override
    */
   publicUrl: computed('record.entityId', function publicUrl() {
     if (this.record.entityId && this.record.public) {
-      return this._location.origin + this._location.pathname +
+      return globals.location.origin + globals.location.pathname +
         this.router.urlFor('public.harvesters', this.record.entityId);
     } else {
       return null;

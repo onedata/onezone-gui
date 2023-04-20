@@ -15,6 +15,7 @@ import { Promise } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { later } from '@ember/runloop';
+import globals from 'onedata-gui-common/utils/globals';
 
 export const sessionExpiredCookie = 'sessionExpired';
 
@@ -37,11 +38,6 @@ export default Component.extend(I18n, {
    * @override
    */
   i18nPrefix: 'components.websocketReconnectionModal',
-
-  /**
-   * @type {Location}
-   */
-  _location: location,
 
   /**
    * Number of automatic (scheduled) reconnect attempt; reset on modal show.
@@ -315,7 +311,7 @@ export default Component.extend(I18n, {
     },
     reload() {
       return new Promise(() => {
-        this.get('_location').reload();
+        globals.location.reload();
       });
     },
     modalShown() {

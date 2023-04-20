@@ -5,6 +5,7 @@ import { render, click, fillIn, find } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import { resolve } from 'rsvp';
+import globals from 'onedata-gui-common/utils/globals';
 
 describe('Integration | Component | sidebar-spaces/space-item', function () {
   setupRenderingTest();
@@ -30,7 +31,7 @@ describe('Integration | Component | sidebar-spaces/space-item', function () {
 
     await click('.collapsible-toolbar-toggle');
     const renameTrigger =
-      document.querySelector('body .webui-popover.in .rename-space-action');
+      globals.document.querySelector('body .webui-popover.in .rename-space-action');
     await click(renameTrigger);
 
     await fillIn('.name-editor .form-control', 'newName');

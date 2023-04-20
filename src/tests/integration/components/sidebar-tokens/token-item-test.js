@@ -8,6 +8,7 @@ import { registerService, lookupService } from '../../../helpers/stub-service';
 import Service from '@ember/service';
 import sinon from 'sinon';
 import { setProperties } from '@ember/object';
+import globals from 'onedata-gui-common/utils/globals';
 
 describe('Integration | Component | sidebar-tokens/token-item', function () {
   setupRenderingTest();
@@ -108,7 +109,7 @@ describe('Integration | Component | sidebar-tokens/token-item', function () {
   it('renders actions in dots menu', async function () {
     await render(hbs `{{sidebar-tokens/token-item item=token}}`);
     await click('.token-menu-trigger');
-    const popoverContent = document.querySelector('.webui-popover.in');
+    const popoverContent = globals.document.querySelector('.webui-popover.in');
     [
       '.remove-token-action-trigger',
       '.rename-token-action-trigger',
@@ -131,7 +132,7 @@ describe('Integration | Component | sidebar-tokens/token-item', function () {
 
     await click('.token-menu-trigger');
     const renameTrigger =
-      document.querySelector('.webui-popover.in .rename-token-action-trigger');
+      globals.document.querySelector('.webui-popover.in .rename-token-action-trigger');
     await click(renameTrigger);
     await fillIn('.token-name .form-control', 'newName');
     await click('.token-name .save-icon');
@@ -154,10 +155,10 @@ describe('Integration | Component | sidebar-tokens/token-item', function () {
     await render(hbs `{{sidebar-tokens/token-item item=token}}`);
     await click('.token-menu-trigger');
     const removeTrigger =
-      document.querySelector('.webui-popover.in .remove-token-action-trigger');
+      globals.document.querySelector('.webui-popover.in .remove-token-action-trigger');
     await click(removeTrigger);
     const removeProceed =
-      document.querySelector('.remove-token-modal.in .proceed');
+      globals.document.querySelector('.remove-token-modal.in .proceed');
     await click(removeProceed);
     expect(deleteTokenStub).to.be.calledWith(token);
   });
@@ -169,12 +170,12 @@ describe('Integration | Component | sidebar-tokens/token-item', function () {
     await render(hbs `{{sidebar-tokens/token-item item=token}}`);
     await click('.token-menu-trigger');
     const removeTrigger =
-      document.querySelector('.webui-popover.in .remove-token-action-trigger');
+      globals.document.querySelector('.webui-popover.in .remove-token-action-trigger');
     await click(removeTrigger);
-    const removeCancel = document.querySelector('.remove-token-modal.in .cancel');
+    const removeCancel = globals.document.querySelector('.remove-token-modal.in .cancel');
     await click(removeCancel);
     expect(deleteTokenSpy).to.not.be.called;
-    expect(document.querySelector('.remove-token-modal.in')).to.not.exist;
+    expect(globals.document.querySelector('.remove-token-modal.in')).to.not.exist;
   });
 });
 

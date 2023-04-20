@@ -140,8 +140,6 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'openRestApiModal',
   ]),
 
-  _location: location,
-
   actions: {
     updateDatasetId(datasetId) {
       this.get('navigationState').changeRouteAspectOptions({

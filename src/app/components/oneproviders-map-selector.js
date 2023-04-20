@@ -16,6 +16,7 @@ import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignor
 import clusterizeProviders from 'onedata-gui-common/utils/clusterize-providers-by-coordinates';
 import mapPositionForCoordinates from 'onedata-gui-common/utils/map-position-for-coordinates';
 import { scheduleOnce } from '@ember/runloop';
+import globals from 'onedata-gui-common/utils/globals';
 
 export default Component.extend({
   classNames: ['oneproviders-map-selector'],
@@ -56,11 +57,6 @@ export default Component.extend({
    * @type {Object}
    */
   mapInitialState: undefined,
-
-  /**
-   * @type {Window}
-   */
-  _window: window,
 
   /**
    * @virtual
@@ -146,7 +142,7 @@ export default Component.extend({
     mapViewportChanged({ scale }) {
       this.set('mapScale', scale);
       scheduleOnce('afterRender', this, () =>
-        this.get('_window').dispatchEvent(new Event('oneprovidersSelectorRefresh'))
+        globals.window.dispatchEvent(new Event('oneprovidersSelectorRefresh'))
       );
     },
     onOneproviderSelectedFromPopover(hideCallback, oneprovider) {

@@ -10,6 +10,7 @@ import { set, setProperties } from '@ember/object';
 import { selectChoose, clickTrigger } from 'ember-power-select/test-support/helpers';
 import OneTooltipHelper from '../../../helpers/one-tooltip';
 import sinon from 'sinon';
+import globals from 'onedata-gui-common/utils/globals';
 
 const exampleHarvester = {
   entityId: 'abc',
@@ -410,7 +411,7 @@ describe('Integration | Component | harvester-configuration/general', function (
       expect(urlFormGroup).to.exist.and.to.have.class('clipboard-field-renderer');
       expect(urlFormGroup.querySelector('.control-label'))
         .to.have.trimmed.text('Public URL:');
-      const correctUrl = `${location.origin}${location.pathname}internalPath`;
+      const correctUrl = `${globals.location.origin}${globals.location.pathname}internalPath`;
       expect(urlFormGroup.querySelector('input')).to.have.value(correctUrl);
     });
 
@@ -495,7 +496,7 @@ describe('Integration | Component | harvester-configuration/general', function (
       expect(find('.public-field .one-way-toggle')).to.have.class('checked');
 
       expect(find('.publicFields-collapse')).to.have.class('in');
-      const correctUrl = `${location.origin}${location.pathname}internalPath`;
+      const correctUrl = `${globals.location.origin}${globals.location.pathname}internalPath`;
       expect(find('.publicFields-collapse .publicUrl-field input'))
         .to.have.value(correctUrl);
     });

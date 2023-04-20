@@ -11,6 +11,7 @@ import sinon from 'sinon';
 import { set, get, setProperties } from '@ember/object';
 import { Promise, resolve } from 'rsvp';
 import { selectChoose } from 'ember-power-select/test-support/helpers';
+import globals from 'onedata-gui-common/utils/globals';
 
 describe('Integration | Component | content-atm-inventories-workflows', function () {
   setupRenderingTest();
@@ -303,7 +304,7 @@ describe('Integration | Component | content-atm-inventories-workflows', function
         await click(
           getSlide('list').querySelector('.revision-actions-trigger')
         );
-        await click(document.querySelector(
+        await click(globals.document.querySelector(
           '.webui-popover.in .create-atm-workflow-schema-revision-action-trigger'
         ));
 

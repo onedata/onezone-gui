@@ -16,6 +16,7 @@ import { defer, Promise } from 'rsvp';
 import config from 'ember-get-config';
 import ObjectProxy from '@ember/object/proxy';
 import ApplyAtmRecordDumpActionBase from 'onezone-gui/utils/workflow-actions/apply-atm-record-dump-action-base';
+import globals from 'onedata-gui-common/utils/globals';
 
 export default ApplyAtmRecordDumpActionBase.extend({
   workflowManager: service(),
@@ -35,11 +36,6 @@ export default ApplyAtmRecordDumpActionBase.extend({
    * @type {DumpLoader}
    */
   dumpLoader: undefined,
-
-  /**
-   * @type {Window}
-   */
-  _window: window,
 
   /**
    * @override
@@ -96,7 +92,6 @@ export default ApplyAtmRecordDumpActionBase.extend({
     this.set('dumpLoader', DumpLoader.create({
       atmModelName: this.atmModelName,
       onExternalUpload: () => this.execute(),
-      _window: this._window,
     }));
   },
 
@@ -158,12 +153,6 @@ const DumpLoader = EmberObject.extend({
   onExternalUpload: undefined,
 
   /**
-   * @virtual
-   * @type {Window}
-   */
-  _window: undefined,
-
-  /**
    * @private
    * @type {HTMLInputElement|null}
    */
@@ -206,22 +195,19 @@ const DumpLoader = EmberObject.extend({
    * @returns {Promise}
    */
   async loadJsonFile() {
-    const {
-      loadJsonFileDefer: existingLoadJsonFileDefer,
-      _window,
-    } = this.getProperties('loadJsonFileDefer', '_window');
+    const existingLoadJsonFileDefer = this.loadJsonFileDefer;
     if (existingLoadJsonFileDefer) {
       this.fileSelectionCancelled();
     }
     const newLoadJsonFileDefer = this.set('loadJsonFileDefer', defer());
-    _window.addEventListener('focus', () => {
+    globals.window.addEventListener('focus', () => {
       // Based on https://stackoverflow.com/a/63773257. It does not detect
       // "open file" dialog canellation on iOS and it is hard to find any working
       // solution for that issue. :(
       // Wait for input change event to be processed (especially in mobile
       // browsers and macOS).
       setTimeout(() => {
-        if (this.get('loadJsonFileDefer') === newLoadJsonFileDefer) {
+        if (this.loadJsonFileDefer === newLoadJsonFileDefer) {
           this.fileSelectionCancelled();
         }
       }, 2000);
@@ -244,18 +230,13 @@ const DumpLoader = EmberObject.extend({
    * @private
    */
   mountUploadInput() {
-    const {
-      uploadInputElement: existingUploadInputElement,
-      _window,
-    } = this.getProperties('uploadInputElement', '_window');
+    const existingUploadInputElement = this.uploadInputElement;
 
     if (existingUploadInputElement) {
       return;
     }
 
-    const _document = _window.document;
-    const _body = _document.body;
-    const input = _document.createElement('input');
+    const input = globals.document.createElement('input');
     input.style.display = 'none';
     input.classList.add('upload-atm-record-action-input');
     input.classList.add(`upload-${dasherize(this.atmModelName)}-action-input`);
@@ -278,7 +259,7 @@ const DumpLoader = EmberObject.extend({
       input.classList.remove('loading-file');
       input.disabled = false;
     });
-    _body.appendChild(input);
+    globals.document.body.appendChild(input);
     this.set('uploadInputElement', input);
   },
 

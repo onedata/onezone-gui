@@ -8,6 +8,7 @@
 
 import browserPost from 'onedata-gui-common/utils/browser-post';
 import validateGetLoginEndpoint from 'onezone-gui/utils/validate-get-login-endpoint';
+import globals from 'onedata-gui-common/utils/globals';
 
 /**
  * @param {object} data the same as resolved by onezoneServer.getLoginEndpoint
@@ -25,7 +26,7 @@ export default function handleLoginEndpoint(data, onError) {
   } else {
     const { method, url, formData } = data;
     if (method === 'get') {
-      window.location = url;
+      globals.window.location = url;
     } else if (method === 'post') {
       browserPost(url, formData);
     }

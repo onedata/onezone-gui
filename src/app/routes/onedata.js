@@ -16,6 +16,7 @@ import { get } from '@ember/object';
 import { resolve } from 'rsvp';
 import DisabledErrorCheckList from 'onedata-gui-common/utils/disabled-error-check-list';
 import { onepanelAbbrev, oneproviderAbbrev } from 'onedata-gui-common/utils/onedata-urls';
+import globals from 'onedata-gui-common/utils/globals';
 
 export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
   currentUser: service(),
@@ -64,9 +65,9 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
     if (redirectUrl) {
       delete queryParams.redirect_url;
       return new Promise(() => {
-        const authRedirect = sessionStorage.getItem('authRedirect');
+        const authRedirect = globals.sessionStorage.getItem('authRedirect');
         if (authRedirect) {
-          sessionStorage.removeItem('authRedirect');
+          globals.sessionStorage.removeItem('authRedirect');
           const urlMatch = redirectUrl.match(
             new RegExp(`/(${oneproviderAbbrev}|${onepanelAbbrev})/(.*?)/`)
           );
@@ -96,7 +97,7 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
         } else {
           // Only redirect url in actual domain is acceptable (to not redirect
           // to some external, possibly malicious pages).
-          window.location.replace(window.location.origin + redirectUrl);
+          globals.location.replace(globals.location.origin + redirectUrl);
         }
       });
     } else {

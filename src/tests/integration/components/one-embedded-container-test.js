@@ -10,6 +10,7 @@ import {
   sharedObjectName,
   sharedDataPropertyName,
 } from 'onedata-gui-common/utils/one-embedded-common';
+import globals from 'onedata-gui-common/utils/globals';
 
 describe('Integration | Component | one-embedded-container', function () {
   setupRenderingTest();
@@ -26,11 +27,11 @@ describe('Integration | Component | one-embedded-container', function () {
     });
     this.owner.register('component:some-embedded-container', SomeEmbeddedContainer);
     this.set('iframeElement', {});
-    const s = document.createElement('script');
+    const s = globals.document.createElement('script');
     s.type = 'text/javascript';
     const code =
       `frameElement.${sharedObjectName}.callParent('hello', frameElement.${sharedObjectName}.${sharedDataPropertyName}.iprop);`;
-    s.appendChild(document.createTextNode(code));
+    s.appendChild(globals.document.createTextNode(code));
 
     await render(hbs `
       <div class="embedded-iframes-container"></div>

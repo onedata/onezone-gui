@@ -9,6 +9,7 @@
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject } from '@ember/service';
+import globals from 'onedata-gui-common/utils/globals';
 
 export default Component.extend(I18n, {
   spaceActions: inject(),
@@ -23,7 +24,7 @@ export default Component.extend(I18n, {
   spaceName: undefined,
 
   didInsertElement() {
-    document.getElementById('new-space-name').focus();
+    globals.document.getElementById('new-space-name').focus();
   },
 
   actions: {

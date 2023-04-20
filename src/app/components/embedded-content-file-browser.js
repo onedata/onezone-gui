@@ -14,6 +14,7 @@ import { reads } from '@ember/object/computed';
 import EmbeddedBrowserCommon from 'onezone-gui/mixins/embedded-browser-common';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import computedAspectOptionsArray from 'onedata-gui-common/utils/computed-aspect-options-array';
+import globals from 'onedata-gui-common/utils/globals';
 
 export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   layout,
@@ -55,8 +56,6 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
    */
   embeddedComponentName: 'content-file-browser',
 
-  _location: location,
-
   /**
    * @override implements OneEmbeddedContainer
    */
@@ -90,11 +89,9 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     },
     getExecuteWorkflowUrl({ workflowSchemaId, workflowSchemaRevision, fillInputStores }) {
       const {
-        _location,
         router,
         navigationState,
       } = this.getProperties(
-        '_location',
         'router',
         'navigationState',
       );
@@ -110,7 +107,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
       if (fillInputStores) {
         aspectOptions.fillInputStores = 'true';
       }
-      return _location.origin + _location.pathname + router.urlFor(
+      return globals.location.origin + globals.location.pathname + router.urlFor(
         'onedata.sidebar.content.aspect',
         'automation', {
           queryParams: {
