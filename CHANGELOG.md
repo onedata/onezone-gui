@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10165 Fixed updating lambda name in automation task form
 * VFS-10819 Added missing automation inventory ID when requesting a named token
 * VFS-9014 Migrated to getting globals from `globals` util
 * VFS-10698 Fixed ember ace resizing mechanism

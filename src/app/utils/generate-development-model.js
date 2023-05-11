@@ -977,7 +977,7 @@ function attachAtmLambdasToAtmInventory(store, atmInventory) {
           atmInventoryList,
           revisionRegistry: [1, 2, 3].reduce((registry, revisionNumber) => {
             registry[revisionNumber] = {
-              name: `Function ${index}`,
+              name: `Function ${index}-${revisionNumber}`,
               state: revisionNumber % 2 === 0 ? 'stable' : 'draft',
               summary: `Some very complicated function #${index}.${revisionNumber}`,
               operationSpec: {
