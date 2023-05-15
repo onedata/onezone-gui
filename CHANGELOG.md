@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10814 Changed landing page after space creation to "Overview"
 * VFS-10165 Fixed updating lambda name in automation task form
 * VFS-10411 Updated onedata-gui-common for better infinite scroll support
 * VFS-10819 Added missing automation inventory ID when requesting a named token
