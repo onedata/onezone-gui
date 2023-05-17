@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10794 Added message about last membership request reject when requesting becomes available
 * VFS-10825 Fixed unnecessary scrollbars in Safari
 * VFS-10814 Changed landing page after space creation to "Overview"
 * VFS-10165 Fixed updating lambda name in automation task form

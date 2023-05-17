@@ -65,6 +65,17 @@
             {{one-icon icon="cart"}}
             <span class="text">{{tt this "requestAccess"}}</span>
           {{/one-button}}
+        {{else if (eq status MarketplaceSpaceStatusEnum.AvailableAfterReject)}}
+          {{#one-icon icon="sign-warning-rounded" class="status-btn-external-icon"}}
+            {{one-tooltip
+              class="tooltip-lg tooltip-text-left"
+              title=(tt this "retryAfterRejectTip")
+            }}
+          {{/one-icon}}
+          {{#one-button size="sm" onClick=(action "requestAccess")}}
+            {{one-icon icon="cart"}}
+            <span class="text">{{tt this "requestAccess"}}</span>
+          {{/one-button}}
         {{else if (eq status MarketplaceSpaceStatusEnum.Pending)}}
           <div class="btn-tooltip-container">
             {{#one-button class="request-pending-btn" size="sm" disabled=true}}
