@@ -9,6 +9,7 @@ import { resolve } from 'rsvp';
 import sinon from 'sinon';
 import { getStorageOneproviderKey } from 'onezone-gui/mixins/choose-default-oneprovider';
 import { lookupService } from '../../helpers/stub-service';
+import globals from 'onedata-gui-common/utils/globals';
 
 describe('Integration | Component | oneprovider-view-container', function () {
   setupRenderingTest();
@@ -237,22 +238,20 @@ describe('Integration | Component | oneprovider-view-container', function () {
       } = this.getProperties('space', 'provider1', 'provider2');
 
       const storageKey = getStorageOneproviderKey(space.entityId);
-      const _localStorage = {
+      globals.mock('localStorage', {
+        values: {
+          [storageKey]: provider2.entityId,
+        },
         getItem(id) {
-          return this[id];
+          return this.values[id];
         },
         setItem(id, value) {
-          this[id] = value;
+          this.values[id] = value;
         },
-        [storageKey]: provider2.entityId,
-      };
-      this.setProperties({
-        space,
-        _localStorage,
       });
+      this.setProperties('space', space);
       await render(hbs `
         {{#oneprovider-view-container
-          _localStorage=_localStorage
           space=space
           oneproviderId=undefined
           mapSelectorEnabled=false
@@ -271,14 +270,14 @@ describe('Integration | Component | oneprovider-view-container', function () {
         {{/oneprovider-view-container}}
       `);
 
-      expect(_localStorage[storageKey], 'initial storage oneproviderId')
+      expect(globals.localStorage.getItem(storageKey), 'initial storage oneproviderId')
         .to.equal(provider2.entityId);
       expect(this.get('oneproviderId'), 'initial context oneproviderId')
         .to.equal(provider2.entityId);
       await click(
         `.space-providers-tab-bar .tab-bar-li.item-${provider1.entityId} .nav-link`
       );
-      expect(_localStorage[storageKey], 'changed storage oneproviderId')
+      expect(globals.localStorage.getItem(storageKey), 'changed storage oneproviderId')
         .to.equal(provider1.entityId);
       expect(this.get('oneproviderId'), 'changed context oneproviderId')
         .to.equal(provider1.entityId);

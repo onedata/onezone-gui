@@ -14,6 +14,7 @@ import RemoveAtmInventoryAction from 'onezone-gui/utils/workflow-actions/remove-
 import CopyRecordIdAction from 'onedata-gui-common/utils/clipboard-actions/copy-record-id-action';
 import sinon from 'sinon';
 import { resolve } from 'rsvp';
+import globals from 'onedata-gui-common/utils/globals';
 
 describe(
   'Integration | Component | sidebar-atm-inventories/atm-inventory-item',
@@ -64,7 +65,7 @@ describe(
 
       await click('.atm-inventory-menu-trigger');
 
-      const popoverContent = document.querySelector('body .webui-popover.in');
+      const popoverContent = globals.document.querySelector('body .webui-popover.in');
       [{
         selector: '.rename-atm-inventory-action-trigger',
         name: 'Rename',
@@ -105,7 +106,7 @@ describe(
 
         await renderComponent();
         await click('.atm-inventory-menu-trigger');
-        const renameTrigger = document.querySelector(
+        const renameTrigger = globals.document.querySelector(
           '.webui-popover.in .rename-atm-inventory-action-trigger'
         );
         await click(renameTrigger);
@@ -130,7 +131,7 @@ describe(
 
         await renderComponent();
         await click('.atm-inventory-menu-trigger');
-        const removeTrigger = document.querySelector(
+        const removeTrigger = globals.document.querySelector(
           '.webui-popover.in .remove-atm-inventory-action-trigger'
         );
         await click(removeTrigger);
@@ -150,7 +151,7 @@ describe(
 
         await renderComponent();
         await click('.atm-inventory-menu-trigger');
-        const removeTrigger = document.querySelector(
+        const removeTrigger = globals.document.querySelector(
           'body .webui-popover.in .copy-record-id-action-trigger'
         );
         await click(removeTrigger);

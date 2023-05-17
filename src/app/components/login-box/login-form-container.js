@@ -20,6 +20,7 @@ import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mix
 import DOMPurify from 'dompurify';
 import isIp from 'is-ip';
 import $ from 'jquery';
+import globals from 'onedata-gui-common/utils/globals';
 
 const ANIMATION_TIMEOUT = 333;
 
@@ -40,11 +41,6 @@ export default LoginFormContainer.extend(
      * @override
      */
     i18nPrefix: 'components.loginBox.loginFormContainer',
-
-    /**
-     * @type {Location}
-     */
-    _location: location,
 
     /**
      * @type {boolean}
@@ -145,8 +141,7 @@ export default LoginFormContainer.extend(
      * @type {computed.boolean}
      */
     showIpWarning: computed(function showIpWarning() {
-      const hostname = this.get('_location.hostname');
-      return isIp(hostname);
+      return isIp(globals.location.hostname);
     }),
 
     /**

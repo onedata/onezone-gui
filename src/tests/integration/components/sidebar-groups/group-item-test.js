@@ -3,6 +3,7 @@ import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render, click, find } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
+import globals from 'onedata-gui-common/utils/globals';
 
 describe('Integration | Component | sidebar-groups/group-item', function () {
   setupRenderingTest();
@@ -35,7 +36,9 @@ describe('Integration | Component | sidebar-groups/group-item', function () {
     await render(hbs `{{sidebar-groups/group-item item=group}}`);
 
     await click('.collapsible-toolbar-toggle');
-    await click(document.querySelector('.webui-popover.in .rename-group-action'));
+    await click(
+      globals.document.querySelector('.webui-popover.in .rename-group-action')
+    );
     expect(find('input[type="text"]')).to.exist;
   });
 
@@ -50,8 +53,10 @@ describe('Integration | Component | sidebar-groups/group-item', function () {
       await render(hbs `{{sidebar-groups/group-item item=group}}`);
 
       await click('.collapsible-toolbar-toggle');
-      await click(document.querySelector(`.webui-popover.in .${operation}-group-action`));
-      expect(document.querySelector(`.${modalClass}.in`)).to.exist;
+      await click(
+        globals.document.querySelector(`.webui-popover.in .${operation}-group-action`)
+      );
+      expect(globals.document.querySelector(`.${modalClass}.in`)).to.exist;
     });
   });
 });

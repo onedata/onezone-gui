@@ -1,4 +1,5 @@
 import { click, triggerEvent } from '@ember/test-helpers';
+import globals from 'onedata-gui-common/utils/globals';
 
 export default class GroupsHierarchyVisualiserHelper {
   constructor(node) {
@@ -14,14 +15,14 @@ export default class GroupsHierarchyVisualiserHelper {
   async clickGroupBoxActions(groupBox, actionsChainSelectors) {
     await click(groupBox.querySelector('.group-actions-trigger'));
     for (const selector of actionsChainSelectors) {
-      await click(document.querySelector('.webui-popover.in ' + selector));
+      await click(globals.document.querySelector('.webui-popover.in ' + selector));
     }
   }
 
   async clickRelationActions(groupBox, actionSelector) {
     await triggerEvent(groupBox.querySelector('.group-box-line'), 'mouseover');
     await click(groupBox.querySelector('.group-box-line .actions-trigger'));
-    await click(document.querySelector('.webui-popover.in ' + actionSelector));
+    await click(globals.document.querySelector('.webui-popover.in ' + actionSelector));
   }
 
   getAllColumns() {

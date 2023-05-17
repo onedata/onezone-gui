@@ -7,6 +7,12 @@ CHANGELOG
 ### Latest changes
 
 * VFS-10794 Added message about last membership request reject when requesting becomes available
+* VFS-10825 Fixed unnecessary scrollbars in Safari
+* VFS-10814 Changed landing page after space creation to "Overview"
+* VFS-10165 Fixed updating lambda name in automation task form
+* VFS-10411 Updated onedata-gui-common for better infinite scroll support
+* VFS-10819 Added missing automation inventory ID when requesting a named token
+* VFS-9014 Migrated to getting globals from `globals` util
 * VFS-10698 Fixed ember ace resizing mechanism
 * VFS-10767 Refactored stacked modals styles
 * VFS-10126 Added space Marketplace with space configuration and requests management

@@ -25,6 +25,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { serializeAspectOptions, parseAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import _ from 'lodash';
+import globals from 'onedata-gui-common/utils/globals';
 
 export default Component.extend(GlobalActions, I18n, {
   classNames: ['content-atm-inventories-workflows'],
@@ -129,11 +130,6 @@ export default Component.extend(GlobalActions, I18n, {
    * @type {Boolean}
    */
   isAskingUserForUnsavedChanges: false,
-
-  /**
-   * @type {Window}
-   */
-  _window: window,
 
   /**
    * @override
@@ -287,21 +283,11 @@ export default Component.extend(GlobalActions, I18n, {
   },
 
   registerPageUnloadHandler() {
-    const {
-      pageUnloadHandler,
-      _window,
-    } = this.getProperties('pageUnloadHandler', '_window');
-
-    _window.addEventListener('beforeunload', pageUnloadHandler);
+    globals.window.addEventListener('beforeunload', this.pageUnloadHandler);
   },
 
   unregisterPageUnloadHandler() {
-    const {
-      pageUnloadHandler,
-      _window,
-    } = this.getProperties('pageUnloadHandler', '_window');
-
-    _window.removeEventListener('beforeunload', pageUnloadHandler);
+    globals.window.removeEventListener('beforeunload', this.pageUnloadHandler);
   },
 
   async synchronizeStateWithUrl() {

@@ -47,11 +47,6 @@ export default Action.extend({
   downloadData,
 
   /**
-   * @type {Window}
-   */
-  _window: window,
-
-  /**
    * @override
    */
   async onExecute() {
@@ -72,7 +67,6 @@ export default Action.extend({
       dataString: JSON.stringify(atmLambdaRevisionDump, null, 2),
       fileName: `${revisionName}.json`,
       mimeType: 'application/json',
-      _window: this._window,
     });
   },
 });

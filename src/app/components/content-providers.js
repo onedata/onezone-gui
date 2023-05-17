@@ -23,6 +23,7 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
 import { Promise } from 'rsvp';
 import getVisitOneproviderUrl from 'onedata-gui-common/utils/get-visit-oneprovider-url';
+import globals from 'onedata-gui-common/utils/globals';
 
 export default Component.extend({
   classNames: ['content-providers'],
@@ -91,12 +92,6 @@ export default Component.extend({
   _mobileMode: false,
 
   /**
-   * Window object (for testing purposes only)
-   * @type {Window}
-   */
-  _window: window,
-
-  /**
    * Map state passed via query params
    * @type {Ember.ComputedProperty<object>}
    */
@@ -152,7 +147,7 @@ export default Component.extend({
       } = this.getProperties('_providers', '_mapState');
       const squareSideLength = 15 / (_mapState.scale || 1);
       scheduleOnce('afterRender', this, () =>
-        this.get('_window').dispatchEvent(new Event('providerPlaceRefresh'))
+        globals.window.dispatchEvent(new Event('providerPlaceRefresh'))
       );
       return clusterizeProviders(_providers || [], squareSideLength,
         squareSideLength);
@@ -212,11 +207,10 @@ export default Component.extend({
     this._super(...arguments);
     const {
       element,
-      _window,
       _windowResizeHandler,
-    } = this.getProperties('element', '_window', '_windowResizeHandler');
+    } = this.getProperties('element', '_windowResizeHandler');
     this.checkOneproviderAuthenticationError();
-    $(_window).on('resize', _windowResizeHandler);
+    $(globals.window).on('resize', _windowResizeHandler);
     this._windowResized();
     element.addEventListener('mousedown', (event) => {
       safeExec(this, () => {
@@ -247,11 +241,7 @@ export default Component.extend({
 
   willDestroyElement() {
     try {
-      const {
-        _window,
-        _windowResizeHandler,
-      } = this.getProperties('_window', '_windowResizeHandler');
-      $(_window).off('resize', _windowResizeHandler);
+      $(globals.window).off('resize', this._windowResizeHandler);
     } finally {
       this._super(...arguments);
     }
@@ -262,7 +252,7 @@ export default Component.extend({
    * @returns {undefined}
    */
   _windowResized() {
-    this.set('_mobileMode', window.innerWidth < 768);
+    this.set('_mobileMode', globals.window.innerWidth < 768);
   },
 
   /**
@@ -310,11 +300,9 @@ export default Component.extend({
         const {
           router,
           guiUtils,
-          _window,
         } = this.getProperties(
           'router',
           'guiUtils',
-          '_window'
         );
         return get(provider, 'spaceList')
           .then(spaceList => get(spaceList, 'list'))
@@ -328,7 +316,7 @@ export default Component.extend({
                 providerVersion,
                 space,
               });
-              return new Promise(() => _window.open(oneproviderUrl, '_self'));
+              return new Promise(() => globals.window.open(oneproviderUrl, '_self'));
             });
           });
       }

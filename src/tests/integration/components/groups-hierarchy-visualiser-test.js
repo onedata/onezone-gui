@@ -21,6 +21,7 @@ import Workspace from 'onezone-gui/utils/groups-hierarchy-visualiser/workspace';
 import GroupsHierarchyVisualiserHelper from '../../helpers/groups-hierarchy-visualiser';
 import { A } from '@ember/array';
 import sinon from 'sinon';
+import globals from 'onedata-gui-common/utils/globals';
 
 function getContainerStyle(style) {
   return htmlSafe(`width: ${style.width}px; height: ${style.height}px;`);
@@ -107,24 +108,6 @@ GroupStub.relationshipNames = {
   belongsTo: ['childList', 'parentList'],
 };
 
-class FakeWindow {
-  constructor() {
-    this.resizeHandler = () => {};
-  }
-
-  addEventListener(eventType, handler) {
-    if (eventType === 'resize') {
-      this.resizeHandler = handler;
-    }
-  }
-
-  removeEventListener(eventType) {
-    if (eventType === 'resize') {
-      this.resizeHandler = null;
-    }
-  }
-}
-
 describe('Integration | Component | groups-hierarchy-visualiser', function () {
   setupRenderingTest();
 
@@ -183,7 +166,26 @@ describe('Integration | Component | groups-hierarchy-visualiser', function () {
       workspace: Workspace.create({
         animationTime: 0,
       }),
-      _window: new FakeWindow(),
+    });
+    globals.mock('window', {
+      resizeHandlers: new Set(),
+      addEventListener(eventType, handler) {
+        if (eventType === 'resize') {
+          this.resizeHandlers.add(handler);
+        } else {
+          globals.nativeWindow.addEventListener(...arguments);
+        }
+      },
+      removeEventListener(eventType) {
+        if (eventType === 'resize') {
+          this.resizeHandlers.delete(null);
+        } else {
+          globals.nativeWindow.removeEventListener(...arguments);
+        }
+      },
+      triggerResize() {
+        this.resizeHandlers.forEach((handler) => handler());
+      },
     });
   });
 
@@ -533,7 +535,8 @@ describe('Integration | Component | groups-hierarchy-visualiser', function () {
       '.add-child-group-action + .nested-actions .generate-invite-token-action ',
     ]);
     const token =
-      document.querySelector('.generate-invite-token-modal .token-textarea').value;
+      globals.document.querySelector('.generate-invite-token-modal .token-textarea')
+      .value;
     expect(token).to.contain('groupJoinGroup');
     expect(token).to.contain('a1');
   });
@@ -600,7 +603,7 @@ describe('Integration | Component | groups-hierarchy-visualiser', function () {
         {{groups-hierarchy-visualiser
           group=group
           workspace=workspace
-          _window=_window}}
+        }}
       </div>
     `);
 
@@ -608,7 +611,7 @@ describe('Integration | Component | groups-hierarchy-visualiser', function () {
       width: 400,
       height: 700,
     }));
-    this.get('_window').resizeHandler();
+    globals.window.triggerResize();
     await settled();
     const helper = new GroupsHierarchyVisualiserHelper(this.element);
     expect(helper.getAllColumns()).to.have.length(1);
@@ -626,7 +629,7 @@ describe('Integration | Component | groups-hierarchy-visualiser', function () {
         {{groups-hierarchy-visualiser
           group=group
           workspace=workspace
-          _window=_window}}
+        }}
       </div>
     `);
 
@@ -634,7 +637,7 @@ describe('Integration | Component | groups-hierarchy-visualiser', function () {
       width: 1200,
       height: 700,
     }));
-    this.get('_window').resizeHandler();
+    globals.window.triggerResize();
     await settled();
     const helper = new GroupsHierarchyVisualiserHelper(this.element);
     const columns = helper.getAllColumns();
@@ -658,7 +661,7 @@ describe('Integration | Component | groups-hierarchy-visualiser', function () {
           {{groups-hierarchy-visualiser
             group=group
             workspace=workspace
-            _window=_window}}
+          }}
         </div>
       `);
 
@@ -666,13 +669,13 @@ describe('Integration | Component | groups-hierarchy-visualiser', function () {
         width: 400,
         height: 700,
       }));
-      this.get('_window').resizeHandler();
+      globals.window.triggerResize();
       await settled();
       this.set('containerStyle', getContainerStyle({
         width: 1200,
         height: 700,
       }));
-      this.get('_window').resizeHandler();
+      globals.window.triggerResize();
       await settled();
       const helper = new GroupsHierarchyVisualiserHelper(this.element);
       const columns = helper.getAllColumns();

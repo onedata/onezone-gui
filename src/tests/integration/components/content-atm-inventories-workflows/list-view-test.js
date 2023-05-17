@@ -14,6 +14,7 @@ import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve } from 'rsvp';
 import sinon from 'sinon';
 import CreateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-revision-action';
+import globals from 'onedata-gui-common/utils/globals';
 
 describe('Integration | Component | content-atm-inventories-workflows/list-view',
   function () {
@@ -135,7 +136,7 @@ describe('Integration | Component | content-atm-inventories-workflows/list-view'
         await renderComponent();
 
         await click('.revision-actions-trigger');
-        await click(document.querySelector(
+        await click(globals.document.querySelector(
           '.webui-popover.in .create-atm-workflow-schema-revision-action-trigger'
         ));
 

@@ -15,6 +15,7 @@ import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import checkImg from 'onedata-gui-common/utils/check-img';
 import { Promise } from 'rsvp';
+import globals from 'onedata-gui-common/utils/globals';
 
 import {
   getOneproviderPath,
@@ -57,12 +58,6 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   isLoading: false,
-
-  /**
-   * For test purposes. Do not change it except when testing!
-   * @type {Location}
-   */
-  _location: location,
 
   goToProviderProxy: computed('spaceId', 'resourceType', function goToProviderProxy() {
     const {
@@ -114,7 +109,6 @@ export default Component.extend(I18n, {
   },
 
   redirectToProvider({ provider, spaceId, resourceType }) {
-    const _location = this.get('_location');
     const _resourceType = resourceType || spaceId && 'data';
     const path = (spaceId || _resourceType) ?
       `onedata/${_resourceType}/${spaceId}` :
@@ -122,7 +116,7 @@ export default Component.extend(I18n, {
     const clusterId =
       parseGri(provider.belongsTo('cluster').id()).entityId;
     return new Promise(() => {
-      _location.replace(getOneproviderPath(clusterId, path));
+      globals.location.replace(getOneproviderPath(clusterId, path));
     });
   },
 

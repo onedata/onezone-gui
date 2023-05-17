@@ -6,6 +6,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import { clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
 import sinon from 'sinon';
 import EmberObject from '@ember/object';
+import globals from 'onedata-gui-common/utils/globals';
 
 const componentClass = 'revision-details-form';
 const states = [{
@@ -51,7 +52,7 @@ describe('Integration | Component | content-atm-inventories-workflows/revision-d
 
       expect(find('.state-field .control-label')).to.have.trimmed.text('State:');
       await clickTrigger('.state-field');
-      const options = document.querySelectorAll('.ember-power-select-option');
+      const options = globals.document.querySelectorAll('.ember-power-select-option');
       expect(options).to.have.length(states.length);
       states.forEach(({ label }, idx) =>
         expect(options[idx]).to.have.trimmed.text(label)

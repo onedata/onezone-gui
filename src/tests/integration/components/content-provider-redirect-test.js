@@ -9,6 +9,7 @@ import sinon from 'sinon';
 import { resolve } from 'rsvp';
 import { oneproviderAbbrev } from 'onedata-gui-common/utils/onedata-urls';
 import gri from 'onedata-gui-websocket-client/utils/gri';
+import globals from 'onedata-gui-common/utils/globals';
 
 const OnezoneServerStub = Service.extend({
   getProviderRedirectUrl() {
@@ -61,25 +62,23 @@ describe('Integration | Component | content-provider-redirect', function () {
         },
       };
       const url = `/${oneproviderAbbrev}/${clusterEntityId}/i`;
-      const fakeLocation = {
-        replace() {},
-      };
-      const locationReplace = sinon.spy(fakeLocation, 'replace');
+      globals.mock('location', {
+        replace: sinon.spy(),
+      });
       const checkIsProviderAvailable = sinon.stub().resolves(true);
 
-      this.setProperties({ provider, fakeLocation, checkIsProviderAvailable });
+      this.setProperties({ provider, checkIsProviderAvailable });
 
       await render(hbs `{{content-provider-redirect
         checkIsProviderAvailable=checkIsProviderAvailable
         provider=provider
-        _location=fakeLocation
       }}`);
 
       const contentProviderRedirect = find('.content-provider-redirect');
       expect(contentProviderRedirect).to.exist;
 
-      expect(locationReplace).to.be.calledOnce;
-      expect(locationReplace).to.be.calledWith(url);
+      expect(globals.location.replace).to.be.calledOnce;
+      expect(globals.location.replace).to.be.calledWith(url);
     }
   );
 

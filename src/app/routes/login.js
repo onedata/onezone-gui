@@ -8,11 +8,12 @@
  */
 
 import Login from 'onedata-gui-common/routes/login';
+import globals from 'onedata-gui-common/utils/globals';
 
 export default Login.extend({
   afterModel() {
     const superResult = this._super(...arguments);
-    sessionStorage.removeItem('authRedirect');
+    globals.sessionStorage.removeItem('authRedirect');
     return superResult;
   },
 });

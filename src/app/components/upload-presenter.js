@@ -24,6 +24,7 @@ import { A } from '@ember/array';
 import _ from 'lodash';
 import $ from 'jquery';
 import isDirectlyClicked from 'onedata-gui-common/utils/is-directly-clicked';
+import globals from 'onedata-gui-common/utils/globals';
 
 const minimizeIndicationClass = 'minimize-target-animation';
 
@@ -85,11 +86,6 @@ export default Component.extend({
    * @type {Ember.A<Utils.UploadObject>}
    */
   orderedUploadObjects: undefined,
-
-  /**
-   * @type {Window}
-   */
-  _window: window,
 
   /**
    * @type {Ember.ComputedProperty<boolean>}
@@ -210,7 +206,7 @@ export default Component.extend({
     function summaryActiveObserver() {
       // showing summary uploads changes size of content view. To reposition all
       // floating elements, trigger simulated window resize
-      next(() => this.get('_window').dispatchEvent(new Event('resize')));
+      next(() => globals.window.dispatchEvent(new Event('resize')));
     }
   ),
 

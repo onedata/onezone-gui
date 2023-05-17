@@ -30,6 +30,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import _ from 'lodash';
 import preventPageUnload from 'onedata-gui-common/utils/prevent-page-unload';
+import globals from 'onedata-gui-common/utils/globals';
 
 export default Service.extend(I18n, {
   embeddedIframeManager: service(),
@@ -41,11 +42,6 @@ export default Service.extend(I18n, {
    * @override
    */
   i18nPrefix: 'services.uploadManager',
-
-  /**
-   * @type {Window}
-   */
-  _window: window,
 
   /**
    * @type {boolean}
@@ -209,11 +205,7 @@ export default Service.extend(I18n, {
    * @returns {undefined}
    */
   attachPageUnloadHandler() {
-    const {
-      _window,
-      pageUnloadHandler,
-    } = this.getProperties('pageUnloadHandler', '_window');
-    _window.addEventListener('beforeunload', pageUnloadHandler);
+    globals.window.addEventListener('beforeunload', this.pageUnloadHandler);
   },
 
   /**

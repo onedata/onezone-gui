@@ -11,6 +11,7 @@ import Mixin from '@ember/object/mixin';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import { get } from '@ember/object';
 import { inject as service } from '@ember/service';
+import globals from 'onedata-gui-common/utils/globals';
 
 /**
  * @typedef {Object} BrowserUrlGeneratorOptions
@@ -22,7 +23,6 @@ import { inject as service } from '@ember/service';
 export default Mixin.create({
   modalManager: service(),
 
-  // required property: _location: Location
   // required property: router: Ember.Router
   // required property: navigationState: Ember.Service
   // required property: embeddedBrowserType: String, one of: 'data', 'datsets', 'share'
@@ -35,12 +35,10 @@ export default Mixin.create({
    */
   getBrowserUrl(type, options, generatorOptions = {}) {
     const {
-      _location,
       router,
       navigationState,
       embeddedBrowserType,
     } = this.getProperties(
-      '_location',
       'router',
       'navigationState',
       'embeddedBrowserType'
@@ -108,7 +106,8 @@ export default Mixin.create({
         },
       }
     );
-    return _location.origin + _location.pathname + router.urlFor(...urlFunctionParams);
+    return globals.location.origin + globals.location.pathname +
+      router.urlFor(...urlFunctionParams);
   },
 
   actions: {
@@ -170,10 +169,6 @@ export default Mixin.create({
      * @returns {String} URL to create token view
      */
     getAccessTokenUrl() {
-      const {
-        router,
-        _location,
-      } = this.getProperties('router', '_location');
       const tokenTemplate = {
         type: { accessToken: {} },
         caveats: [{
@@ -184,7 +179,7 @@ export default Mixin.create({
           whitelist: ['opw-*'],
         }],
       };
-      return _location.origin + _location.pathname + router.urlFor(
+      return globals.location.origin + globals.location.pathname + this.router.urlFor(
         'onedata.sidebar.content',
         'tokens',
         'new', {

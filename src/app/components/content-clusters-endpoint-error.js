@@ -15,6 +15,7 @@ import { inject as service } from '@ember/service';
 import ErrorCheckViewMixin from 'onedata-gui-common/mixins/error-check-view';
 import Looper from 'onedata-gui-common/utils/looper';
 import { resolve } from 'rsvp';
+import globals from 'onedata-gui-common/utils/globals';
 
 export default Component.extend(I18n, ErrorCheckViewMixin, {
   classNames: 'content-clusters-endpoint-error',
@@ -38,11 +39,6 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
    * @override
    */
   resourceId: reads('clusterEntityId'),
-
-  /**
-   * @type {Location}
-   */
-  _location: location,
 
   /**
    * @type {number}
@@ -150,7 +146,7 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
     resolve($.get(this.get('onepanelConfigurationUrl')))
       .then(() => {
         this.destroyConnectionChecker();
-        this.get('_location').reload();
+        globals.location.reload();
       })
       .catch(() => {});
     if (this.get('connectionChecker.interval') === this.get('requestFastInterval')) {

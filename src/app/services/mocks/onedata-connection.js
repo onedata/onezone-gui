@@ -9,9 +9,10 @@
 
 import OnedataConnection from 'onedata-gui-websocket-client/services/mocks/onedata-connection';
 import EmberObject, { computed } from '@ember/object';
+import globals from 'onedata-gui-common/utils/globals';
 
 const zoneName = 'Hello world';
-const zoneDomain = location.hostname;
+const zoneDomain = globals.location.hostname;
 
 export default OnedataConnection.extend({
   zoneName,

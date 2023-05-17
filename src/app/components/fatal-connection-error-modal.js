@@ -12,6 +12,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { Promise } from 'rsvp';
 import { inject as service } from '@ember/service';
 import { reads, notEmpty } from '@ember/object/computed';
+import globals from 'onedata-gui-common/utils/globals';
 
 export default Component.extend(I18n, {
   i18n: service(),
@@ -21,8 +22,6 @@ export default Component.extend(I18n, {
    * @override
    */
   i18nPrefix: 'components.fatalConnectionErrorModal',
-
-  _location: location,
 
   /**
    * Globally set current error of WebSocket connection.
@@ -39,7 +38,7 @@ export default Component.extend(I18n, {
   actions: {
     reload() {
       return new Promise(() => {
-        this.get('_location').reload();
+        globals.location.reload();
       });
     },
   },

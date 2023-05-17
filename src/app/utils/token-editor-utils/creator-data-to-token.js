@@ -10,6 +10,7 @@
  */
 
 import { getProperties, get } from '@ember/object';
+import { camelize } from '@ember/string';
 import {
   tokenInviteTypeToTargetModelMapping,
 } from 'onezone-gui/models/token';
@@ -78,7 +79,9 @@ export default function creatorDataToToken(editorData, currentUser) {
         let targetEntityId;
         if (inviteType === 'registerOneprovider') {
           targetEntityId = currentUser && get(currentUser, 'entityId');
-        } else if (target && get(target, 'entityType') === inviteTypeSpec.modelName) {
+        } else if (
+          target && camelize(get(target, 'entityType') ?? '') === inviteTypeSpec.modelName
+        ) {
           targetEntityId = get(target, 'entityId');
         }
         if (targetEntityId) {

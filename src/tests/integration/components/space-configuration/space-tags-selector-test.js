@@ -5,6 +5,7 @@ import { render, find, fillIn } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import { lookupService } from '../../../helpers/stub-service';
+import globals from 'onedata-gui-common/utils/globals';
 
 const defaultTagsSpec = { one: [] };
 
@@ -50,7 +51,7 @@ describe('Integration | Component | space-configuration/space-tags-selector', fu
 });
 
 function getSelector() {
-  return document.querySelector('.webui-popover.in .space-tags-selector');
+  return globals.document.querySelector('.webui-popover.in .space-tags-selector');
 }
 
 function mockSpaceManagerTags(mochaContext, tagsSpec = defaultTagsSpec) {
