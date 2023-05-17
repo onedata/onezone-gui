@@ -48,19 +48,20 @@
         {{/if}}
       </p>
       {{#unless (or (media "isMobile") noJoinMessage)}}
-        {{join-image
-          class="consume-token-image"
-          joiningModelName=(or joiningRecordSelectorModelName "user")
-          joiningRecord=(if joiningRecordSelectorModelName
-            selectedJoiningRecordOption.value
-            currentUser
-          )
-          inviteTargetModelName=inviteTargetModelName
-          inviteTargetId=inviteTargetId
-          inviteTargetName=inviteTargetName
-          arrowLabelType=(if spaceHarvesterRelationToken "add" "join")
-          placeholderUnderSubjectImage=(tt this "placeholderUnderSubjectImage")
-        }}
+        {{#promise-proxy-container proxy=inviteTargetRecord}}
+          {{join-image
+            class="consume-token-image"
+            joiningModelName=(or joiningRecordSelectorModelName "user")
+            joiningRecord=(if joiningRecordSelectorModelName
+              selectedJoiningRecordOption.value
+              currentUser
+            )
+            inviteTargetModelName=inviteTargetModelName
+            inviteTargetRecord=inviteTargetRecord.content
+            arrowLabelType=(if spaceHarvesterRelationToken "add" "join")
+            placeholderUnderSubjectImage=(tt this "placeholderUnderSubjectImage")
+          }}
+        {{/promise-proxy-container}}
       {{/unless}}
     </div>
   {{/if}}

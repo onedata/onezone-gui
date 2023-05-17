@@ -98,11 +98,16 @@
   .subject-description {
     display: flex;
     padding-left: 5px;
-  }
 
-  .id-trigger {
-    font-size: 150%;
-    color: $color-one-light-gray;
-    vertical-align: text-bottom;
+    .popover-info-trigger {
+      position: relative;
+    }
+    .record-info-icon {
+      position: absolute;
+      left: 0.2em;
+      top: -0.05em;
+      color: $color-one-light-gray;
+      font-size: 80%;
+    }
   }
 }
