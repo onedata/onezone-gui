@@ -127,7 +127,7 @@ export default Service.extend(I18n, {
           'onedata.sidebar.content.aspect',
           'spaces',
           guiUtils.getRoutableIdFor(space),
-          'configuration',
+          'index`',
         );
       });
   },

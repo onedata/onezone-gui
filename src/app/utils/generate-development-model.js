@@ -977,7 +977,7 @@ function attachAtmLambdasToAtmInventory(store, atmInventory) {
           atmInventoryList,
           revisionRegistry: [1, 2, 3].reduce((registry, revisionNumber) => {
             registry[revisionNumber] = {
-              name: `Function ${index}`,
+              name: `Function ${index}-${revisionNumber}`,
               state: revisionNumber % 2 === 0 ? 'stable' : 'draft',
               summary: `Some very complicated function #${index}.${revisionNumber}`,
               operationSpec: {
@@ -1211,8 +1211,14 @@ async function generateSpaceMembershipRequestsInfo(
     'space-market-info-1': {
       requestId: 'abcd-1',
       contactEmail: 'the_requester@example.com',
-      // use earlier timestamp value to see "outdated" state
       lastActivity: Math.floor(Date.now() / 1000) - 10,
+    },
+    'space-market-info-4': {
+      requestId: 'abcd-4',
+      contactEmail: 'the_requester@example.com',
+      // see mocked value of onedataConnection#spaceMarketplaceMinBackoffBetweenReminders
+      // this should be time for which user can retry the rejected request
+      lastActivity: Math.floor(Date.now() / 1000) - 10 * 60 * 60,
     },
   };
   const rejected = {
@@ -1220,6 +1226,13 @@ async function generateSpaceMembershipRequestsInfo(
       requestId: 'abcd-2',
       contactEmail: 'rejected_requester@example.com',
       lastActivity: Math.floor(Date.now() / 1000),
+    },
+    'space-market-info-3': {
+      requestId: 'abcd-3',
+      contactEmail: 'rejected_requester@example.com',
+      // see mocked value of onedataConnection#spaceMarketplaceMinBackoffAfterRejection
+      // this should be time for which user can retry the rejected request
+      lastActivity: Math.floor(Date.now() / 1000) - 10 * 60 * 60,
     },
   };
   return store.createRecord('spaceMembershipRequestsInfo', {
