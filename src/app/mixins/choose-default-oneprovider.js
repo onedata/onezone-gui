@@ -73,7 +73,7 @@ export default Mixin.create({
     const defaultId = this.getBrowserDefaultOneproviderId(spaceId);
     let applicableProviders = providers.filter(provider => get(provider, 'online'));
     if (requiredVersion) {
-      applicableProviders = providers.filter(provider => {
+      applicableProviders = applicableProviders.filter(provider => {
         try {
           const providerVersion = get(provider, 'version');
           return Version.isRequiredVersion(providerVersion, requiredVersion);

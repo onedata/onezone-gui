@@ -71,7 +71,7 @@
             )
             items=tabBarItems
             selectedItem=selectedProviderItem
-            selectDefaultOnInit=true
+            selectDefaultOnInit=false
             selectedItemChanged=(action "selectedProviderChanged")
             tabBarLiComponentName="provider-tab-li"
             isSorted=false
@@ -105,6 +105,11 @@
           {{content-spaces-old-oneprovider
             requiredVersion=minOneproviderRequiredVersion
             infoType="allOld"
+          }}
+        {{else if showAllRequiredVersionsOffline}}
+          {{content-spaces-old-oneprovider
+            requiredVersion=minOneproviderRequiredVersion
+            infoType="allNewOffline"
           }}
         {{else if isNoSelectedProviderErrorShown}}
           {{!-- FIXME: debug, but maybe the safety screen should remain --}}

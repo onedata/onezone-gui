@@ -348,6 +348,17 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
     }
   ),
 
+  showAllRequiredVersionsOffline: computed(
+    'selectedProvider',
+    'providersInRequiredVersion',
+    function showAllRequiredVersionsOffline() {
+      return !this.selectedProvider &&
+        this.providersInRequiredVersion?.every((provider) =>
+          !get(provider, 'online')
+        );
+    }
+  ),
+
   isNoSelectedProviderErrorShown: and(
     'oneproviderViewProxy.isFulfilled',
     not('selectedProvider'),
@@ -379,10 +390,10 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
     })
   ),
 
+  // FIXME: refactor?
   viewRequiredDataProxy: promise.object(computed(
     async function viewRequiredDataProxy() {
       await this.initialProvidersListProxy;
-      await this.hasOneproviderInRequiredVersionProxy;
     }
   )),
 
@@ -417,28 +428,26 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
    */
   minOneproviderRequiredVersion: null,
 
-  hasOneproviderInRequiredVersionProxy: promise.object(computed(
+  providersInRequiredVersion: computed(
     'minOneproviderRequiredVersion',
     'providers.@each.version',
-    async function hasOneproviderInRequiredVersionProxy() {
+    function providersInRequiredVersion() {
       if (!this.providers?.length) {
-        return false;
+        return [];
       }
       const requiredVersion = this.minOneproviderRequiredVersion;
       if (!requiredVersion) {
-        return Boolean(this.providers?.length);
+        return this.providers;
       }
 
-      return this.providers.some((provider) => {
+      return this.providers.filter((provider) => {
         const providerVersion = get(provider, 'version');
         return Version.isRequiredVersion(providerVersion, requiredVersion);
       });
-    }
-  )),
-
-  hasOneproviderInRequiredVersion: computedLastProxyContent(
-    'hasOneproviderInRequiredVersionProxy'
+    },
   ),
+
+  hasOneproviderInRequiredVersion: notEmpty('providersInRequiredVersion'),
 
   /**
    * When there is no Oneprovider selected (or there is no Oneprovider at all)
