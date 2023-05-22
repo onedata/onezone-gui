@@ -22,17 +22,30 @@
     </div>
   {{/container.header}}
   {{#container.body}}
-    {{#if (eq container.selectedProvider "overview")}}
+    {{#if (not container.selectedProvider)}}
+      {{!-- display nothing while providers are loading --}}
+    {{else if (eq container.selectedProvider "overview")}}
       {{spaces-providers-overview
         space=space
         oneproviderIdChanged=(action "oneproviderIdChanged")
         providersProxy=providersProxy
       }}
     {{else}}
-      {{content-spaces-providers/provider-config
-        space=space
-        provider=container.selectedProvider
-      }}
+      {{#if (evaluate-function
+        (action "checkIsOneproviderVersionTooLow")
+        container.selectedProvider
+      )}}
+        {{content-spaces-old-oneprovider
+          requiredVersion=minOneproviderRequiredVersion
+          infoType="selectedOld"
+          selectedProviderVersion=container.selectedProvider.version
+        }}
+      {{else}}
+        {{content-spaces-providers/provider-config
+          space=space
+          provider=container.selectedProvider
+        }}
+      {{/if}}
     {{/if}}
   {{/container.body}}
 {{/oneprovider-view-container}}
