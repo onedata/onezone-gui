@@ -35,7 +35,6 @@ import { guidFor } from '@ember/object/internals';
 import isStandaloneGuiOneprovider from 'onedata-gui-common/utils/is-standalone-gui-oneprovider';
 import ChooseDefaultOneprovider from 'onezone-gui/mixins/choose-default-oneprovider';
 import Version from 'onedata-gui-common/utils/version';
-import computedLastProxyContent from 'onedata-gui-common/utils/computed-last-proxy-content';
 
 const nameComparator = createPropertyComparator('name');
 
@@ -359,6 +358,17 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
     }
   ),
 
+  showSelectedProviderIsOld: computed(
+    'selectedProvider.version',
+    'minOneproviderRequiredVersion',
+    function showSelectedProviderIsOld() {
+      return this.selectedProvider && !Version.isRequiredVersion(
+        get(this.selectedProvider, 'version'),
+        this.minOneproviderRequiredVersion
+      );
+    },
+  ),
+
   isNoSelectedProviderErrorShown: and(
     'oneproviderViewProxy.isFulfilled',
     not('selectedProvider'),
@@ -367,6 +377,7 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   isProvidersTabBarForced: or(
     'showAllOfflineInfo',
     'showAllVersionsOld',
+    'showSelectedProviderIsOld',
     'isNoSelectedProviderErrorShown'
   ),
 

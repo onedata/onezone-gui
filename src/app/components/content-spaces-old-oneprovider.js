@@ -8,8 +8,9 @@
 
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
-
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+
+// FIXME: może zmiana nazwy?
 
 export default Component.extend(I18n, {
   classNames: ['content-spaces-old-oneprovider'],
@@ -30,4 +31,11 @@ export default Component.extend(I18n, {
    * @type {'allOld'|'allNewOffline'|'selectedOld'}
    */
   infoType: undefined,
+
+  /**
+   * For `selectedOld` info type, selected Oneprovider version to show.
+   * @virtual optional
+   * @type {string}
+   */
+  selectedProviderVersion: undefined,
 });

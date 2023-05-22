@@ -111,6 +111,12 @@
             requiredVersion=minOneproviderRequiredVersion
             infoType="allNewOffline"
           }}
+        {{else if showSelectedProviderIsOld}}
+          {{content-spaces-old-oneprovider
+            requiredVersion=minOneproviderRequiredVersion
+            infoType="selectedOld"
+            selectedProviderVersion=selectedProvider.version
+          }}
         {{else if isNoSelectedProviderErrorShown}}
           {{!-- FIXME: debug, but maybe the safety screen should remain --}}
           {{content-info
