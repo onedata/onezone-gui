@@ -26,6 +26,7 @@ import contentSpacesIndex from './components/content-spaces-index';
 import contentSpacesConfiguration from './components/content-spaces-configuration';
 import contentSpacesNew from './components/content-spaces-new';
 import contentSpacesNoSupport from './components/content-spaces-no-support';
+import contentSpacesOldOneprovider from './components/content-spaces-old-oneprovider';
 import contentSpacesSupport from './components/content-spaces-support';
 import contentSpacesProviders from './components/content-spaces-providers';
 import contentSpacesMarketplace from './components/content-spaces-marketplace';
@@ -207,6 +208,7 @@ const translations = {
     contentSpacesNew,
     contentProviderEmpty,
     contentSpacesNoSupport,
+    contentSpacesOldOneprovider,
     contentSpacesSupport,
     contentSpacesProviders,
     contentSpacesMarketplace,

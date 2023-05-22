@@ -1,5 +1,7 @@
-{{#promise-proxy-container proxy=initialProvidersListProxy}}
-  {{#if hasSupport}}
+{{#promise-proxy-container proxy=viewRequiredDataProxy}}
+  {{#if (not hasSupport)}}
+    {{content-spaces-no-support class="cancel-absolute-flex-content-padding"}}
+  {{else}}
     <div class="row content-header-section">
       {{#promise-proxy-container proxy=isEmbeddableOneproviderProxy}}
         {{#if (or isEmbeddableOneprovider (not selectedProvider))}}
@@ -9,7 +11,7 @@
         {{/if}}
       {{/promise-proxy-container}}
       <div class="row row-content-tab-bar">
-        {{#if (and (not (media "isMobile")) isTabBarCollapsed (not showAllOfflineInfo))}}
+        {{#if effIsTabBarCollapsed}}
           <div class={{concat-classes
             "current-oneprovider-bar"
             (if multiOneproviders "current-oneprovider-bar-multi")
@@ -99,6 +101,18 @@
             imagePath=(root-url "assets/images/data-error-no-providers.svg")
             class="preserve-header scroll-breakpoint-600"
           }}
+        {{else if showAllVersionsOld}}
+          {{content-spaces-old-oneprovider
+            requiredVersion=minOneproviderRequiredVersion
+            infoType="allOld"
+          }}
+        {{else if isNoSelectedProviderErrorShown}}
+          {{!-- FIXME: debug, but maybe the safety screen should remain --}}
+          {{content-info
+            header="FIXME: No provider selected"
+            imagePath=(root-url "assets/images/data-error-no-providers.svg")
+            class="preserve-header scroll-breakpoint-900"
+          }}
         {{else}}
           {{#promise-proxy-container proxy=oneproviderViewProxy}}
             {{#if isEmbeddableOneprovider}}
@@ -132,7 +146,5 @@
         selectedProvider=(if (eq oneproviderId "overview") "overview" selectedProvider)
       )}}
     {{/if}}
-  {{else}}
-    {{content-spaces-no-support class="cancel-absolute-flex-content-padding"}}
   {{/if}}
 {{/promise-proxy-container}}

@@ -1,0 +1,10 @@
+{{#content-info
+  class="preserve-header scroll-breakpoint-900"
+  imagePath=(root-url "assets/images/provider-warning.svg")
+  header=(tt this "header")
+  text=(tt this "text" requiredVersion=requiredVersion)
+}}
+  <p class="lead text-center">
+    {{tt this (concat "info." infoType)}}
+  </p>
+{{/content-info}}
