@@ -362,10 +362,12 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
     'selectedProvider.version',
     'minOneproviderRequiredVersion',
     function showSelectedProviderIsOld() {
-      return this.selectedProvider && !Version.isRequiredVersion(
-        get(this.selectedProvider, 'version'),
-        this.minOneproviderRequiredVersion
-      );
+      return this.selectedProvider &&
+        this.minOneproviderRequiredVersion &&
+        !Version.isRequiredVersion(
+          get(this.selectedProvider, 'version'),
+          this.minOneproviderRequiredVersion
+        );
     },
   ),
 
