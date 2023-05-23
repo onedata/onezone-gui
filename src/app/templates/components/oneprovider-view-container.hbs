@@ -102,27 +102,20 @@
             class="preserve-header scroll-breakpoint-600"
           }}
         {{else if showAllVersionsOld}}
-          {{content-spaces-old-oneprovider
+          {{oneprovider-view-container/info-old-oneprovider
             requiredVersion=minOneproviderRequiredVersion
             infoType="allOld"
           }}
         {{else if showAllRequiredVersionsOffline}}
-          {{content-spaces-old-oneprovider
+          {{oneprovider-view-container/info-old-oneprovider
             requiredVersion=minOneproviderRequiredVersion
             infoType="allNewOffline"
           }}
         {{else if showSelectedProviderIsOld}}
-          {{content-spaces-old-oneprovider
+          {{oneprovider-view-container/info-old-oneprovider
             requiredVersion=minOneproviderRequiredVersion
             infoType="selectedOld"
             selectedProviderVersion=selectedProvider.version
-          }}
-        {{else if isNoSelectedProviderErrorShown}}
-          {{!-- FIXME: debug, but maybe the safety screen should remain --}}
-          {{content-info
-            header="FIXME: No provider selected"
-            imagePath=(root-url "assets/images/data-error-no-providers.svg")
-            class="preserve-header scroll-breakpoint-900"
           }}
         {{else}}
           {{#promise-proxy-container proxy=oneproviderViewProxy}}

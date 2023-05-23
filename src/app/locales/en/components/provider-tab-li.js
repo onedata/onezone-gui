@@ -1,4 +1,4 @@
 export default {
   overviewName: 'Overview',
-  versionTooLowWarning: 'The functionality is supported since Oneprovider version {{requiredVersion}}, while this provider is in version {{providerVersion}}.',
+  versionTooLowWarning: 'This provider is in an older version and does not support this feature.',
 };

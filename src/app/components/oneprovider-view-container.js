@@ -153,6 +153,13 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   shouldOfflineOneprovidersBeEnabled: false,
 
   /**
+   * Oneprovider version string or null. Eg. `21.02.1`.
+   * @virtual optional
+   * @type {string | null}
+   */
+  minOneproviderRequiredVersion: null,
+
+  /**
    * In collapsed mode, the currently chosen Oneprovider is displayed and
    * an option to show full options selector
    * @type {boolean}
@@ -388,16 +395,11 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
     },
   ),
 
-  isNoSelectedProviderErrorShown: and(
-    'oneproviderViewProxy.isFulfilled',
-    not('selectedProvider'),
-  ),
-
   isProvidersTabBarForced: or(
     'showAllOfflineInfo',
     'showAllVersionsOld',
     'showSelectedProviderIsOld',
-    'isNoSelectedProviderErrorShown'
+    not('selectedProvider'),
   ),
 
   effIsTabBarCollapsed: and(
@@ -408,7 +410,6 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
 
   hasSupport: notEmpty('providers'),
 
-  // FIXME: trzeba sprawdzić co się dzieje jak dochodzi nowy provider, czy nie miga
   /**
    * @type {ComputedProperty<PromiseObject<Array<Model.Provider>>>}
    */
@@ -420,14 +421,7 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
     })
   ),
 
-  // FIXME: refactor?
-  viewRequiredDataProxy: promise.object(computed(
-    async function viewRequiredDataProxy() {
-      await this.initialProvidersListProxy;
-    }
-  )),
-
-  // FIXME: hasOneproviderInRequiredVersionProxy powinno być robione dopiero po resolve initialProvidersListProxy
+  viewRequiredDataProxy: reads('initialProvidersListProxy'),
 
   isEmbeddableOneproviderProxy: promise.object(
     computed(
@@ -450,13 +444,6 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   ),
 
   isEmbeddableOneprovider: reads('isEmbeddableOneproviderProxy.content'),
-
-  // FIXME: move
-  /**
-   * Oneprovider version string or null. Eg. `21.02.1`.
-   * @type {string | null}
-   */
-  minOneproviderRequiredVersion: null,
 
   providersInRequiredVersion: computed(
     'minOneproviderRequiredVersion',

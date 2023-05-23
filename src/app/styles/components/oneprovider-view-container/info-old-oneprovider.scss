@@ -1,0 +1,10 @@
+.info-old-oneprovider {
+  .content-info-content-container {
+    > .row-yield:last-of-type {
+      margin-bottom: 0;
+      > p.lead:last-of-type {
+        margin-bottom: 0;
+      }
+    }
+  }
+}

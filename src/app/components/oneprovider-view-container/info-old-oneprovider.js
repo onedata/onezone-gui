@@ -10,15 +10,13 @@ import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 
-// FIXME: może zmiana nazwy?
-
 export default Component.extend(I18n, {
-  classNames: ['content-spaces-old-oneprovider'],
+  classNames: ['info-old-oneprovider'],
 
   i18n: service(),
   router: service(),
 
-  i18nPrefix: 'components.contentSpacesOldOneprovider',
+  i18nPrefix: 'components.oneproviderViewContainer.infoOldOneprovider',
 
   /**
    * @virtual

@@ -6,10 +6,7 @@
   }}
     {{#unless isInRequiredVersion}}
       {{#one-icon class="provider-warning-icon" icon="sign-warning-rounded"}}
-        {{one-tooltip title=(tt this "versionTooLowWarning"
-          requiredVersion=requiredVersion
-          providerVersion=providerVersion
-        )}}
+        {{one-tooltip title=(tt this "versionTooLowWarning")}}
       {{/one-icon}}
     {{/unless}}
   {{/provider-info-name}}

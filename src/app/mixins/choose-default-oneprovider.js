@@ -85,9 +85,6 @@ export default Mixin.create({
     const savedDefaultOneprovider = (
       defaultId && applicableProviders.findBy('entityId', defaultId)
     );
-    // FIXME: debug
-    console.log('savedDefaultOneprovider', savedDefaultOneprovider);
-    console.log('applicable', applicableProviders);
     return savedDefaultOneprovider ||
       this.findCurrentDefaultOneprovider(applicableProviders);
   },
