@@ -1,7 +1,8 @@
 {{#if (eq item.type "provider")}}
-  {{provider-info-name
-    provider=provider 
-    class=(concat "nav-link truncate " (if isActive "active"))
+  {{record-info-with-icon
+    record=provider
+    recordType="provider"
+    class=(concat "provider-info-name nav-link truncate " (if isActive "active"))
     click=(action "anchorClicked")
   }}
 {{else if (eq item.type "overview")}}
