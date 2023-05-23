@@ -207,7 +207,6 @@ export default Component.extend(I18n, {
    */
   inviteTargetRecord: computed(
     'inviteTargetId',
-    'inviteTargetModelName',
     'inviteTargetName',
     function inviteTargetRecord() {
       return {
