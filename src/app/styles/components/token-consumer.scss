@@ -35,6 +35,12 @@
     .token-type {
       padding-bottom: 3 * $padding-base-vertical;
       margin: 0;
+
+      .record-info-icon {
+        color: $color-one-light-gray;
+        font-size: 150%;
+        vertical-align: text-bottom;
+      }
     }
   }
 

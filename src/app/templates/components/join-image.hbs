@@ -6,16 +6,23 @@
         {{#truncated-string class="text subject-name"}}
           {{joiningRecord.name}}
         {{/truncated-string}}
-        <div
-          class="joining-record-info-trigger popover-info-trigger"
-          {{action
+        {{one-icon
+          icon="browser-info"
+          class="record-info-icon joining-record-info-trigger popover-info-trigger"
+          click=(action
             (mut joiningRecordInfoOpened)
             (not joiningRecordInfoOpened)
             bubbles=false
+          )
+        }}
+        {{#record-info-popover
+          isOpened=joiningRecordInfoOpened
+          triggerSelector=(local-selector elementId ".joining-record-info-trigger")
+        }}
+          {{component (concat joiningModelName "-info-content")
+            record=joiningRecord
           }}
-        >
-          {{one-icon icon="browser-info" class="record-info-icon"}}
-        </div>
+        {{/record-info-popover}}
       </div>
     {{else}}
       {{#truncated-string class="text select-below-label"}}
@@ -37,35 +44,24 @@
       {{#truncated-string class="text"}}
         {{inviteTargetRecord.name}}
       {{/truncated-string}}
-      <div
-        class="target-record-info-trigger popover-info-trigger"
-        {{action
+      {{one-icon
+        icon="browser-info"
+        class="record-info-icon target-record-info-trigger popover-info-trigger"
+        click=(action
           (mut targetRecordInfoOpened)
           (not targetRecordInfoOpened)
           bubbles=false
+        )
+      }}
+      {{#record-info-popover
+        isOpened=targetRecordInfoOpened
+        triggerSelector=(local-selector elementId ".target-record-info-trigger")
+      }}
+        {{component inviteTargetInfoComponentName
+          record=inviteTargetRecord
+          showDetails=false
         }}
-      >
-        {{one-icon icon="browser-info" class="record-info-icon"}}
-      </div>
+      {{/record-info-popover}}
     </div>
   </figcaption>
 </figure>
-{{#record-info-popover
-  isOpened=joiningRecordInfoOpened
-  triggerSelector=(concat "#" elementId " .joining-record-info-trigger .record-info-icon")
-}}
-  {{component (concat joiningModelName "-info-content")
-    record=joiningRecord
-    errorReason=errorReason
-  }}
-{{/record-info-popover}}
-{{#record-info-popover
-  isOpened=targetRecordInfoOpened
-  triggerSelector=(concat "#" elementId " .target-record-info-trigger .record-info-icon")
-}}
-  {{component inviteTargetInfoComponentName
-    record=inviteTargetRecord
-    errorReason=errorReason
-    showDetails=showDetailsForInviteTarget
-  }}
-{{/record-info-popover}}

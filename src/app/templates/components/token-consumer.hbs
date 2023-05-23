@@ -41,27 +41,40 @@
           }}
         {{/if}}
         {{#if (media "isMobile")}}
-          {{id-info
-            idType=inviteTargetModelName
-            idValue=inviteTargetId
+          {{one-icon
+            icon="browser-info"
+            class="record-info-icon target-record-info-trigger popover-info-trigger"
+            click=(action
+              (mut targetRecordInfoOpened)
+              (not targetRecordInfoOpened)
+              bubbles=false
+            )
           }}
+          {{#record-info-popover
+            isOpened=targetRecordInfoOpened
+            triggerSelector=(local-selector elementId ".target-record-info-trigger")
+          }}
+            {{component inviteTargetInfoComponentName
+              record=inviteTargetRecord
+              showDetails=false
+            }}
+          {{/record-info-popover}}
         {{/if}}
       </p>
       {{#unless (or (media "isMobile") noJoinMessage)}}
-        {{#promise-proxy-container proxy=inviteTargetRecord}}
-          {{join-image
-            class="consume-token-image"
-            joiningModelName=(or joiningRecordSelectorModelName "user")
-            joiningRecord=(if joiningRecordSelectorModelName
-              selectedJoiningRecordOption.value
-              currentUser
-            )
-            inviteTargetModelName=inviteTargetModelName
-            inviteTargetRecord=inviteTargetRecord.content
-            arrowLabelType=(if spaceHarvesterRelationToken "add" "join")
-            placeholderUnderSubjectImage=(tt this "placeholderUnderSubjectImage")
-          }}
-        {{/promise-proxy-container}}
+        {{join-image
+          class="consume-token-image"
+          joiningModelName=(or joiningRecordSelectorModelName "user")
+          joiningRecord=(if joiningRecordSelectorModelName
+            selectedJoiningRecordOption.value
+            currentUser
+          )
+          inviteTargetInfoComponentName=inviteTargetInfoComponentName
+          inviteTargetModelName=inviteTargetModelName
+          inviteTargetRecord=inviteTargetRecord
+          arrowLabelType=(if spaceHarvesterRelationToken "add" "join")
+          placeholderUnderSubjectImage=(tt this "placeholderUnderSubjectImage")
+        }}
       {{/unless}}
     </div>
   {{/if}}

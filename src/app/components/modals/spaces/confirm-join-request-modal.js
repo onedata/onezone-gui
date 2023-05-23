@@ -161,8 +161,9 @@ export default Component.extend(I18n, {
    */
   joiningUserLikeRecord: computed('requesterInfo', function joiningUserLikeRecord() {
     return {
-      entityId: this.requesterInfo.userId,
       name: this.requesterInfo.fullName,
+      entityId: this.requesterInfo.userId,
+      fullName: this.requesterInfo.fullName,
       username: this.requesterInfo.username,
     };
   }),
@@ -227,6 +228,16 @@ export default Component.extend(I18n, {
       }
     }
   ),
+
+  /**
+   * @type {BasicRecordInfo}
+   */
+  inviteTargetRecord: computed('spaceId', 'spaceName', function inviteTargetRecord() {
+    return {
+      entityId: this.spaceId,
+      name: this.spaceName,
+    };
+  }),
 
   actions: {
     async grant() {

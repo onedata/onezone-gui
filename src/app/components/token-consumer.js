@@ -21,7 +21,6 @@ import {
   notEqual,
   isEmpty,
   not,
-  promise,
 } from 'ember-awesome-macros';
 import RecordOptionsArrayProxy from 'onedata-gui-common/utils/record-options-array-proxy';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
@@ -33,7 +32,7 @@ import config from 'ember-get-config';
 import trimToken from 'onedata-gui-common/utils/trim-token';
 import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
-import { Promise } from 'rsvp';
+import { dasherize } from '@ember/string';
 
 /**
  * @typedef {Object} BasicRecordInfo
@@ -204,26 +203,29 @@ export default Component.extend(I18n, {
   }),
 
   /**
-   * @type {ComputedProperty<PromiseObject<GraphModel|BasicRecordInfo>>}
+   * @type {ComputedProperty<BasicRecordInfo>}
    */
-  inviteTargetRecord: promise.object(computed(
+  inviteTargetRecord: computed(
     'inviteTargetId',
     'inviteTargetModelName',
     'inviteTargetName',
-    async function inviteTargetRecord() {
-      try {
-        return await this.recordManager.getRecordById(
-          this.inviteTargetModelName,
-          this.inviteTargetId
-        );
-      } catch (error) {
-        return Promise.resolve({
-          name: this.inviteTargetName,
-          entityId: this.inviteTargetId,
-        });
-      }
+    function inviteTargetRecord() {
+      return {
+        name: this.inviteTargetName,
+        entityId: this.inviteTargetId,
+      };
     }
-  )),
+  ),
+
+  /**
+   * @type {ComputedProperty<string>}
+   */
+  inviteTargetInfoComponentName: computed(
+    'inviteTargetModelName',
+    function inviteTargetInfoComponentName() {
+      return `${dasherize(this.inviteTargetModelName)}-info-content`;
+    }
+  ),
 
   /**
    * @type {ComputedProperty<String>}

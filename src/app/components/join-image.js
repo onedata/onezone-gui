@@ -14,7 +14,6 @@ import {
 } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import computedT from 'onedata-gui-common/utils/computed-t';
-import { computed } from '@ember/object';
 
 const recordImages = {
   user: 'assets/images/consume-token/user.svg',
@@ -54,33 +53,15 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
-   * @type {Models.User|Models.Group|Models.Space|Models.Harvester|BasicRecordInfo}
+   * @type {BasicRecordInfo}
    */
   inviteTargetRecord: undefined,
 
   /**
-   * @type {string}
+   * @virtual
+   * @type {ComputedProperty<string>}
    */
-  inviteTargetInfoComponentName: computed(
-    'inviteTargetModelName',
-    function inviteTargetInfoComponentName() {
-      if (this.inviteTargetModelName === 'atmInventory') {
-        return 'atm-inventory-info-content';
-      } else {
-        return this.inviteTargetModelName + '-info-content';
-      }
-    }
-  ),
-
-  /**
-   * @type {boolean}
-   */
-  showDetailsForInviteTarget: computed(
-    'inviteTargetRecord',
-    function showDetailsForInviteTarget() {
-      return Boolean(this.inviteTargetRecord.constructor?.modelName);
-    }
-  ),
+  inviteTargetInfoComponentName: undefined,
 
   /**
    * @virtual optional
