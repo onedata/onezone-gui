@@ -36,6 +36,11 @@ import isStandaloneGuiOneprovider from 'onedata-gui-common/utils/is-standalone-g
 import ChooseDefaultOneprovider from 'onezone-gui/mixins/choose-default-oneprovider';
 import Version from 'onedata-gui-common/utils/version';
 
+/**
+ * @typedef {Object} OneproviderTabBarContext
+ * @property {string} [requiredVersion]
+ */
+
 const nameComparator = createPropertyComparator('name');
 
 function sortedOneprovidersList(list) {
@@ -45,6 +50,9 @@ function sortedOneprovidersList(list) {
   return [...list].sort(nameComparator);
 }
 
+/**
+ * @type {OneproviderTabItem}
+ */
 const OneproviderTabItem = EmberObject.extend({
   /**
    * @virtual
@@ -57,6 +65,12 @@ const OneproviderTabItem = EmberObject.extend({
    * @type {boolean}
    */
   shouldBeEnabledWhenOffline: false,
+
+  /**
+   * @virtual optional
+   * @type {OneproviderTabBarContext}
+   */
+  context: undefined,
 
   icon: 'provider',
   id: reads('provider.entityId'),
@@ -324,6 +338,9 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
       return (providers || []).map((provider) => OneproviderTabItem.create({
         provider,
         shouldBeEnabledWhenOffline: shouldOfflineOneprovidersBeEnabled,
+        context: this.minOneproviderRequiredVersion ? {
+          requiredVersion: this.minOneproviderRequiredVersion,
+        } : undefined,
       }));
     }
   ),

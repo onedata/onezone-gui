@@ -50,8 +50,11 @@ export default ContentOneproviderContainerBase.extend(...mixins, {
    */
   space: undefined,
 
-  // FIXME: set 21 version
-  minOneproviderRequiredVersion: '22.02.1',
+  /**
+   * Minimum required Oneprovider version to open settings Oneprovider tab.
+   * @type {string}
+   */
+  minOneproviderRequiredVersion: '21.02.1',
 
   /**
    * @override
