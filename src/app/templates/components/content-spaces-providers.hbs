@@ -3,12 +3,14 @@
   space=space
   oneproviderId=oneproviderId
   resourceType="data"
-  oneproviderIdChanged=(action "oneproviderIdChanged")
   isTabBarCollapsed=false
   isOverviewEnabled=true
   isOneproviderViewLocal=true
   shouldOfflineOneprovidersBeEnabled=true
   mapSelectorEnabled=true
+  minOneproviderRequiredVersion=minOneproviderRequiredVersion
+  oneproviderIdChanged=(action "oneproviderIdChanged")
+  hasEmbeddedIframesChanged=(action "hasEmbeddedIframesChanged")
   as |container|
 }}
   {{#container.header class="content-spaces-providers-header"}}
@@ -22,17 +24,30 @@
     </div>
   {{/container.header}}
   {{#container.body}}
-    {{#if (eq container.selectedProvider "overview")}}
+    {{#if (not container.selectedProvider)}}
+      {{!-- display nothing while providers are loading --}}
+    {{else if (eq container.selectedProvider "overview")}}
       {{spaces-providers-overview
         space=space
         oneproviderIdChanged=(action "oneproviderIdChanged")
         providersProxy=providersProxy
       }}
     {{else}}
-      {{content-spaces-providers/provider-config
-        space=space
-        provider=container.selectedProvider
-      }}
+      {{#if (evaluate-function
+        (action "checkIsOneproviderVersionTooLow")
+        container.selectedProvider
+      )}}
+        {{oneprovider-view-container/info-old-oneprovider
+          requiredVersion=minOneproviderRequiredVersion
+          infoType="selectedOld"
+          selectedProviderVersion=container.selectedProvider.version
+        }}
+      {{else}}
+        {{content-spaces-providers/provider-config
+          space=space
+          provider=container.selectedProvider
+        }}
+      {{/if}}
     {{/if}}
   {{/container.body}}
 {{/oneprovider-view-container}}

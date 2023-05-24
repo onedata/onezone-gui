@@ -38,7 +38,7 @@ describe('Integration | Component | content-providers', function () {
           latitude: 10,
           longitude: 20,
           online: true,
-          versionProxy: po('19.02.1'),
+          version: '19.02.1',
           spaceList: po({
             list: po([
               po({

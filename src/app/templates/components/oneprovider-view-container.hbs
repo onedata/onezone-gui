@@ -1,5 +1,7 @@
-{{#promise-proxy-container proxy=initialProvidersListProxy}}
-  {{#if hasSupport}}
+{{#promise-proxy-container proxy=viewRequiredDataProxy}}
+  {{#if (not hasSupport)}}
+    {{content-spaces-no-support class="cancel-absolute-flex-content-padding"}}
+  {{else}}
     <div class="row content-header-section">
       {{#promise-proxy-container proxy=isEmbeddableOneproviderProxy}}
         {{#if (or isEmbeddableOneprovider (not selectedProvider))}}
@@ -9,7 +11,7 @@
         {{/if}}
       {{/promise-proxy-container}}
       <div class="row row-content-tab-bar">
-        {{#if (and (not (media "isMobile")) isTabBarCollapsed (not showAllOfflineInfo))}}
+        {{#if effIsTabBarCollapsed}}
           <div class={{concat-classes
             "current-oneprovider-bar"
             (if multiOneproviders "current-oneprovider-bar-multi")
@@ -72,7 +74,7 @@
             )
             items=tabBarItems
             selectedItem=selectedProviderItem
-            selectDefaultOnInit=true
+            selectDefaultOnInit=false
             selectedItemChanged=(action "selectedProviderChanged")
             tabBarLiComponentName="provider-tab-li"
             isSorted=false
@@ -90,9 +92,14 @@
         {{/if}}
       </div>
     </div>
-    {{#if (and (not-eq oneproviderId "overview") (not isOneproviderViewLocal))}}
-      <div
-        class={{concat-classes
+    {{#if isLocalViewShown}}
+      {{yield (hash
+        body=(component "oneprovider-view-container/container-body")
+        contentIframeBaseUrl=contentIframeBaseUrl
+        selectedProvider=(if (eq oneproviderId "overview") "overview" selectedProvider)
+      )}}
+    {{else}}
+      <div class={{concat-classes
         "row absolute-flex-content-child-stretch oneprovider-view-container-inner"
         contentContainerClass
       }}>
@@ -101,6 +108,22 @@
             header=(tt this "allOneprovidersOffline")
             imagePath=(root-url "assets/images/data-error-no-providers.svg")
             class="preserve-header scroll-breakpoint-600"
+          }}
+        {{else if showAllVersionsOld}}
+          {{oneprovider-view-container/info-old-oneprovider
+            requiredVersion=minOneproviderRequiredVersion
+            infoType="allOld"
+          }}
+        {{else if showAllRequiredVersionsOffline}}
+          {{oneprovider-view-container/info-old-oneprovider
+            requiredVersion=minOneproviderRequiredVersion
+            infoType="allNewOffline"
+          }}
+        {{else if showSelectedProviderIsOld}}
+          {{oneprovider-view-container/info-old-oneprovider
+            requiredVersion=minOneproviderRequiredVersion
+            infoType="selectedOld"
+            selectedProviderVersion=selectedProvider.version
           }}
         {{else}}
           {{#promise-proxy-container proxy=oneproviderViewProxy}}
@@ -128,14 +151,6 @@
           {{/promise-proxy-container}}
         {{/if}}
       </div>
-    {{else}}
-      {{yield (hash
-        body=(component "oneprovider-view-container/container-body")
-        contentIframeBaseUrl=contentIframeBaseUrl
-        selectedProvider=(if (eq oneproviderId "overview") "overview" selectedProvider)
-      )}}
     {{/if}}
-  {{else}}
-    {{content-spaces-no-support class="cancel-absolute-flex-content-padding"}}
   {{/if}}
 {{/promise-proxy-container}}

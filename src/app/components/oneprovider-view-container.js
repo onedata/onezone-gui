@@ -23,6 +23,8 @@ import {
   gt,
   and,
   not,
+  or,
+  eq,
 } from 'ember-awesome-macros';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { next } from '@ember/runloop';
@@ -33,7 +35,12 @@ import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignor
 import { guidFor } from '@ember/object/internals';
 import isStandaloneGuiOneprovider from 'onedata-gui-common/utils/is-standalone-gui-oneprovider';
 import ChooseDefaultOneprovider from 'onezone-gui/mixins/choose-default-oneprovider';
-import { resolve } from 'rsvp';
+import Version from 'onedata-gui-common/utils/version';
+
+/**
+ * @typedef {Object} OneproviderTabBarContext
+ * @property {string} [requiredVersion]
+ */
 
 const nameComparator = createPropertyComparator('name');
 
@@ -44,6 +51,9 @@ function sortedOneprovidersList(list) {
   return [...list].sort(nameComparator);
 }
 
+/**
+ * @type {OneproviderTabItem}
+ */
 const OneproviderTabItem = EmberObject.extend({
   /**
    * @virtual
@@ -56,6 +66,12 @@ const OneproviderTabItem = EmberObject.extend({
    * @type {boolean}
    */
   shouldBeEnabledWhenOffline: false,
+
+  /**
+   * @virtual optional
+   * @type {OneproviderTabBarContext}
+   */
+  context: undefined,
 
   icon: 'provider',
   id: reads('provider.entityId'),
@@ -73,12 +89,13 @@ const OneproviderTabItem = EmberObject.extend({
 export default Component.extend(I18n, ChooseDefaultOneprovider, {
   tagName: '',
 
+  media: service(),
+  pointerEvents: service(),
+
   /**
    * @override
    */
   i18nPrefix: 'components.oneproviderViewContainer',
-
-  pointerEvents: service(),
 
   /**
    * View to show in legacy Oneprovider, eg.spaces, transfers, shares
@@ -111,6 +128,13 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   oneproviderId: undefined,
 
   /**
+   * Inform parent container that an iframe will be rendered in this component, so
+   * specific classes should be applied to parent.
+   * @type {(hasEmbeddedIframes: boolean) => void}
+   */
+  hasEmbeddedIframesChanged: undefined,
+
+  /**
    * @virtual optional
    * @type {String}
    */
@@ -135,6 +159,13 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
    * @type {boolean}
    */
   shouldOfflineOneprovidersBeEnabled: false,
+
+  /**
+   * Oneprovider version string or null. Eg. `21.02.1`.
+   * @virtual optional
+   * @type {string | null}
+   */
+  minOneproviderRequiredVersion: null,
 
   /**
    * In collapsed mode, the currently chosen Oneprovider is displayed and
@@ -215,27 +246,28 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   /**
    * @type {ComputedProperty<String>}
    */
-  collapsedSelectorHintTriggerClass: tag `collapsed-selector-hint-trigger-${'componentGuid'}`,
+  collapsedSelectorHintTriggerClass: tag`collapsed-selector-hint-trigger-${'componentGuid'}`,
 
   /**
    * @type {ComputedProperty<String>}
    */
-  hintTriggersConfiguration: tag `.${'collapsedSelectorHintTriggerClass'}`,
+  hintTriggersConfiguration: tag`.${'collapsedSelectorHintTriggerClass'}`,
 
   validatedOneproviderIdProxy: promise.object(computed(
     'oneproviderId',
-    function validatedOneproviderIdProxy() {
-      const oneproviderId = this.get('oneproviderId');
-      if (oneproviderId) {
-        return resolve(oneproviderId);
+    'minOneproviderRequiredVersion',
+    async function validatedOneproviderIdProxy() {
+      if (this.oneproviderId) {
+        return this.oneproviderId;
       } else {
-        return this.chooseDefaultOneprovider().then(defaultOneprovider => {
-          if (defaultOneprovider) {
-            return resolve(get(defaultOneprovider, 'entityId'));
-          } else {
-            return resolve(null);
-          }
+        const defaultOneprovider = await this.chooseDefaultOneprovider({
+          requiredVersion: this.minOneproviderRequiredVersion,
         });
+        if (defaultOneprovider) {
+          return get(defaultOneprovider, 'entityId');
+        } else {
+          return null;
+        }
       }
     }
   )),
@@ -321,8 +353,27 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
       return (providers || []).map((provider) => OneproviderTabItem.create({
         provider,
         shouldBeEnabledWhenOffline: shouldOfflineOneprovidersBeEnabled,
+        context: this.minOneproviderRequiredVersion ? {
+          requiredVersion: this.minOneproviderRequiredVersion,
+        } : undefined,
       }));
     }
+  ),
+
+  isLocalViewShown: or(
+    eq('oneproviderId', raw('overview')),
+    'isOneproviderViewLocal',
+  ),
+
+  isOneproviderIframeShown: and(
+    not('isLocalViewShown'),
+    not('showAllOfflineInfo'),
+    not('showAllVersionsOld'),
+    not('showAllRequiredVersionsOffline'),
+    not('showSelectedProviderIsOld'),
+    'oneproviderViewProxy.isFulfilled',
+    'isEmbeddableOneprovider',
+    'selectedProvider.online',
   ),
 
   /**
@@ -336,23 +387,70 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
     }
   ),
 
+  showAllVersionsOld: computed(
+    'selectedProvider',
+    'hasOneproviderInRequiredVersion',
+    function showAllVersionsOld() {
+      return !this.selectedProvider && this.hasOneproviderInRequiredVersion === false;
+    }
+  ),
+
+  showAllRequiredVersionsOffline: computed(
+    'selectedProvider',
+    'providersInRequiredVersion',
+    function showAllRequiredVersionsOffline() {
+      return !this.selectedProvider &&
+        this.providersInRequiredVersion?.every((provider) =>
+          !get(provider, 'online')
+        );
+    }
+  ),
+
+  showSelectedProviderIsOld: computed(
+    'selectedProvider.version',
+    'minOneproviderRequiredVersion',
+    function showSelectedProviderIsOld() {
+      return this.selectedProvider &&
+        this.minOneproviderRequiredVersion &&
+        !Version.isRequiredVersion(
+          get(this.selectedProvider, 'version'),
+          this.minOneproviderRequiredVersion
+        );
+    },
+  ),
+
+  isProvidersTabBarForced: or(
+    'showAllOfflineInfo',
+    'showAllVersionsOld',
+    'showSelectedProviderIsOld',
+    not('selectedProvider'),
+  ),
+
+  effIsTabBarCollapsed: and(
+    'isTabBarCollapsed',
+    not('media.isMobile'),
+    not('isProvidersTabBarForced'),
+  ),
+
   hasSupport: notEmpty('providers'),
 
   /**
    * @type {ComputedProperty<PromiseObject<Array<Model.Provider>>>}
    */
   initialProvidersListProxy: promise.object(
-    computed('space.providerList', function initialProvidersListProxy() {
-      return this.get('space').getRelation('providerList')
-        .then(providerList => get(providerList, 'list'))
-        .then(list => sortedOneprovidersList(list.toArray()));
+    computed('space.providerList', async function initialProvidersListProxy() {
+      const providerList = await this.space.getRelation('providerList');
+      const providers = await get(providerList, 'list');
+      return sortedOneprovidersList(providers.toArray());
     })
   ),
+
+  viewRequiredDataProxy: reads('initialProvidersListProxy'),
 
   isEmbeddableOneproviderProxy: promise.object(
     computed(
       'initialProvidersListProxy',
-      'selectedProvider.versionProxy',
+      'selectedProvider.version',
       function isEmbeddableOneproviderProxy() {
         return this.get('initialProvidersListProxy').then(() => {
           const selectedProvider = this.get('selectedProvider');
@@ -360,9 +458,8 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
             if (get(selectedProvider, 'id') === 'overview') {
               return selectedProvider;
             }
-            return get(selectedProvider, 'versionProxy').then(version => {
-              return !isStandaloneGuiOneprovider(version);
-            });
+            const version = get(selectedProvider, 'version');
+            return !isStandaloneGuiOneprovider(version);
           } else {
             return null;
           }
@@ -371,6 +468,27 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   ),
 
   isEmbeddableOneprovider: reads('isEmbeddableOneproviderProxy.content'),
+
+  providersInRequiredVersion: computed(
+    'minOneproviderRequiredVersion',
+    'providers.@each.version',
+    function providersInRequiredVersion() {
+      if (!this.providers?.length) {
+        return [];
+      }
+      const requiredVersion = this.minOneproviderRequiredVersion;
+      if (!requiredVersion) {
+        return this.providers;
+      }
+
+      return this.providers.filter((provider) => {
+        const providerVersion = get(provider, 'version');
+        return Version.isRequiredVersion(providerVersion, requiredVersion);
+      });
+    },
+  ),
+
+  hasOneproviderInRequiredVersion: notEmpty('providersInRequiredVersion'),
 
   /**
    * When there is no Oneprovider selected (or there is no Oneprovider at all)
@@ -387,25 +505,40 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
     }
   }),
 
+  iframeStateObserver: observer(
+    'isOneproviderIframeShown',
+    function iframeStateObserver() {
+      next(() => {
+        safeExec(this, () => {
+          if (
+            this.pointerEvents.pointerNoneToMainContent !== this.isOneproviderIframeShown
+          ) {
+            this.set(
+              'pointerEvents.pointerNoneToMainContent',
+              this.isOneproviderIframeShown,
+            );
+          }
+          if (typeof this.hasEmbeddedIframesChanged === 'function') {
+            this.hasEmbeddedIframesChanged(this.isOneproviderIframeShown);
+          } else {
+            console.error(
+              'iframeStateObserver: required virtual function hasEmbeddedIframesChanged is not injected nor injected'
+            );
+          }
+        });
+      });
+    }
+  ),
+
   init() {
     this._super(...arguments);
 
-    const {
-      initialProvidersListProxy,
-      isOneproviderViewLocal,
-    } = this.getProperties('initialProvidersListProxy', 'isOneproviderViewLocal');
-
-    initialProvidersListProxy.then(list => {
-      const oneproviderId = this.get('oneproviderId');
-      if (!oneproviderId) {
-        return this.selectDefaultProvider(list);
+    this.initialProvidersListProxy.then(async (list) => {
+      if (!this.oneproviderId) {
+        await this.selectDefaultProvider(list);
       }
+      this.iframeStateObserver();
     });
-    if (!isOneproviderViewLocal) {
-      next(() => {
-        safeExec(this, 'set', 'pointerEvents.pointerNoneToMainContent', true);
-      });
-    }
   },
 
   willDestroyElement() {
@@ -415,16 +548,18 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
     });
   },
 
-  selectDefaultProvider(providers = this.get('providers')) {
-    return this.chooseDefaultOneprovider(providers).then(defaultProvider => {
-      if (defaultProvider) {
-        const providerId = get(defaultProvider, 'entityId');
-        this.get('oneproviderIdChanged')(
-          providerId,
-          true,
-        );
-      }
+  async selectDefaultProvider(providers = this.providers) {
+    const defaultProvider = await this.chooseDefaultOneprovider({
+      providers,
+      requiredVersion: this.minOneproviderRequiredVersion,
     });
+    if (defaultProvider && !this.isDestroyed && !this.isDestroying) {
+      const providerId = get(defaultProvider, 'entityId');
+      this.oneproviderIdChanged(
+        providerId,
+        true,
+      );
+    }
   },
 
   actions: {

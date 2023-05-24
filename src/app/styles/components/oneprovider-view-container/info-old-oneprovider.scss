@@ -1,0 +1,18 @@
+.info-old-oneprovider {
+  .content-info-content-container {
+    > .row-yield:last-of-type {
+      margin-bottom: 0;
+      > p.lead:last-of-type {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+// special negative margin revert from generic styles for this view, to not break
+// other views
+.absolute-flex-content .info-old-oneprovider .content-info .world-map {
+  @media (max-width: $screen-sm-max) {
+    margin: 0;
+  }
+}

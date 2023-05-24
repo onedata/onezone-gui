@@ -34,7 +34,7 @@ describe('Integration | Component | content-spaces-index', function () {
       id: 'provider.p1.instance:private',
       entityId: 'op1',
       name: 'Gamma',
-      versionProxy: promiseObject(resolve('20.02.1')),
+      version: '20.02.1',
       online: true,
       onezoneHostedBaseUrl: 'https://op1.onedata.org',
     };
@@ -42,7 +42,7 @@ describe('Integration | Component | content-spaces-index', function () {
       id: 'provider.op2.instance:private',
       entityId: 'op2',
       name: 'Beta',
-      versionProxy: promiseObject(resolve('20.02.1')),
+      version: '20.02.1',
       online: true,
       onezoneHostedBaseUrl: 'https://op2.onedata.org',
     };
@@ -50,7 +50,7 @@ describe('Integration | Component | content-spaces-index', function () {
       id: 'provider.op3.instance:private',
       entityId: 'op3',
       name: 'Alpha',
-      versionProxy: promiseObject(resolve('20.02.1')),
+      version: '20.02.1',
       online: true,
       onezoneHostedBaseUrl: 'https://op3.onedata.org',
     };

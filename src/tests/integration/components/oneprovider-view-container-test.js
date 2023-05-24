@@ -11,6 +11,8 @@ import { getStorageOneproviderKey } from 'onezone-gui/mixins/choose-default-onep
 import { lookupService } from '../../helpers/stub-service';
 import globals from 'onedata-gui-common/utils/globals';
 
+const modernVersion = '21.02.1';
+
 describe('Integration | Component | oneprovider-view-container', function () {
   setupRenderingTest();
 
@@ -21,7 +23,7 @@ describe('Integration | Component | oneprovider-view-container', function () {
       const provider = {
         entityId: oneproviderId,
         name: oneproviderName,
-        versionProxy: promiseObject(resolve('20.02.1')),
+        version: modernVersion,
         online: true,
       };
       const providerListPromise = promiseObject(resolve({
@@ -146,14 +148,14 @@ describe('Integration | Component | oneprovider-view-container', function () {
       const provider1 = {
         entityId: oneproviderId1,
         name: 'Alpha',
-        versionProxy: promiseObject(resolve('20.02.1')),
+        version: modernVersion,
         online: true,
         onezoneHostedBaseUrl: 'https://op1.onedata.org',
       };
       const provider2 = {
         entityId: oneproviderId2,
         name: 'Beta',
-        versionProxy: promiseObject(resolve('20.02.1')),
+        version: modernVersion,
         online: true,
         onezoneHostedBaseUrl: 'https://op2.onedata.org',
       };

@@ -1,3 +1,5 @@
+@import './oneprovider-view-container/info-old-oneprovider';
+
 .oneprovider-view-container {
   $map-trigger-width: 40px;
   $map-trigger-margin-vert: 4px;
@@ -22,6 +24,10 @@
   .provider-offline .one-icon {
     color: $color-one-danger;
   }
+  .provider-warning-icon.one-icon {
+    color: $color-one-warning;
+    margin-left: 0.6em;
+  }
   .one-tab-bar {
     padding-right: $map-trigger-width;
 
@@ -33,6 +39,11 @@
       .tab-bar-selector {
         right: $map-trigger-width + $padding-small-horizontal;
       }
+    }
+
+    .nav-link.provider-info-name {
+      display: flex;
+      align-items: center;
     }
 
     .tab-bar-selector {
