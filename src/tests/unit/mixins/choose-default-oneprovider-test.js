@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import chooseDefaultOneprovider from 'onezone-gui/mixins/choose-default-oneprovider';
-import { resolve, reject } from 'rsvp';
+import { reject } from 'rsvp';
 import EmberObject from '@ember/object';
 
 describe('Unit | Mixin | choose-default-oneprovider', function () {

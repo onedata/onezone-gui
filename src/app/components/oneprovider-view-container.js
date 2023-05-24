@@ -540,9 +540,6 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
       }
       this.iframeStateObserver();
     });
-
-    // FIXME: debug
-    window.oneproviderViewContainer = this;
   },
 
   willDestroyElement() {
