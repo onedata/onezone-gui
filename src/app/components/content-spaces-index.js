@@ -93,14 +93,14 @@ export default Component.extend(
         return this.get('space.providerList')
           .then(providerList => get(providerList, 'list'))
           .then(providers => {
-            return this.chooseDefaultOneprovider(providers);
+            return this.chooseDefaultOneprovider({ providers });
           });
       }
     )),
 
     oneproviderHrefProxy: promise.object(
       computed(
-        'dataProviderProxy.versionProxy.content',
+        'dataProviderProxy.version',
         function oneproviderHrefProxy() {
           const {
             guiUtils,
@@ -117,27 +117,26 @@ export default Component.extend(
           );
           return dataProviderProxy.then(dataProvider => {
             const oneproviderId = guiUtils.getRoutableIdFor(dataProvider);
-            return get(dataProvider, 'versionProxy').then(version => {
-              if (isStandaloneGuiOneprovider(version)) {
-                return router.urlFor(
-                  'provider-redirect',
-                  oneproviderId, {
-                    queryParams: { space_id: spaceId },
-                  }
-                );
-              } else {
-                return router.urlFor(
-                  'onedata.sidebar.content.aspect',
-                  'spaces',
-                  guiUtils.getRoutableIdFor(space),
-                  'data', {
-                    queryParams: {
-                      options: serializeAspectOptions({ oneproviderId }),
-                    },
-                  }
-                );
-              }
-            });
+            const version = get(dataProvider, 'version');
+            if (isStandaloneGuiOneprovider(version)) {
+              return router.urlFor(
+                'provider-redirect',
+                oneproviderId, {
+                  queryParams: { space_id: spaceId },
+                }
+              );
+            } else {
+              return router.urlFor(
+                'onedata.sidebar.content.aspect',
+                'spaces',
+                guiUtils.getRoutableIdFor(space),
+                'data', {
+                  queryParams: {
+                    options: serializeAspectOptions({ oneproviderId }),
+                  },
+                }
+              );
+            }
           });
         }
       )
