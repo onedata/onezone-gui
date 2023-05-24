@@ -24,6 +24,7 @@ import {
   and,
   not,
   or,
+  eq,
 } from 'ember-awesome-macros';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { next } from '@ember/runloop';
@@ -125,6 +126,13 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
    * @type {String}
    */
   oneproviderId: undefined,
+
+  /**
+   * Inform parent container that an iframe will be rendered in this component, so
+   * specific classes should be applied to parent.
+   * @type {(hasEmbeddedIframes: boolean) => void}
+   */
+  hasEmbeddedIframesChanged: undefined,
 
   /**
    * @virtual optional
@@ -238,12 +246,12 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   /**
    * @type {ComputedProperty<String>}
    */
-  collapsedSelectorHintTriggerClass: tag `collapsed-selector-hint-trigger-${'componentGuid'}`,
+  collapsedSelectorHintTriggerClass: tag`collapsed-selector-hint-trigger-${'componentGuid'}`,
 
   /**
    * @type {ComputedProperty<String>}
    */
-  hintTriggersConfiguration: tag `.${'collapsedSelectorHintTriggerClass'}`,
+  hintTriggersConfiguration: tag`.${'collapsedSelectorHintTriggerClass'}`,
 
   validatedOneproviderIdProxy: promise.object(computed(
     'oneproviderId',
@@ -350,6 +358,22 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
         } : undefined,
       }));
     }
+  ),
+
+  isLocalViewShown: or(
+    eq('oneproviderId', raw('overview')),
+    'isOneproviderViewLocal',
+  ),
+
+  isOneproviderIframeShown: and(
+    not('isLocalViewShown'),
+    not('showAllOfflineInfo'),
+    not('showAllVersionsOld'),
+    not('showAllRequiredVersionsOffline'),
+    not('showSelectedProviderIsOld'),
+    'oneproviderViewProxy.isFulfilled',
+    'isEmbeddableOneprovider',
+    'selectedProvider.online',
   ),
 
   /**
@@ -481,19 +505,44 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
     }
   }),
 
+  iframeStateObserver: observer(
+    'isOneproviderIframeShown',
+    function iframeStateObserver() {
+      // const newPointerNoneToMainContent = !this.isOneproviderIframeShown;
+      next(() => {
+        safeExec(this, () => {
+          if (
+            this.pointerEvents.pointerNoneToMainContent !== this.isOneproviderIframeShown
+          ) {
+            this.set(
+              'pointerEvents.pointerNoneToMainContent',
+              this.isOneproviderIframeShown,
+            );
+          }
+          if (typeof this.hasEmbeddedIframesChanged === 'function') {
+            this.hasEmbeddedIframesChanged(this.isOneproviderIframeShown);
+          } else {
+            console.error(
+              'iframeStateObserver: required virtual function hasEmbeddedIframesChanged is not injected nor injected'
+            );
+          }
+        });
+      });
+    }
+  ),
+
   init() {
     this._super(...arguments);
 
-    this.initialProvidersListProxy.then(list => {
+    this.initialProvidersListProxy.then(async (list) => {
       if (!this.oneproviderId) {
-        this.selectDefaultProvider(list);
+        await this.selectDefaultProvider(list);
       }
+      this.iframeStateObserver();
     });
-    if (!this.isOneproviderViewLocal) {
-      next(() => {
-        safeExec(this, 'set', 'pointerEvents.pointerNoneToMainContent', true);
-      });
-    }
+
+    // FIXME: debug
+    window.oneproviderViewContainer = this;
   },
 
   willDestroyElement() {

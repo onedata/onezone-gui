@@ -39,5 +39,10 @@ export default Component.extend(I18n, {
         oneproviderId,
       }, replaceHistory);
     },
+    hasEmbeddedIframesChanged(newValue) {
+      if (this.hasEmbeddedIframes !== newValue) {
+        this.set('hasEmbeddedIframes', newValue);
+      }
+    },
   },
 });

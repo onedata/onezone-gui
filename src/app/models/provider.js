@@ -21,10 +21,25 @@ export default Model.extend(GraphSingleModelMixin, {
   name: attr('string'),
   longitude: attr('number', { defaultValue: 0 }),
   latitude: attr('number', { defaultValue: 0 }),
-  online: attr('boolean'),
+  // online: attr('boolean'),
   domain: attr('string'),
-  version: attr('string'),
+  // version: attr('string'),
   cluster: belongsTo('cluster'),
+
+  // FIXME: debug
+  version: computed('name', function () {
+    if (this.get('name')?.endsWith('paris')) {
+      return '21.02.1';
+    }
+    return '20.02.19';
+  }),
+
+  online: computed('name', function () {
+    if (this.get('name')?.endsWith('paris')) {
+      return false;
+    }
+    return true;
+  }),
 
   spaceList: belongsTo('space-list'),
 

@@ -89,9 +89,14 @@
         {{/if}}
       </div>
     </div>
-    {{#if (and (not-eq oneproviderId "overview") (not isOneproviderViewLocal))}}
-      <div
-        class={{concat-classes
+    {{#if isLocalViewShown}}
+      {{yield (hash
+        body=(component "oneprovider-view-container/container-body")
+        contentIframeBaseUrl=contentIframeBaseUrl
+        selectedProvider=(if (eq oneproviderId "overview") "overview" selectedProvider)
+      )}}
+    {{else}}
+      <div class={{concat-classes
         "row absolute-flex-content-child-stretch oneprovider-view-container-inner"
         contentContainerClass
       }}>
@@ -143,12 +148,6 @@
           {{/promise-proxy-container}}
         {{/if}}
       </div>
-    {{else}}
-      {{yield (hash
-        body=(component "oneprovider-view-container/container-body")
-        contentIframeBaseUrl=contentIframeBaseUrl
-        selectedProvider=(if (eq oneproviderId "overview") "overview" selectedProvider)
-      )}}
     {{/if}}
   {{/if}}
 {{/promise-proxy-container}}
