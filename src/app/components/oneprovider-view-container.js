@@ -508,7 +508,6 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   iframeStateObserver: observer(
     'isOneproviderIframeShown',
     function iframeStateObserver() {
-      // const newPointerNoneToMainContent = !this.isOneproviderIframeShown;
       next(() => {
         safeExec(this, () => {
           if (
