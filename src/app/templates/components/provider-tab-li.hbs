@@ -5,12 +5,11 @@
     class=(concat "provider-info-name nav-link truncate " (if isActive "active"))
     click=(action "anchorClicked")
   }}
-    {{#unless isInRequiredVersion}}
-      {{#one-icon class="provider-warning-icon" icon="sign-warning-rounded"}}
-        {{one-tooltip title=(tt this "versionTooLowWarning")}}
-      {{/one-icon}}
-    {{/unless}}
-  {{/provider-info-name}}
+  {{#unless isInRequiredVersion}}
+    {{#one-icon class="provider-warning-icon" icon="sign-warning-rounded"}}
+      {{one-tooltip title=(tt this "versionTooLowWarning")}}
+    {{/one-icon}}
+  {{/unless}}
 {{else if (eq item.type "overview")}}
   <div
     class={{concat-classes "nav-link truncate" (if isActive "active")}}
