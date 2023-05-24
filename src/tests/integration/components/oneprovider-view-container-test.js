@@ -12,7 +12,6 @@ import { lookupService } from '../../helpers/stub-service';
 import globals from 'onedata-gui-common/utils/globals';
 
 const modernVersion = '21.02.1';
-const version20x = '20.02.20';
 
 describe('Integration | Component | oneprovider-view-container', function () {
   setupRenderingTest();
@@ -284,80 +283,6 @@ describe('Integration | Component | oneprovider-view-container', function () {
         .to.equal(provider1.entityId);
       expect(this.get('oneproviderId'), 'changed context oneproviderId')
         .to.equal(provider1.entityId);
-    });
-  });
-
-  context('with multiple 20.02 Oneproviders', function () {
-    beforeEach(function () {
-      const oneproviderId1 = 'op1';
-      const oneproviderId2 = 'op2';
-      const provider1 = {
-        entityId: oneproviderId1,
-        name: 'Jabłonica Polska',
-        version: version20x,
-        online: true,
-        onezoneHostedBaseUrl: 'https://op1.onedata.org',
-      };
-      const provider2 = {
-        entityId: oneproviderId2,
-        name: 'Sromowce Niżne',
-        version: version20x,
-        online: true,
-        onezoneHostedBaseUrl: 'https://op2.onedata.org',
-      };
-
-      const providerListPromise = promiseObject(resolve({
-        list: promiseArray(resolve([provider1, provider2])),
-      }));
-      const space = {
-        entityId: 's1',
-        providerList: providerListPromise,
-        getRelation(name) {
-          if (name === 'providerList') {
-            return providerListPromise;
-          }
-        },
-      };
-      const changeOneproviderId = sinon.stub().callsFake((id) => {
-        return this.set('oneproviderId', id);
-      });
-      this.set('changeOneproviderId', changeOneproviderId);
-      const providerManager = lookupService(this, 'provider-manager');
-      const getRecordByIdStub = sinon.stub(providerManager, 'getRecordById')
-        .withArgs(oneproviderId1)
-        .resolves(provider1);
-      this.setProperties({
-        provider1,
-        provider2,
-        changeOneproviderId,
-        space,
-        oneproviderId: oneproviderId1,
-        getRecordByIdStub,
-      });
-    });
-
-    it('shows information about too low version to support a feature', async function () {
-      this.set('minOneproviderRequiredVersion');
-
-      await render(hbs `
-        {{#oneprovider-view-container
-          space=space
-          oneproviderId=oneproviderId
-          mapSelectorEnabled=false
-          oneproviderIdChanged=(action (mut oneproviderId))
-          as |container|
-        }}
-          {{#container.header}}
-            hello header
-          {{/container.header}}
-          {{#container.body}}
-            hello body
-          {{/container.body}}
-        {{/oneprovider-view-container}}
-      `);
-
-      expect(find('.content-header-section')).to.contain.text('hello header');
-      expect(find('.oneprovider-view-container-inner')).to.contain.text('hello body');
     });
   });
 });

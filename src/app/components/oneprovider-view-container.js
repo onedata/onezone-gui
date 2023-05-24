@@ -508,7 +508,7 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
       providers,
       requiredVersion: this.minOneproviderRequiredVersion,
     });
-    if (defaultProvider) {
+    if (defaultProvider && !this.isDestroyed && !this.isDestroying) {
       const providerId = get(defaultProvider, 'entityId');
       this.oneproviderIdChanged(
         providerId,
