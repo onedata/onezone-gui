@@ -31,13 +31,15 @@ export default HarvesterInfoContent.extend({
    * @override
    */
   linkToHarvester: computed('record', function linkToHarvester() {
-    if (this.showDetails) {
+    try {
       return this.router.urlFor(
         'onedata.sidebar.content.aspect',
         'harvesters',
         this.guiUtils.getRoutableIdFor(this.record),
         'plugin'
       );
+    } catch (error) {
+      return null;
     }
   }),
 });

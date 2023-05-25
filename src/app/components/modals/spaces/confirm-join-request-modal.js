@@ -161,8 +161,8 @@ export default Component.extend(I18n, {
    */
   joiningUserLikeRecord: computed('requesterInfo', function joiningUserLikeRecord() {
     return {
-      name: this.requesterInfo.fullName,
       entityId: this.requesterInfo.userId,
+      name: this.requesterInfo.fullName,
       fullName: this.requesterInfo.fullName,
       username: this.requesterInfo.username,
     };
@@ -230,7 +230,7 @@ export default Component.extend(I18n, {
   ),
 
   /**
-   * @type {BasicRecordInfo}
+   * @type {ComputedProperty<BasicRecordInfo>}
    */
   inviteTargetRecord: computed('spaceId', 'spaceName', function inviteTargetRecord() {
     return {
