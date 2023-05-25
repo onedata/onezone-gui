@@ -308,16 +308,13 @@ export default Component.extend({
           .then(spaceList => get(spaceList, 'list'))
           .then(list => get(list, 'firstObject'))
           .then(space => {
-            return get(provider, 'versionProxy').then(providerVersion => {
-              const oneproviderUrl = getVisitOneproviderUrl({
-                router,
-                guiUtils,
-                provider,
-                providerVersion,
-                space,
-              });
-              return new Promise(() => globals.window.open(oneproviderUrl, '_self'));
+            const oneproviderUrl = getVisitOneproviderUrl({
+              router,
+              guiUtils,
+              provider,
+              space,
             });
+            return new Promise(() => globals.window.open(oneproviderUrl, '_self'));
           });
       }
     },

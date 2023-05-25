@@ -486,6 +486,7 @@ function createProvidersRecords(store) {
       latitude,
       longitude,
       online: index <= 1,
+      version: index === 1 ? '20.02.19' : '21.02.1',
       host: `${providerId}.local-onedata.org`,
     }).save();
   }));

@@ -8,7 +8,7 @@
  */
 
 import { reads } from '@ember/object/computed';
-import { computed } from '@ember/object';
+import { computed, get } from '@ember/object';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
@@ -16,6 +16,7 @@ import { or, raw } from 'ember-awesome-macros';
 import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 import ContentOneproviderContainerBase from './content-oneprovider-container-base';
 import ProvidersColors from 'onedata-gui-common/mixins/components/providers-colors';
+import Version from 'onedata-gui-common/utils/version';
 
 const mixins = [
   I18n,
@@ -48,6 +49,12 @@ export default ContentOneproviderContainerBase.extend(...mixins, {
    * @type {Models.Space}
    */
   space: undefined,
+
+  /**
+   * Minimum required Oneprovider version to open settings Oneprovider tab.
+   * @type {string}
+   */
+  minOneproviderRequiredVersion: '21.02.1',
 
   /**
    * @override
@@ -117,6 +124,19 @@ export default ContentOneproviderContainerBase.extend(...mixins, {
 
     oneproviderIdChanged(oneproviderId, replaceHistory) {
       return this.oneproviderIdChanged(oneproviderId, replaceHistory);
+    },
+
+    checkIsOneproviderVersionTooLow(provider) {
+      if (!provider) {
+        return false;
+      }
+      if (!this.minOneproviderRequiredVersion) {
+        return true;
+      }
+      return !Version.isRequiredVersion(
+        get(provider, 'version'),
+        this.minOneproviderRequiredVersion
+      );
     },
   },
 });

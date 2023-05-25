@@ -1,3 +1,5 @@
+import infoOldOneprovider from './oneprovider-view-container/info-old-oneprovider';
+
 export default {
   allOneprovidersOffline: 'All supporting Oneproviders are offline',
   oneproviderOffline: 'Selected Oneprovider is currently offline',
@@ -16,4 +18,5 @@ export default {
     close: 'Close',
   },
   overview: 'Overview',
+  infoOldOneprovider,
 };
