@@ -72,6 +72,12 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual optional
+   * @type {boolean}
+   */
+  showDetailsInTargetInfoPopover: false,
+
+  /**
+   * @virtual optional
    * @type {string|SafeString}
    */
   placeholderUnderSubjectImage: computedT('placeholderUnderSubjectImage'),

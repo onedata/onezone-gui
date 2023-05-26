@@ -97,12 +97,12 @@
 
   .subject-description {
     display: flex;
-    padding-left: 5px;
     position: relative;
+    padding-right: 1.4em;
 
     .record-info-icon {
       position: absolute;
-      right: -1em;
+      right: 0.1em;
       bottom: 0.32em;
       color: $color-one-light-gray;
       font-size: 130%;

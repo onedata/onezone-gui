@@ -229,16 +229,6 @@ export default Component.extend(I18n, {
     }
   ),
 
-  /**
-   * @type {ComputedProperty<BasicRecordInfo>}
-   */
-  inviteTargetRecord: computed('spaceId', 'spaceName', function inviteTargetRecord() {
-    return {
-      entityId: this.spaceId,
-      name: this.spaceName,
-    };
-  }),
-
   actions: {
     async grant() {
       if (!this.isProceedAvailable) {
