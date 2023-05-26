@@ -1,8 +1,9 @@
 {{#if (eq item.type "provider")}}
+  <span class="provider-info-container nav-link">
   {{record-info-with-icon
     record=provider
     recordType="provider"
-    class=(concat "provider-info-name nav-link truncate " (if isActive "active"))
+    class=(concat "provider-info-name truncate " (if isActive "active"))
     click=(action "anchorClicked")
   }}
   {{#unless isInRequiredVersion}}
@@ -10,6 +11,7 @@
       {{one-tooltip title=(tt this "versionTooLowWarning")}}
     {{/one-icon}}
   {{/unless}}
+  </span>
 {{else if (eq item.type "overview")}}
   <div
     class={{concat-classes "nav-link truncate" (if isActive "active")}}

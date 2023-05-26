@@ -41,7 +41,7 @@
       }
     }
 
-    .nav-link.provider-info-name {
+    .nav-link.provider-info-container {
       display: flex;
       align-items: center;
     }
@@ -158,16 +158,19 @@
     }
   }
 
-  .provider-info-name {
-    position: relative;
-
-    &.nav-link {
+  .nav-link {
+    .provider-info-name {
       .flippable-icons .icon-container {
         .oneicon-browser-info.one-icon {
           color: inherit;
         }
       }
     }
+  }
+
+  .provider-info-name {
+    position: relative;
+
     .record-with-icon {
       display: inline-flex;
     }
