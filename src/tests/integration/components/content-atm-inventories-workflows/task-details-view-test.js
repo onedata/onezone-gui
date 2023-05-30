@@ -18,7 +18,6 @@ const exampleAtmLambdaRevision = {
     name: 'argint',
     dataSpec: {
       type: 'number',
-      valueConstraints: {},
     },
     isOptional: true,
   }],
@@ -26,7 +25,6 @@ const exampleAtmLambdaRevision = {
     name: 'resstring',
     dataSpec: {
       type: 'string',
-      valueConstraints: {},
     },
   }],
 };
@@ -45,7 +43,6 @@ const exampleStores = [{
   config: {
     itemDataSpec: {
       type: 'string',
-      valueConstraints: {},
     },
   },
   requiresInitialContent: false,
@@ -56,7 +53,6 @@ const exampleStores = [{
   config: {
     itemDataSpec: {
       type: 'string',
-      valueConstraints: {},
     },
   },
   requiresInitialContent: false,

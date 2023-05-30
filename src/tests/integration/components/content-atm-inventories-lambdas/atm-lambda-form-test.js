@@ -551,7 +551,6 @@ describe(
                   // It's very oversimplified to infer dataSpec from it's translation
                   // but it's good enough for test purposes.
                   type: type.toLowerCase(),
-                  valueConstraints: {},
                 },
                 isOptional: idx === 1,
                 defaultValue: idx === 1 ? 'def' : null,
@@ -564,7 +563,6 @@ describe(
               // It's very oversimplified to infer dataSpec from it's translation
               // but it's good enough for test purposes.
               type: type.toLowerCase(),
-              valueConstraints: {},
             },
             relayMethod: 'returnValue',
           })),
@@ -576,7 +574,6 @@ describe(
                   // It's very oversimplified to infer dataSpec from it's translation
                   // but it's good enough for test purposes.
                   type: type.toLowerCase(),
-                  valueConstraints: {},
                 },
                 isOptional: idx === 1,
                 defaultValue: idx === 1 ? 'abc' : null,
@@ -628,7 +625,6 @@ describe(
                 name: 'entry',
                 dataSpec: {
                   type: 'string',
-                  valueConstraints: {},
                 },
                 relayMethod: 'filePipe',
               }],
@@ -853,7 +849,6 @@ describe(
             name: `entry${idx}`,
             dataSpec: {
               type: type.toLocaleLowerCase(),
-              valueConstraints: {},
             },
             isOptional: idx === 1,
             defaultValue: idx === 1 ? 'abc' : null,
@@ -894,7 +889,6 @@ describe(
             name: `entry${idx}`,
             dataSpec: {
               type: type.toLocaleLowerCase(),
-              valueConstraints: {},
             },
             isOptional: idx === 1,
             defaultValue: idx === 1 ? 'abc' : null,
@@ -935,7 +929,6 @@ describe(
             name: `entry${idx}`,
             dataSpec: {
               type: type.toLocaleLowerCase(),
-              valueConstraints: {},
             },
             relayMethod: idx === 0 ? 'filePipe' : 'returnValue',
           })),

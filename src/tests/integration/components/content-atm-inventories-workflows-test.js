@@ -38,7 +38,6 @@ describe('Integration | Component | content-atm-inventories-workflows', function
               name: 'argstring',
               dataSpec: {
                 type: 'string',
-                valueConstraints: {},
               },
               isOptional: true,
             }],
@@ -117,7 +116,6 @@ describe('Integration | Component | content-atm-inventories-workflows', function
             type: 'singleValue',
             dataSpec: {
               type: 'string',
-              valueConstraints: {},
             },
           }],
         },

@@ -996,10 +996,8 @@ function attachAtmLambdasToAtmInventory(store, atmInventory) {
                 name: 'arg1',
                 dataSpec: {
                   type: 'array',
-                  valueConstraints: {
-                    itemDataSpec: {
-                      type: 'string',
-                    },
+                  itemDataSpec: {
+                    type: 'string',
                   },
                 },
                 isOptional: true,
@@ -1009,27 +1007,23 @@ function attachAtmLambdasToAtmInventory(store, atmInventory) {
                 name: 'res1',
                 dataSpec: {
                   type: 'array',
-                  valueConstraints: {
-                    itemDataSpec: {
-                      type: 'string',
-                    },
+                  itemDataSpec: {
+                    type: 'string',
                   },
                 },
               }, {
                 name: 'res2',
                 dataSpec: {
                   type: 'timeSeriesMeasurement',
-                  valueConstraints: {
-                    specs: [{
-                      nameMatcherType: 'exact',
-                      nameMatcher: 'total_size',
-                      unit: 'bytes',
-                    }, {
-                      nameMatcherType: 'hasPrefix',
-                      nameMatcher: 'volume_',
-                      unit: 'custom:liters',
-                    }],
-                  },
+                  specs: [{
+                    nameMatcherType: 'exact',
+                    nameMatcher: 'total_size',
+                    unit: 'bytes',
+                  }, {
+                    nameMatcherType: 'hasPrefix',
+                    nameMatcher: 'volume_',
+                    unit: 'custom:liters',
+                  }],
                 },
               }],
               configParameterSpecs: [{
@@ -1130,7 +1124,6 @@ function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
                     config: {
                       itemDataSpec: {
                         type: 'string',
-                        valueConstraints: {},
                       },
                     },
                   }, {
