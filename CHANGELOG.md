@@ -7,6 +7,7 @@ CHANGELOG
 ### Latest changes
 
 * VFS-10895 Added expand options to automation data spec of file
+* VFS-10886 Replaced browser service usages with Browser util
 * VFS-10889 Added information about unsupported features in legacy Oneproviders supporting space
 * VFS-10794 Added message about last membership request reject when requesting becomes available
 * VFS-10825 Fixed unnecessary scrollbars in Safari
