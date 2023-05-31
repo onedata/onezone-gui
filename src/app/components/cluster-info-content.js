@@ -17,11 +17,15 @@ export default ClusterInfoContent.extend({
    * @override
    */
   linkToCluster: computed('record', function linkToCluster() {
-    return this.router.urlFor(
-      'onedata.sidebar.content.aspect',
-      'clusters',
-      this.guiUtils.getRoutableIdFor(this.record),
-      'index'
-    );
+    try {
+      return this.router.urlFor(
+        'onedata.sidebar.content.aspect',
+        'clusters',
+        this.guiUtils.getRoutableIdFor(this.record),
+        'index'
+      );
+    } catch (error) {
+      return null;
+    }
   }),
 });

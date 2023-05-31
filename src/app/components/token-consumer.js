@@ -32,6 +32,13 @@ import config from 'ember-get-config';
 import trimToken from 'onedata-gui-common/utils/trim-token';
 import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import { dasherize } from '@ember/string';
+
+/**
+ * @typedef {Object} BasicRecordInfo
+ * @property {string} name
+ * @property {string} entityId
+ */
 
 export default Component.extend(I18n, {
   classNames: ['token-consumer'],
@@ -194,6 +201,30 @@ export default Component.extend(I18n, {
       return this.get(`type.inviteToken.${inviteTypeSpec.modelName}Id`);
     }
   }),
+
+  /**
+   * @type {ComputedProperty<BasicRecordInfo>}
+   */
+  inviteTargetRecord: computed(
+    'inviteTargetId',
+    'inviteTargetName',
+    function inviteTargetRecord() {
+      return {
+        name: this.inviteTargetName,
+        entityId: this.inviteTargetId,
+      };
+    }
+  ),
+
+  /**
+   * @type {ComputedProperty<string>}
+   */
+  inviteTargetInfoComponentName: computed(
+    'inviteTargetModelName',
+    function inviteTargetInfoComponentName() {
+      return `${dasherize(this.inviteTargetModelName)}-info-content`;
+    }
+  ),
 
   /**
    * @type {ComputedProperty<String>}
