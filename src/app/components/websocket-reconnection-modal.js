@@ -16,6 +16,7 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { later } from '@ember/runloop';
 import globals from 'onedata-gui-common/utils/globals';
+import browser, { BrowserName } from 'onedata-gui-common/utils/browser';
 
 export const sessionExpiredCookie = 'sessionExpired';
 
@@ -32,7 +33,6 @@ export default Component.extend(I18n, {
   globalNotify: service(),
   session: service(),
   cookies: service(),
-  browser: service(),
 
   /**
    * @override
@@ -119,10 +119,9 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<string|undefined>}
    */
   specialText: computed(
-    'browser.browserName',
     'currentOpeningCompleted',
     function specialText() {
-      const isSafari = (this.get('browser.browserName') === 'safari');
+      const isSafari = browser.name === BrowserName.Safari;
       const isAuthenticated = this.get('session.isAuthenticated');
       if (isSafari && !isAuthenticated && !this.get('currentOpeningCompleted')) {
         return 'safariCert';
