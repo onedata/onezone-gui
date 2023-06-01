@@ -112,6 +112,11 @@
     position: relative;
     height: 44px;
     line-height: 44px;
+
+    .current-oneprovider-bar-left-info {
+      display: flex;
+      height: 100%;
+    }
     &.current-oneprovider-bar-multi {
       .oneprovider-name.truncated-string {
         max-width: calc(100% - 380px);
@@ -133,7 +138,7 @@
       }
     }
     .choose-oneprovider-link {
-      margin-left: 4px;
+      margin-left: 8px;
     }
     .collapsed-selector-hint-trigger {
       margin-left: 6px;
@@ -147,41 +152,43 @@
       }
     }
     .record-name-general {
-      padding-right: 0.3em;
       @include font-bold();
     }
   }
 
-  .space-providers-tab-bar {
-    .record-name-general {
-      @include font-bold();
-    }
-  }
-
-  .nav-link {
-    .provider-info-name {
-      .flippable-icons .icon-container {
-        .oneicon-browser-info.one-icon {
-          color: inherit;
-        }
+  .nav-link .provider-info-name {
+    .flippable-icons .icon-container {
+      .oneicon-browser-info.one-icon {
+        color: inherit;
       }
     }
   }
 
+  ul .provider-info-container {
+    max-width: 300px;
+  }
+
+  .collapsed-selector-hint-trigger {
+    align-self: center;
+  }
+
+  .provider-info-container {
+    max-width: calc(100% - 380px);
+    display: inline-block;
+  }
+
   .provider-info-name {
     position: relative;
+    display: inline-flex;
+    width: 100%;
 
     .record-with-icon {
-      display: inline-flex;
-    }
-    .dot {
-      position: absolute;
-      right: 0.3em;
-      bottom: -0.9em;
+      width: 100%;
     }
 
+
     .record-info-trigger {
-      margin-left: 0.2em;
+      margin-left: 0.3em;
     }
   }
 }

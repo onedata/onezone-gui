@@ -20,13 +20,13 @@
               <span class="current-oneprovider-bar-info">
                 {{tt this "currentOneproviderInfo"}}
               </span>
-              <span class="provider-info-name">
+              <span class="provider-info-container ">
                 {{record-info-with-icon
                   record=selectedProviderItem
                   recordType="provider"
+                  class="provider-info-name"
                 }}
-                {{#if multiOneproviders}}<span class="dot">.</span>{{/if}}
-              </span>
+              </span>{{#if multiOneproviders}}<span class="dot">.</span>{{/if}}
               {{#if multiOneproviders}}
                 <a {{action (mut isTabBarCollapsed) false}}
                   class="choose-oneprovider-link black clickable"
@@ -37,7 +37,7 @@
               {{one-icon
                 icon="sign-question-rounded"
                 class=(concat-classes
-                  "collapsed-selector-hint-trigger vertical-align-middle clickable"
+                  "collapsed-selector-hint-trigger clickable"
                   collapsedSelectorHintTriggerClass
                 )
               }}
