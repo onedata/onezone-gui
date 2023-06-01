@@ -4,12 +4,25 @@
     {{#if joiningRecord}}
       <div class="subject-description">
         {{#truncated-string class="text subject-name"}}
-          {{record-name record=joiningRecord}}
+          {{joiningRecord.name}}
         {{/truncated-string}}
-        {{id-info
-          idType=joiningModelName
-          idValue=joiningRecord.entityId
+        {{one-icon
+          icon="browser-info"
+          class="record-info-icon joining-record-info-trigger popover-info-trigger"
+          click=(action
+            (mut joiningRecordInfoOpened)
+            (not joiningRecordInfoOpened)
+            bubbles=false
+          )
         }}
+        {{#record-info-popover
+          isOpened=joiningRecordInfoOpened
+          triggerSelector=(local-selector elementId ".joining-record-info-trigger")
+        }}
+          {{component (concat joiningModelName "-info-content")
+            record=joiningRecord
+          }}
+        {{/record-info-popover}}
       </div>
     {{else}}
       {{#truncated-string class="text select-below-label"}}
@@ -29,12 +42,26 @@
   <figcaption class="subject-image-label subject-name">
     <div class="subject-description">
       {{#truncated-string class="text"}}
-        {{inviteTargetName}}
+        {{inviteTargetRecord.name}}
       {{/truncated-string}}
-      {{id-info
-        idType=inviteTargetModelName
-        idValue=inviteTargetId
+      {{one-icon
+        icon="browser-info"
+        class="record-info-icon target-record-info-trigger popover-info-trigger"
+        click=(action
+          (mut targetRecordInfoOpened)
+          (not targetRecordInfoOpened)
+          bubbles=false
+        )
       }}
+      {{#record-info-popover
+        isOpened=targetRecordInfoOpened
+        triggerSelector=(local-selector elementId ".target-record-info-trigger")
+      }}
+        {{component inviteTargetInfoComponentName
+          record=inviteTargetRecord
+          showDetails=showDetailsInTargetInfoPopover
+        }}
+      {{/record-info-popover}}
     </div>
   </figcaption>
 </figure>

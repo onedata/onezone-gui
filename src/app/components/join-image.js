@@ -14,6 +14,8 @@ import {
 } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import computedT from 'onedata-gui-common/utils/computed-t';
+import { computed } from '@ember/object';
+import { dasherize } from '@ember/string';
 
 const recordImages = {
   user: 'assets/images/consume-token/user.svg',
@@ -53,15 +55,26 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
-   * @type {string}
+   * @type {BasicRecordInfo}
    */
-  inviteTargetId: undefined,
+  inviteTargetRecord: undefined,
 
   /**
    * @virtual
-   * @type {string}
+   * @type {ComputedProperty<string>}
    */
-  inviteTargetName: undefined,
+  inviteTargetInfoComponentName: computed(
+    'inviteTargetModelName',
+    function inviteTargetInfoComponentName() {
+      return `${dasherize(this.inviteTargetModelName)}-info-content`;
+    }
+  ),
+
+  /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  showDetailsInTargetInfoPopover: false,
 
   /**
    * @virtual optional

@@ -163,6 +163,7 @@ export default Component.extend(I18n, {
     return {
       entityId: this.requesterInfo.userId,
       name: this.requesterInfo.fullName,
+      fullName: this.requesterInfo.fullName,
       username: this.requesterInfo.username,
     };
   }),

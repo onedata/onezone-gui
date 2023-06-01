@@ -35,11 +35,15 @@ export default SpaceInfoContent.extend({
    * @override
    */
   linkToFileBrowser: computed('record', function linkToFileBrowser() {
-    return this.router.urlFor(
-      'onedata.sidebar.content.aspect',
-      'spaces',
-      this.guiUtils.getRoutableIdFor(this.record),
-      'data'
-    );
+    try {
+      return this.router.urlFor(
+        'onedata.sidebar.content.aspect',
+        'spaces',
+        this.guiUtils.getRoutableIdFor(this.record),
+        'data'
+      );
+    } catch (error) {
+      return null;
+    }
   }),
 });

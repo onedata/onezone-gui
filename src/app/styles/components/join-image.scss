@@ -97,12 +97,15 @@
 
   .subject-description {
     display: flex;
-    padding-left: 5px;
-  }
+    position: relative;
+    padding-right: 1.4em;
 
-  .id-trigger {
-    font-size: 150%;
-    color: $color-one-light-gray;
-    vertical-align: text-bottom;
+    .record-info-icon {
+      position: absolute;
+      right: 0.1em;
+      top: 0.1em;
+      color: $color-one-light-gray;
+      font-size: 130%;
+    }
   }
 }
