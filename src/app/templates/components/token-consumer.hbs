@@ -41,10 +41,24 @@
           }}
         {{/if}}
         {{#if (media "isMobile")}}
-          {{id-info
-            idType=inviteTargetModelName
-            idValue=inviteTargetId
+          {{one-icon
+            icon="browser-info"
+            class="record-info-icon target-record-info-trigger popover-info-trigger"
+            click=(action
+              (mut targetRecordInfoOpened)
+              (not targetRecordInfoOpened)
+              bubbles=false
+            )
           }}
+          {{#record-info-popover
+            isOpened=targetRecordInfoOpened
+            triggerSelector=(local-selector elementId ".target-record-info-trigger")
+          }}
+            {{component inviteTargetInfoComponentName
+              record=inviteTargetRecord
+              showDetails=false
+            }}
+          {{/record-info-popover}}
         {{/if}}
       </p>
       {{#unless (or (media "isMobile") noJoinMessage)}}
@@ -56,8 +70,7 @@
             currentUser
           )
           inviteTargetModelName=inviteTargetModelName
-          inviteTargetId=inviteTargetId
-          inviteTargetName=inviteTargetName
+          inviteTargetRecord=inviteTargetRecord
           arrowLabelType=(if spaceHarvesterRelationToken "add" "join")
           placeholderUnderSubjectImage=(tt this "placeholderUnderSubjectImage")
         }}

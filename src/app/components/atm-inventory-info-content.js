@@ -18,11 +18,15 @@ export default AtmInventoryInfoContent.extend({
    * @override
    */
   linkToAtmInventory: computed('record', function linkToAtmInventory() {
-    return this.router.urlFor(
-      'onedata.sidebar.content.aspect',
-      'atm-inventories',
-      this.guiUtils.getRoutableIdFor(this.record),
-      'workflows'
-    );
+    try {
+      return this.router.urlFor(
+        'onedata.sidebar.content.aspect',
+        'atm-inventories',
+        this.guiUtils.getRoutableIdFor(this.record),
+        'workflows'
+      );
+    } catch (error) {
+      return null;
+    }
   }),
 });

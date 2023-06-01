@@ -72,7 +72,6 @@ describe('Integration | Component | content-atm-inventories-workflows/editor-vie
                 type: 'list',
                 dataSpec: {
                   type: 'string',
-                  valueConstraints: {},
                 },
               }],
             },
