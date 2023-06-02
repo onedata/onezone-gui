@@ -1,7 +1,8 @@
-{{provider-info-name
-  provider=provider
+{{record-info-with-icon
+  record=provider
+  recordType="provider"
+  class="provider-info-name provider-item-name-line"
   iconColor=color
-  class="provider-item-name-line"
 }}
 {{#if _renderStatus}}
   {{#status-toolbar class=(unless providerActions.length "push-right") as |toolbar|}}

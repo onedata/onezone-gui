@@ -1,15 +1,19 @@
 {{#if (eq item.type "provider")}}
-  {{#provider-info-name
-    provider=provider
-    class=(concat "nav-link truncate " (if isActive "active"))
-    click=(action "anchorClicked")
-  }}
+  <span
+    class={{concat-classes "provider-info-container nav-link" (if isActive "active")}}
+    onclick={{action "anchorClicked"}}
+  >
+    {{record-info-with-icon
+      record=provider
+      recordType="provider"
+      class="provider-info-name"
+    }}
     {{#unless isInRequiredVersion}}
       {{#one-icon class="provider-warning-icon" icon="sign-warning-rounded"}}
         {{one-tooltip title=(tt this "versionTooLowWarning")}}
       {{/one-icon}}
     {{/unless}}
-  {{/provider-info-name}}
+  </span>
 {{else if (eq item.type "overview")}}
   <div
     class={{concat-classes "nav-link truncate" (if isActive "active")}}

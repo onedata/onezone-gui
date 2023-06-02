@@ -84,7 +84,7 @@ describe('Integration | Component | oneprovider-view-container', function () {
         {{/oneprovider-view-container}}
       `);
 
-      expect(find('.oneprovider-name'), 'current oneprovider name')
+      expect(find('.record-name-general'), 'current oneprovider name')
         .to.contain.text(this.get('oneproviderName'));
     });
 
@@ -222,7 +222,7 @@ describe('Integration | Component | oneprovider-view-container', function () {
       expect(find('.content-iframe-base-url'))
         .to.contain.text(provider1.onezoneHostedBaseUrl);
       await click(
-        `.space-providers-tab-bar .tab-bar-li.item-${provider2.entityId} .nav-link`
+        `.space-providers-tab-bar .tab-bar-li.item-${provider2.entityId} .provider-info-name`
       );
       expect(changeOneproviderId).to.be.calledOnce;
       expect(changeOneproviderId).to.be.calledWith('op2');
@@ -277,7 +277,7 @@ describe('Integration | Component | oneprovider-view-container', function () {
       expect(this.get('oneproviderId'), 'initial context oneproviderId')
         .to.equal(provider2.entityId);
       await click(
-        `.space-providers-tab-bar .tab-bar-li.item-${provider1.entityId} .nav-link`
+        `.space-providers-tab-bar .tab-bar-li.item-${provider1.entityId} .provider-info-name`
       );
       expect(globals.localStorage.getItem(storageKey), 'changed storage oneproviderId')
         .to.equal(provider1.entityId);
