@@ -112,10 +112,10 @@
     position: relative;
     height: 44px;
     line-height: 44px;
+    white-space: nowrap;
 
     .current-oneprovider-bar-left-info {
       display: flex;
-      height: 100%;
     }
     &.current-oneprovider-bar-multi {
       .oneprovider-name.truncated-string {
@@ -150,9 +150,15 @@
       .oneprovider-name.truncated-string {
         max-width: calc(100% - 200px);
       }
+      .dot {
+        display: none;
+      }
     }
     .record-name-general {
       @include font-bold();
+    }
+    .current-oneprovider-bar-info {
+      margin-right: 0.6em;
     }
   }
 
@@ -164,7 +170,7 @@
     }
   }
 
-  ul .provider-info-container {
+  .nav-tabs .provider-info-container {
     max-width: 300px;
   }
 
@@ -173,22 +179,14 @@
   }
 
   .provider-info-container {
-    max-width: calc(100% - 380px);
-    display: inline-block;
+    min-width: 0;
   }
 
   .provider-info-name {
-    position: relative;
-    display: inline-flex;
-    width: 100%;
+    min-width: 0;
 
     .record-with-icon {
       width: 100%;
-    }
-
-
-    .record-info-trigger {
-      margin-left: 0.3em;
     }
   }
 }
