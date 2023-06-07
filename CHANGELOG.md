@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11006 Changed EGI auth icon
 * VFS-10563 Added record info with icon component for providers
 * VFS-10895 Added expand options to automation data spec of file
 * VFS-10286 Added info popovers on consume token page
