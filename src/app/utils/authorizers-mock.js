@@ -84,7 +84,7 @@ export default [{
   {
     iconPath: iconPrefix + 'egi.svg',
     id: 'egi',
-    iconBackgroundColor: '#0455A1',
+    iconBackgroundColor: '#ffffff',
     displayName: 'EGI',
   },
   {
