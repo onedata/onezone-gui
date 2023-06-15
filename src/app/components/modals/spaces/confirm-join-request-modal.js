@@ -12,13 +12,14 @@
  */
 
 import Component from '@ember/component';
-import { computed } from '@ember/object';
+import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import { promise, bool, and, not } from 'ember-awesome-macros';
 import { htmlSafe } from '@ember/string';
 import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
+import findRouteInfo from 'onedata-gui-common/utils/find-route-info';
 
 /**
  * @typedef {Object} ConfirmJoinRequestModalOptions
@@ -264,6 +265,21 @@ export default Component.extend(I18n, {
       this.alert.info(htmlSafe(`<p>${text}</p>`), {
         header: this.t('decideLaterModal.header'),
       });
+    },
+    shouldCloseOnTransition(transition) {
+      const resourceType =
+        findRouteInfo(transition, 'onedata.sidebar')?.attributes.resourceType;
+      const resource =
+        findRouteInfo(transition, 'onedata.sidebar.content')?.attributes.resource;
+      const resourceId = resource && get(resource, 'entityId');
+      const aspect =
+        findRouteInfo(transition, 'onedata.sidebar.content.aspect')?.attributes.aspectId;
+
+      return !(
+        resourceType === 'spaces' &&
+        resourceId === this.spaceId &&
+        aspect === 'members'
+      );
     },
   },
 });
