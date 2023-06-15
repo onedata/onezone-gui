@@ -2,7 +2,7 @@
  * Handles WebSocket errors with graphical components (which use global state).
  *
  * @author Jakub Liput
- * @copyright (C) 2019 ACK CYFRONET AGH
+ * @copyright (C) 2019-2023 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -46,13 +46,6 @@ export default OnedataWebsocketErrorHandler.extend({
    */
   currentOpeningCompleted: undefined,
 
-  /**
-   * Global variable accessible by reconnection modal: error for fatal error modal
-   * Set in init.
-   * @type {any}
-   */
-  currentError: undefined,
-
   init() {
     this._super(...arguments);
     this.resetState();
@@ -71,7 +64,7 @@ export default OnedataWebsocketErrorHandler.extend({
       console.debug(
         'service:onedata-websocket-error-handler#abnormalClose: GOING_AWAY code, ignoring'
       );
-    } else if (!this.get('currentError')) {
+    } else {
       const reconnectorState = this.get('reconnectorState');
       if (reconnectorState === ReconnectorState.closed) {
         this.set('reconnectorState', ReconnectorState.init);
@@ -79,21 +72,7 @@ export default OnedataWebsocketErrorHandler.extend({
       this.setProperties({
         currentCloseEvent: closeEvent,
         currentOpeningCompleted: openingCompleted,
-        currentError: null,
       });
-    }
-  },
-
-  /**
-   * @override
-   */
-  errorOccured(errorEvent) {
-    console.warn(
-      `service:onedata-websocket-error-handler#errorOccured: WS error: ${errorEvent && errorEvent.toString()}`
-    );
-    if (!this.get('currentCloseEvent')) {
-      this.resetState();
-      this.set('currentError', errorEvent || {});
     }
   },
 
@@ -113,7 +92,6 @@ export default OnedataWebsocketErrorHandler.extend({
       reconnectorState: ReconnectorState.closed,
       currentCloseEvent: null,
       currentOpeningCompleted: null,
-      currentError: null,
     });
   },
 });
