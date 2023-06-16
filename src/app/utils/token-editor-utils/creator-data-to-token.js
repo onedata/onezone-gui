@@ -1,6 +1,3 @@
-// TODO: VFS-9257 fix eslint issues in this file
-/* eslint-disable array-callback-return */
-
 /**
  * Converts data from token-editor to model-compatible token object.
  *
@@ -229,6 +226,7 @@ export default function creatorDataToToken(editorData, currentUser) {
             const absolutePath = `/${spaceId}${pathString}`;
             return btoa(absolutePath);
           }
+          return undefined;
         })
         .compact();
       if (whitelist.length) {

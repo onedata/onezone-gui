@@ -1,6 +1,3 @@
-// TODO: VFS-9257 fix eslint issues in this file
-/* eslint-disable no-param-reassign */
-
 /**
  * A component that shows membership path from `contextRecord` to `targetRecord`.
  * Rendering options can be changed using fields `visibleBlocks`, `isCondensed` and
@@ -460,7 +457,7 @@ export default Component.extend(I18n, {
       .then(() => this.findPaths(silent))
       .then(({ allNodes, paths }) => safeExec(this, () => {
         const actualPaths = this.get('paths');
-        paths = paths.map(pathDef => {
+        const membershipPaths = paths.map(pathDef => {
           const existingPath = actualPaths.findBy('id', get(pathDef, 'id'));
           if (existingPath) {
             return existingPath;
@@ -471,7 +468,7 @@ export default Component.extend(I18n, {
           }
         });
         this.setProperties({
-          paths,
+          paths: membershipPaths,
           allNodes,
           silentReloadError: null,
         });

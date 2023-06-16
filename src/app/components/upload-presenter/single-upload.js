@@ -1,6 +1,3 @@
-// TODO: VFS-9257 fix eslint issues in this file
-/* eslint-disable no-param-reassign */
-
 /**
  * Presents a single upload triggered by user (groups possible many files, that
  * were marked to upload in the same operation). May be floating over the content
@@ -194,11 +191,9 @@ export default Component.extend({
         'onToggleExpand',
         'isExpanded'
       );
-      if (expand === undefined) {
-        expand = !isExpanded;
-      }
+      const normalizedExpand = expand ?? !isExpanded;
 
-      if (expand !== isExpanded) {
+      if (normalizedExpand !== isExpanded) {
         this.set('triggerChildrenRender', true);
         if (!triggerChildrenRender) {
           // wait for children to render
@@ -227,10 +222,8 @@ export default Component.extend({
         'onToggleMinimize',
       );
 
-      if (minimize === undefined) {
-        minimize = !isMinimized;
-      }
-      if (minimize === isMinimized) {
+      const normalizedMinimize = minimize ?? !isMinimized;
+      if (normalizedMinimize === isMinimized) {
         return;
       } else {
         if (!isMinimized && minimizeTargetSelector) {
@@ -262,7 +255,7 @@ export default Component.extend({
             }, 550, function afterMinimizeAnimation() {
               dom.setStyle(this, 'display', 'none');
               // minimalization state could change in the middle of animation
-              if (minimize !== component.get('isMinimized')) {
+              if (normalizedMinimize !== component.get('isMinimized')) {
                 safeExec(component, 'onToggleMinimize');
               }
             });
