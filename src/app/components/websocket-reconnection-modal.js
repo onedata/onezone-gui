@@ -7,7 +7,7 @@
  */
 
 import Component from '@ember/component';
-import { ReconnectorState } from 'onezone-gui/services/onedata-websocket-error-handler';
+import { ReconnectorState } from 'onedata-gui-common/services/onedata-websocket-error-handler';
 import { inject as service } from '@ember/service';
 import { reads, gt } from '@ember/object/computed';
 import { computed, observer } from '@ember/object';
@@ -199,8 +199,7 @@ export default Component.extend(I18n, {
     return new Promise((resolve, reject) => {
       later(() => {
         try {
-          this.get('onedataWebsocketErrorHandler')
-            .resetState();
+          this.onedataWebsocketErrorHandler.resetReconnectorState();
           resolve();
         } catch (error) {
           reject(error);
@@ -290,7 +289,7 @@ export default Component.extend(I18n, {
    */
   reconnectAttempt() {
     this.setReconnectorState(ReconnectorState.connecting);
-    return this.get('onedataWebsocketErrorHandler').reconnect()
+    return this.onedataWebsocketErrorHandler.reconnect()
       .then(() => {
         this.reconnectSuccess();
       })
