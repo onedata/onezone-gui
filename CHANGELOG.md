@@ -7,6 +7,7 @@ CHANGELOG
 ### Latest changes
 
 * VFS-8257 Added closing modal on transition
+* VFS-9257 Fixed ignored eslint issues
 * VFS-11006 Changed EGI auth icon
 * VFS-10563 Added record info with icon component for providers
 * VFS-10895 Added expand options to automation data spec of file

@@ -1,6 +1,3 @@
-// TODO: VFS-9257 fix eslint issues in this file
-/* eslint-disable no-param-reassign */
-
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
@@ -89,10 +86,9 @@ describe('Integration | Utility | token-actions/consume-invite-token-action', fu
     }],
   }].forEach(({
     targetModelName,
-    targetRouteResourceType,
+    targetRouteResourceType = targetModelName + 's',
     joiningModels,
   }) => {
-    targetRouteResourceType = targetRouteResourceType || targetModelName + 's';
     joiningModels.forEach(({
       modelName: joiningModelName,
       notifyText,
