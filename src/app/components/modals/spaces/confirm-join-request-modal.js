@@ -266,7 +266,12 @@ export default Component.extend(I18n, {
         header: this.t('decideLaterModal.header'),
       });
     },
-    shouldCloseOnTransition(transition) {
+    shouldCloseOnTransition(transitionInfo) {
+      if (transitionInfo.type !== 'transition') {
+        return;
+      }
+      const transition = transitionInfo.data;
+
       const resourceType =
         findRouteInfo(transition, 'onedata.sidebar')?.attributes.resourceType;
       const resource =
