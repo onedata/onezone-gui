@@ -222,11 +222,11 @@ export default function creatorDataToToken(editorData, currentUser) {
         .map(pathEntry => {
           const spaceId = get(pathEntry, 'pathSpace.entityId');
           const pathString = (get(pathEntry, 'pathString') || '').replace(/\/+$/, '');
-          if (spaceId) {
-            const absolutePath = `/${spaceId}${pathString}`;
-            return btoa(absolutePath);
+          if (!spaceId) {
+            return undefined;
           }
-          return undefined;
+          const absolutePath = `/${spaceId}${pathString}`;
+          return btoa(absolutePath);
         })
         .compact();
       if (whitelist.length) {
