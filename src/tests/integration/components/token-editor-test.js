@@ -1,6 +1,3 @@
-// TODO: VFS-9257 fix eslint issues in this file
-/* eslint-disable no-param-reassign */
-
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
@@ -2647,9 +2644,9 @@ function expectCaveatToHaveEnabledState(testCase, caveatName, isEnabled) {
 function expectLabelToEqual(fieldName, label, omitColon = false) {
   const isCaveat = !basicFieldNameToFieldPath[fieldName];
   const domFieldName = isCaveat ? `${fieldName}Enabled` : fieldName;
-  label = (isCaveat || omitColon) ? label : `${label}:`;
+  const formattedLabel = (isCaveat || omitColon) ? label : `${label}:`;
   expect(find(`.${domFieldName}-field label`))
-    .to.have.trimmed.text(label);
+    .to.have.trimmed.text(formattedLabel);
 }
 
 function expectCaveatToggleState(caveatName, isChecked) {

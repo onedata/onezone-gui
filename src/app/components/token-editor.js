@@ -1,6 +1,3 @@
-// TODO: VFS-9257 fix eslint issues in this file
-/* eslint-disable no-param-reassign */
-
 /**
  * Token creation form.
  *
@@ -994,10 +991,7 @@ export default Component.extend(I18n, {
               );
             },
             valueToTags(value) {
-              if (value && get(value, 'length')) {
-                value = value.map(v => v.toUpperCase());
-              }
-              return this._super(value);
+              return this._super(value?.length ? value.map(v => v.toUpperCase()) : value);
             },
           }).create({
             name: 'countryList',
@@ -1542,15 +1536,17 @@ export default Component.extend(I18n, {
    * @returns {Promise<GraphSingleModel>}
    */
   getRecord(modelName, entityId) {
-    if (entityId === 'onezone') {
+    let normalizedEntityId = entityId;
+
+    if (normalizedEntityId === 'onezone') {
       if (modelName === 'onezone') {
         return resolve(this.get('onedataConnection.onezoneRecord'));
       } else if (modelName === 'cluster') {
-        entityId = this.get('guiContext.clusterId');
+        normalizedEntityId = this.get('guiContext.clusterId');
       }
     }
 
-    return this.get('recordManager').getRecordById(modelName, entityId);
+    return this.get('recordManager').getRecordById(modelName, normalizedEntityId);
   },
 
   /**
