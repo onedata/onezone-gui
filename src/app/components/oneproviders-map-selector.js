@@ -1,6 +1,3 @@
-// TODO: VFS-9257 fix eslint issues in this file
-/* eslint-disable no-param-reassign */
-
 /**
  * Renders scalable map with Oneproviders, that allows selection.
  *
@@ -130,13 +127,10 @@ export default Component.extend({
         onToggleExpand,
       } = this.getProperties('isExpanded', 'onToggleExpand');
 
-      if (expand === undefined) {
-        expand = !isExpanded;
-      }
-      expand = Boolean(expand);
+      const normalizedExpand = Boolean(expand ?? !isExpanded);
 
-      if (expand !== isExpanded) {
-        onToggleExpand(expand);
+      if (normalizedExpand !== isExpanded) {
+        onToggleExpand(normalizedExpand);
       }
     },
     mapViewportChanged({ scale }) {
