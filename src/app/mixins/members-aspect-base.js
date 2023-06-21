@@ -84,7 +84,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   /**
    * @type {boolean}
    */
-  onlyDirect: true,
+  onlyDirect: false,
 
   /**
    * One of: privileges, memberships

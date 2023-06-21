@@ -3,17 +3,6 @@
   class="resource-members-tile"
   aspect="members"}}
   {{#promise-proxy-container proxy=membersProxy}}
-    <p>{{tt this "direct"}}</p>
-    <div class="members-counter-row">
-      <div class="members-counter">
-        {{#one-icon icon="groups"}}{{one-tooltip title=(tt this "groups")}}{{/one-icon}}
-        <span class="direct-groups-counter">{{membersProxy.groupList.length}}</span>
-      </div>
-      <div class="members-counter">
-        {{#one-icon icon="user"}}{{one-tooltip title=(tt this "users")}}{{/one-icon}}
-        <span class="direct-users-counter">{{membersProxy.userList.length}}</span>
-      </div>
-    </div>
     <p>{{tt this "effective"}}</p>
     <div class="members-counter-row">
       <div class="members-counter">
@@ -23,6 +12,17 @@
       <div class="members-counter">
         {{#one-icon icon="user"}}{{one-tooltip title=(tt this "users")}}{{/one-icon}}
         <span class="effective-users-counter">{{membersProxy.effUserList.length}}</span>
+      </div>
+    </div>
+    <p>{{tt this "direct"}}</p>
+    <div class="members-counter-row">
+      <div class="members-counter">
+        {{#one-icon icon="groups"}}{{one-tooltip title=(tt this "groups")}}{{/one-icon}}
+        <span class="direct-groups-counter">{{membersProxy.groupList.length}}</span>
+      </div>
+      <div class="members-counter">
+        {{#one-icon icon="user"}}{{one-tooltip title=(tt this "users")}}{{/one-icon}}
+        <span class="direct-users-counter">{{membersProxy.userList.length}}</span>
       </div>
     </div>
   {{/promise-proxy-container}}

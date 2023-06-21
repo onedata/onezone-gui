@@ -26,13 +26,15 @@
       onChange=(action (mut onlyDirect)) as |bg|
     }}
       <div class="btn-group" role="group">
-        {{#bg.button type="default" class="btn-sm btn-direct" value=true}}
-          {{tt this "direct"}}
+        {{#bg.button type="default" class="btn-sm btn-effective" value=false}}
+          {{tt this "effective"}}
+          {{one-tooltip title=(tt this "effectiveTip" entityType=modelType)}}
         {{/bg.button}}
       </div>
       <div class="btn-group" role="group">
-      {{#bg.button type="default" class="btn-sm btn-effecitve" value=false}}
-          {{tt this "effective"}}
+        {{#bg.button type="default" class="btn-sm btn-direct" value=true}}
+          {{tt this "direct"}}
+          {{one-tooltip title=(tt this "directTip" entityType=modelType)}}
         {{/bg.button}}
       </div>
     {{/bs-button-group}}
@@ -49,7 +51,7 @@
         {{/bg.button}}
       </div>
       <div class="btn-group" role="group">
-        {{#bg.button type="default" class="btn-sm btn-effecitve" value="memberships"}}
+        {{#bg.button type="default" class="btn-sm btn-effective" value="memberships"}}
           {{tt this "membershipsAspect"}}
         {{/bg.button}}
       </div>
