@@ -68,16 +68,20 @@ export default UrlActionRunner.extend({
     } catch {
       // onedata transition could fail, but it should not cause action to cancel
     }
-    this.spaceActions.createConfirmSpaceJoinRequestAction({
-      spaceId,
-      requestId,
-    }).execute();
-    // allow transition that invoked URL action to complete its handlers
-    await this.router.transitionTo(
-      'onedata.sidebar.content.aspect',
-      'spaces',
-      spaceId,
-      'members'
-    );
+
+    try {
+      // allow transition that invoked URL action to complete its handlers
+      await this.router.transitionTo(
+        'onedata.sidebar.content.aspect',
+        'spaces',
+        spaceId,
+        'members'
+      );
+    } finally {
+      this.spaceActions.createConfirmSpaceJoinRequestAction({
+        spaceId,
+        requestId,
+      }).execute();
+    }
   },
 });
