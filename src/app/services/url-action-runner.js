@@ -31,14 +31,21 @@ export default UrlActionRunner.extend({
   /**
    * @param {Object} actionParams
    * @param {String} actionParams.action_space_id
+   * @param {Transition} transition
    * @returns {Promise}
    */
-  removeSpaceActionRunner(actionParams) {
+  async removeSpaceActionRunner(actionParams, transition) {
     // NOTE: legacy name of parameter - in new code please follow convention:
     // `action_camelCaseKey`
     const spaceId = get(actionParams || {}, 'action_space_id');
     if (!spaceId) {
       return reject();
+    }
+
+    try {
+      await transition;
+    } catch {
+      // onedata transition could fail, but it should not cause action to cancel
     }
 
     const {
