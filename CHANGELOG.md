@@ -7,6 +7,7 @@ CHANGELOG
 ### Latest changes
 
 * VFS-10962 Improved WebSocket auto-reconnection
+* VFS-11081 Fixed incorrectly closing alert and remove space modals
 * VFS-8257 Added closing modal on transition
 * VFS-9257 Fixed ignored eslint issues
 * VFS-11006 Changed EGI auth icon
