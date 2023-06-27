@@ -115,7 +115,7 @@ function generateDefaultFormData(defaultAtmResourceSpec) {
     onedataFunctionOptions: createValuesContainer({
       onedataFunctionName: '',
     }),
-    preferredBatchSize: 100,
+    preferredBatchSize: 10,
     arguments: createValuesContainer({
       __fieldsValueNames: [],
     }),

@@ -25,7 +25,7 @@ describe('Integration | Component | content-atm-inventories-workflows', function
           1: {
             name: 'f1',
             summary: 'f1 summary',
-            preferredBatchSize: 100,
+            preferredBatchSize: 10,
             operationSpec: {
               engine: 'openfaas',
               dockerImage: 'f1Image',
