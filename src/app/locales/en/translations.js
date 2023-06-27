@@ -74,8 +74,6 @@ import contentHarvestersPlugin from './components/content-harvesters-plugin';
 import addYourSpaceModal from './components/add-your-space-modal';
 import harvesterRemoveModal from './components/harvester-remove-modal';
 import harvesterConfiguration from './components/harvester-configuration';
-import websocketReconnectionModal from './components/websocket-reconnection-modal';
-import fatalConnectionErrorModal from './components/fatal-connection-error-modal';
 import uploadPresenter from './components/upload-presenter';
 import cookiesConsent from './components/cookies-consent';
 import contentPrivacyPolicy from './components/content-privacy-policy';
@@ -255,8 +253,6 @@ const translations = {
     addYourSpaceModal,
     harvesterRemoveModal,
     harvesterConfiguration,
-    websocketReconnectionModal,
-    fatalConnectionErrorModal,
     uploadPresenter,
     cookiesConsent,
     contentPrivacyPolicy,
