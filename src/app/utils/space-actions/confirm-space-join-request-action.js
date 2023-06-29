@@ -22,6 +22,12 @@ import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-s
  *   `SpaceManager#getSpaceMembershipRequesterInfo`.
  */
 
+/**
+ * @typedef {Object} ConfirmSpaceJoinRequestActionRejectOptions
+ * @type {string} [rejectionReason] If rejecting the request, an optional text
+ *   with rejection reason can be sent to the requesting user.
+ */
+
 export default Action.extend({
   modalManager: service(),
   router: service(),
@@ -72,8 +78,11 @@ export default Action.extend({
     }
   },
 
-  async onReject() {
-    await this.rejectAccess();
+  /**
+   * @param {ConfirmSpaceJoinRequestActionRejectOptions} options
+   */
+  async onReject(options) {
+    await this.rejectAccess(options);
   },
 
   async grantAccess() {
@@ -84,11 +93,15 @@ export default Action.extend({
     );
   },
 
-  async rejectAccess() {
+  /**
+   * @param {ConfirmSpaceJoinRequestActionRejectOptions} options
+   */
+  async rejectAccess(options) {
     await this.spaceManager.resolveMarketplaceSpaceAccess(
       this.spaceId,
       this.requestId,
-      false
+      false,
+      options
     );
   },
 

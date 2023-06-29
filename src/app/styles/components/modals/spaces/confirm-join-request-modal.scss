@@ -6,9 +6,65 @@
   .modal-footer.btn-toolbar {
     display: flex;
     justify-content: flex-end;
-    .decide-later-btn {
+    .decide-later-btn, .back-to-decision-btn {
       margin-right: auto;
       margin-left: 0;
+      @media (max-width: $screen-xs-max) {
+        margin-left: initial;
+        margin-right: initial;
+      }
     }
+    .btn {
+      align-self: flex-end;
+    }
+  }
+  .footer-carousel-slide {
+    display: flex;
+    @media (max-width: $screen-xs-max) {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  }
+  .modal-body {
+    flex-grow: 1;
+  }
+  .body-carousel {
+    overflow:visible;
+    flex-grow: 1;
+    .rejection-carousel-slide {
+      @include fill-flex-using-column;
+    }
+  }
+  .modal-header {
+    h1 {
+      display: flex;
+      align-items: center;
+      .one-icon:first-of-type {
+        font-size: 1.7em;
+        margin-right: 18px;
+      }
+    }
+  }
+  .rejection-form {
+    margin-top: 0.8em;
+    @include fill-flex-using-column;
+    .field-component,
+    .fields-group-collapse,
+    .fields-group-children,
+    textarea {
+      @include fill-flex-using-column;
+    }
+  }
+}
+
+.modal.in.confirm-join-request-modal .modal-dialog .modal-content {
+  overflow: hidden;
+  height: 530px;
+  @media (max-width: 980px) {
+    height: 580px;
+  }
+  @media (max-width: $screen-xs-max) {
+    // minimum height for "rejection" content
+    height: 420px;
   }
 }
