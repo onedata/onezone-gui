@@ -2,11 +2,6 @@
   <div class="row content-row header-row hidden-xs has-border">
     <h1 class="with-menu">
       <span class="one-label">{{tt this "members"}}</span>
-      <div
-        class={{concat-classes "view-tools-toggle" (if viewToolsVisible "active")}}
-        {{action "toogleViewTools"}}>
-        {{one-tooltip title=(tt this (if viewToolsVisible "hideViewOptions" "showViewOptions"))}}
-      </div>
       <div class="btn-toolbar with-place-for-dots">
         {{#if batchPrivilegesEditAvailable}}
           {{#bs-button size="sm" onClick=(action "batchPrivilegesEdit") disabled=(not batchPrivilegesEditEnabled)}}
@@ -17,7 +12,7 @@
       {{actions-toolbar isMinimized=true actionsArray=headerActions}}
     </h1>
   </div>
-  <div class="view-tools row content-row has-border collapse-animation {{unless viewToolsVisible "collapse-hidden"}}">
+  <div class="view-tools row content-row has-border">
     {{#bs-button-group
       value=onlyDirect
       class="direct-selector view-mode-selector"
@@ -26,15 +21,13 @@
       onChange=(action (mut onlyDirect)) as |bg|
     }}
       <div class="btn-group" role="group">
-        {{#bg.button type="default" class="btn-sm btn-effective" value=false}}
-          {{tt this "effective"}}
-          {{one-tooltip title=(tt this "effectiveTip" entityType=modelType)}}
+        {{#bg.button type="default" class="btn-sm btn-direct" value=true}}
+          {{tt this "direct"}}
         {{/bg.button}}
       </div>
       <div class="btn-group" role="group">
-        {{#bg.button type="default" class="btn-sm btn-direct" value=true}}
-          {{tt this "direct"}}
-          {{one-tooltip title=(tt this "directTip" entityType=modelType)}}
+      {{#bg.button type="default" class="btn-sm btn-effecitve" value=false}}
+          {{tt this "effective"}}
         {{/bg.button}}
       </div>
     {{/bs-button-group}}
@@ -56,6 +49,24 @@
         {{/bg.button}}
       </div>
     {{/bs-button-group}}
+    <div class="hint-container">
+      {{one-icon
+        icon="sign-question-rounded"
+        class=(concat-classes
+          "collapsed-selector-hint-trigger clickable hidden-xs"
+          collapsedSelectorHintTriggerClass
+        )
+      }}
+      {{#one-switchable-popover-modal
+        class="collapsed-selector-hint"
+        triggersConfiguration=hintTriggers
+      }}
+        <p>{{tt this "membersPageTip" entityType=modelType}}</p>
+        <p>{{tt this "directMemberTip" entityType=modelType}}</p>
+        <p>{{tt this "effectiveMemberTip" entityType=modelType}}</p>
+        <p>{{tt this "noteTip" entityType=modelType}}</p>
+      {{/one-switchable-popover-modal}}
+    </div>
     {{#if (eq aspect "memberships")}}
       <div class="show-descriptions-toggle">
         {{one-way-toggle inputId="members-show-descriptions" checked=showMembershipDescription update=(action (mut showMembershipDescription))}}

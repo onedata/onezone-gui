@@ -51,6 +51,14 @@
     }
   }
 
+  .hint-container {
+    display: inline-block;
+    margin-right: $padding-base-horizontal;
+    line-height: 1;
+    padding-bottom: 0.5em;
+    opacity: $disabled-opacity;
+  }
+
   .show-descriptions-toggle {
     display: inline-block;
     white-space: nowrap;
@@ -104,7 +112,7 @@
       padding-right: 230px;
     }
     .view-mode-selector {
-      margin-right: $padding-base-horizontal;
+      margin-right: $padding-xs-horizontal;
     }
     .view-tools {
       line-height: 35px;

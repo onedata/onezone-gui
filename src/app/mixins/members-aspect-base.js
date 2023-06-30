@@ -33,12 +33,12 @@ import {
   raw,
   equal,
   conditional,
+  tag,
 } from 'ember-awesome-macros';
 import computedT from 'onedata-gui-common/utils/computed-t';
 import { classify } from '@ember/string';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 import animateCss from 'onedata-gui-common/utils/animate-css';
-import globals from 'onedata-gui-common/utils/globals';
 
 export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   privilegeManager: service(),
@@ -84,7 +84,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   /**
    * @type {boolean}
    */
-  onlyDirect: false,
+  onlyDirect: true,
 
   /**
    * One of: privileges, memberships
@@ -148,11 +148,6 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
    * @type {boolean}
    */
   isJoiningAsUser: false,
-
-  /**
-   * @type {boolean}
-   */
-  viewToolsVisible: false,
 
   /**
    * @type {boolean}
@@ -224,19 +219,6 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
         !this.get('isAnySelectedRecordSaving');
     }
   ),
-
-  /**
-   * @type {Ember.ComputedProperty<boolean>}
-   */
-  viewOptionsAction: computed('viewToolsVisible', function viewOptionsAction() {
-    const viewToolsVisible = this.get('viewToolsVisible');
-    return {
-      action: () => this.send('toogleViewTools'),
-      title: this.t(viewToolsVisible ? 'hideViewOptions' : 'showViewOptions'),
-      class: 'view-options-action',
-      icon: 'no-view',
-    };
-  }),
 
   /**
    * @type {Ember.ComputedProperty<Action>}
@@ -473,23 +455,20 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
   globalActions: computed(
-    'viewOptionsAction',
     'batchPrivilegesEditAction',
     'batchPrivilegesEditAvailable',
     'removeSelectedAction',
     function globalActions() {
       const {
-        viewOptionsAction,
         batchPrivilegesEditAvailable,
         batchPrivilegesEditAction,
         removeSelectedAction,
       } = this.getProperties(
-        'viewOptionsAction',
         'batchPrivilegesEditAvailable',
         'batchPrivilegesEditAction',
         'removeSelectedAction'
       );
-      const actions = [viewOptionsAction];
+      const actions = [];
       if (batchPrivilegesEditAvailable) {
         actions.push(batchPrivilegesEditAction);
       }
@@ -497,6 +476,16 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
       return actions;
     }
   ),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  collapsedSelectorHintTriggerClass: tag`collapsed-selector-hint-trigger-${'componentGuid'}`,
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  hintTriggers: tag`.${'collapsedSelectorHintTriggerClass'}`,
 
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
@@ -562,24 +551,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
     if (['memberships', 'privileges'].includes(aspect)) {
       this.setProperties({
         aspect,
-        viewToolsVisible: true,
       });
-      globals.localStorage.setItem(
-        'membersAspectBaseMixin.viewToolsVisible',
-        true
-      );
-    } else {
-      // Restore remembered view tools visibility
-      let viewToolsVisible =
-        globals.localStorage.getItem('membersAspectBaseMixin.viewToolsVisible');
-      if (viewToolsVisible === null) {
-        viewToolsVisible = 'false';
-        globals.localStorage.setItem(
-          'membersAspectBaseMixin.viewToolsVisible',
-          viewToolsVisible
-        );
-      }
-      this.set('viewToolsVisible', viewToolsVisible === 'true');
     }
     this.selectedMemberObserver();
   },
@@ -708,13 +680,6 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   },
 
   actions: {
-    toogleViewTools() {
-      this.toggleProperty('viewToolsVisible');
-      globals.localStorage.setItem(
-        'membersAspectBaseMixin.viewToolsVisible',
-        String(this.get('viewToolsVisible'))
-      );
-    },
     changeAspect(aspect) {
       this.set('aspect', String(aspect));
     },

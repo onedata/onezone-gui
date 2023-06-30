@@ -25,7 +25,9 @@ export default {
   effectiveTip: 'Effective members are all users and groups that either belong to the {{entityType}} directly, or inherit membership via one or more direct member groups to which they belong.',
   privilegesAspect: 'Privileges',
   membershipsAspect: 'Memberships',
-  showViewOptions: 'Show view options',
-  hideViewOptions: 'Hide view options',
   showDescriptions: 'Show descriptions',
+  membersPageTip: 'This page presents the members of this {{entityType}}. Use the switches on the left to adjust the information shown. Expand a table row to view the privileges or membership details for given member.',
+  directMemberTip: '<strong>Direct</strong> members – users/groups that have been added or invited to this {{entityType}} directly.',
+  effectiveMemberTip: '<strong>Effective</strong> members – users/groups that either belong to this {{entityType}} directly, or inherit membership via one or more direct member groups to which they effectively belong.',
+  noteTip: 'Note: effective privileges of a member are a sum of all privileges inherited via their effective memberships in this {{entityType}}. Privileges can only be modified when the <strong>Direct</strong> privileges view is selected.',
 };
