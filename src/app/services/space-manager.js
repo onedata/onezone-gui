@@ -518,7 +518,7 @@ export default Service.extend({
     });
   },
 
-  // TODO: VFS-10524 use LS+ version of spaces marketplace info listing in list view
+  // TODO: VFS-10524 use LS+ version of Space Marketplace info listing in list view
   /**
    * @param {InfiniteScrollListingParams} listingParams
    * @param {Array<string>} tags

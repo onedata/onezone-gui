@@ -1,5 +1,5 @@
 /**
- * Welcome screen shown when there are no spaces in marketplace.
+ * Welcome screen shown when there are no spaces in the Space Marketplace.
  *
  * @author Jakub Liput
  * @copyright (C) 2022 ACK CYFRONET AGH

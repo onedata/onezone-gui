@@ -1,6 +1,6 @@
 /**
  * A "form" with inline-editors for changing space properties, especiall used when
- * publishing space in marketplace.
+ * publishing space in Space Marketplace.
  *
  * @author Jakub Liput
  * @copyright (C) 2022 ACK CYFRONET AGH

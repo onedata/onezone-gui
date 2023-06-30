@@ -4,7 +4,7 @@ export default {
     leave: 'Leave',
     totalStorageHint: 'Total size of the space: {{{size}}}',
     supportCountHint: 'Number of supporting providers: {{{count}}}',
-    advertisedInMarketplace: 'This space is advertised in the marketplace',
+    advertisedInMarketplace: 'This space is advertised in the Space Marketplace',
     spacePersistence: 'space persistence',
   },
   secondLevelItems: {

@@ -1,3 +1,3 @@
 export default {
-  header: 'Spaces marketplace',
+  header: 'Space Marketplace',
 };

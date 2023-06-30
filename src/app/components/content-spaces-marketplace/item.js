@@ -1,5 +1,5 @@
 /**
- * Single space item in marketplace.
+ * Single space item in the Space Marketplace.
  *
  * @author Jakub Liput
  * @copyright (C) 2022-2023 ACK CYFRONET AGH
