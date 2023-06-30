@@ -247,7 +247,7 @@ function createAtmLambdaRecord(testCase) {
             mountOneclient: false,
           },
         },
-        preferredBatchSize: 100,
+        preferredBatchSize: 10,
         argumentSpecs: [],
         resultSpecs: [],
         resourceSpec: {
