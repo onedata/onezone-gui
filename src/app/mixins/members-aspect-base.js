@@ -490,7 +490,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   /**
    * @type {ComputedProperty<string>}
    */
-  modelTypeTranslation: computed('modelName', function modelTypeTranslation() {
+  modelTypeTranslation: computed('modelType', function modelTypeTranslation() {
     return this.i18n.t(`common.modelNames.${this.modelType}`);
   }),
 
