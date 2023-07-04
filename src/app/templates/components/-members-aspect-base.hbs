@@ -54,17 +54,17 @@
         icon="sign-question-rounded"
         class=(concat-classes
           "collapsed-selector-hint-trigger clickable hidden-xs"
-          collapsedSelectorHintTriggerClass
+          viewOptionsHintTriggerClass
         )
       }}
       {{#one-switchable-popover-modal
         class="collapsed-selector-hint"
-        triggersConfiguration=hintTriggers
+        triggersConfiguration=viewOptionsHintTriggerSelector
       }}
-        <p>{{tt this "membersPageTip" entityType=modelType}}</p>
-        <p>{{tt this "directMemberTip" entityType=modelType}}</p>
-        <p>{{tt this "effectiveMemberTip" entityType=modelType}}</p>
-        <p>{{tt this "noteTip" entityType=modelType}}</p>
+        <p>{{tt this "membersPageTip" entityType=modelTypeTranslation}}</p>
+        <p>{{tt this "directMemberTip" entityType=modelTypeTranslation}}</p>
+        <p>{{tt this "effectiveMemberTip" entityType=modelTypeTranslation}}</p>
+        <p>{{tt this "noteTip" entityType=modelTypeTranslation}}</p>
       {{/one-switchable-popover-modal}}
     </div>
     {{#if (eq aspect "memberships")}}

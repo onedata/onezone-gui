@@ -480,12 +480,19 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   /**
    * @type {ComputedProperty<String>}
    */
-  collapsedSelectorHintTriggerClass: tag`collapsed-selector-hint-trigger-${'componentGuid'}`,
+  viewOptionsHintTriggerClass: tag`collapsed-selector-hint-trigger-${'componentGuid'}`,
 
   /**
    * @type {ComputedProperty<String>}
    */
-  hintTriggers: tag`.${'collapsedSelectorHintTriggerClass'}`,
+  viewOptionsHintTriggerSelector: tag`.${'viewOptionsHintTriggerClass'}`,
+
+  /**
+   * @type {ComputedProperty<string>}
+   */
+  modelTypeTranslation: computed('modelName', function modelTypeTranslation() {
+    return this.i18n.t(`common.modelNames.${this.modelType}`);
+  }),
 
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
@@ -549,9 +556,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
     const aspect = this.navigationState.queryParams.aspect;
 
     if (['memberships', 'privileges'].includes(aspect)) {
-      this.setProperties({
-        aspect,
-      });
+      this.set('aspect', aspect);
     }
     this.selectedMemberObserver();
   },
