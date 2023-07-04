@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10521 Changed always showing switches on the members page
 * VFS-9303 Removed "over-modals" class from popover usages
 * VFS-10973 Added exception store type to the workflow execution GUI
 * VFS-10962 Improved WebSocket auto-reconnection
