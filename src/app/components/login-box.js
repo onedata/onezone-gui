@@ -9,7 +9,7 @@
 
 import { inject as service } from '@ember/service';
 import LoginBox from 'onedata-gui-common/components/login-box';
-import { sessionExpiredCookie } from 'onezone-gui/components/websocket-reconnection-modal';
+import { sessionExpiredCookie } from 'onedata-gui-common/components/websocket-reconnection-modal';
 
 export default LoginBox.extend({
   i18n: service(),
