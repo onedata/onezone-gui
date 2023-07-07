@@ -74,6 +74,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'getExecuteWorkflowUrl',
     'getProvidersUrl',
     'getAccessTokenUrl',
+    'getFileGoToUrl',
     'openRestApiModal',
   ]),
 

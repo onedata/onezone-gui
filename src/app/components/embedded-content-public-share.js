@@ -71,5 +71,7 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
    */
   callParentActionNames: Object.freeze([
     'updateDirId',
+    // FIXME: is this needed?
+    'getFileGoToUrl',
   ]),
 });

@@ -12,6 +12,7 @@ import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-s
 import { get } from '@ember/object';
 import { inject as service } from '@ember/service';
 import globals from 'onedata-gui-common/utils/globals';
+import { GoToFileActionRunner } from 'onezone-gui/services/url-action-runner';
 
 /**
  * @typedef {Object} BrowserUrlGeneratorOptions
@@ -191,6 +192,15 @@ export default Mixin.create({
           },
         }
       );
+    },
+
+    /**
+     * @param {string} fileId
+     * @param {UrlActionRunner.GoToFileActionType} fileAction
+     * @returns {string}
+     */
+    getFileGoToUrl({ fileId, fileAction }) {
+      return new GoToFileActionRunner(this.router).generateUrl({ fileId, fileAction });
     },
 
     async openRestApiModal(space) {

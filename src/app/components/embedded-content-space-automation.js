@@ -84,6 +84,8 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'chooseWorkflowSchemaToRun',
     'getDataUrl',
     'getDatasetsUrl',
+    // FIXME: is this needed?
+    'getFileGoToUrl',
   ]),
 
   actions: {

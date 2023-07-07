@@ -15,7 +15,7 @@ import _ from 'lodash';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import cdmiObjectIdToGuid from 'onedata-gui-common/utils/cdmi-object-id-to-guid';
-import { getSpaceIdFromFileId } from 'onedata-gui-common/utils/file-id-parsers';
+import { getSpaceIdFromGuid } from 'onedata-gui-common/utils/file-guid-parsers';
 import globals from 'onedata-gui-common/utils/globals';
 
 export default Service.extend({
@@ -205,11 +205,11 @@ export default Service.extend({
    * @returns {Promise<String>}
    */
   getFileBrowserUrl(cdmiObjectId) {
-    let fileId;
+    let fileGuid;
     let spaceId;
     try {
-      fileId = cdmiObjectIdToGuid(cdmiObjectId);
-      spaceId = getSpaceIdFromFileId(fileId);
+      fileGuid = cdmiObjectIdToGuid(cdmiObjectId);
+      spaceId = getSpaceIdFromGuid(fileGuid);
     } catch (error) {
       console.error(error);
       return resolve('');
@@ -222,7 +222,7 @@ export default Service.extend({
         spaceId,
         'data', {
           queryParams: {
-            options: serializeAspectOptions({ selected: fileId }),
+            options: serializeAspectOptions({ selected: fileGuid }),
           },
         });
       return onezoneRoute ? `${onezoneUrl}${onezoneRoute}` : '';

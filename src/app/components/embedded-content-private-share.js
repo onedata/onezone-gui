@@ -81,6 +81,8 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
     'updateDirId',
     'getDataUrl',
     'getDatasetsUrl',
+    // FIXME: is this needed?
+    'getFileGoToUrl',
     'showSharesIndex',
     'reloadShareList',
   ]),

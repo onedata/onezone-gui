@@ -119,6 +119,8 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'selectedArchives',
     'selectedFiles',
     'attachmentState',
+    // FIXME: is this needed?
+    'getFileGoToUrl',
   ]),
 
   /**
