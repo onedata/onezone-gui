@@ -44,9 +44,20 @@ export default Mixin.create({
       'findCurrentDefaultOneprovider: oneproviders should be not null/undefined',
       oneproviders
     );
-    const sortedApplicableOneproviders = [...oneproviders.toArray()].sort(
-      createPropertyComparator('name')
-    );
+    // sort providers from newest version to oldest and by name when versions are the same
+    const nameComparator = createPropertyComparator('name');
+    const sortedApplicableOneproviders = [...oneproviders.toArray()]
+      .sort((providerA, providerB) => {
+        const versionCompareResult = -Version.compareVersions(
+          get(providerA, 'version'),
+          get(providerB, 'version')
+        );
+        if (versionCompareResult === 1) {
+          return nameComparator(providerA, providerB);
+        } else {
+          return versionCompareResult;
+        }
+      });
     if (!sortedApplicableOneproviders.length) {
       return null;
     }
@@ -71,6 +82,7 @@ export default Mixin.create({
       return null;
     }
     const defaultId = this.getBrowserDefaultOneproviderId(spaceId);
+    /** @type Array<Models.Provider> */
     let applicableProviders = providers.filter(provider => get(provider, 'online'));
     if (requiredVersion) {
       applicableProviders = applicableProviders.filter(provider => {
