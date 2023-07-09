@@ -51,15 +51,26 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   selected: computedAspectOptionsArray('selected'),
 
   /**
+   * @type {ComputedProperty<GoToFileUrlActionHandler.GoToFileActionType>}
+   */
+  fileAction: reads('navigationState.aspectOptions.fileAction'),
+
+  /**
    * @override implements OneEmbeddedContainer
    * @type {string}
    */
   embeddedComponentName: 'content-file-browser',
 
+  // FIXME: sprawdzić inne browsery
   /**
    * @override implements OneEmbeddedContainer
    */
-  iframeInjectedProperties: Object.freeze(['spaceEntityId', 'dirEntityId', 'selected']),
+  iframeInjectedProperties: Object.freeze([
+    'spaceEntityId',
+    'dirEntityId',
+    'selected',
+    'fileAction',
+  ]),
 
   /**
    * @override implements OneEmbeddedContainer
