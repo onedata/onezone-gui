@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11100 Added global URLs for files show and download
 * VFS-11101 Fixed always shown session expired message
 * VFS-10521 Changed always showing switches on the members page
 * VFS-9303 Removed "over-modals" class from popover usages
