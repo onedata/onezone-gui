@@ -200,7 +200,7 @@ export default Mixin.create({
      * @returns {string}
      */
     getFileGoToUrl({ fileId, fileAction }) {
-      return new GoToFileUrlActionHandler(this.router)
+      return GoToFileUrlActionHandler.create({ ownerSource: this })
         .generateUrl({ fileId, fileAction });
     },
 

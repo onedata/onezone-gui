@@ -109,7 +109,7 @@ export default UrlActionRunner.extend({
       action_fileId: fileId,
       action_fileAction: fileAction,
     } = actionParams;
-    await new GoToFileUrlActionHandler(this.router)
+    await GoToFileUrlActionHandler.create({ ownerSource: this })
       .handle({ fileId, fileAction, transition });
   },
 });
