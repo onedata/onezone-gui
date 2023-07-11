@@ -23,7 +23,9 @@ export default Model.extend(GraphSingleModelMixin, {
   latitude: attr('number', { defaultValue: 0 }),
   online: attr('boolean'),
   domain: attr('string'),
-  version: attr('string'),
+  // FIXME: testing version
+  // version: attr('string'),
+  version: '21.02.3',
   cluster: belongsTo('cluster'),
 
   spaceList: belongsTo('space-list'),

@@ -84,8 +84,8 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'chooseWorkflowSchemaToRun',
     'getDataUrl',
     'getDatasetsUrl',
-    // FIXME: is this needed?
-    'getFileGoToUrl',
+    // TODO: VFS-11155 This method could be needed when implementing info panel
+    // 'getFileGoToUrl',
   ]),
 
   actions: {

@@ -66,8 +66,6 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
     'changeListTab',
     'getDataUrl',
     'getDatasetsUrl',
-    // FIXME: is this needed?
-    'getFileGoToUrl',
   ]),
 
   actions: {

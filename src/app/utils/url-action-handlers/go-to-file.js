@@ -52,8 +52,6 @@ export default EmberObject.extend(...mixins, {
 
   //#endregion
 
-  // FIXME: handle not-happy-path (lack of params, etc.)
-  // FIXME: być może handlować na podstawie samego transition (przenieść tutaj parser)
   /**
    * @param {string} fileId
    * @param {GoToFileUrlActionHandler.GoToFileActionType} fileAction
@@ -64,8 +62,18 @@ export default EmberObject.extend(...mixins, {
     if (!this.availableFileActions.includes(effFileAction)) {
       effFileAction = this.defaultFileAction;
     }
-    const fileGuid = cdmiObjectIdToGuid(fileId);
-    const spaceId = getSpaceIdFromGuid(fileGuid);
+    let fileGuid;
+    let spaceId;
+    try {
+      fileGuid = cdmiObjectIdToGuid(fileId);
+      spaceId = getSpaceIdFromGuid(fileGuid);
+    } catch (fileIdParsingError) {
+      this.globalNotify.backendError(this.t('openingUrl'), fileIdParsingError);
+    }
+    if (!fileGuid || !spaceId) {
+      this.alert.error(this.t('invalidFileId'));
+      return;
+    }
     try {
       await transition;
     } catch {
@@ -75,17 +83,26 @@ export default EmberObject.extend(...mixins, {
     let providerId;
     if (fileAction === 'download') {
       const minSupportedVersion = '21.02.3';
-      // FIXME: handle errors
-      const space = await this.recordManager.getRecordById('space', spaceId);
-      const providerList = await get(space, 'providerList');
-      const providers = (await get(providerList, 'list')).toArray();
-      // Filter out providers that handle download link feature to prefer one of
-      // these providers.
-      const applicableProviders = providers.filter(provider => {
-        return get(provider, 'online') &&
-          Version.isRequiredVersion(get(provider, 'version'), minSupportedVersion);
-      });
-      const provider = findCurrentDefaultOneprovider(applicableProviders);
+      let space;
+      try {
+        space = await this.recordManager.getRecordById('space', spaceId);
+      } catch (spaceLoadError) {
+        this.globalNotify.backendError(this.t('openingSpace'), spaceLoadError);
+      }
+      let provider;
+      try {
+        const providerList = await get(space, 'providerList');
+        const providers = (await get(providerList, 'list')).toArray();
+        // Filter out providers that handle download link feature to prefer one of
+        // these providers.
+        const applicableProviders = providers.filter(provider => {
+          return get(provider, 'online') &&
+            Version.isRequiredVersion(get(provider, 'version'), minSupportedVersion);
+        });
+        provider = findCurrentDefaultOneprovider(applicableProviders);
+      } catch (providersError) {
+        this.globalNotify.backendError(this.t('gettingProviders'), providersError);
+      }
       if (provider) {
         providerId = get(provider, 'entityId');
       } else {
@@ -115,9 +132,8 @@ export default EmberObject.extend(...mixins, {
           },
         }
       );
-    } catch (error) {
-      // FIXME: handle errors
-      console.dir(error);
+    } catch (transitionError) {
+      this.globalNotify.backendError(this.t('redirectingToFile'), transitionError);
     }
   },
 

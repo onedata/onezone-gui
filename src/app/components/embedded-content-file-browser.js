@@ -61,7 +61,6 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
    */
   embeddedComponentName: 'content-file-browser',
 
-  // FIXME: sprawdzić inne browsery
   /**
    * @override implements OneEmbeddedContainer
    */
