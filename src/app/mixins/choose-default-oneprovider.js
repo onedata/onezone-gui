@@ -81,7 +81,7 @@ export function findCurrentDefaultOneprovider(applicableOneproviders) {
         get(providerA, 'version'),
         get(providerB, 'version')
       );
-      if (versionCompareResult === 1) {
+      if (versionCompareResult === 0) {
         return nameComparator(providerA, providerB);
       } else {
         return versionCompareResult;

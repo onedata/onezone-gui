@@ -31,7 +31,7 @@ describe('Integration | Component | content-spaces-index', function () {
 
   it('renders a tile with resolved default Oneprovider', async function () {
     const provider1 = {
-      id: 'provider.p1.instance:private',
+      id: 'provider.op1.instance:private',
       entityId: 'op1',
       name: 'Gamma',
       version: '20.02.1',
