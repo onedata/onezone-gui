@@ -32,6 +32,7 @@ export default EmberObject.extend(...mixins, {
   recordManager: service(),
   alert: service(),
   i18n: service(),
+  globalNotify: service(),
 
   /**
    * @override
@@ -55,9 +56,8 @@ export default EmberObject.extend(...mixins, {
   /**
    * @param {string} fileId
    * @param {GoToFileUrlActionHandler.GoToFileActionType} fileAction
-   * @param {Transition} transition
    */
-  async handle({ fileId, fileAction, transition } = {}) {
+  async handle({ fileId, fileAction } = {}) {
     let effFileAction = fileAction;
     if (!this.availableFileActions.includes(effFileAction)) {
       effFileAction = this.defaultFileAction;
@@ -69,15 +69,11 @@ export default EmberObject.extend(...mixins, {
       spaceId = getSpaceIdFromGuid(fileGuid);
     } catch (fileIdParsingError) {
       this.globalNotify.backendError(this.t('openingUrl'), fileIdParsingError);
+      return;
     }
     if (!fileGuid || !spaceId) {
       this.alert.error(this.t('invalidFileId'));
       return;
-    }
-    try {
-      await transition;
-    } catch {
-      // onedata transition could fail, but it should not cause action to cancel
     }
 
     let providerId;
@@ -88,6 +84,7 @@ export default EmberObject.extend(...mixins, {
         space = await this.recordManager.getRecordById('space', spaceId);
       } catch (spaceLoadError) {
         this.globalNotify.backendError(this.t('openingSpace'), spaceLoadError);
+        return;
       }
       let provider;
       try {
@@ -102,6 +99,7 @@ export default EmberObject.extend(...mixins, {
         provider = findCurrentDefaultOneprovider(applicableProviders);
       } catch (providersError) {
         this.globalNotify.backendError(this.t('gettingProviders'), providersError);
+        return;
       }
       if (provider) {
         providerId = get(provider, 'entityId');
@@ -121,20 +119,16 @@ export default EmberObject.extend(...mixins, {
     if (providerId) {
       aspectOptions.oneproviderId = providerId;
     }
-    try {
-      await this.router.transitionTo(
-        'onedata.sidebar.content.aspect',
-        'spaces',
-        spaceId,
-        'data', {
-          queryParams: {
-            options: serializeAspectOptions(aspectOptions),
-          },
-        }
-      );
-    } catch (transitionError) {
-      this.globalNotify.backendError(this.t('redirectingToFile'), transitionError);
-    }
+    await this.router.transitionTo(
+      'onedata.sidebar.content.aspect',
+      'spaces',
+      spaceId,
+      'data', {
+        queryParams: {
+          options: serializeAspectOptions(aspectOptions),
+        },
+      }
+    );
   },
 
   /**

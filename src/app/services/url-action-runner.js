@@ -109,7 +109,12 @@ export default UrlActionRunner.extend({
       action_fileId: fileId,
       action_fileAction: fileAction,
     } = actionParams;
+    try {
+      await transition;
+    } catch {
+      // onedata transition could fail, but it should not cause action to cancel
+    }
     await GoToFileUrlActionHandler.create({ ownerSource: this })
-      .handle({ fileId, fileAction, transition });
+      .handle({ fileId, fileAction });
   },
 });

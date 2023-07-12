@@ -3,6 +3,5 @@ export default {
   openingUrl: 'opening file URL',
   openingSpace: 'opening space from URL',
   gettingProviders: 'resolving providers info',
-  redirectingToFile: 'redirecting to file browser',
   invalidFileId: 'The file URL is invalid.',
 };
