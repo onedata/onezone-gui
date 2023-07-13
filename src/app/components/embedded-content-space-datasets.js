@@ -11,6 +11,7 @@ import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
 import EmbeddedBrowserCommon from 'onezone-gui/mixins/embedded-browser-common';
 import notImplementedWarn from 'onedata-gui-common/utils/not-implemented-warn';
+import { reads } from '@ember/object/computed';
 
 export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   layout,
@@ -119,6 +120,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'selectedArchives',
     'selectedFiles',
     'attachmentState',
+    'fileAction',
   ]),
 
   /**
@@ -131,14 +133,21 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'updateSelectedDatasets',
     'updateSelectedArchives',
     'updateSelectedFiles',
+    'updateFileAction',
     'getDataUrl',
     'getDatasetsUrl',
     'getTransfersUrl',
     'getShareUrl',
     'getProvidersUrl',
     'getAccessTokenUrl',
+    'getFileGoToUrl',
     'openRestApiModal',
   ]),
+
+  /**
+   * @type {ComputedProperty<GoToFileUrlActionHandler.GoToFileActionType>}
+   */
+  fileAction: reads('navigationState.aspectOptions.fileAction'),
 
   actions: {
     updateDatasetId(datasetId) {

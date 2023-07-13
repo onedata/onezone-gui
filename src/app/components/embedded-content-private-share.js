@@ -83,6 +83,8 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
     'getDatasetsUrl',
     'showSharesIndex',
     'reloadShareList',
+    // TODO: VFS-11156 This method will be needed to implement shared files links
+    // 'getFileGoToUrl',
   ]),
 
   actions: {

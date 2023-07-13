@@ -33,35 +33,6 @@ export default Mixin.create({
       .setItem(this.getStorageOneproviderKey(spaceId), oneproviderId);
   },
 
-  /**
-   * Find Oneprovider that should be currently chosen if saved default Oneprovider
-   * is not available
-   * @param {Array<Models.Provider>} oneproviders
-   * @returns {Models.Provider}
-   */
-  findCurrentDefaultOneprovider(oneproviders) {
-    assert(
-      'findCurrentDefaultOneprovider: oneproviders should be not null/undefined',
-      oneproviders
-    );
-    const sortedApplicableOneproviders = [...oneproviders.toArray()].sort(
-      createPropertyComparator('name')
-    );
-    if (!sortedApplicableOneproviders.length) {
-      return null;
-    }
-    // prefer embeddable (20.02+) providers as default
-    const oneprovider = sortedApplicableOneproviders.find(provider => {
-      const version = get(provider, 'version');
-      return !isStandaloneGuiOneprovider(version);
-    });
-    if (oneprovider) {
-      return oneprovider;
-    } else {
-      return sortedApplicableOneproviders[0];
-    }
-  },
-
   async chooseDefaultOneprovider({
     providers = (this.providers ?? []),
     spaceId = this.get('space.entityId'),
@@ -71,6 +42,7 @@ export default Mixin.create({
       return null;
     }
     const defaultId = this.getBrowserDefaultOneproviderId(spaceId);
+    /** @type Array<Models.Provider> */
     let applicableProviders = providers.filter(provider => get(provider, 'online'));
     if (requiredVersion) {
       applicableProviders = applicableProviders.filter(provider => {
@@ -86,6 +58,46 @@ export default Mixin.create({
       defaultId && applicableProviders.findBy('entityId', defaultId)
     );
     return savedDefaultOneprovider ||
-      this.findCurrentDefaultOneprovider(applicableProviders);
+      findCurrentDefaultOneprovider(applicableProviders);
   },
 });
+
+/**
+ * Find Oneprovider that should be currently chosen if saved default Oneprovider
+ * is not available.
+ * @param {Array<Models.Provider>} applicableOneproviders
+ * @returns {Models.Provider}
+ */
+export function findCurrentDefaultOneprovider(applicableOneproviders) {
+  assert(
+    'findCurrentDefaultOneprovider: applicableOneproviders should be not null/undefined',
+    applicableOneproviders
+  );
+  // sort providers from newest version to oldest and by name when versions are the same
+  const nameComparator = createPropertyComparator('name');
+  const sortedApplicableOneproviders = [...applicableOneproviders.toArray()]
+    .sort((providerA, providerB) => {
+      const versionCompareResult = -Version.compareVersions(
+        get(providerA, 'version'),
+        get(providerB, 'version')
+      );
+      if (versionCompareResult === 0) {
+        return nameComparator(providerA, providerB);
+      } else {
+        return versionCompareResult;
+      }
+    });
+  if (!sortedApplicableOneproviders.length) {
+    return null;
+  }
+  // prefer embeddable (20.02+) providers as default
+  const oneprovider = sortedApplicableOneproviders.find(provider => {
+    const version = get(provider, 'version');
+    return !isStandaloneGuiOneprovider(version);
+  });
+  if (oneprovider) {
+    return oneprovider;
+  } else {
+    return sortedApplicableOneproviders[0];
+  }
+}

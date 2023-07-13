@@ -51,6 +51,11 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   selected: computedAspectOptionsArray('selected'),
 
   /**
+   * @type {ComputedProperty<GoToFileUrlActionHandler.GoToFileActionType>}
+   */
+  fileAction: reads('navigationState.aspectOptions.fileAction'),
+
+  /**
    * @override implements OneEmbeddedContainer
    * @type {string}
    */
@@ -59,7 +64,12 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   /**
    * @override implements OneEmbeddedContainer
    */
-  iframeInjectedProperties: Object.freeze(['spaceEntityId', 'dirEntityId', 'selected']),
+  iframeInjectedProperties: Object.freeze([
+    'spaceEntityId',
+    'dirEntityId',
+    'selected',
+    'fileAction',
+  ]),
 
   /**
    * @override implements OneEmbeddedContainer
@@ -67,6 +77,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   callParentActionNames: Object.freeze([
     'updateDirEntityId',
     'updateSelected',
+    'updateFileAction',
     'getDataUrl',
     'getDatasetsUrl',
     'getTransfersUrl',
@@ -74,6 +85,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'getExecuteWorkflowUrl',
     'getProvidersUrl',
     'getAccessTokenUrl',
+    'getFileGoToUrl',
     'openRestApiModal',
   ]),
 

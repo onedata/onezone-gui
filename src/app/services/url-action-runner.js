@@ -11,6 +11,7 @@ import UrlActionRunner from 'onedata-gui-common/services/url-action-runner';
 import { inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import { reject } from 'rsvp';
+import GoToFileUrlActionHandler from 'onezone-gui/utils/url-action-handlers/go-to-file';
 
 export default UrlActionRunner.extend({
   spaceActions: service(),
@@ -25,6 +26,10 @@ export default UrlActionRunner.extend({
     this.registerActionRunner(
       'confirmJoinSpaceRequest',
       this.confirmSpaceJoinRequestActionRunner.bind(this)
+    );
+    this.registerActionRunner(
+      'goToFile',
+      this.goToFileActionRunner.bind(this)
     );
   },
 
@@ -90,5 +95,26 @@ export default UrlActionRunner.extend({
         requestId,
       }).execute();
     }
+  },
+
+  /**
+   * @param {Object} actionParams
+   * @param {string} actionParams.action_fileId
+   * @param {GoToFileUrlActionHandler.GoToFileActionType} actionParams.action_fileAction
+   * @param {Transition} transition
+   * @returns {Promise}
+   */
+  async goToFileActionRunner(actionParams, transition) {
+    const {
+      action_fileId: fileId,
+      action_fileAction: fileAction,
+    } = actionParams;
+    try {
+      await transition;
+    } catch {
+      // onedata transition could fail, but it should not cause action to cancel
+    }
+    await GoToFileUrlActionHandler.create({ ownerSource: this })
+      .handle({ fileId, fileAction });
   },
 });
