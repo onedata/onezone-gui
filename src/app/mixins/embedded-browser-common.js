@@ -204,6 +204,16 @@ export default Mixin.create({
         .generateUrl({ fileId, fileAction });
     },
 
+    /**
+     * @param {ComputedProperty<GoToFileUrlActionHandler.GoToFileActionType>} fileAction
+     * @param {boolean} [replaceHistory]
+     */
+    updateFileAction(fileAction = null, replaceHistory = true) {
+      this.navigationState.changeRouteAspectOptions({
+        fileAction,
+      }, replaceHistory);
+    },
+
     async openRestApiModal(space) {
       return await this.modalManager.show('api-samples-modal', {
         record: space,

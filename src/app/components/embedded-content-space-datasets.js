@@ -133,6 +133,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'updateSelectedDatasets',
     'updateSelectedArchives',
     'updateSelectedFiles',
+    'updateFileAction',
     'getDataUrl',
     'getDatasetsUrl',
     'getTransfersUrl',

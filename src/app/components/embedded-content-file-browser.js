@@ -77,6 +77,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   callParentActionNames: Object.freeze([
     'updateDirEntityId',
     'updateSelected',
+    'updateFileAction',
     'getDataUrl',
     'getDatasetsUrl',
     'getTransfersUrl',
