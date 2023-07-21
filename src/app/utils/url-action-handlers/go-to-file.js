@@ -133,20 +133,29 @@ export default EmberObject.extend(...mixins, {
 
   /**
    * @param {string} fileId
+   * @param {GoToFileUrlActionHandler.GoToFileActionType} [fileAction]
+   * @returns {string} Onezone URL that this handler can handle.
+   */
+  generatePath({ fileId, fileAction = this.defaultFileAction } = {}) {
+    if (!fileId || !this.availableFileActions.includes(fileAction)) {
+      return '';
+    }
+    return this.router.urlFor('onedata', {
+      queryParams: {
+        action_name: 'goToFile',
+        action_fileId: fileId,
+        action_fileAction: fileAction,
+      },
+    });
+  },
+
+  /**
+   * @param {string} fileId
    * @param {GoToFileUrlActionHandler.GoToFileActionType} fileAction
    * @returns {string} Onezone URL that this handler can handle.
    */
   generateUrl({ fileId, fileAction } = {}) {
-    if (!fileId || !this.availableFileActions.includes(fileAction)) {
-      return '';
-    }
-    return globals.location.origin +
-      this.router.urlFor('onedata', {
-        queryParams: {
-          action_name: 'goToFile',
-          action_fileId: fileId,
-          action_fileAction: fileAction,
-        },
-      });
+    const path = this.generatePath({ fileId, fileAction });
+    return path && (globals.location.origin + path);
   },
 });
