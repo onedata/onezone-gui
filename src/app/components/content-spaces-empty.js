@@ -8,8 +8,18 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import { inject as service } from '@ember/service';
+import { reads } from '@ember/object/computed';
 
 export default Component.extend(I18n, {
   classNames: ['content-spaces-empty'],
+
+  spaceManager: service(),
+
+  /**
+   * @override
+   */
   i18nPrefix: 'components.contentSpacesEmpty',
+
+  isMarketplaceInfoShown: reads('spaceManager.marketplaceConfig.enabled'),
 });
