@@ -30,7 +30,9 @@ Router.map(function () {
       this.route('terms-of-use');
     },
     action() {
-      this.route('go-to-file', { path: 'go-to-file/:file_id/:file_action' });
+      this.route('go-to-file', { path: 'go-to-file/:file_id' }, function goToFileRoute() {
+        this.route('file-action', { path: ':file_action' });
+      });
     },
   });
 });

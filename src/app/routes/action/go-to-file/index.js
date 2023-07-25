@@ -1,5 +1,5 @@
 /**
- * Handles go-to-file URL file_id part provided with prettt URL.
+ * Redirects to the default file action for go-to-file.
  *
  * @author Jakub Liput
  * @copyright (C) 2023 ACK CYFRONET AGH
@@ -8,20 +8,16 @@
 
 import Route from '@ember/routing/route';
 import { inject as service } from '@ember/service';
+import { defaultFileAction } from 'onezone-gui/utils/url-action-handlers/go-to-file';
 
 export default Route.extend({
   router: service(),
 
-  /**
-   * @param {string} file_id
-   * @returns {{ fileId: string }}
-   */
-  model({ file_id: fileId }) {
-    if (!fileId) {
-      this.router.transitionTo('/');
-    }
-    return {
-      fileId,
-    };
+  beforeModel() {
+    this.router.transitionTo(
+      'action.go-to-file.file-action',
+      this.modelFor('action.go-to-file').fileId,
+      defaultFileAction,
+    );
   },
 });

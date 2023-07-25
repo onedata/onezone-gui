@@ -201,7 +201,7 @@ export default Mixin.create({
      */
     getFileGoToUrl({ fileId, fileAction }) {
       return GoToFileUrlActionHandler.create({ ownerSource: this })
-        .generateUrl({ fileId, fileAction });
+        .generatePrettyUrl({ fileId, fileAction });
     },
 
     /**
