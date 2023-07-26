@@ -10,6 +10,11 @@ import { registerService, lookupService } from '../../helpers/stub-service';
 import CurrentUser from 'onedata-gui-websocket-client/services/current-user';
 import sinon from 'sinon';
 import globals from 'onedata-gui-common/utils/globals';
+import createSpace from '../../helpers/create-space';
+import { clearStoreAfterEach } from '../../helpers/clear-store';
+import { assert } from '@ember/debug';
+import CurrentUserHelper from '../../helpers/mixins/current-user';
+import { get } from '@ember/object';
 
 const TestCurrentUser = CurrentUser.extend({
   userProxy: promiseObject(resolve({
@@ -19,17 +24,17 @@ const TestCurrentUser = CurrentUser.extend({
 });
 
 describe('Integration | Component | content-spaces-index', function () {
-  setupRenderingTest();
+  const { afterEach, beforeEach } = setupRenderingTest();
 
-  beforeEach(function () {
+  clearStoreAfterEach();
+
+  it('renders a tile with resolved default Oneprovider', async function () {
     registerService(this, 'currentUser', TestCurrentUser);
     sinon.stub(lookupService(this, 'router'), 'urlFor').returns('#/xd');
     lookupService(this, 'store').findRecord = function findRecord(modelName, id) {
       throw new Error(`findRecord not stubbed: ${modelName}, ${id}`);
     };
-  });
 
-  it('renders a tile with resolved default Oneprovider', async function () {
     const provider1 = {
       id: 'provider.op1.instance:private',
       entityId: 'op1',
@@ -95,4 +100,69 @@ describe('Integration | Component | content-spaces-index', function () {
       'browse files tile text'
     ).to.match(/Alpha/);
   });
+
+  it('renders a tile with space details', async function () {
+    const helper = new Helper(this);
+    await helper.setUser({
+      name: 'Test user',
+    });
+    await helper.setSpace({
+      name: 'Test space',
+      privileges: {
+        view: true,
+      },
+    });
+
+    await helper.render();
+
+    const spaceDetailsTile = helper.element.querySelector('.space-details-tile');
+    expect(spaceDetailsTile).to.exist;
+    expect(spaceDetailsTile).to.contain.text('Space details');
+  });
 });
+
+class Helper {
+  constructor(mochaContext) {
+    assert('mochaContext is mandatory', mochaContext);
+    /** @type {Mocha.Context} */
+    this.mochaContext = mochaContext;
+
+    this.space = null;
+    this.showResourceMembershipTile = false;
+    this.currentUserHelper = new CurrentUserHelper(this.mochaContext);
+  }
+
+  get store() {
+    return lookupService(this.mochaContext, 'store');
+  }
+  /** @returns {HTMLElement|null} */
+  get element() {
+    return find('.content-spaces-index');
+  }
+
+  async setSpace(spaceData = {}) {
+    if (!this.user) {
+      throw new Error('test helper: set user before setting space');
+    }
+    /** @type {Models.Space} */
+    this.space = await createSpace(this.store, spaceData, this.user);
+    return this.space;
+  }
+  async setUser(userData = {}) {
+    const user = await this.currentUserHelper.stubCurrentUser(userData);
+    this.user = user;
+    return user;
+  }
+  async render() {
+    if (!this.space) {
+      throw new Error('test helper: space is not initialized');
+    }
+    this.mochaContext.setProperties({
+      space: this.space,
+      showResourceMembershipTile: this.showResourceMembershipTile,
+    });
+    await render(hbs `{{content-spaces-index
+      space=space
+    }}`);
+  }
+}
