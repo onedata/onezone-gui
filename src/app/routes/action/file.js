@@ -1,5 +1,5 @@
 /**
- * Handles go-to-file URL action provided with pretty URL.
+ * Handles go-to-file URL actions provided with simplified URL.
  *
  * @author Jakub Liput
  * @copyright (C) 2023 ACK CYFRONET AGH
@@ -16,11 +16,13 @@ export default Route.extend({
 
   /**
    * @param {GoToFileUrlActionHandler.GoToFileActionType} file_action
-   * @param {Transition} transition
-   * @returns {void}
+   * @param {string} file_id
+   * @returns {Promise}
    */
-  model({ file_action: fileAction }, transition) {
-    const { fileId } = this.modelFor('action.go-to-file');
+  async model({ file_action: fileAction, file_id: fileId }, transition) {
+    if (!fileId || !fileAction) {
+      this.router.transitionTo('/');
+    }
     const handler = GoToFileUrlActionHandler.create({
       ownerSource: this,
     });
@@ -29,6 +31,6 @@ export default Route.extend({
       this.router.transitionTo('/');
     }
     transition.abort();
-    globals.location.replace(path);
+    return globals.location.replace(path);
   },
 });

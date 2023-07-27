@@ -172,9 +172,9 @@ export default EmberObject.extend(...mixins, {
       return '';
     }
     return this.router.urlFor(
-      'action.go-to-file.file-action',
-      fileId,
+      'action.file',
       fileAction,
+      fileId,
     );
   },
 
