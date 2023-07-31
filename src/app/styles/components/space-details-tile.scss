@@ -1,4 +1,8 @@
 .space-details-tile {
+  .tile-content-inner {
+    display: flex;
+    flex-direction: column;
+  }
   .figure-text-centered {
     font-style: italic;
     @include font-semibold;
@@ -26,5 +30,52 @@
     &.tags-input {
       font-size: 0.85em;
     }
+  }
+  .markdown-view {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .description-row {
+    position: relative;
+    overflow: hidden;
+    z-index: 0;
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 2em;
+      background: linear-gradient(0deg, var(--tile-background), transparent);
+      z-index: 1;
+    }
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      height: 100%;
+      width: 2em;
+      background: linear-gradient(270deg, var(--tile-background), transparent);
+      z-index: 1;
+    }
+  }
+
+  &.one-tile-link {
+    .tile-main {
+      --tile-background: white;
+      &:hover {
+        --tile-background: #{$-tile-hover-background-color};
+      }
+    }
+  }
+
+  .rendered-markdown {
+    transform: scale(0.8);
+    margin: -12%;
+    margin-top: -8%;
   }
 }

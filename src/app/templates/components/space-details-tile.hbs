@@ -6,12 +6,14 @@
   moreText=moreText
 }}
   {{!-- FIXME: może lepiej tutaj użyć ikony? --}}
-  <figure class="main-figure">
-    <img class="main-image " src="assets/images/settings-circle-filled.svg">
-    {{#if centeredMessage}}
-      <div class="figure-text-centered">{{centeredMessage}}</div>
-    {{/if}}
-  </figure>
+  {{#unless description}}
+    <figure class="main-figure">
+      <img class="main-image " src="assets/images/settings-circle-filled.svg">
+      {{#if centeredMessage}}
+        <div class="figure-text-centered">{{centeredMessage}}</div>
+      {{/if}}
+    </figure>
+  {{/unless}}
   {{#if organizationName}}
     <div class="tile-data organization-name-row">
       {{one-icon icon="organization" class="organization-name-icon"}}
@@ -26,4 +28,12 @@
       readonlyTagsDisplayLimit=readonlyTagsDisplayLimit
     }}
   {{/unless}}
+  {{#if description}}
+    <div class="tile-data description-row">
+      {{one-markdown-to-html
+        class="markdown-view"
+        markdown=description
+      }}
+    </div>
+  {{/if}}
 {{/one-tile}}
