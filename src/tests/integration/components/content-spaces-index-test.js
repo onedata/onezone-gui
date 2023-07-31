@@ -10,10 +10,9 @@ import { registerService, lookupService } from '../../helpers/stub-service';
 import CurrentUser from 'onedata-gui-websocket-client/services/current-user';
 import sinon from 'sinon';
 import globals from 'onedata-gui-common/utils/globals';
-import createSpace from '../../helpers/create-space';
 import { clearStoreAfterEach } from '../../helpers/clear-store';
 import { assert } from '@ember/debug';
-import CurrentUserHelper from '../../helpers/mixins/current-user';
+import UserSpaceHelper from '../../helpers/user-space-helper';
 import { get } from '@ember/object';
 
 const TestCurrentUser = CurrentUser.extend({
@@ -101,6 +100,8 @@ describe('Integration | Component | content-spaces-index', function () {
     ).to.match(/Alpha/);
   });
 
+  //#region space-details-tile
+
   it('renders a tile with space details, title and configuration link if user has view and update privileges and there is no space details',
     async function () {
       const helper = new Helper(this);
@@ -155,6 +156,27 @@ describe('Integration | Component | content-spaces-index', function () {
       expect(moreLink).to.not.exist;
     }
   );
+
+  it('renders a tile with space details, but without configuration link if some space detail is present and user has no update privileges',
+    async function () {
+      const helper = new Helper(this);
+      await helper.setSpace({
+        description: 'hello world',
+        privileges: {
+          view: true,
+          update: false,
+        },
+      });
+
+      await helper.render();
+
+      expect(helper.spaceDetailsTile).to.exist;
+      const moreLink = helper.spaceDetailsTile.querySelector('.more-link');
+      expect(moreLink).to.not.exist;
+    }
+  );
+
+  //#endregion
 });
 
 class Helper {
@@ -162,13 +184,8 @@ class Helper {
     assert('mochaContext is mandatory', mochaContext);
     /** @type {Mocha.Context} */
     this.mochaContext = mochaContext;
-
-    /** @type {Models.User} */
-    this.user = null;
-    /** @type {Models.Space} */
-    this.space = null;
     this.showResourceMembershipTile = false;
-    this.currentUserHelper = new CurrentUserHelper(this.mochaContext);
+    this.userSpaceHelper = new UserSpaceHelper(this.mochaContext);
   }
 
   get store() {
@@ -181,28 +198,27 @@ class Helper {
   get spaceDetailsTile() {
     return this.element.querySelector('.space-details-tile');
   }
-
-  async setSpace(spaceData = {}) {
-    if (!this.user) {
-      await this.setUser();
-    }
-    /** @type {Models.Space} */
-    this.space = await createSpace(this.store, spaceData, this.user);
-    return this.space;
+  get space() {
+    return this.userSpaceHelper.space;
   }
-  async setUser(userData = {}) {
-    const user = await this.currentUserHelper.stubCurrentUser(userData);
-    this.user = user;
-    return user;
+  get user() {
+    return this.userSpaceHelper.user;
   }
-  async render() {
-    if (!this.space) {
-      await this.setSpace();
-    }
+  setUser() {
+    return this.userSpaceHelper.setUser(...arguments);
+  }
+  setSpace() {
+    return this.userSpaceHelper.setSpace(...arguments);
+  }
+  async beforeRender() {
+    await this.userSpaceHelper.ensureData();
     this.mochaContext.setProperties({
       space: this.space,
       showResourceMembershipTile: this.showResourceMembershipTile,
     });
+  }
+  async render() {
+    await this.beforeRender();
     await render(hbs `{{content-spaces-index
       space=space
     }}`);

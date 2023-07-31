@@ -4,10 +4,9 @@ import { setupRenderingTest } from 'ember-mocha';
 import { render, find } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import { lookupService } from '../../helpers/stub-service';
-import createSpace from '../../helpers/create-space';
 import { clearStoreAfterEach } from '../../helpers/clear-store';
 import { assert } from '@ember/debug';
-import CurrentUserHelper from '../../helpers/mixins/current-user';
+import UserSpaceHelper from '../../helpers/user-space-helper';
 
 describe('Integration | Component | space-details-tile', function () {
   setupRenderingTest();
@@ -20,6 +19,25 @@ describe('Integration | Component | space-details-tile', function () {
 
     expect(helper.element.textContent).to.contain('Space details');
   });
+
+  it('renders "No details provided" if there are no details', async function () {
+    const helper = new Helper(this);
+
+    await helper.render();
+
+    expect(helper.element.textContent).to.contain('No details provided');
+  });
+
+  it('does not render "No details provided" if there are some details', async function () {
+    const helper = new Helper(this);
+    await helper.setSpace({
+      description: 'hello world',
+    });
+
+    await helper.render();
+
+    expect(helper.element.textContent).to.not.contain('No details provided');
+  });
 });
 
 class Helper {
@@ -27,10 +45,8 @@ class Helper {
     assert('mochaContext is mandatory', mochaContext);
     /** @type {Mocha.Context} */
     this.mochaContext = mochaContext;
-
-    this.space = null;
     this.showResourceMembershipTile = false;
-    this.currentUserHelper = new CurrentUserHelper(this.mochaContext);
+    this.userSpaceHelper = new UserSpaceHelper(this.mochaContext);
   }
 
   get store() {
@@ -40,30 +56,26 @@ class Helper {
   get element() {
     return find('.space-details-tile');
   }
-  get moreLink() {
-    return this.element.querySelector('.more-link');
+  get space() {
+    return this.userSpaceHelper.space;
   }
-
-  async setSpace(spaceData = {}) {
-    if (!this.user) {
-      await this.setUser();
-    }
-    /** @type {Models.Space} */
-    this.space = await createSpace(this.store, spaceData, this.user);
-    return this.space;
+  get user() {
+    return this.userSpaceHelper.user;
   }
-  async setUser(userData = {}) {
-    const user = await this.currentUserHelper.stubCurrentUser(userData);
-    this.user = user;
-    return user;
+  setUser() {
+    return this.userSpaceHelper.setUser(...arguments);
   }
-  async render() {
-    if (!this.space) {
-      await this.setSpace();
-    }
+  setSpace() {
+    return this.userSpaceHelper.setSpace(...arguments);
+  }
+  async beforeRender() {
+    await this.userSpaceHelper.ensureData();
     this.mochaContext.setProperties({
       space: this.space,
     });
+  }
+  async render() {
+    await this.beforeRender();
     await render(hbs `{{space-details-tile
       space=space
     }}`);

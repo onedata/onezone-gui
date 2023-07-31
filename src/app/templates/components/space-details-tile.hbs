@@ -8,8 +8,8 @@
   {{!-- FIXME: może lepiej tutaj użyć ikony? --}}
   <figure class="main-figure">
     <img class="main-image " src="assets/images/settings-circle-filled.svg">
-    {{#truncated-string tagName="span" class="one-label"}}
-      {{dataProviderProxy.name}}
-    {{/truncated-string}}
+    {{#if centeredMessage}}
+      <div class="figure-text-centered">{{centeredMessage}}</div>
+    {{/if}}
   </figure>
 {{/one-tile}}

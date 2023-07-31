@@ -8,10 +8,11 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { computed } from '@ember/object';
+import { computed, getProperties } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { conditional, raw } from 'ember-awesome-macros';
+import { conditional, raw, or, and, not } from 'ember-awesome-macros';
 import computedT from 'onedata-gui-common/utils/computed-t';
+import _ from 'lodash';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -62,8 +63,26 @@ export default Component.extend(I18n, {
     '',
   ),
 
-  init() {
-    this._super(...arguments);
-    console.log(this.hasSpaceUpdatePrivilege);
-  },
+  hasAnyDetail: computed(
+    'space.{organizationName,description,tags}',
+    function hasAnyDetail() {
+      const {
+        organizationName,
+        description,
+        tags,
+      } = getProperties(
+        this.space,
+        'organizationName',
+        'description',
+        'tags'
+      );
+      return Boolean(organizationName) ||
+        Boolean(description) ||
+        !_.isEmpty(tags);
+    }
+  ),
+
+  centeredMessage: or(
+    and(not('hasAnyDetail'), computedT('noDetailsProvided')),
+  ),
 });

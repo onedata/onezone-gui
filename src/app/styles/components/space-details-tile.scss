@@ -1,3 +1,6 @@
 .space-details-tile {
-
+  .figure-text-centered {
+    font-style: italic;
+    @include font-semibold;
+  }
 }
