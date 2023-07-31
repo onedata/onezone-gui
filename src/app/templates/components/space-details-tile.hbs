@@ -12,4 +12,18 @@
       <div class="figure-text-centered">{{centeredMessage}}</div>
     {{/if}}
   </figure>
+  {{#if organizationName}}
+    <div class="tile-data organization-name-row">
+      {{one-icon icon="organization" class="organization-name-icon"}}
+      <span class="organization-name">{{organizationName}}</span>
+    </div>
+  {{/if}}
+  {{#unless noTags}}
+    {{tags-input
+      class="tile-data space-tags static-value"
+      tags=inputTags
+      readonly=true
+      readonlyTagsDisplayLimit=readonlyTagsDisplayLimit
+    }}
+  {{/unless}}
 {{/one-tile}}

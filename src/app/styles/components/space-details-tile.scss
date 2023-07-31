@@ -3,4 +3,28 @@
     font-style: italic;
     @include font-semibold;
   }
+  .tile-data {
+    position: relative;
+  }
+  .organization-name-row {
+    display: flex;
+    align-items: center;
+    font-size: 0.9em;
+    .organization-name-icon {
+      margin-left: -0.15em;
+      font-size: 200%;
+      + .organization-name {
+        margin-left: 0.4em;
+      }
+    }
+    .organization-name {
+      @include font-semibold;
+    }
+  }
+  .space-tags {
+    margin-top: 0.4em;
+    &.tags-input {
+      font-size: 0.85em;
+    }
+  }
 }

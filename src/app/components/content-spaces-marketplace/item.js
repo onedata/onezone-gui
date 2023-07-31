@@ -133,6 +133,8 @@ export default Component.extend(I18n, {
     })) || [];
   }),
 
+  // FIXME: use generic tags limit
+
   tagsLimitExceeded: gt('tags.length', 'tagsLimit'),
 
   tagsDisplayedOnLimitExceed: difference('tagsLimit', 1),

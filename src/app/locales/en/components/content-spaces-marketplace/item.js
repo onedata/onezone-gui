@@ -9,6 +9,7 @@ export default {
   requestAccess: 'Request access',
   requestSent: 'Request submitted',
   creationTimeTooltip: 'The creation time of the space',
+  // FIXME: moved
   moreTags: '...and {{count}} more tags',
   retryWarningTip: `<p>${requestPendingGeneral}</p><p>Your request has not been considered yet; you may send a reminder to the space maintainer.</p>`,
   requestPendingTip: `<p>${requestPendingGeneral}</p><p>Please wait for the request to be considered by the space maintainer.</p>`,

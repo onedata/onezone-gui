@@ -38,6 +38,56 @@ describe('Integration | Component | space-details-tile', function () {
 
     expect(helper.element.textContent).to.not.contain('No details provided');
   });
+
+  it('renders organization name and "No tags or description" message if there is only an organization name provided',
+    async function () {
+      const helper = new Helper(this);
+      await helper.setSpace({
+        organizationName: 'onedata.org',
+      });
+
+      await helper.render();
+
+      expect(helper.element.textContent).to.contain('onedata.org');
+      expect(helper.element.textContent).to.contain('No tags or description');
+    }
+  );
+
+  it('renders organization name, tags and "No description" message if organization name and tags are provided',
+    async function () {
+      const helper = new Helper(this);
+      await helper.setSpace({
+        organizationName: 'onedata.org',
+        tags: ['hello', 'world'],
+      });
+
+      await helper.render();
+
+      expect(helper.element.textContent).to.contain('onedata.org');
+      const tagElements = [...helper.element.querySelectorAll('.tag-item')];
+      expect(tagElements[0]).to.have.trimmed.text('hello');
+      expect(tagElements[1]).to.have.trimmed.text('world');
+      expect(helper.element.textContent).to.contain('No description');
+    }
+  );
+
+  it('renders tags and "unknown organization..." message if only tags are provided',
+    async function () {
+      const helper = new Helper(this);
+      await helper.setSpace({
+        tags: ['hello', 'world'],
+      });
+
+      await helper.render();
+
+      const tagElements = [...helper.element.querySelectorAll('.tag-item')];
+      expect(tagElements[0]).to.have.trimmed.text('hello');
+      expect(tagElements[1]).to.have.trimmed.text('world');
+      expect(helper.element.textContent).to.contain(
+        'Unknown organization, no description'
+      );
+    }
+  );
 });
 
 class Helper {
