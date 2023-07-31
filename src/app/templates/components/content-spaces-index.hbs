@@ -60,19 +60,18 @@
           {{/if}}
         {{/loading-container}}
       {{/one-tile}}
+      {{space-details-tile space=space}}
       {{providers-map-tile
         class="resource-map-tile"
         providersProxy=providersProxy
         aspect=(if isSupported "providers" "support")
-        title=(tt this "tileProvidersMapTitle")}}
-    {{/if}}
-    {{#if space.hasViewPrivilege}}
+        title=(tt this "tileProvidersMapTitle")
+      }}
       {{resource-members-tile record=space}}
     {{/if}}
     {{#if showResourceMembershipTile}}
       {{resource-membership-tile record=space}}
     {{/if}}
-    {{space-details-tile space=space}}
     {{yield}}
   </div>
 </div>

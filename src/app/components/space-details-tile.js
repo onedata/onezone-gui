@@ -1,5 +1,5 @@
 /**
- * FIXME: doc
+ * Shows space properties set in space configuration or prompt to configure space.
  *
  * @author Jakub Liput
  * @copyright (C) 2023 ACK CYFRONET AGH
@@ -8,6 +8,7 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import { computed } from '@ember/object';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -17,7 +18,17 @@ export default Component.extend(I18n, {
    */
   i18nPrefix: 'components.spaceDetailsTile',
 
-  tileClassname: 'space-details-tile',
+  tileClassNames: Object.freeze([
+    'space-details-tile',
+    'resource-browse-tile',
+    'one-tile-link',
+  ]),
 
-  tileIsLink: false,
+  tileClass: computed('tileClassNames', function tileClass() {
+    return this.tileClassNames?.join(' ') ?? '';
+  }),
+
+  tileIsLink: true,
+
+  aspect: 'configuration',
 });

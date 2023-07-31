@@ -1,27 +1,71 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { render, find } from '@ember/test-helpers';
+import { hbs } from 'ember-cli-htmlbars';
+import { lookupService } from '../../helpers/stub-service';
+import createSpace from '../../helpers/create-space';
+import { clearStoreAfterEach } from '../../helpers/clear-store';
+import { assert } from '@ember/debug';
+import CurrentUserHelper from '../../helpers/mixins/current-user';
 
-describe('Integration | Component | space-details-tile', function() {
+describe('Integration | Component | space-details-tile', function () {
   setupRenderingTest();
+  clearStoreAfterEach();
 
-  it('renders', async function() {
-    // Set any properties with this.set('myProperty', 'value');
-    // Handle any actions with this.set('myAction', function(val) { ... });
+  it('renders "Space details" in title', async function () {
+    const helper = new Helper(this);
 
-    await render(hbs`{{space-details-tile}}`);
+    await helper.render();
 
-    expect(this.element.textContent.trim()).to.equal('');
-
-    // Template block usage:
-    await render(hbs`
-      {{#space-details-tile}}
-        template block text
-      {{/space-details-tile}}
-    `);
-
-    expect(this.element.textContent.trim()).to.equal('template block text');
+    expect(helper.element.textContent).to.contain('Space details');
   });
 });
+
+class Helper {
+  constructor(mochaContext) {
+    assert('mochaContext is mandatory', mochaContext);
+    /** @type {Mocha.Context} */
+    this.mochaContext = mochaContext;
+
+    this.space = null;
+    this.showResourceMembershipTile = false;
+    this.currentUserHelper = new CurrentUserHelper(this.mochaContext);
+  }
+
+  get store() {
+    return lookupService(this.mochaContext, 'store');
+  }
+  /** @returns {HTMLElement|null} */
+  get element() {
+    return find('.space-details-tile');
+  }
+  get moreLink() {
+    return this.element.querySelector('.more-link');
+  }
+
+  async setSpace(spaceData = {}) {
+    if (!this.user) {
+      await this.setUser();
+    }
+    /** @type {Models.Space} */
+    this.space = await createSpace(this.store, spaceData, this.user);
+    return this.space;
+  }
+  async setUser(userData = {}) {
+    const user = await this.currentUserHelper.stubCurrentUser(userData);
+    this.user = user;
+    return user;
+  }
+  async render() {
+    if (!this.space) {
+      await this.setSpace();
+    }
+    this.mochaContext.setProperties({
+      space: this.space,
+    });
+    await render(hbs `{{space-details-tile
+      space=space
+    }}`);
+  }
+}

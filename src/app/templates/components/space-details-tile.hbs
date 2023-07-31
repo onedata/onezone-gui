@@ -1,3 +1,15 @@
-{{#one-tile title=(tt this "title") isLink=tileIsLink class=tileClassname}}
-
+{{#one-tile
+  title=(tt this "title")
+  isLink=isLink
+  class=tileClass
+  aspect=aspect
+  moreText=(tt this "configure")
+}}
+  {{!-- FIXME: może lepiej tutaj użyć ikony? --}}
+  <figure class="main-figure">
+    <img class="main-image " src="assets/images/settings-circle-filled.svg">
+    {{#truncated-string tagName="span" class="one-label"}}
+      {{dataProviderProxy.name}}
+    {{/truncated-string}}
+  </figure>
 {{/one-tile}}

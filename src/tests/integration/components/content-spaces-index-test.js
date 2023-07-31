@@ -115,10 +115,10 @@ describe('Integration | Component | content-spaces-index', function () {
 
     await helper.render();
 
-    const spaceDetailsTile = helper.element.querySelector('.space-details-tile');
-    expect(spaceDetailsTile).to.exist;
-    expect(spaceDetailsTile).to.contain.text('Space details');
+    expect(helper.spaceDetailsTile).to.exist;
+    expect(helper.spaceDetailsTile).to.contain.text('Space details');
   });
+
 });
 
 class Helper {
@@ -127,6 +127,9 @@ class Helper {
     /** @type {Mocha.Context} */
     this.mochaContext = mochaContext;
 
+    /** @type {Models.User} */
+    this.user = null;
+    /** @type {Models.Space} */
     this.space = null;
     this.showResourceMembershipTile = false;
     this.currentUserHelper = new CurrentUserHelper(this.mochaContext);
@@ -139,10 +142,13 @@ class Helper {
   get element() {
     return find('.content-spaces-index');
   }
+  get spaceDetailsTile() {
+    return this.element.querySelector('.space-details-tile');
+  }
 
   async setSpace(spaceData = {}) {
     if (!this.user) {
-      throw new Error('test helper: set user before setting space');
+      await this.setUser();
     }
     /** @type {Models.Space} */
     this.space = await createSpace(this.store, spaceData, this.user);
@@ -155,7 +161,7 @@ class Helper {
   }
   async render() {
     if (!this.space) {
-      throw new Error('test helper: space is not initialized');
+      await this.setSpace();
     }
     this.mochaContext.setProperties({
       space: this.space,
