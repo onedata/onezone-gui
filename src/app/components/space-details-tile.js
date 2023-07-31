@@ -9,6 +9,9 @@
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { computed } from '@ember/object';
+import { reads } from '@ember/object/computed';
+import { conditional, raw } from 'ember-awesome-macros';
+import computedT from 'onedata-gui-common/utils/computed-t';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -18,17 +21,49 @@ export default Component.extend(I18n, {
    */
   i18nPrefix: 'components.spaceDetailsTile',
 
-  tileClassNames: Object.freeze([
-    'space-details-tile',
-    'resource-browse-tile',
-    'one-tile-link',
-  ]),
+  /**
+   * @type {Models.Space}
+   */
+  space: undefined,
+
+  tileClassNames: computed('hasSpaceUpdatePrivilege', function tileClassNames() {
+    const classes = [
+      'space-details-tile',
+    ];
+    if (this.hasSpaceUpdatePrivilege) {
+      classes.push(
+        'resource-browse-tile',
+        'one-tile-link'
+      );
+    }
+    return classes;
+  }),
 
   tileClass: computed('tileClassNames', function tileClass() {
     return this.tileClassNames?.join(' ') ?? '';
   }),
 
-  tileIsLink: true,
+  hasSpaceUpdatePrivilege: reads('space.privileges.update'),
 
-  aspect: 'configuration',
+  tileIsLink: reads('hasSpaceUpdatePrivilege'),
+
+  aspect: conditional(
+    'hasSpaceUpdatePrivilege',
+    raw('configuration'),
+    null
+  ),
+
+  /**
+   * @type {ComputedProperty<SafeString|''>}
+   */
+  moreText: conditional(
+    'hasSpaceUpdatePrivilege',
+    computedT('configure'),
+    '',
+  ),
+
+  init() {
+    this._super(...arguments);
+    console.log(this.hasSpaceUpdatePrivilege);
+  },
 });

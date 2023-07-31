@@ -60,7 +60,9 @@
           {{/if}}
         {{/loading-container}}
       {{/one-tile}}
-      {{space-details-tile space=space}}
+      {{#if isDetailsTileShown}}
+        {{space-details-tile space=space}}
+      {{/if}}
       {{providers-map-tile
         class="resource-map-tile"
         providersProxy=providersProxy

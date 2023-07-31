@@ -101,24 +101,60 @@ describe('Integration | Component | content-spaces-index', function () {
     ).to.match(/Alpha/);
   });
 
-  it('renders a tile with space details', async function () {
-    const helper = new Helper(this);
-    await helper.setUser({
-      name: 'Test user',
-    });
-    await helper.setSpace({
-      name: 'Test space',
-      privileges: {
-        view: true,
-      },
-    });
+  it('renders a tile with space details, title and configuration link if user has view and update privileges and there is no space details',
+    async function () {
+      const helper = new Helper(this);
+      await helper.setSpace({
+        privileges: {
+          view: true,
+          update: true,
+        },
+      });
 
-    await helper.render();
+      await helper.render();
 
-    expect(helper.spaceDetailsTile).to.exist;
-    expect(helper.spaceDetailsTile).to.contain.text('Space details');
-  });
+      expect(helper.spaceDetailsTile, 'tile').to.exist;
+      const moreLink = helper.spaceDetailsTile.querySelector('.more-link');
+      expect(moreLink, 'more-link').to.exist;
+      expect(moreLink).to.contain.text('Configure');
+      expect(helper.spaceDetailsTile).to.contain.text('Space details');
+    }
+  );
 
+  it('does not render a tile with space details if all space details are missing and user has no update privileges',
+    async function () {
+      const helper = new Helper(this);
+      await helper.setSpace({
+        privileges: {
+          view: true,
+          update: false,
+        },
+      });
+
+      await helper.render();
+
+      expect(helper.spaceDetailsTile).to.not.exist;
+    }
+  );
+
+  it('renders a tile with space details, but without configuration link if some space detail is present and user has no update privileges',
+    async function () {
+      const helper = new Helper(this);
+      await helper.setSpace({
+        description: 'hello world',
+        privileges: {
+          view: true,
+          update: false,
+        },
+      });
+
+      await helper.render();
+
+      expect(helper.spaceDetailsTile).to.exist;
+      const moreLink = helper.spaceDetailsTile.querySelector('.more-link');
+      expect(moreLink).to.not.exist;
+    }
+  );
 });
 
 class Helper {

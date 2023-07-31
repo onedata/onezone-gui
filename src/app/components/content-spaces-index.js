@@ -9,7 +9,7 @@
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { get, computed, set } from '@ember/object';
+import { get, computed, set, getProperties } from '@ember/object';
 import { reads, gt } from '@ember/object/computed';
 import { reject } from 'rsvp';
 import ProvidersColors from 'onedata-gui-common/mixins/components/providers-colors';
@@ -19,6 +19,7 @@ import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-s
 import ChooseDefaultOneprovider from 'onezone-gui/mixins/choose-default-oneprovider';
 import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
+import _ from 'lodash';
 
 export default Component.extend(
   I18n,
@@ -159,6 +160,29 @@ export default Component.extend(
       });
     }),
 
+    isDetailsTileShown: computed(
+      'space.privileges.{view,update}',
+      'space.{organizationName,description,tags}',
+      function isDetailsTileShown() {
+        const {
+          organizationName,
+          description,
+          tags,
+        } = getProperties(
+          this.space,
+          'organizationName',
+          'description',
+          'tags'
+        );
+        const hasAnyDetail = Boolean(organizationName) ||
+          Boolean(description) ||
+          !_.isEmpty(tags);
+        return this.space.privileges.view && (
+          hasAnyDetail || this.space.privileges.update
+        );
+      }
+    ),
+
     /**
      * Shows global info about save error.
      * @param {object} error
@@ -191,4 +215,5 @@ export default Component.extend(
         return this._saveSpace();
       },
     },
-  });
+  }
+);
