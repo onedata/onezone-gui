@@ -70,7 +70,10 @@
         title=(tt this "tileProvidersMapTitle")
       }}
       {{#if isMarketplaceTileShown}}
-        {{space-marketplace-tile space=space}}
+        {{space-marketplace-tile
+          space=space
+          onDismiss=(action "dismissMarketplaceTile")
+        }}
       {{/if}}
       {{resource-members-tile record=space}}
     {{/if}}

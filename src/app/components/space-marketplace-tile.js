@@ -31,6 +31,12 @@ export default Component.extend(I18n, {
    */
   space: undefined,
 
+  /**
+   * @virtual
+   * @type {() => void}
+   */
+  onDismiss: undefined,
+
   tileClassNames: Object.freeze(['space-marketplace-tile', 'text-center']),
 
   tileClass: computed('tileClassNames', function tileClass() {
@@ -82,4 +88,10 @@ export default Component.extend(I18n, {
       }
     );
   }),
+
+  actions: {
+    dismiss() {
+      this?.onDismiss();
+    },
+  },
 });

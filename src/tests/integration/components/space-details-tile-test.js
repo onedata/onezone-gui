@@ -7,6 +7,7 @@ import { lookupService } from '../../helpers/stub-service';
 import { clearStoreAfterEach } from '../../helpers/clear-store';
 import { assert } from '@ember/debug';
 import UserSpaceHelper from '../../helpers/user-space-helper';
+import sinon from 'sinon';
 
 describe('Integration | Component | space-details-tile', function () {
   setupRenderingTest();
@@ -143,6 +144,7 @@ class Helper {
     /** @type {Mocha.Context} */
     this.mochaContext = mochaContext;
     this.userSpaceHelper = new UserSpaceHelper(this.mochaContext);
+    sinon.stub(lookupService(this.mochaContext, 'router'), 'urlFor').returns('#/url');
   }
 
   get store() {

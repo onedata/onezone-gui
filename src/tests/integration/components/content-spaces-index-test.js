@@ -14,6 +14,7 @@ import { clearStoreAfterEach } from '../../helpers/clear-store';
 import { assert } from '@ember/debug';
 import UserSpaceHelper from '../../helpers/user-space-helper';
 import { set } from '@ember/object';
+import { click } from 'ember-native-dom-helpers';
 
 const TestCurrentUser = CurrentUser.extend({
   userProxy: promiseObject(resolve({
@@ -259,6 +260,29 @@ describe('Integration | Component | content-spaces-index', function () {
     }
   );
 
+  it('closes tile with space Marketplace info after dismiss button is clicked',
+    async function () {
+      const helper = new Helper(this);
+      set(helper.spaceManager, 'marketplaceConfig', {
+        enabled: false,
+      });
+      await helper.setSpace({
+        advertisedInMarketplace: true,
+        privileges: {
+          view: true,
+          update: true,
+        },
+      });
+
+      await helper.render();
+      expect(helper.spaceMarketplaceTile).to.exist;
+      const dismissButton = helper.spaceMarketplaceTile.querySelector('.dismiss-button');
+      await click(dismissButton);
+
+      expect(helper.spaceMarketplaceTile).to.not.exist;
+    }
+  );
+
   //#endregion
 });
 
@@ -269,6 +293,7 @@ class Helper {
     this.mochaContext = mochaContext;
     this.showResourceMembershipTile = false;
     this.userSpaceHelper = new UserSpaceHelper(this.mochaContext);
+    sinon.stub(lookupService(this.mochaContext, 'router'), 'urlFor').returns('#/url');
   }
 
   get store() {
