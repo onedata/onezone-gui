@@ -3,4 +3,5 @@ export default {
   configureAdvertisement: 'Configure advertisement',
   advertised: 'Space advertised',
   notAdvertised: 'Not advertised',
+  show: 'Show',
 };

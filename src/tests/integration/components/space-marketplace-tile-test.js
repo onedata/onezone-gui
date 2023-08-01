@@ -7,6 +7,7 @@ import { lookupService } from '../../helpers/stub-service';
 import { clearStoreAfterEach } from '../../helpers/clear-store';
 import { assert } from '@ember/debug';
 import UserSpaceHelper from '../../helpers/user-space-helper';
+import sinon from 'sinon';
 
 describe('Integration | Component | space-marketplace-tile', function () {
   setupRenderingTest();
@@ -73,6 +74,37 @@ describe('Integration | Component | space-marketplace-tile', function () {
 
     expect(helper.element.textContent).to.not.contain('Configure advertisement');
   });
+
+  it('renders "Show" link if space is advertised', async function () {
+    const helper = new Helper(this);
+    await helper.setSpace({
+      advertisedInMarketplace: true,
+      privileges: {
+        view: true,
+      },
+    });
+
+    await helper.render();
+
+    expect(helper.moreLink).to.exist;
+    expect(helper.moreLink).to.contain.text('Show');
+  });
+
+  it('does not render "Show" link if space is not advertised', async function () {
+    const helper = new Helper(this);
+    await helper.setSpace({
+      advertisedInMarketplace: false,
+      privileges: {
+        view: true,
+        update: true,
+        manageInMarketplace: true,
+      },
+    });
+
+    await helper.render();
+
+    expect(helper.moreLink).to.not.exist;
+  });
 });
 
 class Helper {
@@ -81,6 +113,7 @@ class Helper {
     /** @type {Mocha.Context} */
     this.mochaContext = mochaContext;
     this.userSpaceHelper = new UserSpaceHelper(this.mochaContext);
+    sinon.stub(lookupService(this.mochaContext, 'router'), 'urlFor').returns('#/url');
   }
 
   get store() {
@@ -98,6 +131,9 @@ class Helper {
   }
   get mainImage() {
     return this.element.querySelector('.main-image');
+  }
+  get moreLink() {
+    return this.element.querySelector('.more-link');
   }
   setUser() {
     return this.userSpaceHelper.setUser(...arguments);

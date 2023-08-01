@@ -1,5 +1,5 @@
 /**
- * FIXME: doc
+ * Shows information about space status in Marketplace with links.
  *
  * @author Jakub Liput
  * @copyright (C) 2023 ACK CYFRONET AGH
@@ -10,12 +10,15 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { conditional, raw, isEmpty, and } from 'ember-awesome-macros';
+import { conditional, raw, and } from 'ember-awesome-macros';
 import computedT from 'onedata-gui-common/utils/computed-t';
-import { SpaceTag } from './space-configuration/space-tags-selector';
+import { inject as service } from '@ember/service';
+import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 
 export default Component.extend(I18n, {
   tagName: '',
+
+  router: service(),
 
   /**
    * @override
@@ -52,15 +55,31 @@ export default Component.extend(I18n, {
     return ['onedata.sidebar.content.aspect', 'spaces', this.spaceId, 'configuration'];
   }),
 
+  isAdvertised: reads('space.advertisedInMarketplace'),
+
   figureBottomText: conditional(
-    'space.advertisedInMarketplace',
+    'isAdvertised',
     computedT('advertised'),
     computedT('notAdvertised')
   ),
 
   figureBottomTextClass: conditional(
-    'space.advertisedInMarketplace',
+    'isAdvertised',
     raw('advertised'),
     raw('not-advertised'),
   ),
+
+  viewInMarketplaceHref: computed('spaceId', function viewInMarketplaceHref() {
+    return this.router.urlFor(
+      'onedata.sidebar.content',
+      'spaces',
+      'join', {
+        queryParams: {
+          options: serializeAspectOptions({
+            selectedSpace: this.spaceId,
+          }),
+        },
+      }
+    );
+  }),
 });

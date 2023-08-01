@@ -1,10 +1,10 @@
 {{#one-tile
   title=(tt this "title")
-  isLink=isLink
   class=tileClass
-  aspect=aspect
-  moreText=moreText
-  footerText=(if isConfigureButtonShown (tt this 'configureAdvertisement'))
+  isLink=isAdvertised
+  customLink=(if isAdvertised viewInMarketplaceHref)
+  moreText=(if isAdvertised (tt this "show"))
+  footerText=(if isConfigureButtonShown (tt this "configureAdvertisement"))
   footerTextIcon=(if isConfigureButtonShown "settings")
   footerLinkToParams=(if isConfigureButtonShown footerLinkToParams)
 }}
