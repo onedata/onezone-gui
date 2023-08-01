@@ -33,6 +33,7 @@ export default Component.extend(
     guiUtils: service(),
     i18n: service(),
     apiSamplesActions: service(),
+    spaceManager: service(),
 
     /**
      * @override
@@ -168,18 +169,38 @@ export default Component.extend(
           organizationName,
           description,
           tags,
+          privileges,
         } = getProperties(
           this.space,
           'organizationName',
           'description',
-          'tags'
+          'tags',
+          'privileges',
         );
         const hasAnyDetail = Boolean(organizationName) ||
           Boolean(description) ||
           !_.isEmpty(tags);
-        return this.space.privileges.view && (
-          hasAnyDetail || this.space.privileges.update
+        return privileges.view && (
+          hasAnyDetail || privileges.update
         );
+      }
+    ),
+
+    isMarketplaceTileShown: computed(
+      'space.privileges.{view,update}',
+      'space.advertisedInMarketplace',
+      'spaceManager.marketplaceConfig.enabled',
+      function isMarketplaceTileShown() {
+        const {
+          advertisedInMarketplace,
+          privileges,
+        } = getProperties(
+          this.space,
+          'advertisedInMarketplace',
+          'privileges',
+        );
+        return this.spaceManager.marketplaceConfig.enabled && privileges.view &&
+          (advertisedInMarketplace || privileges.update);
       }
     ),
 

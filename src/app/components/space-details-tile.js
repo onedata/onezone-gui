@@ -23,6 +23,7 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.spaceDetailsTile',
 
   /**
+   * @virtual
    * @type {Models.Space}
    */
   space: undefined,

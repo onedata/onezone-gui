@@ -13,6 +13,7 @@ import globals from 'onedata-gui-common/utils/globals';
 import { clearStoreAfterEach } from '../../helpers/clear-store';
 import { assert } from '@ember/debug';
 import UserSpaceHelper from '../../helpers/user-space-helper';
+import { set } from '@ember/object';
 
 const TestCurrentUser = CurrentUser.extend({
   userProxy: promiseObject(resolve({
@@ -175,6 +176,90 @@ describe('Integration | Component | content-spaces-index', function () {
   );
 
   //#endregion
+
+  //#region space-marketplace-tile
+
+  it('renders a tile with space Marketplace info if Marketplace is enabled and user has space update privileges',
+    async function () {
+      const helper = new Helper(this);
+      set(helper.spaceManager, 'marketplaceConfig', {
+        enabled: true,
+      });
+      await helper.setSpace({
+        advertisedInMarketplace: false,
+        privileges: {
+          view: true,
+          update: true,
+        },
+      });
+
+      await helper.render();
+
+      expect(helper.spaceMarketplaceTile).to.exist;
+    }
+  );
+
+  it('renders a tile with space Marketplace info if Marketplace is enabled, space is advertised and user has no space update privileges',
+    async function () {
+      const helper = new Helper(this);
+      set(helper.spaceManager, 'marketplaceConfig', {
+        enabled: true,
+      });
+      await helper.setSpace({
+        advertisedInMarketplace: true,
+        privileges: {
+          view: true,
+          update: false,
+        },
+      });
+
+      await helper.render();
+
+      expect(helper.spaceMarketplaceTile).to.exist;
+    }
+  );
+
+  it('does not render a tile with space Marketplace info if Marketplace is enabled, space is not advertised and user has no space update privileges',
+    async function () {
+      const helper = new Helper(this);
+      set(helper.spaceManager, 'marketplaceConfig', {
+        enabled: true,
+      });
+      await helper.setSpace({
+        advertisedInMarketplace: false,
+        privileges: {
+          view: true,
+          update: false,
+        },
+      });
+
+      await helper.render();
+
+      expect(helper.spaceMarketplaceTile).to.not.exist;
+    }
+  );
+
+  it('does not render a tile with space Marketplace info if Marketplace is disabled',
+    async function () {
+      const helper = new Helper(this);
+      set(helper.spaceManager, 'marketplaceConfig', {
+        enabled: false,
+      });
+      await helper.setSpace({
+        advertisedInMarketplace: true,
+        privileges: {
+          view: true,
+          update: true,
+        },
+      });
+
+      await helper.render();
+
+      expect(helper.spaceMarketplaceTile).to.not.exist;
+    }
+  );
+
+  //#endregion
 });
 
 class Helper {
@@ -196,11 +281,17 @@ class Helper {
   get spaceDetailsTile() {
     return this.element.querySelector('.space-details-tile');
   }
+  get spaceMarketplaceTile() {
+    return this.element.querySelector('.space-marketplace-tile');
+  }
   get space() {
     return this.userSpaceHelper.space;
   }
   get user() {
     return this.userSpaceHelper.user;
+  }
+  get spaceManager() {
+    return lookupService(this.mochaContext, 'spaceManager');
   }
   setUser() {
     return this.userSpaceHelper.setUser(...arguments);

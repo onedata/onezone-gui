@@ -63,6 +63,9 @@
       {{#if isDetailsTileShown}}
         {{space-details-tile space=space}}
       {{/if}}
+      {{#if isMarketplaceTileShown}}
+        {{space-marketplace-tile space=space}}
+      {{/if}}
       {{providers-map-tile
         class="resource-map-tile"
         providersProxy=providersProxy

@@ -1,6 +1,7 @@
 @use 'sass:math';
 
 .space-details-tile {
+  // FIXME: inna klasa do ustalania backgrounda raczej
   &.one-tile-link {
     .tile-main {
       --tile-background: white;
@@ -82,19 +83,5 @@
     $scale-down-by: 20%;
     width: #{math.div(100%, 100% - $scale-down-by) * 100%};
     transform: translateX(#{-$scale-down-by * 0.5}) translateY(#{-$scale-down-by * 0.5}) scale(#{100% - $scale-down-by});
-    // margin-left: -12%;
-    // margin-right: -12%;
-    margin-bottom: -1em;
-    p:first-child {
-      margin-top: 1em;
-    }
-    h1:first-child,
-    h2:first-child,
-    h3:first-child,
-    h4:first-child,
-    h5:first-child,
-    h6:first-child {
-      margin-top: -8%;
-    }
   }
 }

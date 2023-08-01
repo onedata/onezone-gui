@@ -1,0 +1,12 @@
+.space-marketplace-tile {
+  .tile-content-inner {
+    display: flex;
+    flex-direction: column;
+    .main-figure {
+      transform: translateY(-50%);
+    }
+  }
+  .tile-element {
+    position: relative;
+  }
+}

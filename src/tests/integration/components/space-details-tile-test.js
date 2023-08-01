@@ -142,7 +142,6 @@ class Helper {
     assert('mochaContext is mandatory', mochaContext);
     /** @type {Mocha.Context} */
     this.mochaContext = mochaContext;
-    this.showResourceMembershipTile = false;
     this.userSpaceHelper = new UserSpaceHelper(this.mochaContext);
   }
 
