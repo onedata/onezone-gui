@@ -1,4 +1,15 @@
+@use 'sass:math';
+
 .space-details-tile {
+  &.one-tile-link {
+    .tile-main {
+      --tile-background: white;
+      &:hover {
+        --tile-background: #{$-tile-hover-background-color};
+      }
+    }
+  }
+
   .tile-content-inner {
     display: flex;
     flex-direction: column;
@@ -45,15 +56,11 @@
   .top-placeholder + .space-tags {
     margin-top: 0.6em;
   }
-  .markdown-view {
-    margin-top: 0;
-    margin-bottom: 0;
-  }
-
   .description-row {
     position: relative;
     overflow: hidden;
     z-index: 0;
+    flex-grow: 1;
     &::before {
       content: '';
       position: absolute;
@@ -65,31 +72,29 @@
       background: linear-gradient(0deg, var(--tile-background), transparent);
       z-index: 1;
     }
-    &::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      right: 0;
-      height: 100%;
-      width: 2em;
-      background: linear-gradient(270deg, var(--tile-background), transparent);
-      z-index: 1;
-    }
   }
-
-  &.one-tile-link {
-    .tile-main {
-      --tile-background: white;
-      &:hover {
-        --tile-background: #{$-tile-hover-background-color};
-      }
-    }
+  .markdown-view {
+    margin-top: 0;
+    margin-bottom: 0;
+    pointer-events: none;
   }
-
   .rendered-markdown {
-    transform: scale(0.8);
-    margin: -12%;
-    margin-top: -8%;
+    $scale-down-by: 20%;
+    width: #{math.div(100%, 100% - $scale-down-by) * 100%};
+    transform: translateX(#{-$scale-down-by * 0.5}) translateY(#{-$scale-down-by * 0.5}) scale(#{100% - $scale-down-by});
+    // margin-left: -12%;
+    // margin-right: -12%;
+    margin-bottom: -1em;
+    p:first-child {
+      margin-top: 1em;
+    }
+    h1:first-child,
+    h2:first-child,
+    h3:first-child,
+    h4:first-child,
+    h5:first-child,
+    h6:first-child {
+      margin-top: -8%;
+    }
   }
 }

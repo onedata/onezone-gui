@@ -8,11 +8,10 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { computed, getProperties } from '@ember/object';
+import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { conditional, raw, or, and, not, isEmpty } from 'ember-awesome-macros';
+import { conditional, raw, isEmpty } from 'ember-awesome-macros';
 import computedT from 'onedata-gui-common/utils/computed-t';
-import _ from 'lodash';
 import { SpaceTag } from './space-configuration/space-tags-selector';
 
 export default Component.extend(I18n, {

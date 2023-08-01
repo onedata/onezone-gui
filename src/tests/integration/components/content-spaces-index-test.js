@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
+import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render, find } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
@@ -13,7 +13,6 @@ import globals from 'onedata-gui-common/utils/globals';
 import { clearStoreAfterEach } from '../../helpers/clear-store';
 import { assert } from '@ember/debug';
 import UserSpaceHelper from '../../helpers/user-space-helper';
-import { get } from '@ember/object';
 
 const TestCurrentUser = CurrentUser.extend({
   userProxy: promiseObject(resolve({
@@ -23,8 +22,7 @@ const TestCurrentUser = CurrentUser.extend({
 });
 
 describe('Integration | Component | content-spaces-index', function () {
-  const { afterEach, beforeEach } = setupRenderingTest();
-
+  setupRenderingTest();
   clearStoreAfterEach();
 
   it('renders a tile with resolved default Oneprovider', async function () {

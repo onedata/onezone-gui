@@ -538,16 +538,7 @@ function createSpacesRecords(store) {
         advertisedInMarketplace: true,
         organizationName: 'The company',
         tags: ['energy', 'environment', 'old-tag'],
-        description: `# Hello world
-
-Lorem ipsum sit dolor amet.
-
-Lorem ipsum sit dolor amet.
-
-Lorem ipsum sit dolor amet. Lorem ipsum sit dolor amet. Lorem ipsum sit dolor amet. Lorem ipsum sit dolor amet.
-
-Lorem ipsum sit dolor amet.
-`,
+        description: exampleMarkdownLong,
         marketplaceContactEmail: 'space_user@example.com',
       } : {
         advertisedInMarketplace: false,
