@@ -82,10 +82,6 @@ describe(
                 type: 'service',
                 whitelist: ['opp-oneprovider1id'],
               }),
-              sinon.match({
-                type: 'interface',
-                interface: 'rest',
-              }),
             ],
           }));
       });
@@ -107,10 +103,6 @@ describe(
               sinon.match({
                 type: 'service',
                 whitelist: ['ozp-onezone'],
-              }),
-              sinon.match({
-                type: 'interface',
-                interface: 'rest',
               }),
             ],
           }));
