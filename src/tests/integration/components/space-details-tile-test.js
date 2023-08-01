@@ -88,6 +88,53 @@ describe('Integration | Component | space-details-tile', function () {
       );
     }
   );
+
+  it('renders "unknown organization..." message on top if only tags and description are provided',
+    async function () {
+      const helper = new Helper(this);
+      await helper.setSpace({
+        tags: ['hello', 'world'],
+        description: 'foo bar',
+      });
+
+      await helper.render();
+
+      expect(helper.element.textContent).to.contain(
+        'Unknown organization'
+      );
+    }
+  );
+
+  it('renders "No tags" message on top if only organization name and description are provided',
+    async function () {
+      const helper = new Helper(this);
+      await helper.setSpace({
+        organizationName: 'onedata.org',
+        description: 'foo bar',
+      });
+
+      await helper.render();
+
+      expect(helper.element.textContent).to.contain(
+        'No tags'
+      );
+    }
+  );
+
+  it('renders "Unknown organization, no tags" message on top if only description is provided',
+    async function () {
+      const helper = new Helper(this);
+      await helper.setSpace({
+        description: 'foo bar',
+      });
+
+      await helper.render();
+
+      expect(helper.element.textContent).to.contain(
+        'Unknown organization, no tags'
+      );
+    }
+  );
 });
 
 class Helper {

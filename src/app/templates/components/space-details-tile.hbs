@@ -15,21 +15,26 @@
     </figure>
   {{/unless}}
   {{#if organizationName}}
-    <div class="tile-data organization-name-row">
+    <div class="tile-element organization-name-row">
       {{one-icon icon="organization" class="organization-name-icon"}}
       <span class="organization-name">{{organizationName}}</span>
     </div>
   {{/if}}
+  {{#if topMessage}}
+    <div class="tile-element top-placeholder">
+      {{topMessage}}
+    </div>
+  {{/if}}
   {{#unless noTags}}
     {{tags-input
-      class="tile-data space-tags static-value"
+      class="tile-element space-tags static-value"
       tags=inputTags
       readonly=true
       readonlyTagsDisplayLimit=readonlyTagsDisplayLimit
     }}
   {{/unless}}
   {{#if description}}
-    <div class="tile-data description-row">
+    <div class="tile-element description-row">
       {{one-markdown-to-html
         class="markdown-view"
         markdown=description

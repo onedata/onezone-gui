@@ -2,12 +2,15 @@
   .tile-content-inner {
     display: flex;
     flex-direction: column;
+    .main-figure {
+      transform: translateY(-50%);
+    }
   }
   .figure-text-centered {
     font-style: italic;
     @include font-semibold;
   }
-  .tile-data {
+  .tile-element {
     position: relative;
   }
   .organization-name-row {
@@ -30,6 +33,17 @@
     &.tags-input {
       font-size: 0.85em;
     }
+  }
+  .top-placeholder {
+    font-size: 0.9em;
+    opacity: $disabled-opacity;
+    font-style: italic;
+  }
+  .organization-name-row + .top-placeholder {
+    margin-top: 0.2em;
+  }
+  .top-placeholder + .space-tags {
+    margin-top: 0.6em;
   }
   .markdown-view {
     margin-top: 0;

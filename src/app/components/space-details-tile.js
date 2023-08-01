@@ -87,26 +87,53 @@ export default Component.extend(I18n, {
     });
   }),
 
+  /**
+   * @type {ComputedProperty<SafeString|''>}
+   */
   centeredMessage: computed(
     'organizationName',
     'description',
     'noTags',
     function centeredMessage() {
       const tagsPresent = !this.noTags;
+      if (this.organizationName && tagsPresent && this.description) {
+        return '';
+      }
       if (!this.organizationName && tagsPresent && !this.description) {
         return this.t('unknownOrganizationNoDescription');
-      } else if (this.organizationName && tagsPresent && !this.description) {
+      }
+      if (this.organizationName && tagsPresent && !this.description) {
         return this.t('noDescription');
-      } else if (
-        this.organizationName && !tagsPresent && !this.description
-      ) {
+      }
+      if (this.organizationName && !tagsPresent && !this.description) {
         return this.t('noTagsOrDescription');
-      } else if (
-        !this.organizationName &&
-        !tagsPresent &&
-        !this.description
-      ) {
+      }
+      if (!this.organizationName && !tagsPresent && !this.description) {
         return this.t('noDetailsProvided');
+      }
+    },
+  ),
+
+  /**
+   * @type {ComputedProperty<SafeString|''>}
+   */
+  topMessage: computed(
+    'organizationName',
+    'description',
+    'noTags',
+    function topMessage() {
+      const tagsPresent = !this.noTags;
+      if (!this.description || (this.organizationName && this.tagsPresent)) {
+        return '';
+      }
+      if (!this.organizationName && tagsPresent) {
+        return this.t('unknownOrganization');
+      }
+      if (this.organizationName && !tagsPresent) {
+        return this.t('noTags');
+      }
+      if (!this.organizationName && !tagsPresent) {
+        return this.t('unknownOrganizationNoTags');
       }
     },
   ),
