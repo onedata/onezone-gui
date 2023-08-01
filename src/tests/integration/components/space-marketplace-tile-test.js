@@ -20,7 +20,7 @@ describe('Integration | Component | space-marketplace-tile', function () {
     expect(helper.element.textContent).to.contain('Marketplace');
   });
 
-  it('renders enabled cart image if space is advertised', async function () {
+  it('renders enabled cart image with text if space is advertised', async function () {
     const helper = new Helper(this);
     await helper.setSpace({
       advertisedInMarketplace: true,
@@ -29,9 +29,10 @@ describe('Integration | Component | space-marketplace-tile', function () {
     await helper.render();
 
     expect(helper.mainImage).to.have.attribute('src', 'assets/images/cart-checked.svg');
+    expect(helper.element).to.contain.text('Space advertised');
   });
 
-  it('renders disabled cart image if space is not advertised', async function () {
+  it('renders disabled cart image with text if space is not advertised', async function () {
     const helper = new Helper(this);
     await helper.setSpace({
       advertisedInMarketplace: false,
@@ -40,8 +41,37 @@ describe('Integration | Component | space-marketplace-tile', function () {
     await helper.render();
 
     expect(helper.mainImage).to.have.attribute('src', 'assets/images/cart-disabled.svg');
+    expect(helper.element).to.contain.text('Not advertised');
   });
 
+  it('renders configure button if user has proper privileges', async function () {
+    const helper = new Helper(this);
+    await helper.setSpace({
+      privileges: {
+        view: true,
+        update: true,
+        manageInMarketplace: true,
+      },
+    });
+
+    await helper.render();
+
+    expect(helper.element.textContent).to.contain('Configure advertisement');
+  });
+
+  it('does not render configure button if user does not have proper privileges', async function () {
+    const helper = new Helper(this);
+    await helper.setSpace({
+      privileges: {
+        view: true,
+        update: true,
+        manageInMarketplace: false,
+      },
+    });
+
+    await helper.render();
+
+    expect(helper.element.textContent).to.not.contain('Configure advertisement');
   });
 });
 

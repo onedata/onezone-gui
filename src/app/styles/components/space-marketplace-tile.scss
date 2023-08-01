@@ -9,4 +9,14 @@
   .tile-element {
     position: relative;
   }
+  .figure-bottom-text {
+    margin-top: -0.6em;
+    &.advertised {
+      @include font-semibold;
+    }
+    &.not-advertised {
+      font-style: italic;
+      opacity: $disabled-opacity;
+    }
+  }
 }
