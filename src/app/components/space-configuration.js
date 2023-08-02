@@ -32,6 +32,9 @@ import { validator } from 'ember-cp-validations';
 import { SpaceTag } from './space-configuration/space-tags-selector';
 import CustomValueDropdownField from 'onedata-gui-common/utils/form-component/custom-value-dropdown-field';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
+import globals from 'onedata-gui-common/utils/globals';
+import preventPageUnload from 'onedata-gui-common/utils/prevent-page-unload';
+import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 /**
  * @typedef {'view'|'edit'} SpaceConfigDescriptionEditorMode
@@ -46,6 +49,16 @@ const validations = buildValidations({
   currentContactEmail: contactEmailValidator,
 });
 
+// FIXME: użyć więcej razy?
+
+/**
+ * @typedef {'name'|'organizationName'|'tags'|'contactEmail'} SpaceConfiguration.InlineEditorFieldId
+ */
+
+/**
+ * @typedef {SpaceConfiguration.InlineEditorFieldId|'advertised'|'description'} SpaceConfiguration.FieldId
+ */
+
 export default Component.extend(validations, I18n, {
   classNames: ['space-configuration', 'fill-flex-using-column', 'fill-flex-limited'],
 
@@ -54,6 +67,7 @@ export default Component.extend(validations, I18n, {
   globalNotify: service(),
   spaceManager: service(),
   currentUser: service(),
+  navigationState: service(),
 
   /**
    * @override
@@ -119,9 +133,21 @@ export default Component.extend(validations, I18n, {
   blankInlineEditors: undefined,
 
   /**
-   * @type {OneInlineCustomEditorApi}
+   * Stores ids of currently edited inline editors.
+   * @type {Set<string>}
    */
-  emailInlineEditorApi: undefined,
+  modifiedFields: undefined,
+
+  /**
+   * Stores ids of currently edited inline editors.
+   * @type {Object<SpaceConfiguration.InlineEditorFieldId, OneInlineCustomEditorApi>}
+   */
+  inlineEditorsApis: undefined,
+
+  /**
+   * @type {boolean}
+   */
+  isAskingUserForUnsavedChanges: false,
 
   //#endregion
 
@@ -295,7 +321,7 @@ export default Component.extend(validations, I18n, {
         onValueChange(value, field) {
           this._super(...arguments);
           if (field?.name === this.spaceConfigurationComponent.emailFieldName) {
-            this.spaceConfigurationComponent.emailInlineEditorApi?.onChange(value);
+            this.spaceConfigurationComponent.getEmailInlineEditorApi()?.onChange(value);
           }
         },
       })
@@ -322,21 +348,180 @@ export default Component.extend(validations, I18n, {
       });
   }),
 
+  /**
+   * @type {ComputedProperty<Function>}
+   */
+  routeChangeHandler: computed(function routeChangeHandler() {
+    return (transition) => this.handleRouteChange(transition);
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Function>}
+   */
+  pageUnloadHandler: computed(function pageUnloadHandler() {
+    return (event) => this.handlePageUnload(event);
+  }),
+
   spaceObserver: observer('space', function spaceObserver() {
     this.setCurrentValuesFromRecord();
   }),
 
+  // navigationObserver: observer(
+  //   'navigationState.{activeResourceType,activeResource,activeAspect}',
+  //   function navigationObserver() {
+  //     this.tryAskForUnsavedChanges();
+  //   }
+  // ),
+
+  /**
+   * @override
+   */
   init() {
     this._super(...arguments);
     this.spaceObserver();
-    this.set('blankInlineEditors', {});
+
+    this.setProperties({
+      blankInlineEditors: {},
+      modifiedFields: new Set(),
+      inlineEditorsApis: {},
+    });
+
+    this.registerRouteChangeHandler();
+    this.registerPageUnloadHandler();
+
+    // FIXME: debug code
+    ((name) => {
+      window[name] = this;
+      console.log(`window.${name}`, window[name]);
+    })('debug_space_configuration');
   },
 
   /**
-   * @param {OneInlineCustomEditorApi} api
+   * @override
    */
-  registerEmailInlineEditor(api) {
-    this.set('emailInlineEditorApi', api);
+  willDestroyElement() {
+    try {
+      this.unregisterRouteChangeHandler();
+      this.unregisterPageUnloadHandler();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
+  async handleRouteChange(transition) {
+    // FIXME: użyć isTransitionWithinEditor jak w content-atm-inventories-workflows.js
+    if (transition.isAborted) {
+      return;
+    }
+
+    if (this.shouldBlockTransitionDueToUnsavedChanges()) {
+      // Aborting transition doesn't work properly for query-params-only
+      // transitions. This should be fixed in Ember 3.20.3.
+      // TODO: VFS-10419 Check if Ember 3.20 fixed this issue.
+      transition.abort();
+      const userDecision = await this.askUserAndProcessUnsavedChanges();
+      if (userDecision === 'save' || userDecision === 'ignore') {
+        transition.retry();
+      }
+    }
+  },
+
+  handlePageUnload(event) {
+    if (this.shouldBlockTransitionDueToUnsavedChanges()) {
+      return preventPageUnload(event, String(this.t('confirmPageClose')));
+    }
+  },
+
+  shouldBlockTransitionDueToUnsavedChanges() {
+    const modifiedFieldsIds = this.modifiedFields.values();
+    return Boolean([...modifiedFieldsIds].length);
+  },
+
+  /**
+   * @returns {Promise<'ignore'|'save'|'keepEditing'|'alreadyAsked'>}
+   */
+  async askUserAndProcessUnsavedChanges() {
+    if (this.isAskingUserForUnsavedChanges) {
+      // User is already in the middle of choosing what to do. It means, that
+      // there was some uncommited url/route change earlier, which needs to
+      // be resolved at the first place.
+      return 'alreadyAsked';
+    }
+    this.set('isAskingUserForUnsavedChanges', true);
+
+    let decision = 'keepEditing';
+    await this.modalManager.show('unsaved-changes-question-modal', {
+      // FIXME: blokować save jeśli są jakieś błędy w edytorach
+      saveDisabledReason: this.isAnyValidationError() ?
+        this.t('cannotSaveDueToIssues') : undefined,
+      onSubmit: async ({ shouldSaveChanges }) => {
+        if (shouldSaveChanges) {
+          try {
+            // FIXME: przetestować błąd zapisu
+            await this.saveAllModifiedFields();
+            decision = 'save';
+          } catch {
+            // In case of failure `executeSaveAction` should show proper error
+            // notification. After fail user should stay in editor view and
+            // decide what to do next. Hence `decision` stays as `'keepEditing'`.
+            return;
+          }
+        } else {
+          decision = 'ignore';
+        }
+      },
+    }).hiddenPromise;
+    safeExec(this, () => {
+      this.set('isAskingUserForUnsavedChanges', false);
+      // FIXME: nieużywane, sprawdzić czy będzie wszystko dobrze działać
+      if (decision !== 'keepEditing') {
+        this.revertAllModifiedFields();
+      }
+    });
+
+    return decision;
+  },
+
+  registerRouteChangeHandler() {
+    this.router.on('routeWillChange', this.routeChangeHandler);
+  },
+
+  unregisterRouteChangeHandler() {
+    this.router.off('routeWillChange', this.routeChangeHandler);
+  },
+
+  registerPageUnloadHandler() {
+    globals.window.addEventListener('beforeunload', this.pageUnloadHandler);
+  },
+
+  unregisterPageUnloadHandler() {
+    globals.window.removeEventListener('beforeunload', this.pageUnloadHandler);
+  },
+
+  async saveAllModifiedFields() {
+    const modifiedFieldsIds = this.modifiedFields.values();
+    for (const fieldId of modifiedFieldsIds) {
+      this.inlineEditorsApis[fieldId]?.onSave();
+    }
+  },
+
+  async revertAllModifiedFields() {
+    const modifiedFieldsIds = this.modifiedFields.values();
+    for (const fieldId of modifiedFieldsIds) {
+      this.inlineEditorsApis[fieldId]?.onCancel();
+    }
+  },
+
+  isAnyValidationError() {
+    const modifiedFieldsIds = [...this.modifiedFields.values()];
+    return modifiedFieldsIds.some(fieldId => this.blankInlineEditors[fieldId]);
+  },
+
+  /**
+   * @returns {OneInlineCustomEditorApi}
+   */
+  getEmailInlineEditorApi() {
+    return this.inlineEditorsApis?.['contactEmail'];
   },
 
   /**
@@ -410,6 +595,7 @@ export default Component.extend(validations, I18n, {
         break;
     }
   },
+
   discardValue(fieldId) {
     switch (fieldId) {
       case 'description':
@@ -479,6 +665,18 @@ export default Component.extend(validations, I18n, {
     }
   },
 
+  /**
+   * @param {SpaceConfiguration.InlineEditorFieldId} fieldId
+   * @param {boolean} state The same as `component:one-inline-editor` `onEdit` callback
+   *   `state` parameter.
+   */
+  onInlineEditorStateChange(fieldId, state) {
+    if (!fieldId) {
+      return;
+    }
+    this.modifiedFields[state ? 'add' : 'delete'](fieldId);
+  },
+
   actions: {
     async saveValue(fieldId, value) {
       return this.saveValue(fieldId, value);
@@ -508,6 +706,21 @@ export default Component.extend(validations, I18n, {
       if (state === false) {
         this.contactEmailRootField.reset();
       }
+    },
+    /**
+     * @param {SpaceConfiguration.InlineEditorFieldId} fieldId
+     * @param {OneInlineCustomEditorApi} api
+     */
+    registerInlineEditorApi(fieldId, api) {
+      this.inlineEditorsApis[fieldId] = api;
+    },
+    /**
+     * @param {SpaceConfiguration.InlineEditorFieldId} fieldId
+     * @param {boolean} state The same as `component:one-inline-editor` `onEdit` callback
+     *   `state` parameter.
+     */
+    inlineEditorStateChanged(fieldId, state) {
+      this.onInlineEditorStateChange(fieldId, state);
     },
   },
 });
