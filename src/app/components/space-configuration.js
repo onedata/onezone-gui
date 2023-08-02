@@ -22,7 +22,7 @@ import {
 } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import computedT from 'onedata-gui-common/utils/computed-t';
-import { Promise } from 'rsvp';
+import { Promise, all as allFulfilled } from 'rsvp';
 import { buildValidations } from 'ember-cp-validations';
 import { inject as service } from '@ember/service';
 import _ from 'lodash';
@@ -451,13 +451,11 @@ export default Component.extend(validations, I18n, {
 
     let decision = 'keepEditing';
     await this.modalManager.show('unsaved-changes-question-modal', {
-      // FIXME: blokować save jeśli są jakieś błędy w edytorach
       saveDisabledReason: this.isAnyValidationError() ?
         this.t('cannotSaveDueToIssues') : undefined,
       onSubmit: async ({ shouldSaveChanges }) => {
         if (shouldSaveChanges) {
           try {
-            // FIXME: przetestować błąd zapisu
             await this.saveAllModifiedFields();
             decision = 'save';
           } catch {
@@ -473,7 +471,6 @@ export default Component.extend(validations, I18n, {
     }).hiddenPromise;
     safeExec(this, () => {
       this.set('isAskingUserForUnsavedChanges', false);
-      // FIXME: nieużywane, sprawdzić czy będzie wszystko dobrze działać
       if (decision !== 'keepEditing') {
         this.revertAllModifiedFields();
       }
@@ -499,10 +496,10 @@ export default Component.extend(validations, I18n, {
   },
 
   async saveAllModifiedFields() {
-    const modifiedFieldsIds = this.modifiedFields.values();
-    for (const fieldId of modifiedFieldsIds) {
-      this.inlineEditorsApis[fieldId]?.onSave();
-    }
+    const modifiedFieldsIds = [...this.modifiedFields.values()];
+    await allFulfilled(modifiedFieldsIds.map((fieldId) => {
+      return this.inlineEditorsApis[fieldId]?.onSave();
+    }));
   },
 
   async revertAllModifiedFields() {
@@ -559,40 +556,48 @@ export default Component.extend(validations, I18n, {
    * @returns
    */
   async saveValue(fieldId, value) {
-    switch (fieldId) {
-      case 'name':
-      case 'organizationName':
-        await this.saveSpaceValue(fieldId, value);
-        break;
-      case 'tags': {
-        const tagsRawValue = value?.map(({ label }) => label) || [];
-        await this.saveSpaceValue('tags', tagsRawValue);
-        this.setCurrentValuesFromRecord();
-        break;
-      }
-      case 'advertised': {
-        if (value) {
-          await this.confirmAdvertisementEnable();
-        } else {
-          await this.confirmAdvertisementDisable();
+    try {
+      switch (fieldId) {
+        case 'name':
+        case 'organizationName':
+          await this.saveSpaceValue(fieldId, value);
+          break;
+        case 'tags': {
+          const tagsRawValue = value?.map(({ label }) => label) || [];
+          await this.saveSpaceValue('tags', tagsRawValue);
+          this.setCurrentValuesFromRecord();
+          break;
         }
-        break;
-      }
-      case 'description': {
-        if (this.blankInlineErrors.description) {
-          return;
+        case 'advertised': {
+          if (value) {
+            await this.confirmAdvertisementEnable();
+          } else {
+            await this.confirmAdvertisementDisable();
+          }
+          break;
         }
-        await this.saveSpaceValue('description', value);
-        this.setCurrentValuesFromRecord();
-        break;
+        case 'description': {
+          if (this.blankInlineErrors.description) {
+            return;
+          }
+          await this.saveSpaceValue('description', value);
+          this.setCurrentValuesFromRecord();
+          break;
+        }
+        case 'contactEmail': {
+          await this.saveSpaceValue('marketplaceContactEmail', value);
+          this.setCurrentValuesFromRecord();
+          break;
+        }
+        default:
+          break;
       }
-      case 'contactEmail': {
-        await this.saveSpaceValue('marketplaceContactEmail', value);
-        this.setCurrentValuesFromRecord();
-        break;
-      }
-      default:
-        break;
+    } catch (error) {
+      this.globalNotify.backendError(
+        this.t('savingProperty', { property: fieldId }),
+        error
+      );
+      throw error;
     }
   },
 

@@ -5,6 +5,7 @@ export default {
   spaceTagsSelector,
   confirmPageClose: 'There are unsaved changes. Your changes will be lost if you don\'t save them.',
   cannotSaveDueToIssues: 'Cannot save due to existing issues.',
+  savingProperty: 'saving "{{property}}" space property',
   notSet: 'Not set.',
   organizationName: {
     label: 'Organization name',
