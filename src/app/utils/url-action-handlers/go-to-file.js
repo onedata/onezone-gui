@@ -27,6 +27,8 @@ const mixins = [
   I18n,
 ];
 
+export const defaultFileAction = 'show';
+
 export default EmberObject.extend(...mixins, {
   router: service(),
   recordManager: service(),
@@ -44,7 +46,7 @@ export default EmberObject.extend(...mixins, {
   /**
    * @type {GoToFileUrlActionHandler.GoToFileActionType}
    */
-  defaultFileAction: 'show',
+  defaultFileAction,
 
   /**
    * @type {Array<GoToFileUrlActionHandler.GoToFileActionType>}
@@ -133,20 +135,57 @@ export default EmberObject.extend(...mixins, {
 
   /**
    * @param {string} fileId
-   * @param {GoToFileUrlActionHandler.GoToFileActionType} fileAction
-   * @returns {string} Onezone URL that this handler can handle.
+   * @param {GoToFileUrlActionHandler.GoToFileActionType} [fileAction]
+   * @returns {string} Onezone location path that this handler can handle.
    */
-  generateUrl({ fileId, fileAction } = {}) {
+  generatePath({ fileId, fileAction } = {}) {
     if (!fileId || !this.availableFileActions.includes(fileAction)) {
       return '';
     }
-    return globals.location.origin +
-      this.router.urlFor('onedata', {
-        queryParams: {
-          action_name: 'goToFile',
-          action_fileId: fileId,
-          action_fileAction: fileAction,
-        },
-      });
+    return this.router.urlFor('onedata', {
+      queryParams: {
+        action_name: 'goToFile',
+        action_fileId: fileId,
+        action_fileAction: fileAction,
+      },
+    });
+  },
+
+  /**
+   * @param {string} fileId
+   * @param {GoToFileUrlActionHandler.GoToFileActionType} fileAction
+   * @returns {string} Onezone URL with domain that this handler can handle.
+   */
+  generateUrl({ fileId, fileAction } = {}) {
+    const path = this.generatePath({ fileId, fileAction });
+    return path && (globals.location.origin + path);
+  },
+
+  /**
+   * @param {string} fileId
+   * @param {GoToFileUrlActionHandler.GoToFileActionType} [fileAction]
+   * @returns {string} A pretty-looking path that is handled by Onezone routing, which
+   *   will be redirected to path that can be handled by this class.
+   */
+  generatePrettyPath({ fileId, fileAction } = {}) {
+    if (!fileId || !this.availableFileActions.includes(fileAction)) {
+      return '';
+    }
+    return this.router.urlFor(
+      'action.file',
+      fileAction,
+      fileId,
+    );
+  },
+
+  /**
+   * @param {string} fileId
+   * @param {GoToFileUrlActionHandler.GoToFileActionType} [fileAction]
+   * @returns {string} A pretty-looking URL that is handled by Onezone routing, which
+   *   will be redirected to path that can be handled by this class.
+   */
+  generatePrettyUrl({ fileId, fileAction } = {}) {
+    const path = this.generatePrettyPath({ fileId, fileAction });
+    return path && (globals.location.origin + path);
   },
 });

@@ -6,6 +6,8 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11205 Removed unsupported interface caveat from Onepanel REST access token template
+* VFS-11199 Added pretty URLs for files show and download
 * VFS-11100 Added global URLs for files show and download
 * VFS-11101 Fixed always shown session expired message
 * VFS-10521 Changed always showing switches on the members page

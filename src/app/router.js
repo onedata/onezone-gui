@@ -29,6 +29,9 @@ Router.map(function () {
       this.route('privacy-policy');
       this.route('terms-of-use');
     },
+    action() {
+      this.route('file', { path: 'file/:file_action/:file_id' });
+    },
   });
 });
 
