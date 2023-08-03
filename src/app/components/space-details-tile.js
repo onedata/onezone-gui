@@ -10,7 +10,7 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { conditional, raw, isEmpty } from 'ember-awesome-macros';
+import { conditional, raw, isEmpty, and, not } from 'ember-awesome-macros';
 import computedT from 'onedata-gui-common/utils/computed-t';
 import { SpaceTag } from './space-configuration/space-tags-selector';
 
@@ -34,18 +34,27 @@ export default Component.extend(I18n, {
 
   //#region
 
-  tileClassNames: computed('hasSpaceUpdatePrivilege', function tileClassNames() {
-    const classes = [
-      'space-details-tile',
-    ];
-    if (this.hasSpaceUpdatePrivilege) {
-      classes.push(
-        'resource-browse-tile',
-        'one-tile-link'
-      );
+  tileClassNames: computed(
+    'hasSpaceUpdatePrivilege',
+    'noDetails',
+    function tileClassNames() {
+      const classes = [
+        'space-details-tile',
+      ];
+      if (this.hasSpaceUpdatePrivilege) {
+        classes.push(
+          'resource-browse-tile',
+          'one-tile-link'
+        );
+      }
+      if (this.noDetails) {
+        classes.push(
+          'no-details'
+        );
+      }
+      return classes;
     }
-    return classes;
-  }),
+  ),
 
   tileClass: computed('tileClassNames', function tileClass() {
     return this.tileClassNames?.join(' ') ?? '';
@@ -86,6 +95,12 @@ export default Component.extend(I18n, {
       }) ?? [];
     });
   }),
+
+  noDetails: and(
+    not('organizationName'),
+    'noTags',
+    not('description'),
+  ),
 
   /**
    * @type {ComputedProperty<SafeString|''>}
@@ -137,4 +152,10 @@ export default Component.extend(I18n, {
       }
     },
   ),
+
+  actions: {
+    evaluateMoreTagsText(moreTagsCount) {
+      return this.t('moreTags', { count: moreTagsCount });
+    },
+  },
 });

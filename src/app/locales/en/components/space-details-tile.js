@@ -8,4 +8,5 @@ export default {
   unknownOrganization: 'Unknown organization',
   noTags: 'No tags',
   unknownOrganizationNoTags: 'Unknown organization, no tags',
+  moreTags: '+{{count}} tags',
 };

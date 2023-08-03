@@ -5,7 +5,6 @@
   aspect=aspect
   moreText=moreText
 }}
-  {{!-- FIXME: może lepiej tutaj użyć ikony? --}}
   {{#unless description}}
     <figure class="main-figure">
       <img class="main-image" src="assets/images/settings-circle-filled.svg">
@@ -31,6 +30,7 @@
       tags=inputTags
       readonly=true
       readonlyTagsDisplayLimit=readonlyTagsDisplayLimit
+      onEvaluateMoreTagsText=(action "evaluateMoreTagsText")
     }}
   {{/unless}}
   {{#if description}}

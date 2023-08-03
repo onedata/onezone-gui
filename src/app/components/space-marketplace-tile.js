@@ -10,7 +10,7 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { conditional, raw, and } from 'ember-awesome-macros';
+import { conditional, raw, and, collect } from 'ember-awesome-macros';
 import computedT from 'onedata-gui-common/utils/computed-t';
 import { inject as service } from '@ember/service';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
@@ -37,13 +37,16 @@ export default Component.extend(I18n, {
    */
   onDismiss: undefined,
 
-  tileClassNames: Object.freeze(['space-marketplace-tile', 'text-center']),
+  tileClassNames: collect(
+    raw('space-marketplace-tile'),
+    raw('text-center'),
+    'advertisedClass',
+  ),
 
   tileClass: computed('tileClassNames', function tileClass() {
     return this.tileClassNames?.join(' ') ?? '';
   }),
 
-  // FIXME: sprawdzić na production
   imageSrc: conditional(
     'space.advertisedInMarketplace',
     raw('assets/images/cart-checked.svg'),
@@ -69,7 +72,7 @@ export default Component.extend(I18n, {
     computedT('notAdvertised')
   ),
 
-  figureBottomTextClass: conditional(
+  advertisedClass: conditional(
     'isAdvertised',
     raw('advertised'),
     raw('not-advertised'),
