@@ -37,7 +37,15 @@ import preventPageUnload from 'onedata-gui-common/utils/prevent-page-unload';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 /**
- * @typedef {'view'|'edit'} SpaceConfigDescriptionEditorMode
+ * @typedef {'view'|'edit'} SpaceConfigiration.DescriptionEditorMode
+ */
+
+/**
+ * @typedef {'name'|'organizationName'|'tags'|'contactEmail'} SpaceConfiguration.InlineEditorFieldId
+ */
+
+/**
+ * @typedef {SpaceConfiguration.InlineEditorFieldId|'advertised'|'description'} SpaceConfiguration.FieldId
  */
 
 const contactEmailValidator = validator('format', {
@@ -48,16 +56,6 @@ const contactEmailValidator = validator('format', {
 const validations = buildValidations({
   currentContactEmail: contactEmailValidator,
 });
-
-// FIXME: użyć więcej razy?
-
-/**
- * @typedef {'name'|'organizationName'|'tags'|'contactEmail'} SpaceConfiguration.InlineEditorFieldId
- */
-
-/**
- * @typedef {SpaceConfiguration.InlineEditorFieldId|'advertised'|'description'} SpaceConfiguration.FieldId
- */
 
 export default Component.extend(validations, I18n, {
   classNames: ['space-configuration', 'fill-flex-using-column', 'fill-flex-limited'],
@@ -94,7 +92,7 @@ export default Component.extend(validations, I18n, {
   //#region state
 
   /**
-   * @type {SpaceConfigDescriptionEditorMode}
+   * @type {SpaceConfigiration.DescriptionEditorMode}
    */
   descriptionEditorMode: 'view',
 
@@ -366,13 +364,6 @@ export default Component.extend(validations, I18n, {
     this.setCurrentValuesFromRecord();
   }),
 
-  // navigationObserver: observer(
-  //   'navigationState.{activeResourceType,activeResource,activeAspect}',
-  //   function navigationObserver() {
-  //     this.tryAskForUnsavedChanges();
-  //   }
-  // ),
-
   /**
    * @override
    */
@@ -388,12 +379,6 @@ export default Component.extend(validations, I18n, {
 
     this.registerRouteChangeHandler();
     this.registerPageUnloadHandler();
-
-    // FIXME: debug code
-    ((name) => {
-      window[name] = this;
-      console.log(`window.${name}`, window[name]);
-    })('debug_space_configuration');
   },
 
   /**
@@ -409,7 +394,6 @@ export default Component.extend(validations, I18n, {
   },
 
   async handleRouteChange(transition) {
-    // FIXME: użyć isTransitionWithinEditor jak w content-atm-inventories-workflows.js
     if (transition.isAborted) {
       return;
     }
@@ -433,6 +417,9 @@ export default Component.extend(validations, I18n, {
   },
 
   shouldBlockTransitionDueToUnsavedChanges() {
+    if (this.isDescriptionModified) {
+      return true;
+    }
     const modifiedFieldsIds = this.modifiedFields.values();
     return Boolean([...modifiedFieldsIds].length);
   },
@@ -497,12 +484,21 @@ export default Component.extend(validations, I18n, {
 
   async saveAllModifiedFields() {
     const modifiedFieldsIds = [...this.modifiedFields.values()];
-    await allFulfilled(modifiedFieldsIds.map((fieldId) => {
-      return this.inlineEditorsApis[fieldId]?.onSave();
-    }));
+    try {
+      if (this.isDescriptionModified) {
+        await this.saveDescription();
+      }
+    } finally {
+      await allFulfilled(modifiedFieldsIds.map((fieldId) => {
+        return this.inlineEditorsApis[fieldId]?.onSave();
+      }));
+    }
   },
 
   async revertAllModifiedFields() {
+    if (this.isDescriptionModified) {
+      this.discardValue('description');
+    }
     const modifiedFieldsIds = this.modifiedFields.values();
     for (const fieldId of modifiedFieldsIds) {
       this.inlineEditorsApis[fieldId]?.onCancel();
@@ -551,7 +547,7 @@ export default Component.extend(validations, I18n, {
 
   /**
    * Save inline edited value.
-   * @param {string} fieldId ID of field used in this component - see switch cases.
+   * @param {SpaceConfiguration.FieldId} fieldId ID of field used in this component.
    * @param {any} value Value from component - it will be serialized to model.
    * @returns
    */
@@ -607,6 +603,10 @@ export default Component.extend(validations, I18n, {
         this.setCurrentValuesFromRecord();
         break;
     }
+  },
+
+  async saveDescription() {
+    return await this.saveValue('description', this.currentDescription);
   },
 
   async confirmAdvertisementEnable() {
@@ -685,6 +685,9 @@ export default Component.extend(validations, I18n, {
   actions: {
     async saveValue(fieldId, value) {
       return this.saveValue(fieldId, value);
+    },
+    async saveDescription() {
+      return await this.saveDescription();
     },
     discardValue(fieldId) {
       return this.discardValue(fieldId);
