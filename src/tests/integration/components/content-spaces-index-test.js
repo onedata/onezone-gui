@@ -260,14 +260,14 @@ describe('Integration | Component | content-spaces-index', function () {
     }
   );
 
-  it('closes tile with space Marketplace info after dismiss button is clicked',
+  it('closes tile with unadvertised space Marketplace info after dismiss button is clicked',
     async function () {
       const helper = new Helper(this);
       set(helper.spaceManager, 'marketplaceConfig', {
-        enabled: false,
+        enabled: true,
       });
       await helper.setSpace({
-        advertisedInMarketplace: true,
+        advertisedInMarketplace: false,
         privileges: {
           view: true,
           update: true,
