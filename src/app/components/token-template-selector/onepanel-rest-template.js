@@ -1,6 +1,5 @@
 /**
- * Onepanel REST token template. Sets token API to "rest" and narrows allowed services
- * to any Onepanel.
+ * Onepanel REST token template. It narrows allowed services to a specific Onepanel.
  *
  * @author Agnieszka Warchoł
  * @copyright (C) 2021 ACK CYFRONET AGH
@@ -59,9 +58,6 @@ export default RecordSelectorTemplate.extend({
       caveats: [{
         type: 'service',
         whitelist: [service],
-      }, {
-        type: 'interface',
-        interface: 'rest',
       }],
     };
   },
