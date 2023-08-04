@@ -12,6 +12,7 @@ import {
   observer,
   get,
   getProperties,
+  set,
 } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import {
@@ -236,12 +237,22 @@ export default Service.extend({
     const targetRevisionNumber = revisionNumberFromDump &&
       !existingRevisionNumbers.includes(revisionNumberFromDump) ?
       revisionNumberFromDump : getNextFreeRevisionNumber(existingRevisionNumbers);
+    if (targetRevisionNumber !== revisionNumberFromDump && atmLambdaDump?.revision) {
+      set(atmLambdaDump, 'revision.originalRevisionNumber', targetRevisionNumber);
+    }
 
-    await this.createAtmLambdaRevision(
-      atmLambdaId,
-      targetRevisionNumber,
-      atmLambdaDump.revision.atmLambdaRevision,
-    );
+    await this.onedataGraph.request({
+      gri: gri({
+        entityType: atmLambdaEntityType,
+        entityId: atmLambdaId,
+        aspect: 'instance',
+        scope: 'private',
+      }),
+      operation: 'update',
+      subscribe: false,
+      data: atmLambdaDump,
+    });
+    await this.recordManager.reloadRecordById('atmLambda', atmLambdaId);
 
     return {
       atmLambda,

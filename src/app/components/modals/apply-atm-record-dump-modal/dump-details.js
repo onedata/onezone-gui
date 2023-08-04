@@ -37,12 +37,20 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<String>}
    */
-  name: or('dump.revision.atmLambdaRevision.name', 'dump.name'),
+  name: or(
+    'dump.revision.atmLambdaRevision.name',
+    'dump.revision.atmLambdaRevision._data.name',
+    'dump.name'
+  ),
 
   /**
    * @type {ComputedProperty<String>}
    */
-  summary: or('dump.revision.atmLambdaRevision.summary', 'dump.summary'),
+  summary: or(
+    'dump.revision.atmLambdaRevision.summary',
+    'dump.revision.atmLambdaRevision._data.summary',
+    'dump.summary'
+  ),
 
   /**
    * @type {ComputedProperty<RevisionNumber>}

@@ -341,7 +341,9 @@ const DumpLoader = EmberObject.extend({
     }
 
     const name = this.atmModelName === 'atmLambda' ?
-      parsedContent?.revision?.atmLambdaRevision?.name : parsedContent?.name;
+      parsedContent?.revision?.atmLambdaRevision?.name ??
+      parsedContent?.revision?.atmLambdaRevision?._data?.name :
+      parsedContent?.name;
     if (
       typeof name !== 'string' ||
       typeof parsedContent?.revision !== 'object' ||
