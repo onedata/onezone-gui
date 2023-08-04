@@ -109,7 +109,11 @@ export default Action.extend({
         const atmRecordDumpCopy = _.cloneDeep(atmRecordDump);
         if (this.atmModelName === 'atmLambda') {
           if (atmRecordDumpCopy?.revision?.atmLambdaRevision) {
-            atmRecordDumpCopy.revision.atmLambdaRevision.name = newAtmRecordName;
+            if (atmRecordDumpCopy?.revision?.atmLambdaRevision._data) {
+              atmRecordDumpCopy.revision.atmLambdaRevision._data.name = newAtmRecordName;
+            } else {
+              atmRecordDumpCopy.revision.atmLambdaRevision.name = newAtmRecordName;
+            }
           }
           atmRecord = await this.workflowManager
             .createAtmLambda(atmInventoryId, atmRecordDumpCopy);
