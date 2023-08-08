@@ -245,8 +245,15 @@ export default Component.extend(
   }
 );
 
+/**
+ * String in form: `<userId>:<spaceId>` that determines a tile displayed by a specific
+ * user for a specific space.
+ * @typedef {string} SpaceMarketeplaceTile.TileContextEntry
+ */
+
 const SpaceMarketplaceTileDisplayModel = EmberObject.extend(OwnerInjector, {
   spaceManager: service(),
+  currentUser: service(),
 
   /**
    * @type {Models.Space}
@@ -255,7 +262,7 @@ const SpaceMarketplaceTileDisplayModel = EmberObject.extend(OwnerInjector, {
 
   //#region configuration
 
-  dismissedPersistenceKey: 'spaceMarketplaceTile.dismissedSpaces',
+  dismissedPersistenceKey: 'spaceMarketplaceTile.dismissedUserSpaces',
 
   //#endregion
 
@@ -266,6 +273,8 @@ const SpaceMarketplaceTileDisplayModel = EmberObject.extend(OwnerInjector, {
   //#endregion
 
   spaceId: reads('space.entityId'),
+
+  userId: reads('currentUser.userId'),
 
   isTileShown: computed(
     'isDismissed',
@@ -313,12 +322,12 @@ const SpaceMarketplaceTileDisplayModel = EmberObject.extend(OwnerInjector, {
 
   /**
    * Basing on current localStorage state of dismiss for spaces, create new stringified
-   * array with state of the current space. This string can be saved into localStorage.
+   * array with state of the current tile. This string can be saved into localStorage.
    * @returns {string}
    */
   createDismissedListValue() {
-    const currentSpacesIds = this.readDismissedSpacesArray();
-    return _.uniq([...currentSpacesIds, this.spaceId]).join(',');
+    const currentEntries = this.readDismissedEntriesArray();
+    return _.uniq([...currentEntries, this.createCurrentTileEntry()]).join(',');
   },
 
   /**
@@ -327,15 +336,34 @@ const SpaceMarketplaceTileDisplayModel = EmberObject.extend(OwnerInjector, {
    */
   readDismissedListValue() {
     try {
-      const spacesIds = this.readDismissedSpacesArray();
-      return spacesIds.includes(this.spaceId);
+      const entries = this.readDismissedEntriesArray();
+      return entries.some(entry => this.entryMatchesCurrentTile(entry));
     } catch {
       return false;
     }
   },
 
-  readDismissedSpacesArray() {
+  /**
+   * @returns {SpaceMarketeplaceTile.TileContextEntry}
+   */
+  readDismissedEntriesArray() {
     const raw = globals.localStorage.getItem(this.dismissedPersistenceKey);
     return raw ? raw.split(',') : [];
+  },
+
+  /**
+   * @param {SpaceMarketeplaceTile.TileContextEntry} entry
+   * @returns {boolean}
+   */
+  entryMatchesCurrentTile(entry) {
+    const [userId, spaceId] = entry.split(':');
+    if (!userId || !spaceId) {
+      return false;
+    }
+    return this.userId === userId && this.spaceId === spaceId;
+  },
+
+  createCurrentTileEntry() {
+    return `${this.userId}:${this.spaceId}`;
   },
 });

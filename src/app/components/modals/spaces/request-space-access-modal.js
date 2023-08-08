@@ -99,6 +99,7 @@ export default Component.extend(I18n, {
       isOptional: true,
       customValidators: [
         validator('length', {
+          // a limit in backend
           max: 2000,
         }),
       ],
