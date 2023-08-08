@@ -518,7 +518,7 @@ export default Service.extend({
     });
   },
 
-  // TODO: VFS-10524 use LS+ version of spaces marketplace info listing in list view
+  // TODO: VFS-10524 use LS+ version of Space Marketplace info listing in list view
   /**
    * @param {InfiniteScrollListingParams} listingParams
    * @param {Array<string>} tags
@@ -623,20 +623,27 @@ export default Service.extend({
    * @param {boolean} grantAccess If true, user will gain access to the space and request
    *   will be resolved. If false, request will be rejected and user will receive
    *   information about rejection via e-mail.
+   * @param {Object} [options]
+   * @param {string} [options.rejectionReason] If rejecting the request, an optional text
+   *   with rejection reason can be sent to the requesting user.
    */
-  async resolveMarketplaceSpaceAccess(spaceId, requestId, grantAccess) {
+  async resolveMarketplaceSpaceAccess(spaceId, requestId, grantAccess, options = {}) {
     const requestGri = gri({
       entityType: spaceEntityType,
       entityId: spaceId,
       aspect: 'resolve_membership_request',
       aspectId: requestId,
     });
+    const data = {
+      decision: grantAccess ? 'grant' : 'reject',
+    };
+    if (!grantAccess && options?.rejectionReason) {
+      data.rejectionReason = options.rejectionReason;
+    }
     return this.onedataGraph.request({
       gri: requestGri,
       operation: 'create',
-      data: {
-        decision: grantAccess ? 'grant' : 'reject',
-      },
+      data,
       subscribe: false,
     });
   },

@@ -10,10 +10,12 @@
       {{one-inline-editor
         class="space-name"
         value=spaceName
-        onSave=(action "saveValue" "name")
-        onInputValueChanged=(action "inlineEditorChange" "name")
         isSaveDisabled=blankInlineEditors.name
         saveButtonTip=(if blankInlineEditors.name (tt this "fieldCannotBeEmpty"))
+        onSave=(action "saveValue" "name")
+        onInputValueChanged=(action "inlineEditorChange" "name")
+        onEdit=(action "inlineEditorStateChanged" "name")
+        onApiRegister=(action "registerInlineEditorApi" "name")
       }}
     {{/if}}
   </div>
@@ -35,13 +37,15 @@
       {{one-inline-editor
         class="organization-name"
         value=organizationName
-        onInputValueChanged=(action "inlineEditorChange" "organizationName")
         isSaveDisabled=blankInlineErrors.organizationName
         saveButtonTip=(if
           blankInlineErrors.organizationName
           (tt this "fieldCannotBeEmptyWhenAdvertising")
         )
         onSave=(action "saveValue" "organizationName")
+        onInputValueChanged=(action "inlineEditorChange" "organizationName")
+        onEdit=(action "inlineEditorStateChanged" "organizationName")
+        onApiRegister=(action "registerInlineEditorApi" "organizationName")
       }}
     {{/if}}
   </div>
@@ -68,6 +72,8 @@
         saveButtonTip=tagsInputErrorMessage
         onInputValueChanged=(action "currentSpaceTagsChanged")
         onSave=(action "saveValue" "tags")
+        onEdit=(action "inlineEditorStateChanged" "tags")
+        onApiRegister=(action "registerInlineEditorApi" "tags")
       }}
     {{/if}}
   </div>
@@ -115,7 +121,7 @@
             type="primary"
             size="sm"
             disabled=blankInlineErrors.description
-            onClick=(action "saveValue" "description" currentDescription)
+            onClick=(action "saveDescription")
           }}
             {{tt this "save"}}
           {{/one-button}}
@@ -232,7 +238,8 @@
             saveButtonTip=emailValidation.message
             onSave=(action "saveValue" "contactEmail")
             onEdit=(action "handleContactEmailOnEdit")
-            onApiRegister=(action registerEmailInlineEditor)
+            onApiRegister=(action "registerInlineEditorApi" "contactEmail")
+            onEdit=(action "inlineEditorStateChanged" "contactEmail")
             as |editor|
           }}
             {{form-component/field-renderer field=contactEmailRootField}}

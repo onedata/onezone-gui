@@ -23,13 +23,15 @@
         {{/link-to}}
         {{tt this "p3t2"}}
       </li>
-      <li>
-        {{tt this "pMarketPrefix"}}
-        {{#link-to "onedata.sidebar.content" "spaces" "join"}}
-          {{tt this "pMarketAnchor"}}
-        {{/link-to}}
-        {{tt this "pMarketSuffix"}}
-      </li>
+      {{#if isMarketplaceInfoShown}}
+        <li>
+          {{tt this "pMarketPrefix"}}
+          {{#link-to "onedata.sidebar.content" "spaces" "join"}}
+            {{tt this "pMarketAnchor"}}
+          {{/link-to}}
+          {{tt this "pMarketSuffix"}}
+        </li>
+      {{/if}}
     </ul>
   </p>
 {{/content-info}}

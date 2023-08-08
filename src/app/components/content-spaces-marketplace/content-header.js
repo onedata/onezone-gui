@@ -1,5 +1,5 @@
 /**
- * A header typical for content views intended for spaces marketplace.
+ * A header typical for content views intended for Space Marketplace.
  *
  * @author Jakub Liput
  * @copyright (C) 2023 ACK CYFRONET AGH

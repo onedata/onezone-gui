@@ -6,6 +6,9 @@
  * decision. Implementation of granting access or rejecting request with post-decision
  * actions should be injected.
  *
+ * You can test it out on mock using the following URL:
+ * http://localhost:4200/#/onedata?action_name=confirmJoinSpaceRequest&action_spaceId=space-0&action_requestId=fb50b5c1e09b3910e89ab35327671e19ch18d4-a2647bf5
+ *
  * @author Jakub Liput
  * @copyright (C) 2023 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -16,10 +19,13 @@ import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import { promise, bool, and, not } from 'ember-awesome-macros';
+import { promise, bool, and, not, collect } from 'ember-awesome-macros';
 import { htmlSafe } from '@ember/string';
 import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 import findRouteInfo from 'onedata-gui-common/utils/find-route-info';
+import TextAreaField from 'onedata-gui-common/utils/form-component/textarea-field';
+import { validator } from 'ember-cp-validations';
+import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
 
 /**
  * @typedef {Object} ConfirmJoinRequestModalOptions
@@ -45,6 +51,14 @@ import findRouteInfo from 'onedata-gui-common/utils/find-route-info';
  *   'requesterInfoRelationAlreadyExist'
  * } [errorId] One of known request errors to show special message.
  * @property {any} [error] Error object if the known error is catched.
+ */
+
+/**
+ * Which content should be displayed in modal:
+ * - decision - information about space and user with reject and grant access buttons,
+ * - rejection - opened when user chosses "reject" action in decision slide; shows
+ *   confirmation message for rejecting space access with textarea for optional message.
+ * @typedef {'decision'|'reject'} ConfirmJoinRequestModalSlideId
  */
 
 export default Component.extend(I18n, {
@@ -74,6 +88,11 @@ export default Component.extend(I18n, {
   //#region state
 
   isProcessing: false,
+
+  /**
+   * @type {ConfirmJoinRequestModalSlideId}
+   */
+  activeSlideId: 'decision',
 
   //#endregion
 
@@ -230,6 +249,39 @@ export default Component.extend(I18n, {
     }
   ),
 
+  rejectionRootField: computed(function rootField() {
+    return FormFieldsRootGroup
+      .extend({
+        messageField: reads('modal.rejectionMessageField'),
+        fields: collect(
+          'messageField',
+        ),
+      })
+      .create({
+        modal: this,
+        ownerSource: this,
+        i18nPrefix: `${this.i18nPrefix}.rejectionForm`,
+      });
+  }),
+
+  rejectionMessageField: computed(function rejectionMessageField() {
+    return TextAreaField
+      .extend({
+        isEnabled: not('parent.modal.isProcessing'),
+      })
+      .create({
+        name: 'message',
+        defaultValue: '',
+        isOptional: true,
+        customValidators: [
+          validator('length', {
+            // a limit in backend
+            max: 2000,
+          }),
+        ],
+      });
+  }),
+
   actions: {
     async grant() {
       if (!this.isProceedAvailable) {
@@ -251,7 +303,9 @@ export default Component.extend(I18n, {
       }
       this.set('isProcessing', true);
       try {
-        await this.onReject();
+        await this.onReject({
+          rejectionReason: this.rejectionRootField.dumpValue().message,
+        });
         this.modalManager.hide(this.modalId);
       } catch (error) {
         this.globalNotify.backendError(this.t('rejectingSpaceAccess'), error);
@@ -285,6 +339,12 @@ export default Component.extend(I18n, {
         resourceId === this.spaceId &&
         aspect === 'members'
       );
+    },
+    openRejectionSlide() {
+      this.set('activeSlideId', 'rejection');
+    },
+    openDecisionSlide() {
+      this.set('activeSlideId', 'decision');
     },
   },
 });

@@ -1,0 +1,31 @@
+.space-marketplace-tile {
+  &.advertised {
+    .figure-bottom-text {
+      @include font-semibold;
+    }
+  }
+  &.not-advertised {
+    .figure-bottom-text {
+      font-style: italic;
+      opacity: $disabled-opacity;
+    }
+    .main-figure {
+      .main-image {
+        opacity: 0.2;
+      }
+    }
+  }
+  .tile-content-inner {
+    display: flex;
+    flex-direction: column;
+    .main-figure {
+      transform: translateY(-50%);
+    }
+  }
+  .tile-element {
+    position: relative;
+  }
+  .figure-bottom-text {
+    margin-top: -0.6em;
+  }
+}

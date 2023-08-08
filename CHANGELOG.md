@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10664 Space Marketplace Service Pack 1: reject confirmation view, space details and Marketplace tiles on space overview, space configuration unsaved changes guard, UX fixes
 * VFS-11235 Fixed file attributes handling in file data spec and reading lambda dumps
 * VFS-11165 Added "force continue" action to workflows
 * VFS-11205 Removed unsupported interface caveat from Onepanel REST access token template

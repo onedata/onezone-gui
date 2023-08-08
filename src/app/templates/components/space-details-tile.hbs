@@ -1,0 +1,46 @@
+{{#one-tile
+  title=(tt this "title")
+  isLink=isLink
+  class=tileClass
+  aspect=aspect
+  moreText=moreText
+}}
+  {{#unless description}}
+    <figure class="main-figure">
+      <img class="main-image" src="assets/images/settings-circle-filled.svg">
+      {{#if centeredMessage}}
+        <div class="figure-text-centered">{{centeredMessage}}</div>
+      {{/if}}
+    </figure>
+  {{/unless}}
+  {{#if organizationName}}
+    <div class="tile-element organization-name-row">
+      {{one-icon icon="organization" class="organization-name-icon"}}
+      {{#truncated-string class="organization-name"}}
+        <span >{{organizationName}}</span>
+      {{/truncated-string}}
+    </div>
+  {{/if}}
+  {{#if topMessage}}
+    <div class="tile-element top-placeholder">
+      {{topMessage}}
+    </div>
+  {{/if}}
+  {{#unless noTags}}
+    {{tags-input
+      class="tile-element space-tags static-value"
+      tags=inputTags
+      readonly=true
+      readonlyTagsDisplayLimit=readonlyTagsDisplayLimit
+      onEvaluateMoreTagsText=(action "evaluateMoreTagsText")
+    }}
+  {{/unless}}
+  {{#if description}}
+    <div class="tile-element description-row">
+      {{one-markdown-to-html
+        class="markdown-view"
+        markdown=description
+      }}
+    </div>
+  {{/if}}
+{{/one-tile}}

@@ -1,0 +1,18 @@
+{{#one-tile
+  title=(tt this "title")
+  class=tileClass
+  isLink=isAdvertised
+  customLink=(if isAdvertised viewInMarketplaceHref)
+  moreText=(if isAdvertised (tt this "show"))
+  footerText=(if isConfigureButtonShown (tt this "configureAdvertisement"))
+  footerTextIcon=(if isConfigureButtonShown "settings")
+  footerLinkToParams=(if isConfigureButtonShown footerLinkToParams)
+  onDismiss=(unless isAdvertised (action "dismiss"))
+}}
+  <figure class="main-figure">
+    <img class="main-image" src={{imageSrc}}>
+    <div class="figure-bottom-text">
+      {{figureBottomText}}
+    </div>
+  </figure>
+{{/one-tile}}

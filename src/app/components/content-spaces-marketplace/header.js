@@ -1,5 +1,5 @@
 /**
- * A sticky container for content-spaces marketplace headers.
+ * A sticky container for content-spaces-marketplace headers.
  *
  * @author Jakub Liput
  * @copyright (C) 2023 ACK CYFRONET AGH

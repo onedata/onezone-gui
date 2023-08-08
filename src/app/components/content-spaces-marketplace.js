@@ -1,5 +1,5 @@
 /**
- * Content container view of marketplace.
+ * Content container view of the Space Marketplace.
  *
  * @author Jakub Liput
  * @copyright (C) 2022-2023 ACK CYFRONET AGH
