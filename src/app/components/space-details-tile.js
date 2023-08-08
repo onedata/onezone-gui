@@ -111,20 +111,15 @@ export default Component.extend(I18n, {
     'noTags',
     function centeredMessage() {
       const tagsPresent = !this.noTags;
-      if (this.organizationName && tagsPresent && this.description) {
+      if (this.description) {
         return '';
-      }
-      if (!this.organizationName && tagsPresent && !this.description) {
-        return this.t('unknownOrganizationNoDescription');
-      }
-      if (this.organizationName && tagsPresent && !this.description) {
-        return this.t('noDescription');
-      }
-      if (this.organizationName && !tagsPresent && !this.description) {
-        return this.t('noTagsOrDescription');
-      }
-      if (!this.organizationName && !tagsPresent && !this.description) {
-        return this.t('noDetailsProvided');
+      } else if (this.organizationName) {
+        return this.t(tagsPresent ? 'noDescription' : 'noTagsOrDescription');
+      } else {
+        return this.t(
+          tagsPresent ?
+          'unknownOrganizationNoDescription' : 'noDetailsProvided'
+        );
       }
     },
   ),
@@ -138,17 +133,16 @@ export default Component.extend(I18n, {
     'noTags',
     function topMessage() {
       const tagsPresent = !this.noTags;
-      if (!this.description || (this.organizationName && this.tagsPresent)) {
+      if (!this.description) {
         return '';
-      }
-      if (!this.organizationName && tagsPresent) {
-        return this.t('unknownOrganization');
-      }
-      if (this.organizationName && !tagsPresent) {
-        return this.t('noTags');
-      }
-      if (!this.organizationName && !tagsPresent) {
-        return this.t('unknownOrganizationNoTags');
+      } else if (this.organizationName) {
+        if (tagsPresent) {
+          return '';
+        } else {
+          return this.t('noTags');
+        }
+      } else {
+        return this.t(tagsPresent ? 'unknownOrganization' : 'unknownOrganizationNoTags');
       }
     },
   ),

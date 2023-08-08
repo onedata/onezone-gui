@@ -97,8 +97,9 @@
     pointer-events: none;
   }
   .rendered-markdown {
-    $scale-down-by: 20%;
-    width: #{math.div(100%, 100% - $scale-down-by) * 100%};
-    transform: translateX(#{-$scale-down-by * 0.5}) translateY(#{-$scale-down-by * 0.5}) scale(#{100% - $scale-down-by});
+    $scale: 80%;
+    width: math.div(100%, $scale) * 100%;
+    transform-origin: top left;
+    transform: scale($scale);
   }
 }

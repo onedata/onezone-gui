@@ -417,11 +417,7 @@ export default Component.extend(validations, I18n, {
   },
 
   shouldBlockTransitionDueToUnsavedChanges() {
-    if (this.isDescriptionModified) {
-      return true;
-    }
-    const modifiedFieldsIds = this.modifiedFields.values();
-    return Boolean([...modifiedFieldsIds].length);
+    return this.isDescriptionModified || this.modifiedFields.size > 0;
   },
 
   /**
@@ -514,7 +510,7 @@ export default Component.extend(validations, I18n, {
    * @returns {OneInlineCustomEditorApi}
    */
   getEmailInlineEditorApi() {
-    return this.inlineEditorsApis?.['contactEmail'];
+    return this.inlineEditorsApis?.contactEmail;
   },
 
   /**

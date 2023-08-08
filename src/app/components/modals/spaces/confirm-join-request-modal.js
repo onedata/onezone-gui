@@ -6,6 +6,9 @@
  * decision. Implementation of granting access or rejecting request with post-decision
  * actions should be injected.
  *
+ * You can test it out on mock using the following URL:
+ * http://localhost:4200/#/onedata?action_name=confirmJoinSpaceRequest&action_spaceId=space-0&action_requestId=fb50b5c1e09b3910e89ab35327671e19ch18d4-a2647bf5
+ *
  * @author Jakub Liput
  * @copyright (C) 2023 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

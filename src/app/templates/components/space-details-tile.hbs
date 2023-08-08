@@ -16,7 +16,9 @@
   {{#if organizationName}}
     <div class="tile-element organization-name-row">
       {{one-icon icon="organization" class="organization-name-icon"}}
-      <span class="organization-name">{{organizationName}}</span>
+      {{#truncated-string class="organization-name"}}
+        <span >{{organizationName}}</span>
+      {{/truncated-string}}
     </div>
   {{/if}}
   {{#if topMessage}}

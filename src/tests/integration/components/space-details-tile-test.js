@@ -72,6 +72,27 @@ describe('Integration | Component | space-details-tile', function () {
     }
   );
 
+  it('renders organization name, tags and description when provided',
+    async function () {
+      const helper = new Helper(this);
+      await helper.setSpace({
+        organizationName: 'onedata.org',
+        tags: ['hello', 'world'],
+        description: 'foo bar',
+      });
+
+      await helper.render();
+
+      expect(helper.element.textContent).to.contain('onedata.org');
+      const tagElements = [...helper.element.querySelectorAll('.tag-item')];
+      expect(tagElements[0]).to.have.trimmed.text('hello');
+      expect(tagElements[1]).to.have.trimmed.text('world');
+      expect(helper.element.textContent).to.contain('foo bar');
+      expect(find('.top-placeholder')).to.not.exist;
+      expect(find('.figure-text-centered')).to.not.exist;
+    }
+  );
+
   it('renders tags and "unknown organization..." message if only tags are provided',
     async function () {
       const helper = new Helper(this);
