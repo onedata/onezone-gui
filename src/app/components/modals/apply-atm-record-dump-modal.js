@@ -236,7 +236,9 @@ export default Component.extend(I18n, {
 
   reinitializeNewAtmRecordName() {
     const nameFromDump = this.atmModelName === 'atmLambda' ?
-      this.get('dump.revision.atmLambdaRevision.name') : this.get('dump.name');
+      this.get('dump.revision.atmLambdaRevision.name') ??
+      this.get('dump.revision.atmLambdaRevision._data.name') :
+      this.get('dump.name');
     if (nameFromDump) {
       this.set('newAtmRecordName', nameFromDump);
     }
