@@ -1107,6 +1107,7 @@ function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
                     id: 'lane1',
                     name: 'lane 1',
                     maxRetries: 1,
+                    failForExceptionsRatio: 0.1,
                     storeIteratorSpec: {
                       storeSchemaId: 'store1',
                       maxBatchSize: 50,

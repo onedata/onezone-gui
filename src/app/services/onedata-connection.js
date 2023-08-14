@@ -57,6 +57,12 @@ const OnezoneConnection = ProductionSymbol.extend({
   defaultAtmResourceSpec: reads('attributes.defaultAtmResourceSpec'),
 
   /**
+   * Default value for `failForExceptionsRatio` field of atm lane.
+   * @type {ComputedProperty<AtmResourceSpec>}
+   */
+  defaultAtmLaneFailForExceptionsRatio: reads('attributes.defaultAtmLaneFailForExceptionsRatio'),
+
+  /**
    * Maps: category -> array of available tags to use in spaces
    * @type {Object<string, Array<string>>}
    */
