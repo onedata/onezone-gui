@@ -45,7 +45,7 @@ export default WorkflowManager.extend({
   /**
    * @override
    */
-  atmLaneFailForExceptionsRatio: reads('defaultAtmLaneFailForExceptionsRatio'),
+  atmInstantFailureExceptionThreshold: reads('defaultAtmInstantFailureExceptionThreshold'),
 
   /**
    * Creates new automation inventory.
