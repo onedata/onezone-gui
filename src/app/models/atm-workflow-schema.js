@@ -68,6 +68,8 @@ export const entityType = 'atm_workflow_schema';
  * @typedef {Object} AtmLaneSchema
  * @property {String} id
  * @property {String} name
+ * @property {number} maxRetries
+ * @property {number} instantFailureExceptionThreshold
  * @property {AtmLaneStoreIteratorSpec} storeIteratorSpec
  * @property {Array<AtmParallelBoxSchema>} parallelBoxes
  */

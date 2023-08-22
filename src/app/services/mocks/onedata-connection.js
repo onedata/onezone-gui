@@ -31,6 +31,7 @@ export default OnedataConnection.extend({
     ephemeralStorageRequested: 0,
     ephemeralStorageLimit: null,
   })),
+  defaultAtmInstantFailureExceptionThreshold: 0.1,
   availableSpaceTags: Object.freeze({
     general: [
       'archival',
