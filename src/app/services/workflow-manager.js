@@ -45,7 +45,9 @@ export default WorkflowManager.extend({
   /**
    * @override
    */
-  atmInstantFailureExceptionThreshold: reads('defaultAtmInstantFailureExceptionThreshold'),
+  atmInstantFailureExceptionThreshold: reads(
+    'onedataConnection.defaultAtmInstantFailureExceptionThreshold'
+  ),
 
   /**
    * Creates new automation inventory.
