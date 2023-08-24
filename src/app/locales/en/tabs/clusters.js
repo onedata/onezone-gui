@@ -14,6 +14,5 @@ export default {
     provider: 'Provider',
     spaces: 'Spaces',
     storages: 'Storages',
-    ceph: 'Ceph',
   },
 };
