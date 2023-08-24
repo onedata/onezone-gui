@@ -6,7 +6,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Service, { inject as service } from '@ember/service';
+import { inject as service } from '@ember/service';
 import {
   computed,
   observer,
@@ -14,6 +14,8 @@ import {
   getProperties,
   set,
 } from '@ember/object';
+import { reads } from '@ember/object/computed';
+import WorkflowManager from 'onedata-gui-common/services/workflow-manager';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import {
   entityType as atmInventoryEntityType,
@@ -34,10 +36,18 @@ import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import ArrayProxy from '@ember/array/proxy';
 import getNextFreeRevisionNumber from 'onedata-gui-common/utils/revisions/get-next-free-revision-number';
 
-export default Service.extend({
+export default WorkflowManager.extend({
   store: service(),
   recordManager: service(),
   onedataGraph: service(),
+  onedataConnection: service(),
+
+  /**
+   * @override
+   */
+  atmInstantFailureExceptionThreshold: reads(
+    'onedataConnection.defaultAtmInstantFailureExceptionThreshold'
+  ),
 
   /**
    * Creates new automation inventory.
