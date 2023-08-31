@@ -291,29 +291,6 @@ export default Service.extend(I18n, {
   },
 
   /**
-   * @param {Model.AtmInventory} atmInventory
-   * @returns {Promise}
-   */
-  leaveAtmInventory(atmInventory) {
-    const {
-      recordManager,
-      globalNotify,
-    } = this.getProperties('recordManager', 'globalNotify');
-
-    return recordManager.removeUserRelation(atmInventory)
-      .then(() => {
-        globalNotify.success(this.t(
-          'leaveAtmInventorySuccess', {
-            atmInventoryName: get(atmInventory, 'name'),
-          }));
-      })
-      .catch(error => {
-        globalNotify.backendError(this.t('leavingAtmInventory'), error);
-        throw error;
-      });
-  },
-
-  /**
    * Joins current user to a automation inventory (without token)
    * @param {Model.AtmInventory} atmInventory
    * @returns {Promise}

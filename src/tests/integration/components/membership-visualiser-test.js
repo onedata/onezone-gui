@@ -7,8 +7,9 @@ import EmberObject, { get, setProperties } from '@ember/object';
 import { registerService, lookupService } from '../../helpers/stub-service';
 import _ from 'lodash';
 import { resolve, reject } from 'rsvp';
-import Service from '@ember/service';
 import { suppressRejections } from '../../helpers/suppress-rejections';
+import Store from 'onedata-gui-websocket-client/services/store';
+import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 
 const userEntityId = 'userEntityId';
 
@@ -20,7 +21,7 @@ function membershipGri(groupNo) {
   return `group.group${groupNo}EntityId.eff_user_membership,${userEntityId}:private`;
 }
 
-const StoreStub = Service.extend({
+const StoreStub = Store.extend({
   groups: Object.freeze({}),
   memberships: Object.freeze({}),
 
@@ -47,8 +48,10 @@ function generateNGroups(context, n) {
   const groupsMap = {};
   const membershipsMap = {};
   const groups = _.times(n, index => {
+    const gri = groupGri(index);
     const group = EmberObject.create({
-      gri: groupGri(index),
+      gri,
+      entityId: parseGri(gri).entityId,
       name: `groups${index}`,
       entityType: 'group',
       constructor: {

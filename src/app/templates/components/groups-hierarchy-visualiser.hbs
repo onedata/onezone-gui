@@ -9,7 +9,7 @@ right column will always be before left in html --}}
     removeRelation=(action (mut relationToRemove))
     modifyPrivileges=(action (mut relationPrivilegesToChange))
     renameGroup=(action "renameGroup")
-    leaveGroup=(action (mut groupToLeave))
+    leaveGroup=(action "leaveGroup")
     joinGroup=(action (mut groupToJoin))
     removeGroup=(action (mut groupToRemove))
     createRelativeGroup=(action "showCreateRelativeModal")
@@ -18,12 +18,6 @@ right column will always be before left in html --}}
     viewGroup=(action "viewGroup")}}
   {{groups-hierarchy-visualiser/column-separator separator=column.separator}}
 {{/each}}
-{{leave-modal
-  opened=(and groupToLeave (not groupToLeave.isDeleted))
-  close=(action (mut groupToLeave) null)
-  proceed=(action "leaveGroup")
-  processing=isLeavingGroup
-  record=groupToLeave}}
 {{join-as-user-modal
   opened=(and groupToJoin (not groupToJoin.isDeleted))
   close=(action (mut groupToJoin) null)

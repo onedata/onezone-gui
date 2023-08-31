@@ -104,6 +104,7 @@ export default Component.extend(I18n, {
   currentUser: service(),
   recordManager: service(),
   sidebarResources: service(),
+  userActions: service(),
 
   /**
    * @override
@@ -143,6 +144,12 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   isCondensed: false,
+
+  /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  hideDirectMembership: false,
 
   /**
    * @type {number}
@@ -628,7 +635,11 @@ export default Component.extend(I18n, {
           donePaths.push(workingPath.concat([null]).reverse());
           return [];
         } else {
-          if (get(lastNode, 'directMembership')) {
+          if (
+            get(lastNode, 'directMembership') && (
+              !this.hideDirectMembership || workingPath.length > 1
+            )
+          ) {
             donePaths.push(workingPath.slice(0).reverse());
           }
           return get(lastNode, 'intermediaries')
@@ -677,6 +688,15 @@ export default Component.extend(I18n, {
           get(relationPrivilegesToChange, 'parent').reload();
         })
         .finally(() => safeExec(this, 'set', 'relationPrivilegesToChange', null));
+    },
+    scheduleRelationRemoval(relationToRemove) {
+      if (this.currentUser.userId === relationToRemove.child?.entityId) {
+        this.userActions.createLeaveAction({
+          recordToLeave: relationToRemove.parent,
+        }).execute();
+      } else {
+        this.set('relationToRemove', relationToRemove);
+      }
     },
     removeRelation() {
       const {

@@ -73,7 +73,7 @@ describe(
       }, {
         selector: '.leave-atm-inventory-action-trigger',
         name: 'Leave',
-        icon: 'group-leave-group',
+        icon: 'leave-space',
       }, {
         selector: '.remove-atm-inventory-action-trigger',
         name: 'Remove',

@@ -7,7 +7,6 @@ export default {
   },
   groupItem: {
     rename: 'Rename',
-    leave: 'Leave',
     remove: 'Remove',
     groupPersistence: 'group persistence',
   },

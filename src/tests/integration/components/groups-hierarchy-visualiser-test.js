@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
+import { describe, it, beforeEach, before, afterEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render, click, fillIn, settled, find, findAll } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
@@ -22,6 +22,7 @@ import GroupsHierarchyVisualiserHelper from '../../helpers/groups-hierarchy-visu
 import { A } from '@ember/array';
 import sinon from 'sinon';
 import globals from 'onedata-gui-common/utils/globals';
+import LeaveAction from 'onezone-gui/utils/user-actions/leave-action';
 
 function getContainerStyle(style) {
   return htmlSafe(`width: ${style.width}px; height: ${style.height}px;`);
@@ -111,6 +112,12 @@ GroupStub.relationshipNames = {
 describe('Integration | Component | groups-hierarchy-visualiser', function () {
   setupRenderingTest();
 
+  before(function () {
+    // Instatiate Action class to make its `prototype.execute` available for
+    // mocking.
+    LeaveAction.create();
+  });
+
   beforeEach(function beforeEach() {
     registerService(this, 'i18n', I18nStub);
     registerService(this, 'navigation-state', Service.extend({
@@ -187,6 +194,13 @@ describe('Integration | Component | groups-hierarchy-visualiser', function () {
         this.resizeHandlers.forEach((handler) => handler());
       },
     });
+  });
+
+  afterEach(function () {
+    // Reset stubbed action
+    if (LeaveAction.prototype.execute.restore) {
+      LeaveAction.prototype.execute.restore();
+    }
   });
 
   it(
@@ -468,13 +482,12 @@ describe('Integration | Component | groups-hierarchy-visualiser', function () {
 
   it('leaves group', async function () {
     let leftGroup = {};
-    registerService(this, 'group-actions', Service.extend({
-      leaveGroup(group) {
-        leftGroup = group;
-        set(group, 'directMembership', false);
-        return resolve();
-      },
-    }));
+    sinon.stub(LeaveAction.prototype, 'execute')
+      .callsFake(function () {
+        leftGroup = this.context.recordToLeave;
+        set(leftGroup, 'directMembership', false);
+        return resolve({ status: 'done' });
+      });
 
     await render(hbs `
       <div style={{containerStyle}}>
@@ -485,7 +498,6 @@ describe('Integration | Component | groups-hierarchy-visualiser', function () {
     const helper = new GroupsHierarchyVisualiserHelper(this.element);
     let groupBox = helper.getGroupBox('a1', 'children', 'b2');
     await helper.clickGroupBoxActions(groupBox, ['.leave-group-action']);
-    await click('.leave-modal .proceed');
     expect(get(leftGroup, 'name')).to.equal('b2');
     groupBox = helper.getGroupBox('a1', 'children', 'b2');
     expect(groupBox).to.exist;

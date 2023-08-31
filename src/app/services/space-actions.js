@@ -133,26 +133,6 @@ export default Service.extend(I18n, {
   },
 
   /**
-   * Leave space
-   * @param {models.Space} space
-   * @returns {Promise}
-   */
-  leaveSpace(space) {
-    const {
-      spaceManager,
-      globalNotify,
-    } = this.getProperties('spaceManager', 'globalNotify');
-    return spaceManager.leaveSpace(get(space, 'entityId'))
-      .then(() => {
-        globalNotify.success(this.t('spaceLeftSuccess'));
-      })
-      .catch(error => {
-        globalNotify.backendError(this.t('leavingSpace'), error);
-        throw error;
-      });
-  },
-
-  /**
    * Joins user to an existing space (without token)
    * @param {Space} space
    * @returns {Promise} A promise, which resolves to space if it has

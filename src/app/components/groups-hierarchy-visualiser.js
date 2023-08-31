@@ -201,6 +201,7 @@ export default Component.extend(I18n, {
   groupManager: service(),
   groupActions: service(),
   tokenActions: service(),
+  userActions: service(),
   privilegeManager: service(),
   privilegeActions: service(),
   globalNotify: service(),
@@ -224,18 +225,6 @@ export default Component.extend(I18n, {
    * @type {Object}
    */
   groupedPrivilegesFlags: groupedFlags,
-
-  /**
-   * Group for group-leave-modal
-   * @type {Group|null}
-   */
-  groupToLeave: null,
-
-  /**
-   * If true, user is leaving `groupToLeave`
-   * @type {boolean}
-   */
-  isLeavingGroup: false,
 
   /**
    * Group for join-as-user-modal
@@ -416,24 +405,6 @@ export default Component.extend(I18n, {
   windowResizeHandler: computed(function windowResizeHandler() {
     return () => this.recalculateAvailableArea();
   }),
-
-  groupToLeaveObserver: observer(
-    'groupToLeave.directMembership',
-    function groupToLeaveObserver() {
-      const {
-        groupToLeave,
-        isLeavingGroup,
-      } = this.getProperties('groupToLeave', 'isLeavingGroup');
-      // if user left group without our action, close leave-group modal
-      if (
-        groupToLeave &&
-        !isLeavingGroup &&
-        !get(groupToLeave, 'directMembership')
-      ) {
-        this.set('groupToLeave', null);
-      }
-    }
-  ),
 
   groupToJoinObserver: observer(
     'groupToJoin.directMembership',
@@ -845,26 +816,14 @@ export default Component.extend(I18n, {
           })
         );
     },
-    leaveGroup() {
-      const {
-        groupToLeave,
-        groupActions,
-      } = this.getProperties('groupToLeave', 'groupActions');
-      this.set('isLeavingGroup', true);
-      return groupActions.leaveGroup(groupToLeave)
-        .then(() =>
-          this.redirectOnGroupDeletion().then(willRedirect => {
-            if (!willRedirect) {
-              safeExec(this, 'reloadModel');
-            }
-          })
-        )
-        .finally(() =>
-          safeExec(this, 'setProperties', {
-            isLeavingGroup: false,
-            groupToLeave: null,
-          })
-        );
+    async leaveGroup(group) {
+      const action = this.userActions.createLeaveAction({
+        recordToLeave: group,
+      });
+      const result = await action.execute();
+      if (result.status === 'done') {
+        safeExec(this, 'reloadModel');
+      }
     },
     joinGroup() {
       const {
