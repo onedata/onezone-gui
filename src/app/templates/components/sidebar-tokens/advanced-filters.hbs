@@ -25,39 +25,41 @@
   <div class="target-filter-row filter-row">
     <label class="filter-label">{{tt this "targetFilter.label"}}:</label>
     <div class="filter-control target-filter">
-      {{#power-select
-        tagName="div"
+      <OneDropdown
         class="target-model-filter"
-        triggerClass="small"
-        dropdownClass="small"
-        options=targetModelOptions
-        onchange=(action "targetModelChanged")
-        selected=selectedTargetModelOption
-        renderInPlace=true
+        @tagName="div"
+        @triggerClass="small"
+        @dropdownClass="small"
+        @options={{targetModelOptions}}
+        @onChange={{action "targetModelChanged"}}
+        @selected={{selectedTargetModelOption}}
+        @renderInPlace={{true}}
         as |option|
-      }}
+      >
         {{#truncated-string class="option-container"}}
           {{#if option.icon}}
             {{one-icon class="model-icon" icon=option.icon}}
           {{/if}}
           <span class="text model-name">{{tt this (concat "targetFilter.model.options." option.modelName)}}</span>
         {{/truncated-string}}
-      {{/power-select}}
-      {{#power-select
-        tagName="div"
+      </OneDropdown>
+      <OneDropdown
         class="target-record-filter"
-        triggerClass="small"
-        dropdownClass="small"
-        options=targetRecordOptions
-        onchange=(action "targetRecordChanged")
-        selected=selectedTargetRecordOption
-        renderInPlace=true
-        disabled=isTargetRecordDisabled
-        as |option|}}
+        @tagName="div"
+        @triggerClass="small"
+        @dropdownClass="small"
+        @options={{targetRecordOptions}}
+        @onChange={{action "targetRecordChanged"}}
+        @selected={{selectedTargetRecordOption}}
+        @renderInPlace={{true}}
+        @disabled={{isTargetRecordDisabled}}
+        @searchEnabled={{true}}
+        as |option|
+      >
         {{#truncated-string}}
           {{option.name}}
         {{/truncated-string}}
-      {{/power-select}}
+      </OneDropdown>
     </div>
   </div>
 {{/one-collapse}}
