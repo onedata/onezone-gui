@@ -20,6 +20,9 @@ import RecordManagerConfiguration from 'onezone-gui/utils/record-manager-configu
  * @property {boolean} [backgroundReload]
  */
 
+/**
+ * @type {LoadRecordOptions}
+ */
 const defaultLoadRecordOptions = Object.freeze({
   reload: false,
   backgroundReload: false,
@@ -528,9 +531,11 @@ export default Service.extend({
     targetRecordId,
     loadOptions
   ) {
-    let griMembershipType = this.getEntityTypeForModelName(memberModelName);
+    let griMembershipType;
     if (memberModelName === 'group' && targetModelName === 'group') {
       griMembershipType = 'child';
+    } else {
+      griMembershipType = this.getEntityTypeForModelName(memberModelName);
     }
 
     const membershipGri = gri({

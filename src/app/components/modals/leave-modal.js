@@ -119,7 +119,7 @@ export default Component.extend(I18n, {
   isCurrentUserIndirectMember: reads('isCurrentUserIndirectMemberProxy.content'),
 
   /**
-   * @type {ComputedProperty<SafeString>}
+   * @type {ComputedProperty<{ main: SafeString, beforeMemberships: SafeString, afterMemberships: SafeString }>}
    */
   infoText: computed(
     'isCurrentUserDirectMember',

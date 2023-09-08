@@ -2,6 +2,7 @@
   classNames="leave-modal"
   allowClose=(not isSubmitting)
   modalId=modalId
+  size=(if isCurrentUserIndirectMember "lg" null)
   as |modal|
 }}
   {{#modal.header}}

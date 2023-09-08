@@ -19,6 +19,7 @@ export default {
       generic: 'You cannot leave {{readableModelName}}&nbsp;<strong>{{recordName}}</strong> because you are not its direct member.',
     },
     beforeMemberships: 'Your membership is inherited from the following memberships:',
+    afterMemberships: 'You would have to cease all these memberships to effectively leave {{readableModelName}}&nbsp;<strong>{{recordName}}</strong>.',
   },
   infoNotMember: {
     main: {
