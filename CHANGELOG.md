@@ -7,6 +7,7 @@ CHANGELOG
 ### Latest changes
 
 * VFS-11134 Added information about membership to leaving modal
+* VFS-10939 Fixed copying from provider popover in firefox
 * VFS-11202 Removed Embedded Ceph cluster configuration
 * VFS-11225 Added failure threshold to atm lane
 * VFS-10664 Space Marketplace Service Pack 1: reject confirmation view, space details and Marketplace tiles on space overview, space configuration unsaved changes guard, UX fixes
