@@ -24,10 +24,9 @@ export default Component.extend(I18n, {
   i18n: service(),
   globalNotify: service(),
   spaceActions: service(),
-  router: service(),
-  navigationState: service(),
   clipboardActions: service(),
   apiSamplesActions: service(),
+  userActions: service(),
 
   /**
    * @override
@@ -51,16 +50,6 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   inSidenav: false,
-
-  /**
-   * @type {boolean}
-   */
-  leaveSpaceModalOpen: false,
-
-  /**
-   * @type {boolean}
-   */
-  isLeaving: false,
 
   /**
    * @type {boolean}
@@ -136,13 +125,12 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Utils.Action>}
    */
-  leaveAction: computed(function leaveAction() {
-    return {
-      action: () => this.send('showLeaveModal'),
-      title: this.t('leave'),
-      class: 'leave-record-trigger',
-      icon: 'leave-space',
-    };
+  leaveAction: computed('space', function leaveAction() {
+    const action = this.userActions.createLeaveAction({
+      recordToLeave: this.space,
+    });
+    set(action, 'className', `${action.className} leave-record-trigger`);
+    return action;
   }),
 
   /**
@@ -214,12 +202,6 @@ export default Component.extend(I18n, {
         event.preventDefault();
       }
     },
-    showLeaveModal() {
-      this.set('leaveSpaceModalOpen', true);
-    },
-    closeLeaveModal() {
-      this.set('leaveSpaceModalOpen', false);
-    },
     toggleRename(value) {
       next(() => safeExec(this, 'set', 'isRenaming', value));
     },
@@ -249,22 +231,6 @@ export default Component.extend(I18n, {
           set(space, 'name', oldName);
           throw error;
         });
-    },
-    leave() {
-      const {
-        space,
-        spaceActions,
-        navigationState,
-      } = this.getProperties('space', 'spaceActions', 'navigationState');
-      this.set('isLeaving', true);
-      return spaceActions.leaveSpace(space)
-        .then(() => navigationState.redirectToCollectionIfResourceNotExist())
-        .finally(() =>
-          safeExec(this, 'setProperties', {
-            isLeaving: false,
-            leaveSpaceModalOpen: false,
-          })
-        );
     },
   },
 });

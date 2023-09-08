@@ -39,15 +39,4 @@
     dropdownPlacement="auto"
     actionsArray=itemActions
   }}
-
-  {{#render-later triggerRender=leaveSpaceModalOpen as |renderLater|}}
-    {{leave-modal
-      opened=leaveSpaceModalOpen
-      close=(action "closeLeaveModal")
-      proceed=(action "leave")
-      processing=isLeaving
-      record=space
-      onHidden=renderLater.resetRenderTrigger
-    }}
-  {{/render-later}}
 {{/unless}}

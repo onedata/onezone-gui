@@ -4,6 +4,9 @@ import { setupRenderingTest } from 'ember-mocha';
 import { render, click, find } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import globals from 'onedata-gui-common/utils/globals';
+import sinon from 'sinon';
+import { lookupService } from '../../../helpers/stub-service';
+import { resolve } from 'rsvp';
 
 describe('Integration | Component | sidebar-harvesters/harvester-item', function () {
   setupRenderingTest();
@@ -15,6 +18,8 @@ describe('Integration | Component | sidebar-harvesters/harvester-item', function
       },
       name: 'harvester1',
     });
+    sinon.stub(lookupService(this, 'record-manager'), 'getCurrentUserMembership')
+      .returns(resolve({ intermediaries: [] }));
   });
 
   it('renders harvester name, icon and menu trigger', async function () {
@@ -47,10 +52,14 @@ describe('Integration | Component | sidebar-harvesters/harvester-item', function
     modalClass: 'harvester-remove-modal',
   }].forEach(({ operation, modalClass }) => {
     it(`shows ${operation} acknowledgment modal`, async function () {
-      await render(hbs `{{sidebar-harvesters/harvester-item item=harvester}}`);
+      await render(hbs`
+        {{global-modal-mounter}}
+        {{sidebar-harvesters/harvester-item item=harvester}}
+      `);
 
       await click('.collapsible-toolbar-toggle');
       await click(globals.document.querySelector(`.webui-popover.in .${operation}-harvester-action`));
+
       expect(globals.document.querySelector(`.${modalClass}.in`)).to.exist;
     });
   });

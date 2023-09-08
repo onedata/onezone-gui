@@ -1,6 +1,4 @@
 export default {
-  leaveAtmInventorySuccess: 'Automation inventory "{{atmInventoryName}}" left successfully.',
-  leavingAtmInventory: 'leaving the automation inventory',
   createMemberGroupSuccess: 'Member group "{{memberGroupName}}" has been created successfully',
   creatingMemberGroup: 'creating member group',
   addMemberGroupSuccess: 'Member group "{{memberGroupName}}" has been added successfully',

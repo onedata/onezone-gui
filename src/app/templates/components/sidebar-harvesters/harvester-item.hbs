@@ -23,17 +23,6 @@
     actionsArray=itemActions
   }}
 
-  {{#render-later triggerRender=isLeaveModalOpened as |renderLater|}}
-    {{leave-modal
-      opened=isLeaveModalOpened
-      close=(action "closeLeaveModal")
-      proceed=(action "leave")
-      processing=isLeaving
-      record=harvester
-      onHidden=renderLater.resetRenderTrigger
-    }}
-  {{/render-later}}
-
   {{#render-later triggerRender=isRemoveModalOpened as |renderLater|}}
     {{harvester-remove-modal
       opened=isRemoveModalOpened

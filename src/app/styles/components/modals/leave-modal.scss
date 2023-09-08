@@ -1,0 +1,23 @@
+.leave-modal {
+  .membership-visualiser {
+    $memberships-margin: 1em;
+    min-height: initial;
+    border: 1px solid $main-border-color;
+    border-radius: $border-radius-base;
+    margin-top: $memberships-margin;
+
+    .membership-relation {
+      width: 3em;
+      pointer-events: none;
+
+      .actions-trigger {
+        display: none;
+      }
+    }
+
+    & + p {
+      // 10px is a margin of the <p> from bootstrap. Not available via any variable
+      margin-top: calc(#{$memberships-margin} + 10px);
+    }
+  }
+}

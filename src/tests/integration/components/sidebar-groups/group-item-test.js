@@ -4,6 +4,9 @@ import { setupRenderingTest } from 'ember-mocha';
 import { render, click, find } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import globals from 'onedata-gui-common/utils/globals';
+import sinon from 'sinon';
+import { lookupService } from '../../../helpers/stub-service';
+import { resolve } from 'rsvp';
 
 describe('Integration | Component | sidebar-groups/group-item', function () {
   setupRenderingTest();
@@ -16,6 +19,8 @@ describe('Integration | Component | sidebar-groups/group-item', function () {
       name: 'group1',
       type: 'group',
     });
+    sinon.stub(lookupService(this, 'record-manager'), 'getCurrentUserMembership')
+      .returns(resolve({ intermediaries: [] }));
   });
 
   it('renders group name, icon and menu trigger', async function () {
@@ -50,7 +55,10 @@ describe('Integration | Component | sidebar-groups/group-item', function () {
     modalClass: 'group-remove-modal',
   }].forEach(({ operation, modalClass }) => {
     it(`shows ${operation} acknowledgment modal`, async function () {
-      await render(hbs `{{sidebar-groups/group-item item=group}}`);
+      await render(hbs`
+        {{global-modal-mounter}}
+        {{sidebar-groups/group-item item=group}}
+      `);
 
       await click('.collapsible-toolbar-toggle');
       await click(

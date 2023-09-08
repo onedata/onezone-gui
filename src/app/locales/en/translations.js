@@ -52,7 +52,6 @@ import membersCollection from './components/members-collection';
 import privilegesEditorModal from './components/privileges-editor-modal';
 import contentSpacesMembers from './components/content-spaces-members';
 import groupsHierarchyVisualiser from './components/groups-hierarchy-visualiser';
-import leaveModal from './components/leave-modal';
 import groupRemoveModal from './components/group-remove-modal';
 import removeRelationModal from './components/remove-relation-modal';
 import groupCreateRelativeModal from './components/group-create-relative-modal';
@@ -111,6 +110,7 @@ import shareNotFound from './components/errors/share-not-found';
 import openShareFailed from './components/errors/open-share-failed';
 import offlineProviders from './components/errors/offline-providers';
 import apiSamplesModal from './components/modals/api-samples-modal';
+import leaveModal from './components/modals/leave-modal';
 import spacesModals from './components/modals/spaces';
 
 import spaceActions from './services/space-actions';
@@ -140,6 +140,7 @@ import generateInviteTokenAction from './utils/token-actions/generate-invite-tok
 import openConsumeTokenViewAction from './utils/token-actions/open-consume-token-view-action';
 import consumeInviteTokenAction from './utils/token-actions/consume-invite-token-action';
 import toggleBeingOwnerAction from './utils/user-actions/toggle-being-owner-action';
+import leaveAction from './utils/user-actions/leave-action';
 import openCreateAtmInventoryViewAction from './utils/workflow-actions/open-create-atm-inventory-view-action';
 import createAtmInventoryAction from './utils/workflow-actions/create-atm-inventory-action';
 import modifyAtmInventoryAction from './utils/workflow-actions/modify-atm-inventory-action';
@@ -187,6 +188,7 @@ const translations = {
       unlinkAtmLambdaModal,
       applyAtmRecordDumpModal,
       apiSamplesModal,
+      leaveModal,
       spaces: spacesModals,
     },
     errors: {
@@ -234,7 +236,6 @@ const translations = {
     privilegesEditorModal,
     contentSpacesMembers,
     groupsHierarchyVisualiser,
-    leaveModal,
     groupRemoveModal,
     removeRelationModal,
     groupCreateRelativeModal,
@@ -322,6 +323,7 @@ const translations = {
     },
     userActions: {
       toggleBeingOwnerAction,
+      leaveAction,
     },
     workflowActions: {
       openCreateAtmInventoryViewAction,

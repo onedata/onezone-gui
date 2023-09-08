@@ -2,7 +2,7 @@
  * Has generic functions to manage records and relations.
  *
  * @author Michał Borzęcki
- * @copyright (C) 2020-2021 ACK CYFRONET AGH
+ * @copyright (C) 2020-2023 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -13,6 +13,20 @@ import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import RecordManagerConfiguration from 'onezone-gui/utils/record-manager-configuration';
+
+/**
+ * @typedef {Object} LoadRecordOptions
+ * @property {boolean} [reload]
+ * @property {boolean} [backgroundReload]
+ */
+
+/**
+ * @type {LoadRecordOptions}
+ */
+const defaultLoadRecordOptions = Object.freeze({
+  reload: false,
+  backgroundReload: false,
+});
 
 export default Service.extend({
   currentUser: service(),
@@ -142,12 +156,12 @@ export default Service.extend({
    * Loads record by modelName and gri
    * @param {String} modelName
    * @param {String} gri
-   * @param {boolean} [backgroundReload=false]
+   * @param {LoadRecordOptions} [loadOptions]
    * @returns {Promise<GraphModel>}
    */
-  getRecord(modelName, gri, backgroundReload = false) {
+  getRecord(modelName, gri, loadOptions = defaultLoadRecordOptions) {
     return this.get('store')
-      .findRecord(modelName, gri, { backgroundReload })
+      .findRecord(modelName, gri, { ...defaultLoadRecordOptions, ...loadOptions })
       .then(record => this.loadRequiredRelationsOfRecord(record).then(() => record));
   },
 
@@ -155,10 +169,10 @@ export default Service.extend({
    * Loads record by modelName and recordId
    * @param {String} modelName
    * @param {String} recordId
-   * @param {boolean} [backgroundReload=false]
+   * @param {LoadRecordOptions} [loadOptions]
    * @returns {Promise<GraphModel>}
    */
-  getRecordById(modelName, recordId, backgroundReload = false) {
+  getRecordById(modelName, recordId, loadOptions = defaultLoadRecordOptions) {
     const recordGri = gri({
       entityType: this.getEntityTypeForModelName(modelName),
       entityId: recordId,
@@ -166,7 +180,7 @@ export default Service.extend({
       scope: 'auto',
     });
 
-    return this.getRecord(modelName, recordGri, backgroundReload);
+    return this.getRecord(modelName, recordGri, loadOptions);
   },
 
   /**
@@ -300,6 +314,18 @@ export default Service.extend({
     // Get application adapter. It's not important for which model it is
     return this.get('store').adapterFor('user')
       .getEntityTypeForModelName(this.emberifyModelName(modelName));
+  },
+
+  /**
+   * Returns model name for given entity type
+   * @param {String} entityType
+   * @returns {String}
+   */
+  getModelNameForEntityType(entityType) {
+    return camelize(
+      // Get application adapter. It's not important for which model it is
+      this.store.adapterFor('user').getModelNameForEntityType(entityType)
+    );
   },
 
   /**
@@ -455,5 +481,71 @@ export default Service.extend({
       relationTargetRecordId,
       relationType
     );
+  },
+
+  /**
+   * Gets membership of the current user in the `targetRecord` record.
+   * @public
+   * @param {GraphSingleModel} targetRecord
+   * @param {LoadRecordOptions} [loadOptions]
+   * @returns {Promise<Model.Membership>}
+   */
+  getCurrentUserMembership(targetRecord, loadOptions) {
+    return this.getMembership(this.getCurrentUserRecord(), targetRecord, loadOptions);
+  },
+
+  /**
+   * Gets membership of the `memberRecord` record in the `targetRecord` record.
+   * @public
+   * @param {Model.User | Model.Group} memberRecord
+   * @param {GraphSingleModel} targetRecord
+   * @param {LoadRecordOptions} [loadOptions]
+   * @returns {Promise<Model.Membership>}
+   */
+  getMembership(memberRecord, targetRecord, loadOptions) {
+    return this.getMembershipById(
+      this.getModelNameForRecord(memberRecord),
+      get(memberRecord, 'entityId'),
+      this.getModelNameForRecord(targetRecord),
+      get(targetRecord, 'entityId'),
+      loadOptions
+    );
+  },
+
+  /**
+   * Gets membership of the member record (specified by `memberModelName` and
+   * `memberRecordId`) record in the target record (specified by
+   * `targetModelName` and `targetRecordId`).
+   * @public
+   * @param {string} memberModelName
+   * @param {string} memberRecordId
+   * @param {string} targetModelName
+   * @param {string} targetRecordId
+   * @param {LoadRecordOptions} [loadOptions]
+   * @returns {Promise<Model.Membership>}
+   */
+  getMembershipById(
+    memberModelName,
+    memberRecordId,
+    targetModelName,
+    targetRecordId,
+    loadOptions
+  ) {
+    let griMembershipType;
+    if (memberModelName === 'group' && targetModelName === 'group') {
+      griMembershipType = 'child';
+    } else {
+      griMembershipType = this.getEntityTypeForModelName(memberModelName);
+    }
+
+    const membershipGri = gri({
+      entityType: this.getEntityTypeForModelName(targetModelName),
+      entityId: targetRecordId,
+      aspect: `eff_${griMembershipType}_membership`,
+      aspectId: memberRecordId,
+      scope: 'private',
+    });
+
+    return this.getRecord('membership', membershipGri, loadOptions);
   },
 });

@@ -19,8 +19,6 @@ export default {
   addingMemberGroup: 'adding member group',
   removeHarvesterSuccess: 'Harvester "{{harvesterName}}" has been removed',
   removingHarvester: 'removing harvester',
-  leaveHarvesterSuccess: 'Harvester "{{harvesterName}}" left successfully',
-  leavingHarvester: 'leaving harvester',
   updateHarvesterSuccess: 'Harvester has been updated successfully',
   updatingHarvester: 'updating harvester',
   createIndexSuccess: 'New index created successfully',

@@ -99,28 +99,6 @@ export default Service.extend(I18n, {
   },
 
   /**
-   * Leave harvester
-   * @param {Model.Harvester} harvester
-   * @returns {Promise}
-   */
-  leaveHarvester(harvester) {
-    const {
-      harvesterManager,
-      globalNotify,
-    } = this.getProperties('harvesterManager', 'globalNotify');
-    return harvesterManager.leaveHarvester(get(harvester, 'entityId'))
-      .then(() => {
-        globalNotify.success(this.t(
-          'leaveHarvesterSuccess', { harvesterName: get(harvester, 'name') }
-        ));
-      })
-      .catch(error => {
-        globalNotify.backendError(this.t('leavingHarvester'), error);
-        throw error;
-      });
-  },
-
-  /**
    * Redirects to harvester page
    * @param {Model.Harvester} harvester
    * @param {string} aspect

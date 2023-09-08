@@ -23,17 +23,6 @@
     actionsArray=itemActions
   }}
 
-  {{#render-later triggerRender=leaveGroupModalOpen as |renderLater|}}
-    {{leave-modal
-      opened=leaveGroupModalOpen
-      close=(action "closeLeaveModal")
-      proceed=(action "leave")
-      processing=isLeaving
-      record=group
-      onHidden=renderLater.resetRenderTrigger
-    }}
-  {{/render-later}}
-
   {{#render-later triggerRender=removeGroupModalOpen as |renderLater|}}
     {{group-remove-modal
       opened=removeGroupModalOpen

@@ -2,7 +2,7 @@
  * Provides project-specific, custom logic to record-manager service.
  *
  * @author Michał Borzęcki
- * @copyright (C) 2021 ACK CYFRONET AGH
+ * @copyright (C) 2021-2023 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -11,6 +11,15 @@ import _ from 'lodash';
 import { Promise } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import ignoreNotFoundError from 'onedata-gui-common/utils/ignore-not-found-error';
+
+/**
+ * Describes which lists of records should be additionally reloaded when
+ * user/group relation with model type (key in this map) has been removed.
+ */
+const customListsToReloadForRemovedMembership = Object.freeze({
+  space: ['provider'],
+  group: ['atmInventory', 'cluster', 'harvester', 'provider', 'space'],
+});
 
 export default class RecordManagerConfiguration {
   constructor(recordManager) {
@@ -170,25 +179,27 @@ export default class RecordManagerConfiguration {
 
     const reloadPromises = [];
 
-    // Reload relation records
     if (relationOriginRecord && !isCurrentUserAnOrigin) {
       reloadPromises.push(
+        // Reload origin
         relationOriginRecord.reload().catch(ignoreRelationReloadError)
       );
     }
     if (relationTargetRecord && !isCurrentUserATarget) {
       reloadPromises.push(
+        // Reload target
         relationTargetRecord.reload().catch(ignoreRelationReloadError)
       );
     }
 
-    // Reload lists of relation-related records in both sides of the relation
     reloadPromises.push(
+      // Reload list of targets in origin
       this.recordManager.reloadRecordListById(
         relationOriginModelName,
         relationOriginRecordId,
         relationTargetModelName
       ).catch(ignoreRelationReloadError),
+      // Reload list of origins in target
       this.recordManager.reloadRecordListById(
         relationTargetModelName,
         relationTargetRecordId,
@@ -196,32 +207,82 @@ export default class RecordManagerConfiguration {
       ).catch(ignoreRelationReloadError)
     );
 
-    // Reload:
-    // - users list in the one side of the relation,
-    // - records list of the current user related to the one side of the relation,
-    // when the other side of the relation was a group.
     if (relationOriginModelName === 'group') {
+      const customListsToReload =
+        customListsToReloadForRemovedMembership[relationTargetModelName] ?? [];
+
       reloadPromises.push(
+        // Reload list of users in target
         this.recordManager.reloadRecordListById(
           relationTargetModelName,
           relationTargetRecordId,
           'user'
         ).catch(ignoreRelationReloadError),
+        // Reload list of targets in current user (because it's possible that
+        // current user is a member of origin group and that group was a source
+        // of relation "current user -> target").
         this.recordManager.reloadUserRecordList(
           relationTargetModelName
-        ).catch(ignoreForbiddenError)
+        ).catch(ignoreForbiddenError),
+        // Reload additional model lists in origin as some types of targets
+        // implicitly introduce additional relations
+        ...customListsToReload.map((modelInList) =>
+          this.recordManager.reloadRecordListById(
+            relationOriginModelName,
+            relationOriginRecordId,
+            modelInList
+          ).catch(ignoreRelationReloadError)
+        )
       );
     }
     if (relationTargetModelName === 'group') {
+      const customListsToReload =
+        customListsToReloadForRemovedMembership[relationOriginModelName] ?? [];
+
       reloadPromises.push(
+        // Reload list of users in origin
         this.recordManager.reloadRecordListById(
           relationOriginModelName,
           relationOriginRecordId,
           'user'
         ).catch(ignoreRelationReloadError),
+        // Reload list of origins in current user (because it's possible that
+        // current user is a member of target group and that group was a source
+        // of relation "current user -> origin").
         this.recordManager.reloadUserRecordList(
           relationOriginModelName
-        ).catch(ignoreForbiddenError)
+        ).catch(ignoreForbiddenError),
+        // Reload additional model lists in target as some types of origins
+        // implicitly introduce additional relations
+        ...customListsToReload.map((modelInList) =>
+          this.recordManager.reloadRecordListById(
+            relationTargetModelName,
+            relationTargetRecordId,
+            modelInList
+          ).catch(ignoreRelationReloadError)
+        )
+      );
+    }
+
+    if (isCurrentUserAnOrigin || relationOriginModelName === 'group') {
+      const customListsToReload =
+        customListsToReloadForRemovedMembership[relationTargetModelName] ?? [];
+      reloadPromises.push(
+        // Reload additional model lists in current user as some types of targets
+        // implicitly introduce additional relations
+        ...customListsToReload.map((modelInList) =>
+          this.recordManager.reloadUserRecordList(modelInList)
+          .catch(ignoreForbiddenError))
+      );
+    } else if (isCurrentUserATarget || relationTargetModelName === 'group') {
+      const customListsToReload =
+        customListsToReloadForRemovedMembership[relationOriginModelName] ?? [];
+      reloadPromises.push(
+        // Reload additional model lists in current user as some types of origins
+        // implicitly introduce additional relations
+        ...customListsToReload.map((modelInList) =>
+          this.recordManager.reloadUserRecordList(modelInList)
+          .catch(ignoreForbiddenError))
       );
     }
 
