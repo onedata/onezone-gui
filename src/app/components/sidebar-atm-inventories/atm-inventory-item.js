@@ -61,7 +61,7 @@ export default Component.extend(I18n, {
       action: () => this.toggleRename(true),
       title: this.t('actions.rename.title'),
       className: 'rename-atm-inventory-action-trigger',
-      icon: 'rename',
+      icon: 'browser-rename',
       disabled: this.get('isRenaming'),
     };
   }),

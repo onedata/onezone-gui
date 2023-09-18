@@ -80,7 +80,7 @@ export default SecondLevelItems.extend(I18n, {
     return {
       id: 'shares',
       label: this.t('aspects.shares'),
-      icon: 'share',
+      icon: 'browser-share',
       forbidden,
       tip: forbidden ? insufficientPrivilegesMessage({
         i18n,

@@ -30,7 +30,7 @@ const lambdaPresentationActionsSpec = [{
 }, {
   className: 'copy-record-id-action-trigger',
   label: 'Copy ID',
-  icon: 'copy',
+  icon: 'browser-copy',
 }];
 
 const revisionActionsSpec = [{

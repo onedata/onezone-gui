@@ -61,7 +61,7 @@ export default Component.extend(I18n, GlobalActions, {
       component,
       i18nPrefix: tag `${'component.i18nPrefix'}.editTriggerAction`,
       className: 'edit-token-action-btn',
-      icon: 'rename',
+      icon: 'browser-rename',
       title: computedT('title'),
       disabled: equal('component.mode', raw('edit')),
       execute() {

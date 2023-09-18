@@ -75,7 +75,7 @@ export default Component.extend(I18n, {
       action: () => this.set('isRenaming', true),
       title: this.t('rename'),
       class: 'rename-index',
-      icon: 'rename',
+      icon: 'browser-rename',
       disabled: this.get('isRenaming'),
     };
   }),

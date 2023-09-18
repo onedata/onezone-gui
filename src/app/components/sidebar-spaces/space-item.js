@@ -167,7 +167,7 @@ export default Component.extend(I18n, {
       action: () => this.send('toggleRename', true),
       title: this.t('rename'),
       class: 'rename-space-action',
-      icon: 'rename',
+      icon: 'browser-rename',
       disabled: this.get('isRenaming'),
     };
   }),

@@ -111,7 +111,7 @@ export default Component.extend(...mixins, {
    */
   copyProviderIdAction: computed(function copyProviderIdAction() {
     return {
-      icon: 'copy',
+      icon: 'browser-copy',
       text: this.t('copyProviderIdAction'),
       class: 'copy-provider-id-action-trigger',
       action: (provider) => this.get('globalClipboard').copy(
@@ -126,7 +126,7 @@ export default Component.extend(...mixins, {
    */
   copyProviderDomainAction: computed(function copyProviderDomainAction() {
     return {
-      icon: 'copy',
+      icon: 'browser-copy',
       text: this.t('copyProviderDomainAction'),
       class: 'copy-provider-domain-action-trigger',
       action: (provider) => this.get('globalClipboard').copy(

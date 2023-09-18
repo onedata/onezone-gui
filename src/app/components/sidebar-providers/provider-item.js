@@ -74,7 +74,7 @@ export default Component.extend(I18n, UserProxyMixin, {
       ),
       title: this.t('copyDomainAction'),
       class: 'copy-provider-domain-action-trigger',
-      icon: 'copy',
+      icon: 'browser-copy',
     };
   }),
 

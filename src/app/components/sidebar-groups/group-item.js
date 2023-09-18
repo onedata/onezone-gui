@@ -65,7 +65,7 @@ export default Component.extend(I18n, {
       action: () => this.send('toggleRename', true),
       title: this.t('rename'),
       class: 'rename-group-action',
-      icon: 'rename',
+      icon: 'browser-rename',
       disabled: this.get('isRenaming'),
     };
   }),
@@ -89,7 +89,7 @@ export default Component.extend(I18n, {
       action: () => this.send('showRemoveModal'),
       title: this.t('remove'),
       class: 'remove-group-action',
-      icon: 'remove',
+      icon: 'browser-delete',
     };
   }),
 
