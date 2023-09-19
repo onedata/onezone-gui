@@ -83,7 +83,7 @@ export default {
     indexIdTooltipNoEndpoint: indexIdTooltip,
     usedByGui: 'Used by GUI',
     remove: 'Remove',
-    rename: 'browser-rename',
+    rename: 'Rename',
     harvestingProgress: 'Harvesting progress',
     settings: 'Settings',
   },
