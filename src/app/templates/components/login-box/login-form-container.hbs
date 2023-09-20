@@ -43,7 +43,7 @@
   <p class="no-login-methods">{{tt this "noSignInMethods"}}</p>
 {{/if}}
 
-{{#if true}}
+{{#if sessionHasExpired}}
   <div class="login-notification login-notification-session-expired login-notification-warning">
     <div class="inline-icon-container session-expired-icon-container">
       {{one-icon icon="time-outline" class="session-expired-icon"}}
