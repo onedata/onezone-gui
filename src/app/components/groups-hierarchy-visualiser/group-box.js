@@ -223,7 +223,7 @@ export default Component.extend(I18n, {
       action: () => this.set('isRenaming', true),
       title: this.t('rename'),
       class: 'rename-group-action',
-      icon: 'rename',
+      icon: 'browser-rename',
       disabled: isRenaming,
     };
   }),
@@ -314,7 +314,7 @@ export default Component.extend(I18n, {
       action: () => this.get('removeGroup')(),
       title: this.t('remove'),
       class: 'remove-group-action',
-      icon: 'remove',
+      icon: 'browser-delete',
     };
   }),
 

@@ -93,7 +93,7 @@ export default Component.extend(I18n, {
       action: () => this.send('toggleRename', true),
       title: this.t('renameAction'),
       class: 'rename-token-action-trigger',
-      icon: 'rename',
+      icon: 'browser-rename',
       disabled: this.get('isRenaming'),
     };
   }),
@@ -106,7 +106,7 @@ export default Component.extend(I18n, {
       action: () => this.set('isRemoveTokenModalOpened', true),
       title: this.t('removeAction'),
       class: 'remove-token-action-trigger',
-      icon: 'remove',
+      icon: 'browser-delete',
     };
   }),
 
@@ -121,7 +121,7 @@ export default Component.extend(I18n, {
       ),
       title: this.t('copyTokenAction'),
       class: 'copy-token-action-trigger',
-      icon: 'copy',
+      icon: 'browser-copy',
     };
   }),
 

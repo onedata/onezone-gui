@@ -103,7 +103,7 @@ export default Component.extend(I18n, {
       action: () => this.set('isEditing', true),
       title: this.t('changeDetailsAction'),
       class: 'change-details-action-trigger',
-      icon: 'rename',
+      icon: 'browser-rename',
       disabled: this.get('isEditing'),
     };
   }),

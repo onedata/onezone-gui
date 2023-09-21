@@ -22,7 +22,7 @@ export default OneSidebar.extend({
   /**
    * @override
    */
-  firstLevelItemIcon: 'share',
+  firstLevelItemIcon: 'browser-share',
 
   /**
    * @override
