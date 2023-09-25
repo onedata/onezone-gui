@@ -8,27 +8,54 @@
 
 import PromiseProxyContainer from 'onedata-gui-common/components/promise-proxy-container';
 import { computed } from '@ember/object';
-import { or } from '@ember/object/computed';
 
 export default PromiseProxyContainer.extend({
   /**
    * @override
    */
   isLoaded: computed(
-    'proxy.{isFulfilled,content.isForbidden}',
-    function isLoaded() {
-      return this.get('proxy.isFulfilled') &&
-        !this.get('proxy.content.isForbidden');
+    'proxy.{isFulfilled,content.isForbidden}', {
+      get() {
+        return this.injectedIsLoaded ?? (
+          this.proxy?.isFulfilled &&
+          !this.proxy?.content?.isForbidden
+        );
+      },
+      set(key, value) {
+        return this.injectedIsLoaded = value;
+      },
     }
   ),
 
   /**
    * @override
    */
-  isError: or('proxy.isRejected', 'proxy.content.isForbidden'),
+  isError: computed(
+    'proxy.{isRejected,content.isForbidden}', {
+      get() {
+        return this.injectedIsError ??
+          this.proxy?.isRejected ??
+          this.proxy?.content?.isForbidden;
+      },
+      set(key, value) {
+        return this.injectedIsError = value;
+      },
+    }
+  ),
 
   /**
    * @override
    */
-  errorReason: or('proxy.reason', 'proxy.content.forbiddenError'),
+  errorReason: computed(
+    'proxy.{reason,content.forbiddenError}', {
+      get() {
+        return this.injectedErrorReason ??
+          this.proxy?.reason ??
+          this.proxy?.content?.forbiddenError;
+      },
+      set(key, value) {
+        return this.injectedErrorReason = value;
+      },
+    }
+  ),
 });

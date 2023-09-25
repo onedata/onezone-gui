@@ -96,6 +96,12 @@ export default EmberObject.extend({
   nextColumn: undefined,
 
   /**
+   * Array of group boxes (unsorted)
+   * @type {Ember.A<Utils/GroupHierarchyVisualiser/GroupBox>}
+   */
+  groupBoxes: undefined,
+
+  /**
    * Column width
    * @type {Ember.ComputedProperty<number>}
    */
@@ -159,14 +165,6 @@ export default EmberObject.extend({
     set(key, value) {
       return value ? value : createEmptyColumnModel();
     },
-  }),
-
-  /**
-   * Array of group boxes (unsorted)
-   * @type {Ember.ComputedProperty<Ember.A<Utils/GroupHierarchyVisualiser/GroupBox>>}
-   */
-  groupBoxes: computed(function groupBoxes() {
-    return A();
   }),
 
   /**
@@ -440,10 +438,15 @@ export default EmberObject.extend({
 
   prevColumnObserver: observer('prevColumn', function prevColumnObserver() {
     if (this.get('prevColumn')) {
-      defineProperty(this, 'x', computed('prevColumn.x', 'width', function x() {
-        const width = this.get('width');
-        const prevX = this.get('prevColumn.x');
-        return prevX === undefined ? 0 : prevX + width;
+      defineProperty(this, 'x', computed('prevColumn.x', 'width', {
+        get() {
+          const width = this.get('width');
+          const prevX = this.get('prevColumn.x');
+          return prevX === undefined ? 0 : prevX + width;
+        },
+        set(key, value) {
+          return value;
+        },
       }));
       // Without this `get` new value of `x` is not calculated. We need to
       // trigger first calculation manually.
@@ -454,6 +457,9 @@ export default EmberObject.extend({
   init() {
     this._super(...arguments);
     this.set('columnId', getNextColumnId());
+    if (!this.groupBoxes) {
+      this.set('groupBoxes', A());
+    }
     this.modelObserver();
     this.prevColumnObserver();
   },

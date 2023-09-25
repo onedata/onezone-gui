@@ -83,8 +83,8 @@ const perProviderSize = Math.pow(1024, 4);
 
 const providerClusterDefaultData = {
   type: 'oneprovider',
-  hasViewPrivilege: true,
   onepanelProxy: false,
+  scope: 'private',
   info: {
     creatorType: 'root',
     creatorId: '',
@@ -648,7 +648,7 @@ function createClusterRecords(store) {
       type: 'onezone',
       name: 'PL-Grid',
       onepanelProxy: true,
-      hasViewPrivilege: true,
+      scope: 'private',
       info: {
         creatorType: 'root',
         creatorId: '',

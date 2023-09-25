@@ -8,7 +8,7 @@
  */
 
 import Component from '@ember/component';
-import { computed, observer, get } from '@ember/object';
+import { observer, get } from '@ember/object';
 import {
   conditional,
   and,
@@ -88,6 +88,11 @@ export default Component.extend({
   orderedUploadObjects: undefined,
 
   /**
+   * @type {Ember.A<Utils.UploadObject>}
+   */
+  expandedUploads: undefined,
+
+  /**
    * @type {Ember.ComputedProperty<boolean>}
    */
   summaryActive: and(
@@ -97,11 +102,6 @@ export default Component.extend({
     // summary is not visible in sidebar mobile mode
     not(equal('navigationState.activeContentLevel', raw('sidebar')))
   ),
-
-  /**
-   * @type {Ember.ComputedProperty<Ember.A<Utils.UploadObject>>}
-   */
-  expandedUploads: computed(() => A()),
 
   /**
    * @type {Ember.ComputedProperty<boolean>}

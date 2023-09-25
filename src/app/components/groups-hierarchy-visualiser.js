@@ -336,11 +336,9 @@ export default Component.extend(I18n, {
 
   /**
    * Workspace definition
-   * @type {Ember.ComputedProperty<Utils/GroupsHierarchyVisualiser/Workspace>}
+   * @type {Utils/GroupsHierarchyVisualiser/Workspace}
    */
-  workspace: computed(function workspace() {
-    return Workspace.create();
-  }),
+  workspace: undefined,
 
   /**
    * @type {Ember.ComputedProperty<string>}
@@ -547,6 +545,16 @@ export default Component.extend(I18n, {
       });
     }
   ),
+
+  /**
+   * @override
+   */
+  init() {
+    this._super(...arguments);
+    if (!this.workspace) {
+      this.set('workspace', Workspace.create());
+    }
+  },
 
   didInsertElement() {
     this._super(...arguments);
