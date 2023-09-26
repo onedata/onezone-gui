@@ -34,8 +34,7 @@ export default PromiseProxyContainer.extend({
     'proxy.{isRejected,content.isForbidden}', {
       get() {
         return this.injectedIsError ??
-          this.proxy?.isRejected ??
-          this.proxy?.content?.isForbidden;
+          (this.proxy?.isRejected || this.proxy?.content?.isForbidden);
       },
       set(key, value) {
         return this.injectedIsError = value;

@@ -196,7 +196,6 @@ export default Service.extend(I18n, {
 
   init() {
     this._super(...arguments);
-
     this.embeddedIframesObserver();
     this.attachPageUnloadHandler();
     this.hasActiveUploadsObserver();
