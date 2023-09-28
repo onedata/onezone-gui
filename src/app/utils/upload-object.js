@@ -26,6 +26,7 @@ import {
   raw,
   writable,
   or,
+  neq,
 } from 'ember-awesome-macros';
 import _ from 'lodash';
 import moment from 'moment';
@@ -111,66 +112,109 @@ export default EmberObject.extend({
   /**
    * Object size (in bytes). Should be overridden with a number if objectType
    * is `file`.
-   * @virtual
+   * @virtual optional
    * @type {Ember.ComputedProperty<number>|number}
    */
-  objectSize: writable(
+  objectSize: writable(conditional(
+    neq('injectedFields.objectSize', raw(undefined)),
+    'injectedFields.objectSize',
     sum(array.mapBy(
       array.rejectBy('children', raw('isCancelled')),
       raw('objectSize')
     ))
-  ),
+  ), {
+    set(value) {
+      return this.injectedFields.objectSize = value;
+    },
+  }),
 
   /**
    * Always is <= `objectSize`. Should be overridden with a number if objectType
    * is `file`.
-   * @virtual
+   * @virtual optional
    * @type {Ember.ComputedProperty<number>|number}
    */
-  bytesUploaded: writable(
+  bytesUploaded: writable(conditional(
+    neq('injectedFields.bytesUploaded', raw(undefined)),
+    'injectedFields.bytesUploaded',
     sum(array.mapBy(
       array.rejectBy('children', raw('isCancelled')),
       raw('bytesUploaded')
     ))
-  ),
+  ), {
+    set(value) {
+      return this.injectedFields.bytesUploaded = value;
+    },
+  }),
 
   /**
    * Errors related to uploading this file or nested files in directory.
-   * @virtual
+   * @virtual optional
    * @type {Ember.ComputedProperty<Array<unknown>>}
    */
   errors: writable(conditional(
-    equal('objectType', raw('file')),
-    raw([]),
-    array.reduce(
-      array.mapBy('children', raw('errors')),
-      (arr, cur) => arr.concat(cur),
-      []
+    neq('injectedFields.errors', raw(undefined)),
+    'injectedFields.errors',
+    conditional(
+      equal('objectType', raw('file')),
+      raw([]),
+      array.reduce(
+        array.mapBy('children', raw('errors')),
+        (arr, cur) => arr.concat(cur),
+        []
+      )
     )
-  )),
+  ), {
+    set(value) {
+      return this.injectedFields.errors = value;
+    },
+  }),
 
   /**
    * True if object is cancelled, false otherwise. Should be overridden with
    * a boolean if objectType is `file`.
-   * @virtual
+   * @virtual optional
    * @type {Ember.ComputedProperty<boolean>}
    */
   isCancelled: writable(conditional(
-    equal('objectType', raw('file')),
-    raw(false),
-    array.isEvery('children', raw('isCancelled'))
-  )),
+    neq('injectedFields.isCancelled', raw(undefined)),
+    'injectedFields.isCancelled',
+    conditional(
+      equal('objectType', raw('file')),
+      raw(false),
+      array.isEvery('children', raw('isCancelled'))
+    )
+  ), {
+    set(value) {
+      return this.injectedFields.isCancelled = value;
+    },
+  }),
 
   /**
    * True if object is uploading. Should be overridden with a boolean if
    * objectType is `file`.
+   * @virtual optional
    * @type {Ember.ComputedProperty<boolean>}
    */
   isUploading: writable(conditional(
-    equal('objectType', raw('file')),
-    raw(true),
-    array.isAny('children', raw('isUploading'))
-  )),
+    neq('injectedFields.isUploading', raw(undefined)),
+    'injectedFields.isUploading',
+    conditional(
+      equal('objectType', raw('file')),
+      raw(true),
+      array.isAny('children', raw('isUploading'))
+    )
+  ), {
+    set(value) {
+      return this.injectedFields.isUploading = value;
+    },
+  }),
+
+  /**
+   * Contains values used to override virtual computed fields
+   * @type {ComputedProperty<Object>}
+   */
+  injectedFields: computed(() => ({})),
 
   /**
    * Object name (extracted from object path)
