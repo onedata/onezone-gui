@@ -174,7 +174,6 @@ import EmberObject, {
   setProperties,
   observer,
 } from '@ember/object';
-import { alias } from '@ember/object/computed';
 import { A } from '@ember/array';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
@@ -218,6 +217,12 @@ export default Component.extend(I18n, {
    * @virtual
    */
   group: undefined,
+
+  /**
+   * @virtual optional
+   * @type {string}
+   */
+  searchString: '',
 
   /**
    * Privileges definition for groups
@@ -339,11 +344,6 @@ export default Component.extend(I18n, {
    * @type {Utils/GroupsHierarchyVisualiser/Workspace}
    */
   workspace: undefined,
-
-  /**
-   * @type {Ember.ComputedProperty<string>}
-   */
-  searchString: alias('workspace.searchString'),
 
   /**
    * Column manager instance
@@ -546,6 +546,10 @@ export default Component.extend(I18n, {
     }
   ),
 
+  searchStringObserver: observer('searchString', function searchStringObserver() {
+    set(this.workspace, 'searchString', this.searchString);
+  }),
+
   /**
    * @override
    */
@@ -554,6 +558,7 @@ export default Component.extend(I18n, {
     if (!this.workspace) {
       this.set('workspace', Workspace.create());
     }
+    this.searchStringObserver();
   },
 
   didInsertElement() {
