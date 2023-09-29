@@ -438,14 +438,18 @@ export default EmberObject.extend({
 
   prevColumnObserver: observer('prevColumn', function prevColumnObserver() {
     if (this.get('prevColumn')) {
+      let injectedValue = null;
       defineProperty(this, 'x', computed('prevColumn.x', 'width', {
         get() {
+          if (injectedValue !== null) {
+            return injectedValue;
+          }
           const width = this.get('width');
           const prevX = this.get('prevColumn.x');
           return prevX === undefined ? 0 : prevX + width;
         },
         set(key, value) {
-          return value;
+          return injectedValue = value;
         },
       }));
       // Without this `get` new value of `x` is not calculated. We need to

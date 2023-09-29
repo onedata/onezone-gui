@@ -3,7 +3,6 @@ import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render, find, waitUntil } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
-import { computed } from '@ember/object';
 import sinon from 'sinon';
 import OneEmbeddedContainer from 'onezone-gui/components/one-embedded-container';
 import oneEmbeddedContainerLayout from 'onezone-gui/templates/components/one-embedded-container';
@@ -22,7 +21,7 @@ describe('Integration | Component | one-embedded-container', function () {
       layout: oneEmbeddedContainerLayout,
       iframeInjectedProperties: Object.freeze(['iprop']),
       callParentActionNames: Object.freeze(['hello']),
-      src: computed(() => 'empty.html'),
+      src: 'empty.html',
       actions: {
         hello,
       },
