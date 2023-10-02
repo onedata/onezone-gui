@@ -116,15 +116,15 @@ export default EmberObject.extend({
    * @type {Ember.ComputedProperty<number>|number}
    */
   objectSize: writable(conditional(
-    neq('injectedFields.objectSize', raw(undefined)),
-    'injectedFields.objectSize',
+    neq('overriddenComputedFields.objectSize', raw(undefined)),
+    'overriddenComputedFields.objectSize',
     sum(array.mapBy(
       array.rejectBy('children', raw('isCancelled')),
       raw('objectSize')
     ))
   ), {
     set(value) {
-      return this.injectedFields.objectSize = value;
+      return this.overriddenComputedFields.objectSize = value;
     },
   }),
 
@@ -135,15 +135,15 @@ export default EmberObject.extend({
    * @type {Ember.ComputedProperty<number>|number}
    */
   bytesUploaded: writable(conditional(
-    neq('injectedFields.bytesUploaded', raw(undefined)),
-    'injectedFields.bytesUploaded',
+    neq('overriddenComputedFields.bytesUploaded', raw(undefined)),
+    'overriddenComputedFields.bytesUploaded',
     sum(array.mapBy(
       array.rejectBy('children', raw('isCancelled')),
       raw('bytesUploaded')
     ))
   ), {
     set(value) {
-      return this.injectedFields.bytesUploaded = value;
+      return this.overriddenComputedFields.bytesUploaded = value;
     },
   }),
 
@@ -153,8 +153,8 @@ export default EmberObject.extend({
    * @type {Ember.ComputedProperty<Array<unknown>>}
    */
   errors: writable(conditional(
-    neq('injectedFields.errors', raw(undefined)),
-    'injectedFields.errors',
+    neq('overriddenComputedFields.errors', raw(undefined)),
+    'overriddenComputedFields.errors',
     conditional(
       equal('objectType', raw('file')),
       raw([]),
@@ -166,7 +166,7 @@ export default EmberObject.extend({
     )
   ), {
     set(value) {
-      return this.injectedFields.errors = value;
+      return this.overriddenComputedFields.errors = value;
     },
   }),
 
@@ -177,8 +177,8 @@ export default EmberObject.extend({
    * @type {Ember.ComputedProperty<boolean>}
    */
   isCancelled: writable(conditional(
-    neq('injectedFields.isCancelled', raw(undefined)),
-    'injectedFields.isCancelled',
+    neq('overriddenComputedFields.isCancelled', raw(undefined)),
+    'overriddenComputedFields.isCancelled',
     conditional(
       equal('objectType', raw('file')),
       raw(false),
@@ -186,7 +186,7 @@ export default EmberObject.extend({
     )
   ), {
     set(value) {
-      return this.injectedFields.isCancelled = value;
+      return this.overriddenComputedFields.isCancelled = value;
     },
   }),
 
@@ -197,8 +197,8 @@ export default EmberObject.extend({
    * @type {Ember.ComputedProperty<boolean>}
    */
   isUploading: writable(conditional(
-    neq('injectedFields.isUploading', raw(undefined)),
-    'injectedFields.isUploading',
+    neq('overriddenComputedFields.isUploading', raw(undefined)),
+    'overriddenComputedFields.isUploading',
     conditional(
       equal('objectType', raw('file')),
       raw(true),
@@ -206,15 +206,15 @@ export default EmberObject.extend({
     )
   ), {
     set(value) {
-      return this.injectedFields.isUploading = value;
+      return this.overriddenComputedFields.isUploading = value;
     },
   }),
 
   /**
    * Contains values used to override virtual computed fields
-   * @type {ComputedProperty<Object>}
+   * @type {Object}
    */
-  injectedFields: computed(() => ({})),
+  overriddenComputedFields: undefined,
 
   /**
    * Object name (extracted from object path)
@@ -370,7 +370,10 @@ export default EmberObject.extend({
   init() {
     this._super(...arguments);
 
-    this.set('startTime', moment().valueOf());
+    this.setProperties({
+      startTime: moment().valueOf(),
+      overriddenComputedFields: {},
+    });
   },
 
   /**
