@@ -15,6 +15,7 @@ const zoneName = 'Hello world';
 const zoneDomain = globals.location.hostname;
 
 export default OnedataConnection.extend({
+  onezoneRecord: undefined,
   zoneName,
   zoneDomain,
   serviceVersion: '19.02.9',
@@ -85,11 +86,16 @@ export default OnedataConnection.extend({
   spaceMarketplaceEnabled: true,
   spaceMarketplaceMinBackoffBetweenReminders: 60 * 60,
   spaceMarketplaceMinBackoffAfterRejection: 60 * 60,
-  onezoneRecord: computed(function onezoneRecord() {
-    return EmberObject.create({
+
+  /**
+   * @override
+   */
+  init() {
+    this._super(...arguments);
+    this.set('onezoneRecord', EmberObject.create({
       name: zoneName,
       domain: zoneDomain,
       serviceType: 'onezone',
-    });
-  }),
+    }));
+  },
 });

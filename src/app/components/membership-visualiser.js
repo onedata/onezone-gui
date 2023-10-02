@@ -212,11 +212,9 @@ export default Component.extend(I18n, {
   ]),
 
   /**
-   * @type {Ember.ComputedProperty<Ember.A<Utils/MembershipVisualiser/MembershipPath>>}
+   * @type {Ember.A<Utils/MembershipVisualiser/MembershipPath>}
    */
-  paths: computed(function paths() {
-    return A();
-  }),
+  paths: undefined,
 
   /**
    * @type {Ember.ComputedProperty<Ember.A<Utils/MembershipVisualiser/MembershipPath>>}

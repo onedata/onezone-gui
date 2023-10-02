@@ -49,6 +49,11 @@ export default Service.extend(I18n, {
   areFloatingUploadsVisible: true,
 
   /**
+   * @type {Array<Utils.UploadObject>}
+   */
+  uploadsForGlobalProgress: undefined,
+
+  /**
    * @type {Ember.ComputedProperty<Ember.A<Utils.UploadObject>>}
    */
   uploadRootObjects: computed(() => A()),
@@ -108,11 +113,6 @@ export default Service.extend(I18n, {
    * @type {Ember.ComputedProperty<boolean>}
    */
   hasActiveUploads: gt('activeUploads.length', raw(0)),
-
-  /**
-   * @type {Ember.ComputedProperty<Array<Utils.UploadObject>>}
-   */
-  uploadsForGlobalProgress: computed(() => A()),
 
   /**
    * @type {Ember.ComputedProperty<number|undefined>}

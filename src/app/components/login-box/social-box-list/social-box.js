@@ -73,26 +73,33 @@ export default Component.extend({
   action: notImplementedIgnore,
 
   /**
+   * @virtual optional
    * @type {Ember.ComputedProperty<string>}
    */
-  socialIconStyle: computed(
-    'authId',
-    'iconPath',
-    function socialIconStyle() {
-      let iconPath = this.get('iconPath');
-      iconPath = iconPath || defaultIconPath;
+  socialIconStyle: computed('authId', 'iconPath', {
+    get() {
+      if (this.injectedSocialIconStyle) {
+        return this.injectedSocialIconStyle;
+      }
+      const iconPath = this.iconPath ?? defaultIconPath;
       const style = `background-image: url(${iconPath});`;
       return htmlSafe(style);
-    }
-  ),
+    },
+    set(key, value) {
+      return this.injectedSocialIconStyle = value;
+    },
+  }),
 
   /**
+   * @virtual optional
    * @type {Ember.ComputedProperty<string>}
    */
-  aStyle: computed(
-    'iconBackgroundColor',
-    function aStyle() {
-      const iconBackgroundColor = this.get('iconBackgroundColor') ||
+  aStyle: computed('iconBackgroundColor', {
+    get() {
+      if (this.injectedAStyle) {
+        return this.injectedAStyle;
+      }
+      const iconBackgroundColor = this.iconBackgroundColor ??
         defaultIconBackgroundColor;
       const fgColor = contrast(iconBackgroundColor) === 'light' ? darkFgColor :
         lightFgColor;
@@ -101,8 +108,21 @@ export default Component.extend({
       const style =
         `background-color: ${iconBackgroundColor}; color: ${fgColor}; border-color: ${borderColor};`;
       return htmlSafe(style);
-    }
-  ),
+    },
+    set(key, value) {
+      return this.injectedAStyle = value;
+    },
+  }),
+
+  /**
+   * @type {string | null}
+   */
+  injectedSocialIconStyle: null,
+
+  /**
+   * @type {string | null}
+   */
+  injectedAStyle: null,
 
   hasLink: computed('link', function hasLink() {
     const link = this.get('link');
