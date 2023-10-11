@@ -13,6 +13,6 @@ export default {
     nodes: 'Nodes',
     provider: 'Provider',
     spaces: 'Spaces',
-    storages: 'Storages',
+    storages: 'Storage backends',
   },
 };
