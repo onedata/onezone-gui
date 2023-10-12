@@ -8,7 +8,6 @@ export default {
   },
   harvesterItem: {
     rename: 'Rename',
-    leave: 'Leave',
     remove: 'Remove',
     persistingHarvester: 'persisting harvester',
   },

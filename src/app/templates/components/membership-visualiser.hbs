@@ -5,7 +5,7 @@
         pathStart=contextRecord
         path=path
         view=(action "view")
-        removeRelation=(action (mut relationToRemove))
+        removeRelation=(action "scheduleRelationRemoval")
         modifyPrivileges=(action (mut relationPrivilegesToChange))
         searchString=searchString
         visibleBlocks=visibleBlocks
@@ -26,22 +26,13 @@
 {{/if}}
 {{#unless isCondensed}}
   {{#if relationToRemove}}
-    {{#if (eq currentUser.userId relationToRemove.child.entityId)}}
-      {{leave-modal
-        opened=relationToRemove
-        close=(action (mut relationToRemove) null)
-        proceed=(action "removeRelation")
-        processing=isRemovingRelation
-        record=relationToRemove.parent}}
-    {{else}}
-      {{remove-relation-modal
-        opened=relationToRemove
-        close=(action (mut relationToRemove) null)
-        proceed=(action "removeRelation")
-        processing=isRemovingRelation
-        parent=relationToRemove.parent
-        child=relationToRemove.child}}
-    {{/if}}
+    {{remove-relation-modal
+      opened=relationToRemove
+      close=(action (mut relationToRemove) null)
+      proceed=(action "removeRelation")
+      processing=isRemovingRelation
+      parent=relationToRemove.parent
+      child=relationToRemove.child}}
   {{/if}}
   {{#if privilegesEditorModel}}
     {{privileges-editor-modal

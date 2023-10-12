@@ -26,7 +26,7 @@ export default Action.extend({
   /**
    * @override
    */
-  icon: 'remove',
+  icon: 'browser-delete',
 
   /**
    * @override

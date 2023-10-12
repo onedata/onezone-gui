@@ -70,9 +70,8 @@ import { sort } from '@ember/object/computed';
 import { A } from '@ember/array';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import gri from 'onedata-gui-websocket-client/utils/gri';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
-import { resolve, reject, Promise } from 'rsvp';
+import { reject, Promise } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
 import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
@@ -93,7 +92,6 @@ export default Component.extend(I18n, {
     'hasOnlyDirectPath:only-direct',
   ],
 
-  store: service(),
   router: service(),
   guiUtils: service(),
   privilegeManager: service(),
@@ -106,6 +104,7 @@ export default Component.extend(I18n, {
   currentUser: service(),
   recordManager: service(),
   sidebarResources: service(),
+  userActions: service(),
 
   /**
    * @override
@@ -145,6 +144,12 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   isCondensed: false,
+
+  /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  hideDirectMembership: false,
 
   /**
    * @type {number}
@@ -435,12 +440,16 @@ export default Component.extend(I18n, {
    * Loads root node of all membership paths (membership model for targetRecord).
    * @returns {Promise}
    */
-  fetchRootMembership() {
-    const membershipGri = this.getMembershipGri(this.get('targetRecord.gri'));
-    return this.fetchMembership(membershipGri, true)
-      .then(rootMembership => safeExec(this, () => {
-        this.set('rootMembership', rootMembership);
-      }));
+  async fetchRootMembership() {
+    const rootMembership = await this.recordManager.getMembership(
+      this.contextRecord,
+      this.targetRecord, {
+        reload: true,
+      }
+    );
+    safeExec(this, () => {
+      this.set('rootMembership', rootMembership);
+    });
   },
 
   /**
@@ -492,44 +501,6 @@ export default Component.extend(I18n, {
   },
 
   /**
-   * Generates membership record gri related to given regular record gri.
-   * @param {string} recordGri
-   * @returns {string}
-   */
-  getMembershipGri(recordGri) {
-    const {
-      entityType,
-      entityId,
-    } = getProperties(this.get('contextRecord'), 'entityType', 'entityId');
-    const parsedRecordGri = parseGri(recordGri);
-    let aspectType = entityType;
-    if (entityType === 'group' && get(parsedRecordGri, 'entityType') === 'group') {
-      aspectType = 'child';
-    }
-    return gri(_.assign(parsedRecordGri, {
-      aspect: `eff_${aspectType}_membership`,
-      aspectId: entityId,
-      scope: 'private',
-    }));
-  },
-
-  /**
-   * Loads membership record.
-   * @param {string} membershipGri
-   * @param {boolean} forceReload
-   * @returns {Promise<Membership>}
-   */
-  fetchMembership(membershipGri, forceReload) {
-    const store = this.get('store');
-    const loadedRecord = store.peekRecord('membership', membershipGri);
-    if (forceReload || !loadedRecord) {
-      return store.findRecord('membership', membershipGri, { reload: true });
-    } else {
-      return resolve(loadedRecord);
-    }
-  },
-
-  /**
    * Loads next level of membership graph. Iterates over parentLevel membership
    * and loads all (one level) nested memberships.
    * @param {Array<Membership>} parentLevel
@@ -546,13 +517,21 @@ export default Component.extend(I18n, {
       if (!get(parentMembership, 'isForbidden') &&
         !get(parentMembership, 'isDeleted')) {
         get(parentMembership, 'intermediaries').forEach(intermediaryGri => {
-          if (parseGri(intermediaryGri).entityId !== contextRecordEntityId) {
-            const membershipGri = this.getMembershipGri(intermediaryGri);
+          const parsedIntermediaryGri = parseGri(intermediaryGri);
+          if (parsedIntermediaryGri.entityId !== contextRecordEntityId) {
             if (!allNodesMap.has(intermediaryGri)) {
               const fetchReload = !allNodesMap.has(intermediaryGri) || !silent;
               allNodesMap.set(intermediaryGri, null);
-              const promise = this.fetchMembership(membershipGri, fetchReload)
-                .catch(error => {
+              const promise = this.recordManager.getMembershipById(
+                  this.recordManager.getModelNameForRecord(this.contextRecord),
+                  get(this.contextRecord, 'entityId'),
+                  this.recordManager.getModelNameForEntityType(
+                    parsedIntermediaryGri.entityType
+                  ),
+                  parsedIntermediaryGri.entityId, {
+                    reload: fetchReload,
+                  }
+                ).catch(error => {
                   if (error && get(error, 'id') === 'forbidden') {
                     return null;
                   } else {
@@ -654,7 +633,11 @@ export default Component.extend(I18n, {
           donePaths.push(workingPath.concat([null]).reverse());
           return [];
         } else {
-          if (get(lastNode, 'directMembership')) {
+          if (
+            get(lastNode, 'directMembership') && (
+              !this.hideDirectMembership || workingPath.length > 1
+            )
+          ) {
             donePaths.push(workingPath.slice(0).reverse());
           }
           return get(lastNode, 'intermediaries')
@@ -703,6 +686,15 @@ export default Component.extend(I18n, {
           get(relationPrivilegesToChange, 'parent').reload();
         })
         .finally(() => safeExec(this, 'set', 'relationPrivilegesToChange', null));
+    },
+    scheduleRelationRemoval(relationToRemove) {
+      if (this.currentUser.userId === relationToRemove.child?.entityId) {
+        this.userActions.createLeaveAction({
+          recordToLeave: relationToRemove.parent,
+        }).execute();
+      } else {
+        this.set('relationToRemove', relationToRemove);
+      }
     },
     removeRelation() {
       const {

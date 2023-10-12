@@ -18,8 +18,6 @@ export default {
   memberGroupCreation: 'member group creation',
   addMemberGroupSuccess: 'Member group "{{memberGroupName}}" has been added successfully',
   memberGroupAddition: 'member group addition',
-  leavingSpace: 'leaving space',
-  spaceLeftSuccess: 'Space left successfully',
   joiningSpace: 'joining space',
   joinedSpaceSuccess: 'You have joined the space successfully.',
 };

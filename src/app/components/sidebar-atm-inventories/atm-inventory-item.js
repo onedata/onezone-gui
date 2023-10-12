@@ -7,7 +7,7 @@
  */
 
 import Component from '@ember/component';
-import { computed, get } from '@ember/object';
+import { computed, get, set } from '@ember/object';
 import { reads, collect } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import { reject, resolve } from 'rsvp';
@@ -24,6 +24,7 @@ export default Component.extend(I18n, {
   workflowActions: service(),
   clipboardActions: service(),
   navigationState: service(),
+  userActions: service(),
 
   /**
    * @override
@@ -47,16 +48,6 @@ export default Component.extend(I18n, {
   isRenaming: false,
 
   /**
-   * @type {Boolean}
-   */
-  isLeaveModalOpened: false,
-
-  /**
-   * @type {Boolean}
-   */
-  isLeaving: false,
-
-  /**
    * Alias for `item` to make code more verbose
    * @type {ComputedProperty<Models.AtmInventory>}
    */
@@ -70,7 +61,7 @@ export default Component.extend(I18n, {
       action: () => this.toggleRename(true),
       title: this.t('actions.rename.title'),
       className: 'rename-atm-inventory-action-trigger',
-      icon: 'rename',
+      icon: 'browser-rename',
       disabled: this.get('isRenaming'),
     };
   }),
@@ -78,13 +69,12 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  leaveAction: computed(function leaveAction() {
-    return {
-      action: () => this.showLeaveModal(),
-      title: this.t('actions.leave.title'),
-      class: 'leave-atm-inventory-action-trigger',
-      icon: 'group-leave-group',
-    };
+  leaveAction: computed('atmInventory', function leaveAction() {
+    const action = this.userActions.createLeaveAction({
+      recordToLeave: this.atmInventory,
+    });
+    set(action, 'className', `${action.className} leave-atm-inventory-action-trigger`);
+    return action;
   }),
 
   /**
@@ -126,10 +116,6 @@ export default Component.extend(I18n, {
     this.set('isRenaming', value);
   },
 
-  showLeaveModal() {
-    this.set('isLeaveModalOpened', true);
-  },
-
   actions: {
     toggleRename(value) {
       this.toggleRename(value);
@@ -169,32 +155,6 @@ export default Component.extend(I18n, {
           safeExec(this, () => this.toggleRename(false));
         }
       });
-    },
-    showLeaveModal() {
-      this.showLeaveModal();
-    },
-    closeLeaveModal() {
-      this.set('isLeaveModalOpened', false);
-    },
-    leave() {
-      const {
-        atmInventory,
-        workflowActions,
-        navigationState,
-      } = this.getProperties(
-        'atmInventory',
-        'workflowActions',
-        'navigationState'
-      );
-      this.set('isLeaving', true);
-      return workflowActions.leaveAtmInventory(atmInventory)
-        .then(() => navigationState.redirectToCollectionIfResourceNotExist())
-        .finally(() =>
-          safeExec(this, 'setProperties', {
-            isLeaving: false,
-            isLeaveModalOpened: false,
-          })
-        );
     },
   },
 });

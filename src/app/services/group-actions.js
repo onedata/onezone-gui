@@ -110,28 +110,6 @@ export default Service.extend(I18n, {
   },
 
   /**
-   * Leave group
-   * @param {Group} group
-   * @returns {Promise}
-   */
-  leaveGroup(group) {
-    const {
-      groupManager,
-      globalNotify,
-    } = this.getProperties('groupManager', 'globalNotify');
-    return groupManager.leaveGroup(get(group, 'id'))
-      .then(() => {
-        globalNotify.success(this.t(
-          'leaveGroupSuccess', { groupName: get(group, 'name') }
-        ));
-      })
-      .catch(error => {
-        globalNotify.backendError(this.t('groupLeaving'), error);
-        throw error;
-      });
-  },
-
-  /**
    * Redirects to group page
    * @param {Group} group
    * @param {string} aspect

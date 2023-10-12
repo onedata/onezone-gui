@@ -24,6 +24,7 @@ export default Component.extend(I18n, {
   router: service(),
   navigationState: service(),
   clipboardActions: service(),
+  userActions: service(),
 
   /**
    * @override
@@ -52,16 +53,6 @@ export default Component.extend(I18n, {
   isRemoving: false,
 
   /**
-   * @type {boolean}
-   */
-  leaveGroupModalOpen: false,
-
-  /**
-   * @type {boolean}
-   */
-  isLeaving: false,
-
-  /**
    * @type {Ember.ComputedProperty<Group>}
    */
   group: reads('item'),
@@ -74,7 +65,7 @@ export default Component.extend(I18n, {
       action: () => this.send('toggleRename', true),
       title: this.t('rename'),
       class: 'rename-group-action',
-      icon: 'rename',
+      icon: 'browser-rename',
       disabled: this.get('isRenaming'),
     };
   }),
@@ -82,13 +73,12 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  leaveAction: computed(function leaveAction() {
-    return {
-      action: () => this.send('showLeaveModal'),
-      title: this.t('leave'),
-      class: 'leave-group-action',
-      icon: 'group-leave-group',
-    };
+  leaveAction: computed('group', function leaveAction() {
+    const action = this.userActions.createLeaveAction({
+      recordToLeave: this.group,
+    });
+    set(action, 'className', `${action.className} leave-group-action`);
+    return action;
   }),
 
   /**
@@ -99,7 +89,7 @@ export default Component.extend(I18n, {
       action: () => this.send('showRemoveModal'),
       title: this.t('remove'),
       class: 'remove-group-action',
-      icon: 'remove',
+      icon: 'browser-delete',
     };
   }),
 
@@ -201,27 +191,6 @@ export default Component.extend(I18n, {
             removeGroupModalOpen: false,
           });
         });
-    },
-    showLeaveModal() {
-      this.set('leaveGroupModalOpen', true);
-    },
-    closeLeaveModal() {
-      this.set('leaveGroupModalOpen', false);
-    },
-    leave() {
-      const {
-        group,
-        groupActions,
-      } = this.getProperties('group', 'groupActions');
-      this.set('isLeaving', true);
-      return groupActions.leaveGroup(group)
-        .then(() => this.redirectOnGroupDeletion())
-        .finally(() =>
-          safeExec(this, 'setProperties', {
-            isLeaving: false,
-            leaveGroupModalOpen: false,
-          })
-        );
     },
   },
 });

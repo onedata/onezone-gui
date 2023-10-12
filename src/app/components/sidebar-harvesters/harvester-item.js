@@ -22,9 +22,9 @@ export default Component.extend(I18n, {
   globalNotify: service(),
   harvesterActions: service(),
   router: service(),
-  guiUtils: service(),
   navigationState: service(),
   clipboardActions: service(),
+  userActions: service(),
 
   /**
    * @override
@@ -53,16 +53,6 @@ export default Component.extend(I18n, {
   isRemoving: false,
 
   /**
-   * @type {boolean}
-   */
-  isLeaveModalOpened: false,
-
-  /**
-   * @type {boolean}
-   */
-  isLeaving: false,
-
-  /**
    * @type {Ember.ComputedProperty<Model.Group>}
    */
   harvester: reads('item'),
@@ -75,7 +65,7 @@ export default Component.extend(I18n, {
       action: () => this.send('toggleRename', true),
       title: this.t('rename'),
       class: 'rename-harvester-action',
-      icon: 'rename',
+      icon: 'browser-rename',
       disabled: this.get('isRenaming'),
     };
   }),
@@ -83,13 +73,12 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  leaveAction: computed(function leaveAction() {
-    return {
-      action: () => this.send('showLeaveModal'),
-      title: this.t('leave'),
-      class: 'leave-harvester-action',
-      icon: 'group-leave-group',
-    };
+  leaveAction: computed('harvester', function leaveAction() {
+    const action = this.userActions.createLeaveAction({
+      recordToLeave: this.harvester,
+    });
+    set(action, 'className', `${action.className} leave-harvester-action`);
+    return action;
   }),
 
   /**
@@ -100,7 +89,7 @@ export default Component.extend(I18n, {
       action: () => this.send('showRemoveModal'),
       title: this.t('remove'),
       class: 'remove-harvester-action',
-      icon: 'remove',
+      icon: 'browser-delete',
     };
   }),
 
@@ -202,27 +191,6 @@ export default Component.extend(I18n, {
             isRemoveModalOpened: false,
           });
         });
-    },
-    showLeaveModal() {
-      this.set('isLeaveModalOpened', true);
-    },
-    closeLeaveModal() {
-      this.set('isLeaveModalOpened', false);
-    },
-    leave() {
-      const {
-        harvester,
-        harvesterActions,
-      } = this.getProperties('harvester', 'harvesterActions');
-      this.set('isLeaving', true);
-      return harvesterActions.leaveHarvester(harvester)
-        .then(() => this.redirectOnHarvesterRemove())
-        .finally(() =>
-          safeExec(this, 'setProperties', {
-            isLeaving: false,
-            isLeaveModalOpened: false,
-          })
-        );
     },
   },
 });

@@ -1,0 +1,64 @@
+{{#global-modal
+  classNames="leave-modal"
+  allowClose=(not isSubmitting)
+  modalId=modalId
+  size=(if isCurrentUserIndirectMember "lg" null)
+  as |modal|
+}}
+  {{#modal.header}}
+    <h1>
+      {{one-icon icon="sign-warning-rounded"}}
+      <span class="one-label">{{modalHeader}}</span>
+    </h1>
+  {{/modal.header}}
+
+  {{#modal.body class="loadable-row"}}
+    {{#promise-proxy-container proxy=loadingProxy}}
+      {{#if isCurrentUserDirectMember}}
+        <p>
+          {{tt this "areYouSure"
+            readableModelName=translatedModelNameToLeave
+            recordName=recordToLeave.name
+          }}
+        </p>
+      {{/if}}
+      <p>{{infoText.main}}</p>
+      {{#if isCurrentUserIndirectMember}}
+        {{#if infoText.beforeMemberships}}
+          <p>{{infoText.beforeMemberships}}</p>
+        {{/if}}
+        {{membership-visualiser
+          contextRecord=currentUser
+          targetRecord=recordToLeave
+          maxPathsNumber=4
+          visibleBlocks=3
+          hideDirectMembership=true
+        }}
+        {{#if infoText.afterMemberships}}
+          <p>{{infoText.afterMemberships}}</p>
+        {{/if}}
+      {{/if}}
+    {{/promise-proxy-container}}
+  {{/modal.body}}
+
+  {{#modal.footer class="btn-toolbar"}}
+    {{#bs-button
+      type="default"
+      class="cancel-btn"
+      onClick=modal.close
+      disabled=isSubmitting
+    }}
+      {{tt this (if isCurrentUserDirectMember "buttons.cancel" "buttons.close")}}
+    {{/bs-button}}
+    {{#if isCurrentUserDirectMember}}
+      {{#one-button
+        type="danger"
+        buttonType="submit"
+        class="submit-btn proceed"
+        onClick=(action "submit" modal.submit)
+      }}
+        {{tt this "buttons.submit"}}
+      {{/one-button}}
+    {{/if}}
+  {{/modal.footer}}
+{{/global-modal}}

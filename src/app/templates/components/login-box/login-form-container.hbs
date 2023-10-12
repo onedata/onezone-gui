@@ -2,7 +2,7 @@
   <div class="basicauth-login-form-container animated fast {{if (or isLoading _hasAuthorizersForSelect) "hide" "always-visible"}}">
     <h2>{{t "components.loginBox.loginFormContainer.formSubtitle"}}
       <span class="subtitle-tip">
-        {{one-icon icon="sign-question"}}
+        {{one-icon icon="sign-question-rounded"}}
         {{one-tooltip title=(if _hasAuthorizersForSelect
           (t "components.loginBox.loginFormContainer.formSubtitleTip")
           (t "components.loginBox.loginFormContainer.noProvidersFormSubtitleTip"))}}
@@ -44,9 +44,9 @@
 {{/if}}
 
 {{#if sessionHasExpired}}
-  <div class="login-notification login-notification-sesion-expired login-notification-warning">
+  <div class="login-notification login-notification-session-expired login-notification-warning">
     <div class="inline-icon-container session-expired-icon-container">
-      {{one-icon icon="menu-recent" class="session-expired-icon"}}  
+      {{one-icon icon="time-outline" class="session-expired-icon"}}
     </div>
     {{tt this "sessionExpired"}}.
   </div>
@@ -54,7 +54,7 @@
 {{#if showIpWarning}}
   <div class="login-notification login-notification-warning">
     <div class="inline-icon-container session-expired-icon-container">
-      {{one-icon icon="sign-warning-rounded" class="ip-warning-icon"}}  
+      {{one-icon icon="sign-warning-rounded" class="ip-warning-icon"}}
     </div>
     {{tt this "ipWarning"}}
   </div>

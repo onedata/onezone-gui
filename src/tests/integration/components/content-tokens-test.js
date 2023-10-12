@@ -36,7 +36,7 @@ describe('Integration | Component | content-tokens', function () {
     const trigger = find('.edit-token-action-btn');
     expect(trigger).to.exist;
     expect(trigger).to.contain.text('Modify');
-    expect(trigger.querySelector('.one-icon')).to.have.class('oneicon-rename');
+    expect(trigger.querySelector('.one-icon')).to.have.class('oneicon-browser-rename');
     expect(trigger.closest('.one-collapsible-toolbar-item.disabled')).to.not.exist;
   });
 

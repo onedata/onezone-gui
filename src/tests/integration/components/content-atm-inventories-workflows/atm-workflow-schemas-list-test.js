@@ -23,7 +23,7 @@ import globals from 'onedata-gui-common/utils/globals';
 const workflowActionsSpec = [{
   className: 'change-details-action-trigger',
   label: 'Change details',
-  icon: 'rename',
+  icon: 'browser-rename',
 }, {
   className: 'remove-atm-workflow-schema-action-trigger',
   label: 'Remove',
@@ -31,7 +31,7 @@ const workflowActionsSpec = [{
 }, {
   className: 'copy-record-id-action-trigger',
   label: 'Copy ID',
-  icon: 'copy',
+  icon: 'browser-copy',
 }];
 
 const revisionActionsSpec = [{

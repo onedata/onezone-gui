@@ -26,15 +26,5 @@
     actionsArray=itemActions
     toolbarToggleClasses="atm-inventory-menu-trigger"
   }}
-  {{#render-later triggerRender=isLeaveModalOpened as |renderLater|}}
-    {{leave-modal
-      opened=isLeaveModalOpened
-      close=(action "closeLeaveModal")
-      proceed=(action "leave")
-      processing=isLeaving
-      record=atmInventory
-      onHidden=renderLater.resetRenderTrigger
-    }}
-  {{/render-later}}
 {{/unless}}
 {{yield}}

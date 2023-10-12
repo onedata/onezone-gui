@@ -230,7 +230,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
         action: () => this.send('batchPrivilegesEdit'),
         title: this.t('multiedit'),
         class: 'batch-edit',
-        icon: 'rename',
+        icon: 'browser-rename',
         disabled: !this.get('batchPrivilegesEditEnabled'),
       };
     }

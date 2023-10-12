@@ -69,19 +69,19 @@ describe(
       [{
         selector: '.rename-atm-inventory-action-trigger',
         name: 'Rename',
-        icon: 'rename',
+        icon: 'browser-rename',
       }, {
         selector: '.leave-atm-inventory-action-trigger',
         name: 'Leave',
-        icon: 'group-leave-group',
+        icon: 'leave-space',
       }, {
         selector: '.remove-atm-inventory-action-trigger',
         name: 'Remove',
-        icon: 'remove',
+        icon: 'browser-delete',
       }, {
         selector: '.copy-record-id-action-trigger',
         name: 'Copy ID',
-        icon: 'copy',
+        icon: 'browser-copy',
       }].forEach(({ selector, name, icon }) => {
         const trigger = popoverContent.querySelector(selector);
         expect(trigger).to.exist;
