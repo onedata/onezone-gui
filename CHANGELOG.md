@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11434 Added new file attributes to atm file data spec
 * VFS-9080 Introduced new global modal control callbacks
 * VFS-11431 Added better validation errors propagation to charts dashboard editor
 * VFS-10083 Added better formatting of large numbers
