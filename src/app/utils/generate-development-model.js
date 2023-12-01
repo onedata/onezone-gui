@@ -43,7 +43,7 @@ const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
 const USER_LOGIN = 'stub_user';
 const NUMBER_OF_SHARED_USERS = 3;
-const NUMBER_OF_PROVIDERS = 11;
+const NUMBER_OF_PROVIDERS = 3;
 const NUMBER_OF_SPACES = 3;
 const NUMBER_OF_TOKENS = 3;
 const NUMBER_OF_GROUPS = 10;
@@ -452,19 +452,11 @@ function createListRecord(store, type, records) {
 
 function getCoordinates(index) {
   const sign = index % 2 ? -1 : 1;
-  if (index <= 11) {
+  if (index <= 2) {
     return [
-      [48.8566, 2.3522],
-      [43.2965, 5.3698],
-      [45.764, 4.8357],
-      [43.6047, 1.4442],
-      [43.7102, 7.262],
-      [47.2184, -1.5536],
-      [43.6108, 3.8767],
-      [48.5734, 7.7521],
-      [44.8378, -0.5792],
-      [50.6292, 3.0573],
-      [48.1173, -1.6778],
+      [50.065, 19.945],
+      [48.865, 2.349],
+      [38.737, -9.143],
     ][index];
   } else {
     return [
