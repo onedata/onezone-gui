@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11575 Increased max zoom of jvectormap
 * VFS-11251 Removed unused oneicons
 * VFS-11134 Added information about membership to leaving modal
 * VFS-10939 Fixed copying from provider popover in firefox
