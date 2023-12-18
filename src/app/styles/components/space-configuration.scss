@@ -16,14 +16,24 @@
       color: $main-text-color-disabled;
     }
     .control-label {
-      width: 14em;
-      min-width: 14em;
+      $-label-width: 15.3em;
+      width: $-label-width;
+      min-width: $-label-width;
       text-align: left;
       padding-top: 0;
       margin-bottom: 0;
       @media (max-width: $screen-xs-max) {
-        width: 8em;
-        min-width: 8em;
+        $-label-width: 8em;
+        width: $-label-width;
+        min-width: $-label-width;
+      }
+    }
+    // some label-tips looks poor on mobile - it's better to disable them
+    @media (max-width: $screen-xs-max) {
+      .advertised-form-group, .description-form-group {
+        .one-label-tip {
+          display: none;
+        }
       }
     }
     .one-way-toggle {

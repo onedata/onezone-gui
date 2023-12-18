@@ -197,6 +197,10 @@
   <div class="form-group advertised-form-group">
     <label class="control-label">
       {{tt this "advertised.label"}}:
+      {{one-label-tip
+        tooltipClass="tooltip-lg tooltip-text-left"
+        title=(tt this "advertised.customTip")
+      }}
     </label>
     {{one-way-toggle
       class="form-control advertised-toggle"
