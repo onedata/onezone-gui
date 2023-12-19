@@ -10,6 +10,8 @@ const defineSassBreakpoints = require(
 );
 const colors = require('./lib/onedata-gui-common/config/colors');
 const breakpoints = require('./lib/onedata-gui-common/config/breakpoints');
+const copyDynamicLibraries = require('./lib/onedata-gui-common/addon/utils/copy-dynamic-libraries');
+const dynamicLibraries = require('./lib/onedata-gui-common/config/dynamic-libraries');
 const sass = require('sass-embedded');
 
 const environment = EmberApp.env();
@@ -94,6 +96,7 @@ module.exports = function (defaults) {
 
   defineSassColors(app, colors);
   defineSassBreakpoints(app, breakpoints);
+  copyDynamicLibraries(app, dynamicLibraries);
 
   // Use `app.import` to add additional libraries to the generated
   // output files.

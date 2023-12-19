@@ -299,6 +299,9 @@ function itSubmitsFormDataOnSubmitClick(formDataMatcher) {
     expect(find('.btn-submit')).to.not.have.attr('disabled');
     expect(find('.task-form')).to.have.class('form-enabled');
     expect(applyChangesSpy).to.be.calledOnce
-      .and.to.be.calledWith(Object.assign({ name: 'newName' }, formDataMatcher));
+      .and.to.be.calledWith(Object.assign({
+        id: sinon.match.string,
+        name: 'newName',
+      }, formDataMatcher));
   });
 }
