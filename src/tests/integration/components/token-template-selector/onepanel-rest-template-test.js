@@ -64,6 +64,15 @@ describe(
       expect(records[1].querySelector('.oneicon-provider')).to.exist;
     });
 
+    it('shows information about no clusters to choose', async function () {
+      this.clusters.splice(0, this.clusters.length);
+
+      await render(hbs `{{token-template-selector/onepanel-rest-template}}`);
+
+      await click('.one-tile');
+      expect(find('.no-records-info')).to.have.trimmed.text('You have no clusters.');
+    });
+
     it('passes template name and template for oneprovider via selection handler',
       async function () {
         const selectedSpy = this.set('selectedSpy', sinon.spy());
