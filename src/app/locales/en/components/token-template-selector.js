@@ -24,6 +24,7 @@ export default {
     },
     onepanelRest: {
       title: 'Onepanel REST access',
+      noRecordsInfo: 'You have no clusters.',
       newTokenNamePrefix: 'Onepanel REST ',
     },
     oneclient: {
