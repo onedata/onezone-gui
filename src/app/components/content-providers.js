@@ -119,7 +119,7 @@ export default Component.extend({
    * @type {Ember.ComputedProperty<number>}
    */
   _providerCircleScale: computed('_mapState.scale', function () {
-    return 2 + this.get('_mapState.scale') / 4;
+    return 1 + 0.1 * this._mapState.scale;
   }),
 
   /**

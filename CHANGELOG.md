@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11578 Further improvements in providers map scaling
 * VFS-11229 Added new texts about Space Marketplace
 * VFS-11592 Fixed missing translation of an empty cluster selector in Onepanel REST token template tile
 * VFS-11575 Increased max zoom of jvectormap
