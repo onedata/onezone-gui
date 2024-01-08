@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10649 Added complex charts dashboard editor to the automation GUI
 * VFS-11229 Added new texts about Space Marketplace
 * VFS-11592 Fixed missing translation of an empty cluster selector in Onepanel REST token template tile
 * VFS-11575 Increased max zoom of jvectormap
