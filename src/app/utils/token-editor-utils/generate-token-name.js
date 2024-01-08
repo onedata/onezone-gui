@@ -72,7 +72,7 @@ export default function generateTokenName(type, inviteType, inviteTargetName) {
  * @returns {String}
  */
 export function constructTokenName(preVarName = '', varName = '', postVarName = '') {
-  const timeString = moment().format('YYYY.MM.DD-HH.mm');
+  const timeString = moment().format('YYYY.MM.DD-HH.mm.SS');
   const constNamePartsTotalLength = preVarName.length + postVarName.length;
   const maxNameLength = maxLength - constNamePartsTotalLength - timeString.length - 1;
   const cutVarName = varName.slice(0, maxNameLength);

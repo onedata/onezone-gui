@@ -13,12 +13,12 @@ import _ from 'lodash';
 
 describe('Unit | Utility | token-editor-utils/generate-token-name', function () {
   beforeEach(function () {
-    const now = moment('2020-04-28 10:05:00');
+    const now = moment('2020-04-28 10:05:05');
     this.fakeClock = sinon.useFakeTimers({
       now: now.valueOf(),
       shouldAdvanceTime: true,
     });
-    this.nowString = now.format('YYYY.MM.DD-HH.mm');
+    this.nowString = now.format('YYYY.MM.DD-HH.mm.SS');
   });
 
   afterEach(function () {
