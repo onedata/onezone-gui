@@ -59,6 +59,28 @@ const providerVersions = _.times(NUMBER_OF_PROVIDERS, _.constant('20.02.0-beta1'
 // uncomment below to test 19.02.1 integration
 // providerVersions[0] = '19.02.1';
 
+const providerLocations = [
+  [50.065, 19.945],
+  [48.865, 2.349],
+  [38.737, -9.143],
+];
+// Uncomment to use more dense providers localization
+// providerLocations.splice(
+//   0,
+//   providerLocations.length,
+//   [48.8566, 2.3522],
+//   [43.2965, 5.3698],
+//   [45.764, 4.8357],
+//   [43.6047, 1.4442],
+//   [43.7102, 7.262],
+//   [47.2184, -1.5536],
+//   [43.6108, 3.8767],
+//   [48.5734, 7.7521],
+//   [44.8378, -0.5792],
+//   [50.6292, 3.0573],
+//   [48.1173, -1.6778],
+// );
+
 const types = [
   'space',
   'group',
@@ -452,12 +474,8 @@ function createListRecord(store, type, records) {
 
 function getCoordinates(index) {
   const sign = index % 2 ? -1 : 1;
-  if (index <= 2) {
-    return [
-      [50.065, 19.945],
-      [48.865, 2.349],
-      [38.737, -9.143],
-    ][index];
+  if (index < providerLocations.length) {
+    return providerLocations[index];
   } else {
     return [
       ((180 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 90) * sign,

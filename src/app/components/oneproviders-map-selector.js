@@ -84,7 +84,7 @@ export default Component.extend({
   /**
    * @type {Ember.ComputedProperty<number>}
    */
-  oneproviderCircleScale: sum(raw(2), quotient('mapScale', raw(3))),
+  oneproviderCircleScale: sum(raw(1), quotient('mapScale', raw(10))),
 
   init() {
     this._super(...arguments);

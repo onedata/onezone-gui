@@ -10,11 +10,12 @@
         {{#if (and (gte x 0) (lte x map.width) (gte y 0) (lte y map.height))}}
           {{oneprovider-map-circle
             class=(concat "oneprovider-map-circle-" (model-routable-id square.providers.[0]))
-            mapSize=(max map.width map.height 1200)
-            scale=oneproviderCircleScale
+            mapSize=1500
+            scale=(mult oneproviderCircleScale map.containerScale)
             oneproviders=square.providers
             isSelected=(contains selectedOneprovider square.providers)
-            click=(if (eq square.providers.length 1) (action onOneproviderSelected square.providers.[0]))}}
+            click=(if (eq square.providers.length 1) (action onOneproviderSelected square.providers.[0]))
+          }}
           {{#if (gt square.providers.length 1)}}
             {{#one-webui-popover
               class="oneproviders-selector-popover"
@@ -22,11 +23,13 @@
               padding=false
               popoverStyle="oneproviders-selector"
               windowEvent="oneprovidersSelectorRefresh"
-              as |popover|}}
+              as |popover|
+            }}
               {{oneproviders-selector-popover-content
                 oneproviders=square.providers
                 selectedOneprovider=selectedOneprovider
-                onOneproviderSelected=(action "onOneproviderSelectedFromPopover" popover.hide)}}
+                onOneproviderSelected=(action "onOneproviderSelectedFromPopover" popover.hide)
+              }}
             {{/one-webui-popover}}
           {{/if}}
         {{/if}}
