@@ -128,7 +128,7 @@ export default Component.extend({
   _providersProxy: reads('providerList.list'),
 
   /**
-   * Array of all prviders
+   * Array of all providers
    * @type {Ember.ComputedProperty<DS.RecordArray<Provider>>>}
    */
   _providers: reads('_providersProxy.content'),
