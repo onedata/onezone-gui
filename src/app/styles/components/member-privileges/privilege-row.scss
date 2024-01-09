@@ -1,0 +1,33 @@
+.privilege-row {
+  font-size: 85%;
+  background-color: $block-background-color;
+
+  td.priv {
+    padding-left: 40px;
+  }
+  .oneicon-lock {
+    opacity: 0.6;
+  }
+
+  .priv-revoke {
+    font-size: 200%;
+    font-weight: bold;
+    padding-bottom: 4px;
+    padding-top: 2px;
+    color: #BEBEBE;
+  }
+
+  .effective {
+    display: flex;
+    justify-content: center;
+    padding: 6px;
+
+    span {
+      display: block;
+    }
+  }
+  .oneicon-checked {
+    font-size: 240%;
+    color: $color-one-mint;
+  }
+}

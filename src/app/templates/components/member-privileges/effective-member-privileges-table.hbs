@@ -7,7 +7,7 @@
   <table class="table-privileges table table-info">
     <thead>
       <tr>
-        <td style="width:60%">
+        <td class="privileges-column">
           Privileges
           {{one-label-tip title="Privileges"}}
         </td>
@@ -43,22 +43,15 @@
         </tr>
         {{#if (get isOpenedGroup groupPrivileges.name)}}
           {{#each groupPrivileges.subtree as |privilege|}}
-            <tr>
-              <td class="priv">{{privilege.text}}</td>
-              <td class="toggle-column direct">n/a</td>
-              <td class="toggle-column status">
-                {{#if (get
-                  (get
-                    effectivePrivileges
-                    groupPrivileges.name)
-                  privilege.name
-                )}}
-                  {{one-icon icon="checked"}}
-                {{else}}
-                  –
-                {{/if}}
-              </td>
-            </tr>
+            {{member-privileges/privilege-row
+              privilege=privilege
+              effectivePrivilege=(get
+                (get effectivePrivileges groupPrivileges.name)
+                privilege.name
+              )
+              groupPrivileges=groupPrivileges.name
+              isDirect=false
+            }}
           {{/each}}
         {{/if}}
       {{/each}}

@@ -4,12 +4,26 @@
   margin-left: $padding-base-horizontal;
   margin-top: $padding-base-vertical;
   margin-bottom: $padding-base-vertical;
-  width: 500px;
+  margin-right: $padding-base-horizontal;
+
+  // @media (min-width: $screen-sm-min) {
+  //   width: 500px;
+  // }
 
   .table-privileges {
     margin-bottom: 0;
     border: 1px solid $table-border-color;
-  border-radius: $border-radius-base;
+    border-radius: $border-radius-base;
+
+    .privileges-column {
+      width: 60%;
+    }
+
+    @media (min-width: $screen-sm-min) {
+      .privileges-column {
+        width: 50%;
+      }
+    }
 
     thead, tbody .header {
       background-color: #eaeaea;
@@ -49,46 +63,13 @@
     .toggle-column {
       text-align: center;
       vertical-align: middle;
-      // padding: 0;
+
       &.global {
         padding-bottom: 9px;
         padding-top: 9px;
       }
-      &.checked {
-        padding-bottom: 5px;
-        padding-top: 5px;
-      }
-      &.false {
-        font-size: 200%;
-        font-weight: bold;
-        padding-bottom: 4px;
-        padding-top: 2px;
-        color: #BEBEBE;
-      }
     }
 
-    .status {
-      // opacity: 0.6;
-      // font-size: 280%;
-      padding: 6px;
-      span {
-        display: block;
-      }
-
-      display: flex;
-      justify-content: center;
-
-
-      .oneicon-lock {
-        padding-top: 4px;
-      }
-    }
-    .tmp {
-      .one-way-toggle-track {
-        visibility: hidden;
-        color: green;
-      }
-    }
     .direct {
       background: repeating-linear-gradient(
   45deg,
@@ -101,10 +82,7 @@
     td.one-icon {
       color: #555555;
     }
-    .oneicon-checked {
-      font-size: 240%;
-      color: $color-one-mint;
-    }
+
 
     .pill {
       padding-left: 8px;

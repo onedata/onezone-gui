@@ -14,7 +14,7 @@
     <table class="table-privileges table table-info">
       <thead>
         <tr>
-          <td style="width:60%">
+          <td class="privileges-column">
             Privileges
             {{one-label-tip title="Privileges"}}
           </td>
@@ -81,6 +81,7 @@
                   (concat (concat groupPrivileges.name '.') privilege.name)
                 )
                 form=form
+                isDirect=true
               }}
             {{/each}}
           {{/if}}

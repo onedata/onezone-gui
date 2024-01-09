@@ -14,7 +14,10 @@ import { inject as service } from '@ember/service';
 import DisabledPaths from 'onedata-gui-common/mixins/components/one-dynamic-tree/disabled-paths';
 
 export default Component.extend(DisabledPaths, {
-  classNames: ['children-privileges'],
+  classNames: ['privilege-row'],
+  classNameBindings: [
+    'isDirect:direct-member-privilege-row:effective-member-privilege-row',
+  ],
   tagName: 'tr',
 
   i18n: service(),
@@ -26,6 +29,8 @@ export default Component.extend(DisabledPaths, {
   effectivePrivilege: undefined,
 
   groupPrivileges: undefined,
+
+  isDirect: false,
 
   /**
    * Input changed action.

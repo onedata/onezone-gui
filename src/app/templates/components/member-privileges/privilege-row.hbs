@@ -1,23 +1,27 @@
 <td class="priv">{{privilege.text}}</td>
-<td class="toggle-column">
-  {{#form.group}}
-    {{one-way-toggle
-      class=inputClass
-      inputId=inputId
-      checked=directPrivilege
-      threeState=privilege.field.threeState
-      allowThreeStateToggle=privilege.field.allowThreeStateToggle
-      showLockForReadOnly=false
-      isReadOnly=false
-      update=(action "inputChanged")
-      onFocusOut=(action "focusedOut")
-    }}
-  {{/form.group}}
+<td class="toggle-column direct">
+  {{#if isDirect}}
+    {{#form.group}}
+      {{one-way-toggle
+        class=inputClass
+        inputId=inputId
+        checked=directPrivilege
+        threeState=privilege.field.threeState
+        allowThreeStateToggle=privilege.field.allowThreeStateToggle
+        showLockForReadOnly=false
+        isReadOnly=false
+        update=(action "inputChanged")
+        onFocusOut=(action "focusedOut")
+      }}
+    {{/form.group}}
+  {{else}}
+    n/a
+  {{/if}}
 </td>
-<td class="toggle-column status">
+<td class="toggle-column effective">
   {{#if effectivePrivilege}}
     {{one-icon icon="checked"}}
   {{else}}
-    –
+    <div class="priv-revoke">–</div>
   {{/if}}
 </td>

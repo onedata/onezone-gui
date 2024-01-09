@@ -4,12 +4,22 @@
   margin-left: $padding-base-horizontal;
   margin-top: $padding-base-vertical;
   margin-bottom: $padding-base-vertical;
-  width: 500px;
+  margin-right: $padding-base-horizontal;
 
   .table-privileges {
     margin-bottom: 0;
     border: 1px solid $table-border-color;
     border-radius: $border-radius-base;
+
+    .privileges-column {
+      width: 60%;
+    }
+
+    @media (min-width: $screen-sm-min) {
+      .privileges-column {
+        width: 50%;
+      }
+    }
 
     thead, tbody .header {
       background-color: #eaeaea;
@@ -33,21 +43,6 @@
       padding-right: 10px;
       vertical-align: middle;
       font-weight: bold;
-    }
-    .children-privileges {
-      font-size: 85%;
-      background-color: $block-background-color;
-
-      td.priv {
-        padding-left: 40px;
-      }
-      .status {
-
-        // font-size: 270%;
-      }
-      .oneicon-lock {
-        opacity: 0.6;
-      }
     }
 
     .toggle-column {
