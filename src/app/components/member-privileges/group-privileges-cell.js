@@ -48,7 +48,7 @@ export default Component.extend({
 
   privilegesGrantedCount: computed('privileges', function privilegesGrantedCount() {
     let privTrue = 0;
-    for (const [key, value] of Object.entries(this.privileges)) {
+    for (const value of Object.values(this.privileges)) {
       if (value) {
         privTrue++;
       }

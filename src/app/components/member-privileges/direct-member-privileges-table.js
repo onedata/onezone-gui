@@ -242,6 +242,8 @@ export default Component.extend({
      * @param {string} path Path to the value in the values tree.
      */
     inputFocusedOut(path, value) {
+      console.log(path);
+      console.log(value);
       // set(this.compareValues, path, value);
       // this.get('recordDirectProxy').setNewPrivileges(this.compareValues);
       // this._markFieldAsModified(path);
