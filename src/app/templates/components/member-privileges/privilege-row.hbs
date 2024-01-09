@@ -18,10 +18,12 @@
     n/a
   {{/if}}
 </td>
-<td class="toggle-column effective">
-  {{#if effectivePrivilege}}
-    {{one-icon icon="checked"}}
-  {{else}}
-    <div class="priv-revoke">–</div>
-  {{/if}}
-</td>
+{{#if (not isBulkEdit)}}
+  <td class="toggle-column effective">
+    {{#if effectivePrivilege}}
+      {{one-icon icon="checked"}}
+    {{else}}
+      <div class="priv-revoke">–</div>
+    {{/if}}
+  </td>
+{{/if}}

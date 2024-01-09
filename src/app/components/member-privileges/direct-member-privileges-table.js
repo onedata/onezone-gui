@@ -46,6 +46,8 @@ export default Component.extend({
    */
   recordDirectProxy: Object.freeze({}),
 
+  isBulkEdit: false,
+
   /**
    * Record proxy with privileges.
    * @virtual

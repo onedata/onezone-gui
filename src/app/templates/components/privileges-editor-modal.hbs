@@ -9,17 +9,15 @@
   proceedButtonText=(tt this "save")
   proceedDisabled=(not recordProxy.isLoaded)
   textCenter=false}}
-  <div class="tree-container">
-    {{#if recordProxy.isLoaded}}
-      <div class="batch-edit-tree-title hidden-xs">
-        {{one-icon icon="group"}}
-        <span class="one-label">{{treeRootText}}</span>
-      </div>
-    {{/if}}
-    {{record-privileges-tree-editor
+  <div class="bulk-edit-privileges-table-container">
+    {{member-privileges/direct-member-privileges-table
       privilegesGroups=privilegesGroups
       privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
       privilegesTranslationsPath=privilegesTranslationsPath
-      recordProxy=recordProxy}}
+      recordDirectProxy=recordProxy
+      recordEffectiveProxy=recordProxy
+      isDirect=true
+      isBulkEdit=true
+    }}
   </div>
 {{/proceed-process-modal}}
