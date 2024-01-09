@@ -84,7 +84,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   /**
    * @type {boolean}
    */
-  onlyDirect: true,
+  onlyDirect: false,
 
   /**
    * One of: privileges, memberships
@@ -155,6 +155,11 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   showMembershipDescription: false,
 
   /**
+   * @type {boolean}
+   */
+  showOnlyDirect: false,
+
+  /**
    * @type {Ember.ComputedProperty<string>}
    */
   privilegesTranslationsPath: computed(
@@ -190,21 +195,6 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
     function isAnySelectedRecordSaving() {
       return this.get('selectedMembersProxies')
         .filter(memberProxy => get(memberProxy, 'privilegesProxy.saving')).length > 0;
-    }
-  ),
-
-  /**
-   * @type {Ember.ComputedProperty<boolean>}
-   */
-  batchPrivilegesEditAvailable: computed(
-    'aspect',
-    'onlyDirect',
-    function batchPrivilegesEditAvailable() {
-      const {
-        aspect,
-        onlyDirect,
-      } = this.getProperties('aspect', 'onlyDirect');
-      return aspect === 'privileges' && onlyDirect;
     }
   ),
 
@@ -456,22 +446,17 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
    */
   globalActions: computed(
     'batchPrivilegesEditAction',
-    'batchPrivilegesEditAvailable',
     'removeSelectedAction',
     function globalActions() {
       const {
-        batchPrivilegesEditAvailable,
         batchPrivilegesEditAction,
         removeSelectedAction,
       } = this.getProperties(
-        'batchPrivilegesEditAvailable',
         'batchPrivilegesEditAction',
         'removeSelectedAction'
       );
       const actions = [];
-      if (batchPrivilegesEditAvailable) {
-        actions.push(batchPrivilegesEditAction);
-      }
+      actions.push(batchPrivilegesEditAction);
       actions.push(removeSelectedAction);
       return actions;
     }

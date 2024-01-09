@@ -67,6 +67,12 @@ export default Component.extend(I18n, {
   subjectType: undefined,
 
   /**
+   * @virtual
+   * @type {boolean}
+   */
+  showOnlyDirect: false,
+
+  /**
    * @type {Array<Model.User>}
    */
   owners: undefined,
@@ -216,34 +222,22 @@ export default Component.extend(I18n, {
 
   /**
    * One of `directMembers`, `effectiveMembers` depending on
-   * `onlyDirect` flag
+   *`showOnlyDirect` flag
    * @type {Ember.ComputedProperty<PromiseArray<DS.ManyArray<GraphSingleModel>>>}
    */
   members: computed(
-    'onlyDirect',
+    'showOnlyDirect',
     'record',
     'subjectType',
     function members() {
-      return this.get('onlyDirect') ?
+      return this.get('showOnlyDirect') ?
         this.get('directMembers') : this.get('effectiveMembers');
     }
   ),
 
-  /**
-   * Controls whether save/cancel buttons should be rendered or not
-   * @type {Ember.ComputedProperty<boolean>}
-   */
-  showSaveCancel: computed('aspect', 'onlyDirect', function showSaveCancel() {
-    const {
-      aspect,
-      onlyDirect,
-    } = this.getProperties('aspect', 'onlyDirect');
-    return aspect === 'privileges' && onlyDirect;
-  }),
-
   membersObserver: observer(
     'members.@each.{entityId,name,username}',
-    'onlyDirect',
+    'showOnlyDirect',
     function membersObserver() {
       const {
         owners,
@@ -253,7 +247,6 @@ export default Component.extend(I18n, {
         members,
         membersProxyList,
         groupedPrivilegesFlags,
-        onlyDirect,
         currentUser,
         isListCollapsed,
         collapseForNumber,
@@ -267,7 +260,6 @@ export default Component.extend(I18n, {
         'members',
         'membersProxyList',
         'groupedPrivilegesFlags',
-        'onlyDirect',
         'currentUser',
         'isListCollapsed',
         'collapseForNumber',
@@ -293,6 +285,7 @@ export default Component.extend(I18n, {
         } = getProperties(member, 'entityId', 'name', 'username');
         let key = member === currentUserMember ? '0\n' : '1\n';
         key += (owners || []).includes(member) ? '0\n' : '1\n';
+        key += this.directMembers.includes(member) ? '0\n' : '1\n';
         key += `${name}\n`;
         if (subjectType === 'user') {
           key += `${username || '\n'}\n`;
@@ -314,7 +307,9 @@ export default Component.extend(I18n, {
             member,
             owners,
             directMembers,
+            isDirect: directMembers.includes(member),
             privilegesProxy: {},
+            privilegesEffectiveProxy: {},
             isYou: member === currentUserMember,
             directMemberActions: itemActionsGenerator(
               member,
@@ -328,19 +323,28 @@ export default Component.extend(I18n, {
             ),
           });
         }
-        // If privileges mode is different, generate new privileges object.
-        if (get(proxy, 'privilegesProxy.direct') !== onlyDirect) {
-          const privilegesGri = this.getPrivilegesGriForMember(member);
+        if (directMembers.includes(member)) {
+          const directPrivilegesGri = this.getPrivilegesGriForMember(member, true);
           const privilegesProxy = PrivilegeRecordProxy.create(
             getOwner(this).ownerInjection(), {
               groupedPrivilegesFlags,
-              griArray: [privilegesGri],
-              direct: onlyDirect,
-              isReadOnly: !onlyDirect,
+              griArray: [directPrivilegesGri],
+              direct: true,
+              isReadOnly: false,
             }
           );
           set(proxy, 'privilegesProxy', privilegesProxy);
         }
+        const effectivePrivilegesGri = this.getPrivilegesGriForMember(member, false);
+        const privilegesEffectiveProxy = PrivilegeRecordProxy.create(
+          getOwner(this).ownerInjection(), {
+            groupedPrivilegesFlags,
+            griArray: [effectivePrivilegesGri],
+            direct: false,
+            isReadOnly: true,
+          }
+        );
+        set(proxy, 'privilegesEffectiveProxy', privilegesEffectiveProxy);
         return proxy;
       });
       this.set('membersProxyList', newMembersProxyList);
@@ -385,13 +389,12 @@ export default Component.extend(I18n, {
    * @param {string} type `group` or `user`
    * @returns {string}
    */
-  getPrivilegesGriForMember(member) {
+  getPrivilegesGriForMember(member, isDirect) {
     const {
       record,
       recordType,
       griAspect,
-      onlyDirect,
-    } = this.getProperties('record', 'recordType', 'griAspect', 'onlyDirect');
+    } = this.getProperties('record', 'recordType', 'griAspect');
     let recordId;
     let subjectId;
     try {
@@ -405,7 +408,7 @@ export default Component.extend(I18n, {
       );
       return '';
     }
-    const griAspectPrefix = onlyDirect ? '' : 'eff_';
+    const griAspectPrefix = isDirect ? '' : 'eff_';
     return this.get('privilegeManager').generateGri(
       recordType,
       recordId,

@@ -1,0 +1,59 @@
+{{#promise-proxy-container
+  proxy=recordEffectiveProxy.models
+  isLoading=(and recordEffectiveProxy.isLoading (not recordEffectiveProxy.hasBeenLoaded))
+  isLoaded=(and recordEffectiveProxy.hasBeenLoaded (not recordEffectiveProxy.models.isRejected))
+  isError=recordEffectiveProxy.fetchError
+  errorReason=recordEffectiveProxy.fetchError}}
+  <table class="table-privileges table table-info">
+    <thead>
+      <tr>
+        <td style="width:60%">Privileges</td>
+        <td class="toggle-column">Direct</td>
+        <td class="toggle-column">Effective</td>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each definition as |groupPrivileges|}}
+        <tr
+          onclick={{action "changeOpenGroup" groupPrivileges.name}}
+        >
+          <td>
+            {{#if (get isOpenedGroup groupPrivileges.name)}}
+              {{one-icon icon="arrow-down"}}
+            {{else}}
+              {{one-icon icon="arrow-up"}}
+            {{/if}}
+            {{groupPrivileges.text}}
+          </td>
+          <td class="toggle-column direct global">n/a</td>
+          {{member-privileges/group-privileges-cell
+            privileges=(get effectivePrivileges groupPrivileges.name)
+            groupPrivileges=groupPrivileges
+            isDirect=false
+          }}
+        </tr>
+        {{#if (get isOpenedGroup groupPrivileges.name)}}
+          {{#each groupPrivileges.subtree as |privilege|}}
+            <tr>
+              <td class="priv">{{privilege.text}}</td>
+              <td class="toggle-column direct">n/a</td>
+              <td class="toggle-column status">
+                {{#if (get
+                  (get
+                    effectivePrivileges
+                    groupPrivileges.name)
+                  privilege.name
+                )}}
+                  {{one-icon icon="checked"}}
+                {{else}}
+                  –
+                {{/if}}
+              </td>
+            </tr>
+          {{/each}}
+        {{/if}}
+      {{/each}}
+    </tbody>
+  </table>
+{{/promise-proxy-container}}
+

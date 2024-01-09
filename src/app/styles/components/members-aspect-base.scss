@@ -11,8 +11,72 @@
     position: relative;
     &.opened {
       min-height: 150px;
+
+      @media (min-width: $screen-md-min) {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+
+        .member-privileges-table {
+          width: 50%;
+
+          .table-privileges {
+            max-width: 500px;
+          }
+        }
+      }
+
+      .memberships-container {
+        display: flex;
+        flex-direction: column;
+        max-width: 50%;
+        margin-top: 12px;
+        margin-right: 18px;
+        margin-bottom: 12px;
+      }
+      .header-memberships {
+        border: 1px solid $table-border-color;
+        border-bottom: none;
+        border-radius: $border-radius-base $border-radius-base 0 0;
+        background-color: #eaeaea;
+        @include font-semibold;
+        padding: 10px 10px 10px 16px;
+      }
+
+      .membership-visualiser {
+        min-height: 50px;
+      }
+
+      .body-memberships {
+        border: 1px solid $table-border-color;
+        border-radius: 0 0 $border-radius-base $border-radius-base;
+      }
+
+      .show-descriptions-toggle {
+        padding-top: 10px;
+        display: flex;
+        justify-content: flex-end;
+      }
     }
   }
+
+  .content-row h1 {
+    .show-only-direct {
+      float: right;
+      padding-right: 33px;
+      font-size: 70%;
+
+      label {
+        padding-right: 10px;
+        text-transform: none;
+      }
+
+      div.one-way-toggle {
+        margin-top: -0.2em;
+      }
+    }
+  }
+
 
   .member-item .one-collapsible-list-item-header {
     padding-right: 190px;
@@ -36,7 +100,7 @@
   }
 
   .membership-visualiser {
-    margin: $padding-large-horizontal;
+    // margin: $padding-large-horizontal;
     .membership:last-child {
       border-bottom: 0;
     }

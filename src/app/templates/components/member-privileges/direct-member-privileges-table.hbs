@@ -1,0 +1,84 @@
+{{#promise-proxy-container
+  proxy=recordDirectProxy.models
+  isLoading=(and recordDirectProxy.isLoading (not recordDirectProxy.hasBeenLoaded))
+  isLoaded=(and recordDirectProxy.hasBeenLoaded (not recordDirectProxy.models.isRejected))
+  isError=recordDirectProxy.fetchError
+  errorReason=recordDirectProxy.fetchError}}
+{{#promise-proxy-container
+  proxy=recordEffectiveProxy.models
+  isLoading=(and recordEffectiveProxy.isLoading (not recordEffectiveProxy.hasBeenLoaded))
+  isLoaded=(and recordEffectiveProxy.hasBeenLoaded (not recordEffectiveProxy.models.isRejected))
+  isError=recordEffectiveProxy.fetchError
+  errorReason=recordEffectiveProxy.fetchError}}
+  {{#bs-form submitOnEnter=false as |form|}}
+    <table class="table-privileges table table-info">
+      <thead>
+        <tr>
+          <td style="width:60%">Privileges</td>
+          <td class="toggle-column">Direct</td>
+          <td class="toggle-column">Effective</td>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each definition as |groupPrivileges|}}
+          <tr>
+            <td onclick={{action "changeOpenGroup" groupPrivileges.name}}>
+              {{#if (get isOpenedGroup groupPrivileges.name)}}
+                {{one-icon icon="arrow-down"}}
+              {{else}}
+                {{one-icon icon="arrow-up"}}
+              {{/if}}
+              {{groupPrivileges.text}}
+            </td>
+            {{member-privileges/group-privileges-cell
+              privileges=(get
+                      directPrivilegesToShow
+                      groupPrivileges.name)
+              groupPrivileges=groupPrivileges
+              inputChanged=(action "inputValueChanged")
+              focusedOut=(action "inputFocusedOut")
+              form=form
+              isDirect=true
+            }}
+            {{member-privileges/group-privileges-cell
+              privileges=(get
+                      effectivePrivileges
+                      groupPrivileges.name)
+              groupPrivileges=groupPrivileges
+              inputChanged=(action "inputValueChanged")
+              focusedOut=(action "inputFocusedOut")
+              form=form
+              isDirect=false
+            }}
+          </tr>
+          {{#if (get isOpenedGroup groupPrivileges.name)}}
+            {{#each groupPrivileges.subtree as |privilege|}}
+              {{member-privileges/privilege-row
+                privilege=privilege
+                directPrivilege=(get
+                  (get directPrivilegesToShow groupPrivileges.name)
+                  privilege.name
+                )
+                effectivePrivilege=(get
+                  (get effectivePrivileges groupPrivileges.name)
+                  privilege.name
+                )
+                groupPrivileges=groupPrivileges.name
+                treeDisabledPaths=treeDisabledPaths
+                inputChanged=(action "inputValueChanged"
+                  (concat (concat groupPrivileges.name '.') privilege.name)
+                )
+                focusedOut=(action "inputFocusedOut"
+                  (concat (concat groupPrivileges.name '.') privilege.name)
+                )
+                form=form
+              }}
+            {{/each}}
+          {{/if}}
+        {{/each}}
+      </tbody>
+    </table>
+  {{/bs-form}}
+{{/promise-proxy-container}}
+{{/promise-proxy-container}}
+
