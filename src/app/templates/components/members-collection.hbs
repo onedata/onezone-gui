@@ -130,7 +130,10 @@
                 }}
               {{/if}}
               <div class="memberships-container">
-                <div class="header-memberships">Memberships</div>
+                <div class="header-memberships">
+                  Memberships
+                  {{one-label-tip title="Memberships"}}
+                </div>
                 <div class="body-memberships">
                   {{membership-visualiser
                     contextRecord=memberProxy.member

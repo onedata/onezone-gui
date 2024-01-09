@@ -4,7 +4,7 @@
   margin-left: $padding-base-horizontal;
   margin-top: $padding-base-vertical;
   margin-bottom: $padding-base-vertical;
-  min-width: 500px;
+  width: 500px;
 
   .table-privileges {
     margin-bottom: 0;
@@ -94,7 +94,7 @@
       }
     }
 
-    .one-icon {
+    td.one-icon {
       color: #555555;
     }
     .oneicon-checked {
