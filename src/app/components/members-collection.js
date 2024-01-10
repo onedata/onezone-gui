@@ -71,6 +71,10 @@ export default Component.extend(I18n, {
    */
   owners: undefined,
 
+  /**
+   * @virtual
+   * @type {string}
+   */
   modelTypeTranslation: undefined,
 
   /**

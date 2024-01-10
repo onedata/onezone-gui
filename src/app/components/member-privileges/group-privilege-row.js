@@ -46,6 +46,8 @@ export default Component.extend({
 
   isOpen: false,
 
+  editionEnabled: true,
+
   actions: {
     /**
      * Notifies about change in input.

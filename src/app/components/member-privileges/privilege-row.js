@@ -37,6 +37,8 @@ export default Component.extend(DisabledPaths, I18n, {
 
   isBulkEdit: false,
 
+  editionEnabled: true,
+
   /**
    * Input changed action.
    * @type {Function}

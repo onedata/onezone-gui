@@ -19,8 +19,8 @@
         {{#each definition as |groupPrivileges|}}
           {{member-privileges/group-privilege-row
             privileges=(get
-                    directPrivilegesToShow
-                    groupPrivileges.name)
+              modifiedPrivileges
+              groupPrivileges.name)
             effPrivileges=(get
                     effectivePrivileges
                     groupPrivileges.name)
@@ -32,13 +32,14 @@
             isOpen=(get isOpenedGroup groupPrivileges.name)
             form=form
             isDirect=true
+            editionEnabled=editionEnabled
           }}
           {{#if (get isOpenedGroup groupPrivileges.name)}}
             {{#each groupPrivileges.subtree as |privilege|}}
               {{member-privileges/privilege-row
                 privilege=privilege
                 directPrivilege=(get
-                  (get directPrivilegesToShow groupPrivileges.name)
+                  (get modifiedPrivileges groupPrivileges.name)
                   privilege.name
                 )
                 oldPrivilege=(get
@@ -50,7 +51,6 @@
                   privilege.name
                 )
                 groupPrivileges=groupPrivileges.name
-                treeDisabledPaths=treeDisabledPaths
                 inputChanged=(action "inputValueChanged"
                   (concat (concat groupPrivileges.name '.') privilege.name)
                 )
@@ -60,6 +60,7 @@
                 form=form
                 isDirect=true
                 isBulkEdit=isBulkEdit
+                editionEnabled=editionEnabled
               }}
             {{/each}}
           {{/if}}

@@ -18,5 +18,9 @@ export default Component.extend(I18n, {
    */
   i18nPrefix: 'components.memberPrivileges.tableHeader',
 
+  /**
+   * @virtual
+   * @type {string}
+   */
   modelTypeTranslation: undefined,
 });

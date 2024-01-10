@@ -26,6 +26,8 @@ export default Component.extend({
    */
   focusedOut: () => {},
 
+  editionEnabled: true,
+
   /**
    * Input classes.
    * @type {computed.string}

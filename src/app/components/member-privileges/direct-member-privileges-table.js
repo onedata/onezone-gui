@@ -10,16 +10,12 @@ import { computed, observer, get, set } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { scheduleOnce } from '@ember/runloop';
 import Component from '@ember/component';
-import { inject as service } from '@ember/service';
-import { A } from '@ember/array';
-import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 
 export default Component.extend({
   classNames: ['direct-member-privileges-table', 'member-privileges-table'],
-  i18n: service(),
 
   /**
-   * Grouped privileges used to construct tree nodes
+   * Grouped privileges
    * @virtual
    * @type {Array<Object>}
    */
@@ -40,50 +36,57 @@ export default Component.extend({
   privilegesTranslationsPath: undefined,
 
   /**
-   * Record proxy with privileges.
+   * Record proxy with direct privileges.
    * @virtual
    * @type {PrivilegeRecordProxy}
    */
   recordDirectProxy: Object.freeze({}),
 
-  isBulkEdit: false,
-
-  modelTypeTranslation: undefined,
-
   /**
-   * Record proxy with privileges.
+   * Record proxy with effective privileges.
    * @virtual
    * @type {PrivilegeRecordProxy}
    */
   recordEffectiveProxy: Object.freeze({}),
 
+  /**
+   * @virtual
+   * @type {string}
+   */
+  modelTypeTranslation: undefined,
+
+  /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  isBulkEdit: false,
+
+  /**
+   * Object with name of group privileges with information about
+   * it should be expanded in table and show more specific privileges
+   * for this group or not.
+   * @type {object}
+   */
+  isOpenedGroup: Object.freeze({}),
+
+  /**
+   * @type {Ember.ComputedProperty<Object>}
+   */
   directPrivileges: reads('recordDirectProxy.effectivePrivilegesSnapshot'),
 
-  modifiedPrivileges: reads('recordDirectProxy.modifiedPrivileges'),
-
-  directPrivilegesToShow: computed(
-    'directPrivileges',
-    'modifiedPrivileges',
-    function directPrivilegesToShow() {
-      if (this.modifiedPrivileges) {
-        return this.modifiedPrivileges;
-      } else {
-        return this.directPrivileges;
-      }
-    }
-  ),
-
+  /**
+   * @type {Ember.ComputedProperty<Object>}
+   */
   effectivePrivileges: reads('recordEffectiveProxy.effectivePrivilegesSnapshot'),
 
   /**
-   * @override
+   * @type {Ember.ComputedProperty<Object>}
    */
-  overridePrivileges: reads('recordDirectProxy.effectivePrivilegesSnapshot'),
+  modifiedPrivileges: reads('recordDirectProxy.modifiedPrivileges'),
 
-  allowThreeStateToggles: true,
-
-  isOpen: false,
-
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
   editionEnabled: computed(
     'recordDirectProxy.{isSaving,isReadOnly}',
     function editionEnabled() {
@@ -92,88 +95,53 @@ export default Component.extend({
     }
   ),
 
-  /**
-   * Values used to fill tree form elements. On each change of this property
-   * all tree values will be refreshed with new values.
-   * @type {object}
-   */
-  overrideValues: reads('directPrivileges'),
-
-  /**
-   * Tree paths, which are disabled for edition. Used to block tree edition.
-   * @type {Ember.ComputedProperty<Ember.Array<string>>}
-   */
-  treeDisabledPaths: computed(
-    'editionEnabled',
-    'privilegesGroups',
-    function treeDisabledPaths() {
-      const {
-        editionEnabled,
-        privilegesGroups,
-      } = this.getProperties('editionEnabled', 'privilegesGroups');
-      return editionEnabled ? A() : A(privilegesGroups.map(g => g.groupName));
+  recordDirectProxyObserver: observer(
+    'recordDirectProxy',
+    function recordDirectProxyObserver() {
+      const recordDirectProxy = this.get('recordDirectProxy');
+      if (
+        !get(recordDirectProxy, 'isLoaded') &&
+        !get(recordDirectProxy, 'isLoading')
+      ) {
+        recordDirectProxy.reloadRecords();
+      }
     }
   ),
 
-  isDirect: undefined,
-
-  recordDirectProxyObserver: observer('recordDirectProxy', function recordDirectProxyObserver() {
-    const recordDirectProxy = this.get('recordDirectProxy');
-    if (!get(recordDirectProxy, 'isLoaded') && !get(
-        recordDirectProxy,
-        'isLoading')) {
-      recordDirectProxy.reloadRecords();
+  recordEffectiveProxyObserver: observer(
+    'recordEffectiveProxy',
+    function recordEffectiveProxyObserver() {
+      const recordEffectiveProxy = this.get('recordEffectiveProxy');
+      if (
+        !get(recordEffectiveProxy, 'isLoaded') &&
+        !get(recordEffectiveProxy, 'isLoading')
+      ) {
+        recordEffectiveProxy.reloadRecords();
+      }
     }
-  }),
-
-  recordEffectiveProxyObserver: observer('recordEffectiveProxy', function recordEffectiveProxyObserver() {
-    const recordEffectiveProxy = this.get('recordEffectiveProxy');
-    if (!get(recordEffectiveProxy, 'isLoaded') && !get(recordEffectiveProxy, 'isLoading')) {
-      recordEffectiveProxy.reloadRecords();
-    }
-  }),
-
-  isOpenedGroup: Object.freeze({}),
+  ),
 
   /**
    * Tree definition
    * @type {Ember.ComputedProperty<Array<Object>>}
    */
   definition: computed(
-    'allowThreeStateToggles',
     'directPrivileges',
     'privilegesGroups',
     'privilegeGroupsTranslationsPath',
     'privilegesTranslationsPath',
-    'effOverridePrivileges',
     function definition() {
-      const {
-        allowThreeStateToggles,
-        directPrivileges,
-        privilegesGroups,
-        privilegeGroupsTranslationsPath,
-        privilegesTranslationsPath,
-        i18n,
-      } = this.getProperties(
-        'allowThreeStateToggles',
-        'directPrivileges',
-        'privilegesGroups',
-        'privilegeGroupsTranslationsPath',
-        'privilegesTranslationsPath',
-        'i18n'
-      );
-      if (!directPrivileges) {
+      if (!this.directPrivileges) {
         return [];
       }
-      return privilegesGroups.map(privilegesGroup => {
+      return this.privilegesGroups.map(privilegesGroup => {
         const groupName = privilegesGroup.groupName;
-        // this.isOpenedGroup[groupName] = false;
         const privilegesNodes = privilegesGroup.privileges.map(privilege => {
-          const threeStatePermission = allowThreeStateToggles &&
-            directPrivileges[groupName][privilege.name] === 2;
+          const threeStatePermission =
+            this.directPrivileges[groupName][privilege.name] === 2;
           return {
             name: privilege.name,
-            text: i18n.t(privilegesTranslationsPath + '.' + privilege.name),
+            text: this.i18n.t(this.privilegesTranslationsPath + '.' + privilege.name),
             field: {
               type: 'checkbox',
               threeState: threeStatePermission,
@@ -184,7 +152,7 @@ export default Component.extend({
         return {
           name: groupName,
           icon: privilegesGroup.icon,
-          text: i18n.t(privilegeGroupsTranslationsPath + '.' + groupName),
+          text: this.i18n.t(this.privilegeGroupsTranslationsPath + '.' + groupName),
           allowSubtreeCheckboxSelect: true,
           subtree: privilegesNodes,
         };
@@ -199,6 +167,7 @@ export default Component.extend({
     // in the same render (recordProxyObserver changes recordProxy content)
     scheduleOnce('afterRender', this, 'recordDirectProxyObserver');
     scheduleOnce('afterRender', this, 'recordEffectiveProxyObserver');
+
     const isOpened = {};
     for (const entry of this.privilegesGroups) {
       isOpened[entry.groupName] = false;
@@ -206,50 +175,26 @@ export default Component.extend({
     this.set('isOpenedGroup', isOpened);
   },
 
-  /**
-   * @type {Function}
-   * @param {Object} data actual values of privileges tree (compatible
-   *   with overridePrivileges)
-   * @returns {undefined}
-   */
-  onChange: notImplementedIgnore,
-
   actions: {
     changeOpenGroup(groupName) {
       set(this.isOpenedGroup, groupName, !this.isOpenedGroup[groupName]);
     },
 
     inputValueChanged(path, value) {
-      // set(this.compareValues, path, value);
-      // const superResult = this.get('onChange')(this.compareValues);
-      let tmp;
-      if (this.recordDirectProxy.modifiedPrivileges) {
-        tmp = this.recordDirectProxy.modifiedPrivileges;
-      } else {
-        tmp = this.recordDirectProxy.effectivePrivilegesSnapshot;
-      }
+      const privileges = this.recordDirectProxy.modifiedPrivileges;
       if (typeof path === 'string') {
-        set(tmp, path, value);
+        set(privileges, path, value);
       } else {
         for (const p of path) {
-          set(tmp, p, value);
+          set(privileges, p, value);
         }
       }
-      this.get('recordDirectProxy').setNewPrivileges(tmp);
-
+      this.get('recordDirectProxy').setNewPrivileges(privileges);
     },
 
-    /**
-     * Marks an input as 'changed' after focus out event.
-     * @param {string} path Path to the value in the values tree.
-     */
     inputFocusedOut(path, value) {
       console.log(path);
       console.log(value);
-      // set(this.compareValues, path, value);
-      // this.get('recordDirectProxy').setNewPrivileges(this.compareValues);
-      // this._markFieldAsModified(path);
-      // this.valuesHaveChanged(false, false);
     },
   },
 });
