@@ -13,10 +13,8 @@
   {{groupPrivileges.text}}
 </td>
 {{member-privileges/group-privileges-cell
-  state=state
-  inputClass=inputClass
-  privilegesGrantedCount=privilegesGrantedCount
-  allPrivilegesCount=allPrivilegesCount
+  privileges=privileges
+  groupPrivileges=groupPrivileges
   inputChanged=(action "inputChanged")
   focusedOut=(action "focusedOut")
   form=form
@@ -24,10 +22,8 @@
 }}
 {{#if (not isBulkEdit)}}
   {{member-privileges/group-privileges-cell
-    state=state
-    inputClass=inputClass
-    privilegesGrantedCount=effPrivilegesGrantedCount
-    allPrivilegesCount=allPrivilegesCount
+    privileges=effPrivileges
+    groupPrivileges=groupPrivileges
     inputChanged=(action "inputChanged")
     focusedOut=(action "focusedOut")
     form=form

@@ -10,11 +10,15 @@ import { computed, observer, get, set } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { scheduleOnce } from '@ember/runloop';
 import Component from '@ember/component';
-import { inject as service } from '@ember/service';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
 
-export default Component.extend({
+export default Component.extend(I18n, {
   classNames: ['effective-member-privileges-table', 'member-privileges-table'],
-  i18n: service(),
+
+  /**
+   * @override
+   */
+  i18nPrefix: 'components.memberPrivileges.effectiveMemberPrivilegesTable',
 
   /**
    * Grouped privileges used to construct tree nodes
@@ -49,6 +53,8 @@ export default Component.extend({
   allowThreeStateToggles: true,
 
   isOpen: false,
+
+  modelTypeTranslation: undefined,
 
   recordEffectiveProxyObserver: observer('recordEffectiveProxy', function recordEffectiveProxyObserver() {
     const recordEffectiveProxy = this.get('recordEffectiveProxy');

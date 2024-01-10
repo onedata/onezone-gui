@@ -8,4 +8,7 @@ export default {
   ownerPrivilegesWarningModels: {
     space: 'space',
   },
+  showDescriptions: 'Show descriptions',
+  memberships: 'Memberships',
+  membershipsTip: 'Memberships shows how this member belong to this resources.',
 };

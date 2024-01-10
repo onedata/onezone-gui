@@ -66,7 +66,7 @@
               {{#if memberProxy.isOwner}}
                 <span class="space"></span><span class="label label-info">{{tt this "owner"}}</span>
               {{/if}}
-              {{#if (and (not onlyDirect) (contains memberProxy.member directMembers))}}
+              {{#if (contains memberProxy.member directMembers)}}
                 <span class="space"></span><span class="label label-default">{{tt this "direct"}}</span>
               {{/if}}
             </span>
@@ -84,33 +84,34 @@
         {{/listItem.header}}
         {{#listItem.content}}
           {{#render-later triggerRender=listItem.isActive}}
-              <div class="hidden-sm hidden-md hidden-lg text-center row content-row">
-                {{#bs-button size="sm" type="primary"
-                  disabled=(or memberProxy.privilegesProxy.saving (not memberProxy.privilegesProxy.isModified))
-                  onClick=(action "savePrivileges" memberProxy)
+            <div class="hidden-sm hidden-md hidden-lg text-center row content-row">
+              {{#bs-button size="sm" type="primary"
+                disabled=(or memberProxy.privilegesProxy.saving (not memberProxy.privilegesProxy.isModified))
+                onClick=(action "savePrivileges" memberProxy)
+              }}
+                {{tt this "save"}}
+              {{/bs-button}}
+              {{#bs-button
+                size="sm"
+                type="warning"
+                class="discard-btn"
+                disabled=(or memberProxy.privilegesProxy.saving (not memberProxy.privilegesProxy.isModified))
+                onClick=(action "discardChanges" memberProxy)
+              }}
+                {{tt this "discard"
+              }}
+              {{/bs-button}}
+            </div>
+            {{#if memberProxy.isOwner}}
+              <div class="alert alert-warning privileges-of-owner-warning">
+                {{tt this "ownerPrivilegesWarning"
+                  model=(tt this
+                    (concat "ownerPrivilegesWarningModels." record.constructor.modelName)
+                  )
                 }}
-                  {{tt this "save"}}
-                {{/bs-button}}
-                {{#bs-button
-                  size="sm"
-                  type="warning"
-                  class="discard-btn"
-                  disabled=(or memberProxy.privilegesProxy.saving (not memberProxy.privilegesProxy.isModified))
-                  onClick=(action "discardChanges" memberProxy)
-                }}
-                  {{tt this "discard"
-                }}
-                {{/bs-button}}
               </div>
-              {{#if memberProxy.isOwner}}
-                <div class="alert alert-warning privileges-of-owner-warning">
-                  {{tt this "ownerPrivilegesWarning"
-                    model=(tt this
-                      (concat "ownerPrivilegesWarningModels." record.constructor.modelName)
-                    )
-                  }}
-                </div>
-              {{/if}}
+            {{/if}}
+            <div class="member-content">
               {{#if memberProxy.isDirect}}
                 {{member-privileges/direct-member-privileges-table
                   privilegesGroups=groupedPrivilegesFlags
@@ -119,6 +120,7 @@
                   recordDirectProxy=memberProxy.privilegesProxy
                   recordEffectiveProxy=memberProxy.privilegesEffectiveProxy
                   isDirect=true
+                  modelTypeTranslation=modelTypeTranslation
                 }}
               {{else}}
                 {{member-privileges/effective-member-privileges-table
@@ -127,12 +129,13 @@
                   privilegesTranslationsPath=privilegesTranslationsPath
                   recordEffectiveProxy=memberProxy.privilegesEffectiveProxy
                   isDirect=false
+                  modelTypeTranslation=modelTypeTranslation
                 }}
               {{/if}}
               <div class="memberships-container">
                 <div class="header-memberships">
-                  Memberships
-                  {{one-label-tip title="Memberships"}}
+                  {{tt this "memberships"}}
+                  {{one-label-tip title=(tt this "membershipsTip")}}
                 </div>
                 <div class="body-memberships">
                   {{membership-visualiser
@@ -143,9 +146,10 @@
                 </div>
                 <div class="show-descriptions-toggle">
                   {{one-way-toggle inputId="members-show-descriptions" checked=showMembershipDescription update=(action (mut showMembershipDescription))}}
-                  <label for="members-show-descriptions" class="inline-label">Show descriptions</label>
+                  <label for="members-show-descriptions" class="inline-label">{{tt this "showDescriptions"}}</label>
                 </div>
               </div>
+            </div>
           {{/render-later}}
         {{/listItem.content}}
       {{/list.item}}

@@ -48,6 +48,8 @@ export default Component.extend({
 
   isBulkEdit: false,
 
+  modelTypeTranslation: undefined,
+
   /**
    * Record proxy with privileges.
    * @virtual

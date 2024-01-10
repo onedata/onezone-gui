@@ -1,5 +1,5 @@
 /**
- * Renders list of members with additional features specified by `aspect` property.
+ * Renders list of members.
  * Yields list when there are no items to present.
  *
  * @author Michał Borzęcki
@@ -67,15 +67,11 @@ export default Component.extend(I18n, {
   subjectType: undefined,
 
   /**
-   * @virtual
-   * @type {boolean}
-   */
-  showOnlyDirect: false,
-
-  /**
    * @type {Array<Model.User>}
    */
   owners: undefined,
+
+  modelTypeTranslation: undefined,
 
   /**
    * If greater than 0, autocollapses list on init if number of records is over
@@ -130,22 +126,17 @@ export default Component.extend(I18n, {
   privilegesTranslationsPath: undefined,
 
   /**
+   * If true, only direct members of the record will be visible
+   * @type {boolean}
+   * @virtual
+   */
+  onlyDirect: false,
+
+  /**
    * Is calculated by `membersObserver`
    * @type {Array<Utils/MembersCollection/ItemProxy>}
    */
   membersProxyList: Object.freeze([]),
-
-  /**
-   * One of: privileges, memberships
-   * @type {string}
-   */
-  aspect: 'privileges',
-
-  /**
-   * If true, only direct members of the record will be visible
-   * @type {boolean}
-   */
-  onlyDirect: true,
 
   /**
    * If true, membership-visualiser component will show path descriptions
@@ -222,22 +213,22 @@ export default Component.extend(I18n, {
 
   /**
    * One of `directMembers`, `effectiveMembers` depending on
-   *`showOnlyDirect` flag
+   *`onlyDirect` flag
    * @type {Ember.ComputedProperty<PromiseArray<DS.ManyArray<GraphSingleModel>>>}
    */
   members: computed(
-    'showOnlyDirect',
+    'onlyDirect',
     'record',
     'subjectType',
     function members() {
-      return this.get('showOnlyDirect') ?
+      return this.get('onlyDirect') ?
         this.get('directMembers') : this.get('effectiveMembers');
     }
   ),
 
   membersObserver: observer(
     'members.@each.{entityId,name,username}',
-    'showOnlyDirect',
+    'onlyDirect',
     function membersObserver() {
       const {
         owners,
@@ -353,15 +344,6 @@ export default Component.extend(I18n, {
       }
     }
   ),
-
-  aspectObserver: observer('aspect', function aspectObserver() {
-    // Reset privileges modification state after aspect change
-    this.get('membersProxyList').forEach(memberProxy => {
-      if (get(memberProxy, 'privilegesProxy.isModified')) {
-        get(memberProxy, 'privilegesProxy').resetModifications();
-      }
-    });
-  }),
 
   init() {
     this._super(...arguments);

@@ -10,17 +10,20 @@
 
 import { computed } from '@ember/object';
 import Component from '@ember/component';
-import { inject as service } from '@ember/service';
 import DisabledPaths from 'onedata-gui-common/mixins/components/one-dynamic-tree/disabled-paths';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
 
-export default Component.extend(DisabledPaths, {
+export default Component.extend(DisabledPaths, I18n, {
   classNames: ['privilege-row'],
   classNameBindings: [
     'isDirect:direct-member-privilege-row:effective-member-privilege-row',
   ],
   tagName: 'tr',
 
-  i18n: service(),
+  /**
+   * @override
+   */
+  i18nPrefix: 'components.memberPrivileges.privilegeRow',
 
   privilege: undefined,
 

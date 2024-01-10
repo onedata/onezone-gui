@@ -87,12 +87,6 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   onlyDirect: false,
 
   /**
-   * One of: privileges, memberships
-   * @type {string}
-   */
-  aspect: 'privileges',
-
-  /**
    * Contains users selected on list
    * @type {Ember.Array<Utils/MembersCollection/ItemProxy>}
    */
@@ -153,11 +147,6 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
    * @type {boolean}
    */
   showMembershipDescription: false,
-
-  /**
-   * @type {boolean}
-   */
-  showOnlyDirect: false,
 
   /**
    * @type {Ember.ComputedProperty<string>}
@@ -538,11 +527,6 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
 
   init() {
     this._super(...arguments);
-    const aspect = this.navigationState.queryParams.aspect;
-
-    if (['memberships', 'privileges'].includes(aspect)) {
-      this.set('aspect', aspect);
-    }
     this.selectedMemberObserver();
   },
 
@@ -670,9 +654,6 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   },
 
   actions: {
-    changeAspect(aspect) {
-      this.set('aspect', String(aspect));
-    },
     recordsLoaded() {
       this.scheduleExpandSelectedMember();
     },

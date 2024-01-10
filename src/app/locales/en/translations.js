@@ -113,6 +113,10 @@ import apiSamplesModal from './components/modals/api-samples-modal';
 import leaveModal from './components/modals/leave-modal';
 import spacesModals from './components/modals/spaces';
 
+import tableHeader from './components/member-privileges/table-header';
+import privilegeRow from './components/member-privileges/privilege-row';
+import effectiveMemberPrivilegesTable from './components/member-privileges/effective-member-privileges-table';
+
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
 import clusterActions from './services/cluster-actions';
@@ -195,6 +199,11 @@ const translations = {
       shareNotFound,
       openShareFailed,
       offlineProviders,
+    },
+    memberPrivileges: {
+      tableHeader,
+      privilegeRow,
+      effectiveMemberPrivilegesTable,
     },
     loginBox,
     contentTokens,

@@ -27,46 +27,6 @@ export default Component.extend({
 
   changeOpenGroup: () => {},
 
-  /**
-   * Input classes.
-   * @type {computed.string}
-   */
-  inputClass: computed('privilege', 'groupPrivileges', function inputClass() {
-    return `field-${this.groupPrivileges}-${this.privilege} form-control`;
-  }),
-
-  state: computed('privilegesGrantedCount', 'allPrivilegesCount', function state() {
-    if (
-      this.privilegesGrantedCount &&
-      this.privilegesGrantedCount < this.allPrivilegesCount
-    ) {
-      return 2;
-    } else if (this.privilegesGrantedCount) {
-      return true;
-    }
-    return false;
-  }),
-
-  privilegesGrantedCount: computed('privileges', function privilegesGrantedCount() {
-    let privTrue = 0;
-    for (const value of Object.values(this.privileges)) {
-      if (value) {
-        privTrue++;
-      }
-    }
-    return privTrue;
-  }),
-
-  effPrivilegesGrantedCount: computed('effPrivileges', function effPrivilegesGrantedCount() {
-    let privTrue = 0;
-    for (const value of Object.values(this.effPrivileges)) {
-      if (value) {
-        privTrue++;
-      }
-    }
-    return privTrue;
-  }),
-
   allPrivilegesCount: computed('privileges', function allPrivilegesCount() {
     return Object.keys(this.privileges).length;
   }),

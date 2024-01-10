@@ -12,24 +12,9 @@
   errorReason=recordEffectiveProxy.fetchError}}
   {{#bs-form submitOnEnter=false as |form|}}
     <table class="table-privileges table table-info">
-      <thead>
-        <tr>
-          <td class="privileges-column">
-            Privileges
-            {{one-label-tip title="Privileges"}}
-          </td>
-          <td class="toggle-column">
-            Direct
-            {{one-label-tip title="Direct"}}
-          </td>
-          {{#if (not isBulkEdit)}}
-            <td class="toggle-column">
-              Effective
-              {{one-label-tip title="Effective"}}
-            </td>
-          {{/if}}
-        </tr>
-      </thead>
+      {{member-privileges/table-header
+        modelTypeTranslation=modelTypeTranslation
+      }}
       <tbody>
         {{#each definition as |groupPrivileges|}}
           {{member-privileges/group-privilege-row

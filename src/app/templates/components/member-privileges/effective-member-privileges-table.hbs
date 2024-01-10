@@ -5,22 +5,9 @@
   isError=recordEffectiveProxy.fetchError
   errorReason=recordEffectiveProxy.fetchError}}
   <table class="table-privileges table table-info">
-    <thead>
-      <tr>
-        <td class="privileges-column">
-          Privileges
-          {{one-label-tip title="Privileges"}}
-        </td>
-        <td class="toggle-column">
-          Direct
-          {{one-label-tip title="Direct"}}
-        </td>
-        <td class="toggle-column">
-          Effective
-          {{one-label-tip title="Effective"}}
-        </td>
-      </tr>
-    </thead>
+    {{member-privileges/table-header
+      modelTypeTranslation=modelTypeTranslation
+    }}
     <tbody>
       {{#each definition as |groupPrivileges|}}
         <tr
@@ -34,7 +21,7 @@
             {{/if}}
             {{groupPrivileges.text}}
           </td>
-          <td class="toggle-column direct global">n/a</td>
+          <td class="toggle-column direct global">{{tt this "na"}}</td>
           {{member-privileges/group-privileges-cell
             privileges=(get effectivePrivileges groupPrivileges.name)
             groupPrivileges=groupPrivileges
