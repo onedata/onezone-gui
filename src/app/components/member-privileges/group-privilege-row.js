@@ -1,6 +1,5 @@
 /**
- * Show cell with group privileges status for effective privileges or toggle to edit for
- * direct privileges group.
+ * Show row with group privileges for direct member.
  *
  * @author Agnieszka Warchoł
  * @copyright (C) 2023 ACK CYFRONET AGH
@@ -11,8 +10,8 @@ import { computed } from '@ember/object';
 import Component from '@ember/component';
 
 export default Component.extend({
-  classNames: ['group-privileges-cell', 'toggle-column', 'global'],
-  tagName: 'td',
+  classNames: ['group-privileges-row'],
+  tagName: 'tr',
 
   /**
    * Input changed action.
@@ -25,6 +24,8 @@ export default Component.extend({
    * @type {Function}
    */
   focusedOut: () => {},
+
+  changeOpenGroup: () => {},
 
   /**
    * Input classes.
@@ -56,11 +57,34 @@ export default Component.extend({
     return privTrue;
   }),
 
+  effPrivilegesGrantedCount: computed('effPrivileges', function effPrivilegesGrantedCount() {
+    let privTrue = 0;
+    for (const value of Object.values(this.effPrivileges)) {
+      if (value) {
+        privTrue++;
+      }
+    }
+    return privTrue;
+  }),
+
   allPrivilegesCount: computed('privileges', function allPrivilegesCount() {
     return Object.keys(this.privileges).length;
   }),
 
-  isDirect: undefined,
+  isModified: computed('oldPrivileges', 'privileges', function isModified() {
+    for (const [key, value] of Object.entries(this.privileges)) {
+      if (this.oldPrivileges[key] !== value) {
+        return true;
+      }
+    }
+    return false;
+  }),
+
+  oldPrivileges: undefined,
+
+  isDirect: true,
+
+  isOpen: false,
 
   actions: {
     /**
@@ -68,7 +92,18 @@ export default Component.extend({
      * @param {*} value Changed value.
      */
     inputChanged(value) {
-      this.get('inputChanged')(value);
+      if (this.get('value') !== value) {
+        const parentName = this.groupPrivileges.name;
+        const paths = [];
+        for (const priv of this.groupPrivileges.subtree) {
+          paths.push(parentName + '.' + priv.name);
+        }
+        if (value === 2) {
+          this.get('inputChanged')(paths, true);
+        } else {
+          this.get('inputChanged')(paths, value);
+        }
+      }
     },
 
     /**
@@ -76,6 +111,10 @@ export default Component.extend({
      */
     focusedOut(value) {
       this.get('focusedOut')(value);
+    },
+
+    changeOpenGroup() {
+      this.get('changeOpenGroup')();
     },
   },
 });

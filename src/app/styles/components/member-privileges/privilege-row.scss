@@ -1,9 +1,10 @@
-.privilege-row {
+tr.privilege-row {
   font-size: 85%;
   background-color: $block-background-color;
 
-  td.priv {
+  td.priv:first-child {
     padding-left: 40px;
+    vertical-align: middle;
   }
   .oneicon-lock {
     opacity: 0.6;
@@ -12,10 +13,13 @@
   .priv-revoke {
     font-size: 200%;
     font-weight: bold;
-    padding-bottom: 4px;
-    padding-top: 2px;
     color: #BEBEBE;
   }
+
+  .modified-priv {
+    font-weight: bold;
+  }
+
 
   .effective {
     display: flex;
@@ -24,6 +28,11 @@
 
     span {
       display: block;
+    }
+
+    &.not-granted {
+      padding-top: 4px;
+      padding-bottom: 4px;
     }
   }
   .oneicon-checked {

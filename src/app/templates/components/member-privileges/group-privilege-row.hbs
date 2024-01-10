@@ -1,0 +1,36 @@
+<td
+  onclick={{action "changeOpenGroup"}}
+  class={{concat-classes
+    "priv-group"
+    (if isModified "modified-priv")
+  }}
+>
+  {{#if isOpen}}
+    {{one-icon icon="arrow-down"}}
+  {{else}}
+    {{one-icon icon="arrow-up"}}
+  {{/if}}
+  {{groupPrivileges.text}}
+</td>
+{{member-privileges/group-privileges-cell
+  state=state
+  inputClass=inputClass
+  privilegesGrantedCount=privilegesGrantedCount
+  allPrivilegesCount=allPrivilegesCount
+  inputChanged=(action "inputChanged")
+  focusedOut=(action "focusedOut")
+  form=form
+  isDirect=true
+}}
+{{#if (not isBulkEdit)}}
+  {{member-privileges/group-privileges-cell
+    state=state
+    inputClass=inputClass
+    privilegesGrantedCount=effPrivilegesGrantedCount
+    allPrivilegesCount=allPrivilegesCount
+    inputChanged=(action "inputChanged")
+    focusedOut=(action "focusedOut")
+    form=form
+    isDirect=false
+  }}
+{{/if}}

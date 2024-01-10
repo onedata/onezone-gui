@@ -32,44 +32,32 @@
       </thead>
       <tbody>
         {{#each definition as |groupPrivileges|}}
-          <tr>
-            <td onclick={{action "changeOpenGroup" groupPrivileges.name}}>
-              {{#if (get isOpenedGroup groupPrivileges.name)}}
-                {{one-icon icon="arrow-down"}}
-              {{else}}
-                {{one-icon icon="arrow-up"}}
-              {{/if}}
-              {{groupPrivileges.text}}
-            </td>
-            {{member-privileges/group-privileges-cell
-              privileges=(get
-                      directPrivilegesToShow
-                      groupPrivileges.name)
-              groupPrivileges=groupPrivileges
-              inputChanged=(action "inputValueChanged")
-              focusedOut=(action "inputFocusedOut")
-              form=form
-              isDirect=true
-            }}
-            {{#if (not isBulkEdit)}}
-              {{member-privileges/group-privileges-cell
-                privileges=(get
-                        effectivePrivileges
-                        groupPrivileges.name)
-                groupPrivileges=groupPrivileges
-                inputChanged=(action "inputValueChanged")
-                focusedOut=(action "inputFocusedOut")
-                form=form
-                isDirect=false
-              }}
-            {{/if}}
-          </tr>
+          {{member-privileges/group-privilege-row
+            privileges=(get
+                    directPrivilegesToShow
+                    groupPrivileges.name)
+            effPrivileges=(get
+                    effectivePrivileges
+                    groupPrivileges.name)
+            groupPrivileges=groupPrivileges
+            oldPrivileges=(get directPrivileges groupPrivileges.name)
+            inputChanged=(action "inputValueChanged")
+            focusedOut=(action "inputFocusedOut")
+            changeOpenGroup=(action "changeOpenGroup" groupPrivileges.name)
+            isOpen=(get isOpenedGroup groupPrivileges.name)
+            form=form
+            isDirect=true
+          }}
           {{#if (get isOpenedGroup groupPrivileges.name)}}
             {{#each groupPrivileges.subtree as |privilege|}}
               {{member-privileges/privilege-row
                 privilege=privilege
                 directPrivilege=(get
                   (get directPrivilegesToShow groupPrivileges.name)
+                  privilege.name
+                )
+                oldPrivilege=(get
+                  (get directPrivileges groupPrivileges.name)
                   privilege.name
                 )
                 effectivePrivilege=(get

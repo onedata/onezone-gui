@@ -1,4 +1,10 @@
-<td class="priv">{{privilege.text}}</td>
+<td class={{concat-classes
+    "priv"
+    (if (not (eq oldPrivilege directPrivilege)) "modified-priv")
+  }}
+>
+  {{privilege.text}}
+</td>
 <td class="toggle-column direct">
   {{#if isDirect}}
     {{#form.group}}
@@ -19,7 +25,12 @@
   {{/if}}
 </td>
 {{#if (not isBulkEdit)}}
-  <td class="toggle-column effective">
+  <td
+    class={{concat-classes
+      "toggle-column effective"
+      (if (not effectivePrivilege) "not-granted")
+    }}
+  >
     {{#if effectivePrivilege}}
       {{one-icon icon="checked"}}
     {{else}}
