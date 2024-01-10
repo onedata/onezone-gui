@@ -268,6 +268,11 @@ describe('Integration | Component | token-editor', function () {
         getRecordByIdStub.withArgs(modelName, record.entityId).resolves(record)
       );
     });
+    getUserRecordListStub.withArgs('token').resolves({
+      list: PromiseArray.create({
+        promise: resolve([]),
+      }),
+    });
     mockedRecords['cluster'].concat(mockedRecords['provider'])
       .forEach(record => record.serviceType = 'oneprovider');
     const ozCluster = mockedRecords['cluster'][0];

@@ -13,6 +13,9 @@ export default {
     basic: {
       name: {
         label: 'Name',
+        errors: {
+          notUnique: 'This name is already used',
+        },
       },
       revoked: {
         label: 'Revoked',

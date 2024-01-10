@@ -12,7 +12,6 @@ import { get } from '@ember/object';
 import { inject as service } from '@ember/service';
 import Action from 'onedata-gui-common/utils/action';
 import ActionResult from 'onedata-gui-common/utils/action-result';
-import { next } from '@ember/runloop';
 
 export default Action.extend({
   tokenManager: service(),
@@ -52,13 +51,11 @@ export default Action.extend({
         .then(() => {
           this.notifyResult(result);
           if (get(result, 'status') === 'done') {
-            next(() => {
-              router.transitionTo(
-                'onedata.sidebar.content',
-                'tokens',
-                guiUtils.getRoutableIdFor(get(result, 'result'))
-              );
-            });
+            router.transitionTo(
+              'onedata.sidebar.content',
+              'tokens',
+              guiUtils.getRoutableIdFor(get(result, 'result'))
+            );
           }
           return result;
         });

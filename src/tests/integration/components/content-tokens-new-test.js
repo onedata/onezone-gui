@@ -62,6 +62,11 @@ describe('Integration | Component | content-tokens-new', function () {
         list: PromiseArray.create({
           promise: resolve(harvesters),
         }),
+      })
+      .withArgs('token').resolves({
+        list: PromiseArray.create({
+          promise: resolve([]),
+        }),
       });
     sinon.stub(recordManager, 'getRecordById')
       .withArgs('user', 'user1').resolves(currentUser)
