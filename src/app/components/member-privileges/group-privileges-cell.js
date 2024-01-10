@@ -11,31 +11,64 @@ import { computed } from '@ember/object';
 import Component from '@ember/component';
 
 export default Component.extend({
-  classNames: ['group-privileges-cell', 'toggle-column', 'global'],
   tagName: 'td',
+  classNames: ['group-privileges-cell', 'toggle-column', 'global'],
+
+  /**
+   * @virtual
+   * @type {Object}
+   */
+  privileges: undefined,
+
+  /**
+   * @virtual
+   * @type {Array<Object>}
+   */
+  groupPrivileges: undefined,
+
+  /**
+   * @virtual
+   * @type {boolean}
+   */
+  editionEnabled: true,
+
+  /**
+   * @virtual
+   * @type {boolean}
+   */
+  isDirect: undefined,
+
+  /**
+   * @virtual
+   * @type {Object}
+   */
+  form: undefined,
 
   /**
    * Input changed action.
+   * @virtual
    * @type {Function}
    */
   inputChanged: () => {},
 
   /**
    * Input focused out action.
+   * @virtual
    * @type {Function}
    */
   focusedOut: () => {},
 
-  editionEnabled: true,
-
   /**
    * Input classes.
-   * @type {computed.string}
+   * @type {Ember.ComputedProperty<string>}
    */
-  inputClass: computed('privilege', 'groupPrivileges', function inputClass() {
-    return `field-${this.groupPrivileges}-${this.privilege} form-control`;
+  inputClass: computed('groupPrivileges', function inputClass() {
+    return `field-${this.groupPrivileges} form-control`;
   }),
 
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
   state: computed('privilegesGrantedCount', 'allPrivilegesCount', function state() {
     if (
       this.privilegesGrantedCount &&
@@ -48,6 +81,9 @@ export default Component.extend({
     return false;
   }),
 
+  /**
+   * @type {Ember.ComputedProperty<number>}
+   */
   privilegesGrantedCount: computed('privileges', function privilegesGrantedCount() {
     let privTrue = 0;
     for (const value of Object.values(this.privileges)) {
@@ -58,11 +94,12 @@ export default Component.extend({
     return privTrue;
   }),
 
+  /**
+   * @type {Ember.ComputedProperty<number>}
+   */
   allPrivilegesCount: computed('privileges', function allPrivilegesCount() {
     return Object.keys(this.privileges).length;
   }),
-
-  isDirect: undefined,
 
   actions: {
     /**

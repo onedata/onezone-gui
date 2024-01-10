@@ -115,7 +115,7 @@ import spacesModals from './components/modals/spaces';
 
 import tableHeader from './components/member-privileges/table-header';
 import privilegeRow from './components/member-privileges/privilege-row';
-import effectiveMemberPrivilegesTable from './components/member-privileges/effective-member-privileges-table';
+import memberPrivilegesTable from './components/member-privileges/member-privileges-table';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
@@ -203,7 +203,7 @@ const translations = {
     memberPrivileges: {
       tableHeader,
       privilegeRow,
-      effectiveMemberPrivilegesTable,
+      memberPrivilegesTable,
     },
     loginBox,
     contentTokens,

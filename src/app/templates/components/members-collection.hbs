@@ -119,16 +119,14 @@
                   privilegesTranslationsPath=privilegesTranslationsPath
                   recordDirectProxy=memberProxy.privilegesProxy
                   recordEffectiveProxy=memberProxy.privilegesEffectiveProxy
-                  isDirect=true
                   modelTypeTranslation=modelTypeTranslation
                 }}
               {{else}}
-                {{member-privileges/effective-member-privileges-table
+                {{member-privileges/member-privileges-table
                   privilegesGroups=groupedPrivilegesFlags
                   privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
                   privilegesTranslationsPath=privilegesTranslationsPath
                   recordEffectiveProxy=memberProxy.privilegesEffectiveProxy
-                  isDirect=false
                   modelTypeTranslation=modelTypeTranslation
                 }}
               {{/if}}

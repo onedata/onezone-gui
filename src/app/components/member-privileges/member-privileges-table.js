@@ -13,7 +13,7 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 export default Component.extend(I18n, {
-  classNames: ['effective-member-privileges-table', 'member-privileges-table'],
+  classNames: ['member-privileges-table'],
 
   /**
    * @override
@@ -67,12 +67,18 @@ export default Component.extend(I18n, {
    */
   effectivePrivileges: reads('recordEffectiveProxy.effectivePrivilegesSnapshot'),
 
-  recordEffectiveProxyObserver: observer('recordEffectiveProxy', function recordEffectiveProxyObserver() {
-    const recordEffectiveProxy = this.get('recordEffectiveProxy');
-    if (!get(recordEffectiveProxy, 'isLoaded') && !get(recordEffectiveProxy, 'isLoading')) {
-      recordEffectiveProxy.reloadRecords();
+  recordEffectiveProxyObserver: observer(
+    'recordEffectiveProxy',
+    function recordEffectiveProxyObserver() {
+      const recordEffectiveProxy = this.get('recordEffectiveProxy');
+      if (
+        !get(recordEffectiveProxy, 'isLoaded') &&
+        !get(recordEffectiveProxy, 'isLoading')
+      ) {
+        recordEffectiveProxy.reloadRecords();
+      }
     }
-  }),
+  ),
 
   /**
    * Tree definition

@@ -266,18 +266,15 @@
       .modified-priv {
         font-weight: bold;
       }
-    }
-  }
-
-  .effective-member-privileges-table {
-    .direct {
-      background: repeating-linear-gradient(
-        45deg,
-      #F7F7F7,
-      #F7F7F7 10px,
-      #FAFAFA 10px,
-      #FAFAFA 20px
-      );
+      .na {
+        background: repeating-linear-gradient(
+          45deg,
+        #F7F7F7,
+        #F7F7F7 10px,
+        #FAFAFA 10px,
+        #FAFAFA 20px
+        );
+      }
     }
   }
 }

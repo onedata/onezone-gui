@@ -9,32 +9,9 @@
 import { computed, observer, get, set } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { scheduleOnce } from '@ember/runloop';
-import Component from '@ember/component';
+import MemberPrivilegesTable from './member-privileges-table';
 
-export default Component.extend({
-  classNames: ['direct-member-privileges-table', 'member-privileges-table'],
-
-  /**
-   * Grouped privileges
-   * @virtual
-   * @type {Array<Object>}
-   */
-  privilegesGroups: Object.freeze([]),
-
-  /**
-   * Path to the translations of privilege groups names
-   * @virtual
-   * @type {string}
-   */
-  privilegeGroupsTranslationsPath: undefined,
-
-  /**
-   * Path to the translations of privileges names
-   * @virtual
-   * @type {string}
-   */
-  privilegesTranslationsPath: undefined,
-
+export default MemberPrivilegesTable.extend({
   /**
    * Record proxy with direct privileges.
    * @virtual
@@ -43,41 +20,15 @@ export default Component.extend({
   recordDirectProxy: Object.freeze({}),
 
   /**
-   * Record proxy with effective privileges.
-   * @virtual
-   * @type {PrivilegeRecordProxy}
-   */
-  recordEffectiveProxy: Object.freeze({}),
-
-  /**
-   * @virtual
-   * @type {string}
-   */
-  modelTypeTranslation: undefined,
-
-  /**
    * @virtual optional
    * @type {boolean}
    */
   isBulkEdit: false,
 
   /**
-   * Object with name of group privileges with information about
-   * it should be expanded in table and show more specific privileges
-   * for this group or not.
-   * @type {object}
-   */
-  isOpenedGroup: Object.freeze({}),
-
-  /**
    * @type {Ember.ComputedProperty<Object>}
    */
   directPrivileges: reads('recordDirectProxy.effectivePrivilegesSnapshot'),
-
-  /**
-   * @type {Ember.ComputedProperty<Object>}
-   */
-  effectivePrivileges: reads('recordEffectiveProxy.effectivePrivilegesSnapshot'),
 
   /**
    * @type {Ember.ComputedProperty<Object>}
@@ -104,19 +55,6 @@ export default Component.extend({
         !get(recordDirectProxy, 'isLoading')
       ) {
         recordDirectProxy.reloadRecords();
-      }
-    }
-  ),
-
-  recordEffectiveProxyObserver: observer(
-    'recordEffectiveProxy',
-    function recordEffectiveProxyObserver() {
-      const recordEffectiveProxy = this.get('recordEffectiveProxy');
-      if (
-        !get(recordEffectiveProxy, 'isLoaded') &&
-        !get(recordEffectiveProxy, 'isLoading')
-      ) {
-        recordEffectiveProxy.reloadRecords();
       }
     }
   ),
@@ -162,24 +100,10 @@ export default Component.extend({
 
   init() {
     this._super(...arguments);
-
-    // Moving record processing to the next runloop frame to avoid double set
-    // in the same render (recordProxyObserver changes recordProxy content)
     scheduleOnce('afterRender', this, 'recordDirectProxyObserver');
-    scheduleOnce('afterRender', this, 'recordEffectiveProxyObserver');
-
-    const isOpened = {};
-    for (const entry of this.privilegesGroups) {
-      isOpened[entry.groupName] = false;
-    }
-    this.set('isOpenedGroup', isOpened);
   },
 
   actions: {
-    changeOpenGroup(groupName) {
-      set(this.isOpenedGroup, groupName, !this.isOpenedGroup[groupName]);
-    },
-
     inputValueChanged(path, value) {
       const privileges = this.recordDirectProxy.modifiedPrivileges;
       if (typeof path === 'string') {

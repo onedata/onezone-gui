@@ -5,7 +5,7 @@
 >
   {{privilege.text}}
 </td>
-<td class="toggle-column direct">
+<td class={{concat-classes "toggle-column direct" (if (not isDirect) "na")}}>
   {{#if isDirect}}
     {{#form.group}}
       {{one-way-toggle

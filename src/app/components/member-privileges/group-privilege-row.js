@@ -10,27 +10,87 @@ import { computed } from '@ember/object';
 import Component from '@ember/component';
 
 export default Component.extend({
-  classNames: ['group-privileges-row'],
   tagName: 'tr',
+  classNames: ['group-privilege-row'],
+
+  /**
+   * @virtual
+   * @type {Object}
+   */
+  privileges: undefined,
+
+  /**
+   * @virtual
+   * @type {Object}
+   */
+  effPrivileges: undefined,
+
+  /**
+   * @virtual
+   * @type {Array<Object>}
+   */
+  groupPrivileges: undefined,
+
+  /**
+   * @virtual
+   * @type {Object}
+   */
+  oldPrivileges: undefined,
+
+  /**
+   * @virtual
+   * @type {boolean}
+   */
+  isDirect: true,
+
+  /**
+   * @virtual
+   * @type {boolean}
+   */
+  isOpen: false,
+
+  /**
+   * @virtual
+   * @type {boolean}
+   */
+  editionEnabled: true,
+
+  /**
+   * @virtual
+   * @type {Object}
+   */
+  form: undefined,
 
   /**
    * Input changed action.
+   * @virtual
    * @type {Function}
    */
   inputChanged: () => {},
 
   /**
    * Input focused out action.
+   * @virtual
    * @type {Function}
    */
   focusedOut: () => {},
 
+  /**
+   * @virtual
+   * @type {Function}
+   */
   changeOpenGroup: () => {},
 
+  /**
+   * @type {Ember.ComputedProperty<number>}
+   */
   allPrivilegesCount: computed('privileges', function allPrivilegesCount() {
     return Object.keys(this.privileges).length;
   }),
 
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
   isModified: computed('oldPrivileges', 'privileges', function isModified() {
     for (const [key, value] of Object.entries(this.privileges)) {
       if (this.oldPrivileges[key] !== value) {
@@ -39,14 +99,6 @@ export default Component.extend({
     }
     return false;
   }),
-
-  oldPrivileges: undefined,
-
-  isDirect: true,
-
-  isOpen: false,
-
-  editionEnabled: true,
 
   actions: {
     /**
