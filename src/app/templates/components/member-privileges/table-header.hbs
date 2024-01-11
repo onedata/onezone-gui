@@ -7,8 +7,10 @@
     {{tt this "direct"}}
     {{one-label-tip title=(tt this "directTip" entityType=modelTypeTranslation)}}
   </td>
-  <td class="toggle-column">
-    {{tt this "effective"}}
-    {{one-label-tip title=(tt this "effectiveTip" entityType=modelTypeTranslation)}}
-  </td>
+  {{#if (not isBulkEdit)}}
+    <td class="toggle-column">
+      {{tt this "effective"}}
+      {{one-label-tip title=(tt this "effectiveTip" entityType=modelTypeTranslation)}}
+    </td>
+  {{/if}}
 </tr>

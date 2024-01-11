@@ -14,6 +14,7 @@
     <table class="table-privileges table table-info">
       {{member-privileges/table-header
         modelTypeTranslation=modelTypeTranslation
+        isBulkEdit=isBulkEdit
       }}
       <tbody>
         {{#each definition as |groupPrivileges|}}
@@ -33,6 +34,7 @@
             form=form
             isDirect=true
             editionEnabled=editionEnabled
+            isBulkEdit=isBulkEdit
           }}
           {{#if (get isOpenedGroup groupPrivileges.name)}}
             {{#each groupPrivileges.subtree as |privilege|}}

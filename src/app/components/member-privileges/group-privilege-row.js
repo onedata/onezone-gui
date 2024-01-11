@@ -62,6 +62,12 @@ export default Component.extend({
   form: undefined,
 
   /**
+   * @virtual
+   * @type {boolean}
+   */
+  isBulkEdit: false,
+
+  /**
    * Input changed action.
    * @virtual
    * @type {Function}

@@ -1,0 +1,73 @@
+.member-privileges-table {
+  margin-left: $padding-base-horizontal;
+  margin-top: $padding-base-vertical;
+  margin-bottom: $padding-base-vertical;
+  margin-right: $padding-base-horizontal;
+
+  .table-privileges {
+    margin-bottom: 0;
+    border: 1px solid $table-border-color;
+    border-radius: $border-radius-base;
+
+    .privileges-column {
+      width: 65%;
+    }
+
+    @media (max-width: $screen-sm) {
+      .privileges-column {
+        width: 55%;
+      }
+    }
+
+    thead, tbody .header {
+      background-color: #eaeaea;
+      @include font-semibold;
+      // Using background-clip to fix border hiding under background in Firefox.
+      // See more: https://bugzilla.mozilla.org/show_bug.cgi?id=688556
+      background-clip: padding-box;
+    }
+    tbody tr {
+      border-top: 1px solid $table-border-color;
+    }
+    tbody td:not(:first-of-type), thead td:not(:first-of-type) {
+      border-left: 1px solid $table-border-color;
+    }
+
+    .form-group {
+      margin-bottom: 0;
+    }
+
+    .oneicon-arrow-down, .oneicon-arrow-up {
+      padding-right: 10px;
+      vertical-align: middle;
+      font-weight: bold;
+    }
+
+    .toggle-column {
+      text-align: center;
+      vertical-align: middle;
+
+      &.global {
+        padding-bottom: 9px;
+        padding-top: 9px;
+      }
+    }
+
+    td.one-icon {
+      color: #555555;
+    }
+
+    .modified-priv {
+      font-weight: bold;
+    }
+    .na {
+      background: repeating-linear-gradient(
+        45deg,
+      #F7F7F7,
+      #F7F7F7 10px,
+      #FAFAFA 10px,
+      #FAFAFA 20px
+      );
+    }
+  }
+}

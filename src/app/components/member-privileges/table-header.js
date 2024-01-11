@@ -23,4 +23,10 @@ export default Component.extend(I18n, {
    * @type {string}
    */
   modelTypeTranslation: undefined,
+
+  /**
+   * @virtual
+   * @type {boolean}
+   */
+  isBulkEdit: false,
 });
