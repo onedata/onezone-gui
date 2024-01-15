@@ -6,7 +6,8 @@
       triggerWindowEventName="providerPlaceRefresh"
       onViewportChange=(action "mapViewportChanged")
       initialState=_mapInitialState
-      as |map|}}
+      as |map|
+    }}
       {{#each _clusteredProviders key="id" as |square|}}
         {{#map.position latitude=square.latitude longitude=square.longitude as |x y|}}
           {{#if (and (gte x 0) (lte x map.width) (gte y 0) (lte y map.height))}}
@@ -24,7 +25,7 @@
                 class=(concat "provider-place-" (model-routable-id square.providers.[0]))
                 provider=square.providers
                 atlasWidth=1500
-                circleSizeScale=_providerCircleScale
+                circleSizeScale=(mult _providerCircleScale map.containerScale)
                 active=(contains selectedProvider square.providers)
                 renderDrop=(and
                   (contains selectedProvider square.providers)

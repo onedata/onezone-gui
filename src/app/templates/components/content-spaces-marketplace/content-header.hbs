@@ -2,5 +2,9 @@
   <span class="one-label">
     {{tt this "header"}}
   </span>
+  {{one-label-tip
+    tooltipClass="tooltip-lg tooltip-text-left"
+    title=(tt this "headerTip")
+  }}
   {{actions-toolbar actionsArray=actionsArray}}
 </h1>
