@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11667 Added version to documentation links
 * VFS-10649 Added complex charts dashboard editor to the automation GUI
 * VFS-11578 Further improvements in providers map scaling
 * VFS-11229 Added new texts about Space Marketplace
