@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11617 Upgraded EmberJS to v3.12.4
 * VFS-10649 Added complex charts dashboard editor to the automation GUI
 * VFS-11578 Further improvements in providers map scaling
 * VFS-11229 Added new texts about Space Marketplace
