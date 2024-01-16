@@ -1,5 +1,5 @@
 /**
- * Table for direct member with privileges.
+ * Table for direct member with privileges and memberships.
  *
  * @author Agnieszka Warchoł
  * @copyright (C) 2023 ACK CYFRONET AGH
@@ -114,11 +114,6 @@ export default MemberPrivilegesTable.extend({
         }
       }
       this.get('recordDirectProxy').setNewPrivileges(privileges);
-    },
-
-    inputFocusedOut(path, value) {
-      console.log(path);
-      console.log(value);
     },
   },
 });

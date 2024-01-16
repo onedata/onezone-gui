@@ -1,5 +1,5 @@
 /**
- * Table for not direct member with privileges.
+ * Table for member with privileges and memberships.
  *
  * @author Agnieszka Warchoł
  * @copyright (C) 2023 ACK CYFRONET AGH

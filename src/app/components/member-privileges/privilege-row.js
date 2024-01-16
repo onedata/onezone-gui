@@ -1,5 +1,5 @@
 /**
- * Show row in table for direct member for single privileges.
+ * Show row in table for member for single privileges.
  * This includes such cell like: name privileges, toggle to change direct privilege and
  * status for effective privileges.
  *

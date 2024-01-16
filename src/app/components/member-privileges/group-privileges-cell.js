@@ -62,10 +62,10 @@ export default Component.extend({
   /**
    * @type {Ember.ComputedProperty<boolean>}
    */
-  state: computed('privilegesGrantedCount', 'allPrivilegesCount', function state() {
+  state: computed('privilegesGrantedCount', 'privilegesCount', function state() {
     if (
       this.privilegesGrantedCount &&
-      this.privilegesGrantedCount < this.allPrivilegesCount
+      this.privilegesGrantedCount < this.privilegesCount
     ) {
       return 2;
     } else if (this.privilegesGrantedCount) {
@@ -90,7 +90,7 @@ export default Component.extend({
   /**
    * @type {Ember.ComputedProperty<number>}
    */
-  allPrivilegesCount: computed('privileges', function allPrivilegesCount() {
+  privilegesCount: computed('privileges', function privilegesCount() {
     return Object.keys(this.privileges).length;
   }),
 

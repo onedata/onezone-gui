@@ -83,7 +83,7 @@ export default Component.extend({
   /**
    * @type {Ember.ComputedProperty<number>}
    */
-  allPrivilegesCount: computed('privileges', function allPrivilegesCount() {
+  privilegesCount: computed('privileges', function privilegesCount() {
     return Object.keys(this.privileges).length;
   }),
 
