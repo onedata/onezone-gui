@@ -28,7 +28,6 @@
             groupPrivileges=groupPrivileges
             oldPrivileges=(get directPrivileges groupPrivileges.name)
             inputChanged=(action "inputValueChanged")
-            focusedOut=(action "inputFocusedOut")
             changeOpenGroup=(action "changeOpenGroup" groupPrivileges.name)
             isOpen=(get isOpenedGroup groupPrivileges.name)
             form=form
@@ -54,9 +53,6 @@
                 )
                 groupPrivileges=groupPrivileges.name
                 inputChanged=(action "inputValueChanged"
-                  (concat (concat groupPrivileges.name '.') privilege.name)
-                )
-                focusedOut=(action "inputFocusedOut"
                   (concat (concat groupPrivileges.name '.') privilege.name)
                 )
                 form=form

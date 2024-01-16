@@ -75,13 +75,6 @@ export default Component.extend({
   inputChanged: () => {},
 
   /**
-   * Input focused out action.
-   * @virtual
-   * @type {Function}
-   */
-  focusedOut: () => {},
-
-  /**
    * @virtual
    * @type {Function}
    */
@@ -124,13 +117,6 @@ export default Component.extend({
           this.get('inputChanged')(paths, value);
         }
       }
-    },
-
-    /**
-     * Notifies about an input focusOut event.
-     */
-    focusedOut(value) {
-      this.get('focusedOut')(value);
     },
 
     changeOpenGroup() {

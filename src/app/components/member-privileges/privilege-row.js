@@ -86,12 +86,6 @@ export default Component.extend(DisabledPaths, I18n, {
   inputChanged: () => {},
 
   /**
-   * Input focused out action.
-   * @type {Function}
-   */
-  focusedOut: () => {},
-
-  /**
    * Input classes.
    * @type {Ember.ComputedProperty<string>}
    */
@@ -108,13 +102,6 @@ export default Component.extend(DisabledPaths, I18n, {
       if (this.get('value') !== value) {
         this.get('inputChanged')(value);
       }
-    },
-
-    /**
-     * Notifies about an input focusOut event.
-     */
-    focusedOut(value) {
-      this.get('focusedOut')(value);
     },
   },
 });
