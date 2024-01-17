@@ -1,16 +1,22 @@
 <tr>
   <td class="privileges-column">
-    {{tt this "privileges"}}
-    {{one-label-tip title=(tt this "privilegesTip" entityType=modelTypeTranslation)}}
+    <div class="header-container">
+      <div class="header-text">{{tt this "privileges"}}</div>
+      {{one-label-tip title=(tt this "privilegesTip" entityType=modelTypeTranslation)}}
+    </div>
   </td>
   <td class="toggle-column">
-    {{tt this "direct"}}
-    {{one-label-tip title=(tt this "directTip" entityType=modelTypeTranslation)}}
+    <div class="header-container">
+      <div class="header-text">{{tt this "direct"}}</div>
+      {{one-label-tip title=(tt this "directTip" entityType=modelTypeTranslation)}}
+    </div>
   </td>
   {{#if (not isBulkEdit)}}
     <td class="toggle-column">
-      {{tt this "effective"}}
-      {{one-label-tip title=(tt this "effectiveTip" entityType=modelTypeTranslation)}}
+      <div class="header-container">
+        <div class="header-text">{{tt this "effective"}}</div>
+        {{one-label-tip title=(tt this "effectiveTip" entityType=modelTypeTranslation)}}
+      </div>
     </td>
   {{/if}}
 </tr>

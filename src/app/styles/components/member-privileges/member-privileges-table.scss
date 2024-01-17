@@ -8,25 +8,40 @@
     margin-bottom: 0;
     border: 1px solid $table-border-color;
     border-radius: $border-radius-base;
+    max-width: 600px;
+    border-spacing: 0;
+    border-collapse: separate;
+    overflow: hidden;
+
+    .header-container {
+      display: flex;
+      flex-wrap: wrap;
+
+      .one-label-tip {
+        display: flex;
+        align-items: center;
+        margin-left: 0.4em;
+      }
+    }
 
     .privileges-column {
-      width: 65%;
+      width: 66%;
     }
 
     @media (max-width: $screen-sm) {
       .privileges-column {
-        width: 55%;
+        width: 56%;
       }
     }
 
     thead, tbody .header {
-      background-color: #eaeaea;
+      background-color: $collapsible-list-item-header-opened;
       @include font-semibold;
       // Using background-clip to fix border hiding under background in Firefox.
       // See more: https://bugzilla.mozilla.org/show_bug.cgi?id=688556
       background-clip: padding-box;
     }
-    tbody tr {
+    tbody td {
       border-top: 1px solid $table-border-color;
     }
     tbody td:not(:first-of-type), thead td:not(:first-of-type) {
@@ -63,11 +78,24 @@
     .na {
       background: repeating-linear-gradient(
         45deg,
-      #F7F7F7,
-      #F7F7F7 10px,
-      #FAFAFA 10px,
-      #FAFAFA 20px
+      $main-content-hover-background,
+      $main-content-hover-background 10px,
+      $block-background-color 10px,
+      $block-background-color 20px
       );
+    }
+
+    .group-privilege-text-container {
+      display: flex;
+
+      .one-icon {
+        display: flex;
+        padding-top: 0.35em;
+      }
+    }
+
+    .priv-group:hover {
+      background-color: darken($main-content-hover-background, 3%);
     }
   }
 }

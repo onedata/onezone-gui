@@ -5,12 +5,14 @@
     (if isModified "modified-priv")
   }}
 >
-  {{#if isOpen}}
-    {{one-icon icon="arrow-down"}}
-  {{else}}
-    {{one-icon icon="arrow-up"}}
-  {{/if}}
-  {{groupPrivileges.text}}
+  <div class="group-privilege-text-container">
+    {{#if isOpen}}
+      {{one-icon icon="arrow-up"}}
+    {{else}}
+      {{one-icon icon="arrow-down"}}
+    {{/if}}
+    <div>{{groupPrivileges.text}}</div>
+  </div>
 </td>
 {{member-privileges/group-privileges-cell
   privileges=privileges

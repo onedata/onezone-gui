@@ -13,13 +13,15 @@
         <tr
           onclick={{action "changeOpenGroup" groupPrivileges.name}}
         >
-          <td>
-            {{#if (get isOpenedGroup groupPrivileges.name)}}
-              {{one-icon icon="arrow-down"}}
-            {{else}}
-              {{one-icon icon="arrow-up"}}
-            {{/if}}
-            {{groupPrivileges.text}}
+          <td class="priv-group">
+            <div class="group-privilege-text-container">
+              {{#if (get isOpenedGroup groupPrivileges.name)}}
+                {{one-icon icon="arrow-up"}}
+              {{else}}
+                {{one-icon icon="arrow-down"}}
+              {{/if}}
+              <div>{{groupPrivileges.text}}</div>
+            </div>
           </td>
           <td class="toggle-column direct global na">{{tt this "na"}}</td>
           {{member-privileges/group-privileges-cell

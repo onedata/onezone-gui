@@ -36,17 +36,33 @@
         margin-bottom: 12px;
         margin-left: 18px;
       }
-      .header-memberships {
+      .header-memberships-container {
         border: 1px solid $table-border-color;
         border-bottom: none;
         border-radius: $border-radius-base $border-radius-base 0 0;
         background-color: #eaeaea;
         @include font-semibold;
         padding: 10px 10px 10px 16px;
+        display: flex;
+        justify-content: space-between;
+
+        .header-memberships {
+          display: flex;
+
+          .one-label-tip {
+            display: flex;
+            align-items: center;
+            margin-left: 0.4em;
+          }
+        }
       }
 
       .membership-visualiser {
         min-height: 50px;
+
+        .membership-block {
+          padding-left: 1.45em;
+        }
       }
 
       .body-memberships {
@@ -55,9 +71,12 @@
       }
 
       .show-descriptions-toggle {
-        padding-top: 10px;
-        display: flex;
-        justify-content: flex-end;
+        font-size: 85%;
+        font-weight: normal;
+
+        label {
+          margin-right: 10px;
+        }
       }
     }
   }
@@ -71,6 +90,7 @@
       label {
         padding-right: 10px;
         text-transform: none;
+        letter-spacing: normal;
       }
 
       div.one-way-toggle {

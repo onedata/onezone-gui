@@ -131,9 +131,15 @@
                 }}
               {{/if}}
               <div class="memberships-container">
-                <div class="header-memberships">
-                  {{tt this "memberships"}}
-                  {{one-label-tip title=(tt this "membershipsTip")}}
+                <div class="header-memberships-container">
+                  <div class="header-memberships">
+                    <div>{{tt this "memberships"}}</div>
+                    {{one-label-tip title=(tt this "membershipsTip")}}
+                  </div>
+                  <div class="show-descriptions-toggle">
+                    <label for="members-show-descriptions" class="inline-label">{{tt this "showDescriptions"}}</label>
+                    {{one-way-toggle inputId="members-show-descriptions" checked=showMembershipDescription update=(action (mut showMembershipDescription))}}
+                  </div>
                 </div>
                 <div class="body-memberships">
                   {{membership-visualiser
@@ -142,10 +148,7 @@
                     showDescription=showMembershipDescription
                   }}
                 </div>
-                <div class="show-descriptions-toggle">
-                  {{one-way-toggle inputId="members-show-descriptions" checked=showMembershipDescription update=(action (mut showMembershipDescription))}}
-                  <label for="members-show-descriptions" class="inline-label">{{tt this "showDescriptions"}}</label>
-                </div>
+
               </div>
             </div>
           {{/render-later}}
