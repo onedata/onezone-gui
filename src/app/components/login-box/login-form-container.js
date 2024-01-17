@@ -4,11 +4,11 @@
  * by backend.
  *
  * @author Michał Borzęcki, Jakub Liput
- * @copyright (C) 2016-2018 ACK CYFRONET AGH
+ * @copyright (C) 2016-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { notEmpty, gt, equal } from '@ember/object/computed';
+import { notEmpty, gt, equal, reads } from '@ember/object/computed';
 import { not, or } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
@@ -18,7 +18,6 @@ import _ from 'lodash';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import DOMPurify from 'dompurify';
-import isIp from 'is-ip';
 import $ from 'jquery';
 import globals from 'onedata-gui-common/utils/globals';
 
@@ -140,9 +139,19 @@ export default LoginFormContainer.extend(
     /**
      * @type {computed.boolean}
      */
-    showIpWarning: computed(function showIpWarning() {
-      return isIp(globals.location.hostname);
+    showDomainMismatchWarning: computed(
+      'browserDomain',
+      'onezoneDomain',
+      function showDomainMismatchWarning() {
+        return this.browserDomain !== this.onezoneDomain;
+      }
+    ),
+
+    browserDomain: computed(function browserDomain() {
+      return globals.location.hostname;
     }),
+
+    onezoneDomain: reads('onedataConnection.zoneDomain'),
 
     /**
      * @override

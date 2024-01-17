@@ -33,6 +33,13 @@
     word-break: break-word;
   }
 
+  .login-notification {
+    .warning-icon {
+      padding-left: 4px;
+      font-size: 120%;
+    }
+  }
+
   @media (max-width: $screen-xs-max) {
     .zone-name {
       width: calc(50vw - 35px);
