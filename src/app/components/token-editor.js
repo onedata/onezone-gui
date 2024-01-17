@@ -362,16 +362,17 @@ export default Component.extend(I18n, {
         }).create({
           name: 'name',
           customValidators: [
-            validator(function (value, options, model) {
-              if (!value) {
-                return true;
-              }
-              const tokenRecord = isRecord(component.token) ? component.token : null;
-              const field = get(model, 'field');
-              const errorMsg = String(field.getTranslation('errors.notUnique'));
-              return component.tokenNameConflictDetector
-                ?.isNameConflicting(value, tokenRecord) ? errorMsg : true;
-            }, {
+            validator('inline', {
+              validate(value, options, model) {
+                if (!value) {
+                  return true;
+                }
+                const tokenRecord = isRecord(component.token) ? component.token : null;
+                const field = get(model, 'field');
+                const errorMsg = String(field.getTranslation('errors.notUnique'));
+                return component.tokenNameConflictDetector
+                  ?.isNameConflicting(value, tokenRecord) ? errorMsg : true;
+              },
               dependentKeys: [
                 'model.field.component.{tokenNameConflictDetector.allTokenNames.[],token.name}',
               ],
