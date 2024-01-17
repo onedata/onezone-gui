@@ -19,21 +19,22 @@
         <p>{{tt this "allAdvertisedText"}}</p>
       {{else}}
         <p>{{tt this "introText"}}</p>
-        {{#one-dropdown
-          triggerClass="spaces-dropdown-trigger"
-          options=nonAdvertisedSpaces
-          selected=selectedSpace
-          placeholder=(tt this "dropdownPlaceholder")
-          searchField="name"
-          onchange=(action "spaceChanged")
+        <OneDropdown
+          @triggerClass="spaces-dropdown-trigger"
+          @options={{nonAdvertisedSpaces}}
+          @selected={{selectedSpace}}
+          @placeholder={{tt this "dropdownPlaceholder"}}
+          @searchEnabled={{true}}
+          @searchField="name"
+          @onChange={{action "spaceChanged"}}
           as |space|
-        }}
+        >
           <div class="option-container">
             {{#truncated-string class="text"}}
               {{name-conflict item=space}}
             {{/truncated-string}}
           </div>
-        {{/one-dropdown}}
+        </OneDropdown>
       {{/if}}
     {{/promise-proxy-container}}
   {{/modal.body}}

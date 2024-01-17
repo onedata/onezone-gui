@@ -1,0 +1,54 @@
+{
+  "extends": "@tsconfig/ember/tsconfig.json",
+  "compilerOptions": {
+
+    // The combination of `baseUrl` with `paths` allows Ember's classic package
+    // layout, which is not resolvable with the Node resolution algorithm, to
+    // work with TypeScript.
+    "baseUrl": ".",
+    "paths": {
+      "onezone-gui/tests/*": [
+        "tests/*"
+      ],
+      "onezone-gui/*": [
+        "app/*",
+        "lib/onedata-gui-common/app/*",
+        "lib/onedata-gui-websocket-client/app/*"
+      ],
+      "onedata-gui-common": [
+        "lib/onedata-gui-common/addon"
+      ],
+      "onedata-gui-common/*": [
+        "lib/onedata-gui-common/addon/*"
+      ],
+      "onedata-gui-common/test-support": [
+        "lib/onedata-gui-common/addon-test-support"
+      ],
+      "onedata-gui-common/test-support/*": [
+        "lib/onedata-gui-common/addon-test-support/*"
+      ],
+      "onedata-gui-websocket-client": [
+        "lib/onedata-gui-websocket-client/addon"
+      ],
+      "onedata-gui-websocket-client/*": [
+        "lib/onedata-gui-websocket-client/addon/*"
+      ],
+      "onedata-gui-websocket-client/test-support": [
+        "lib/onedata-gui-websocket-client/addon-test-support"
+      ],
+      "onedata-gui-websocket-client/test-support/*": [
+        "lib/onedata-gui-websocket-client/addon-test-support/*"
+      ],
+      "*": [
+        "types/*"
+      ]
+    }
+  },
+  "include": [
+    "app/**/*",
+    "tests/**/*",
+    "types/**/*",
+    "lib/onedata-gui-common/**/*",
+    "lib/onedata-gui-websocket-client/**/*"
+  ]
+}

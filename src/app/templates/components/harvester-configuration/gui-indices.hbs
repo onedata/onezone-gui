@@ -42,18 +42,18 @@
                 <div>
                   {{#if (eq mode "edit")}}
                     {{#bs-form class="row form-horizontal without-labels" as |bsForm|}}
-                      {{#power-select
-                        tagName="div"
+                      <OneDropdown
                         class="col-xs-12 col-sm-6"
-                        options=assignIndexMethods
-                        selected=(get selectedAssignMethods guiPluginIndex.name)
-                        onchange=(action "changeAssignMethod" guiPluginIndex.name)
-                        searchEnabled=false
-                        renderInPlace=true
-                        disabled=isSaving
-                        as |assignMethod|}}
+                        @tagName="div"
+                        @options={{assignIndexMethods}}
+                        @selected={{get selectedAssignMethods guiPluginIndex.name}}
+                        @onChange={{action "changeAssignMethod" guiPluginIndex.name}}
+                        @renderInPlace={{true}}
+                        @disabled={{isSaving}}
+                        as |assignMethod|
+                      >
                         {{tt this (concat "assignMethods." assignMethod)}}
-                      {{/power-select}}
+                      </OneDropdown>
                       {{#bsForm.group
                         class=(concat-classes "col-xs-12 col-sm-6" (if (not-eq (get selectedAssignMethods guiPluginIndex.name) "create") "dropdown-input"))
                         validation=(if (get guiIndicesErrors guiPluginIndex.name) "error" "success")}}
@@ -64,17 +64,17 @@
                             class="form-control"
                             disabled={{isSaving}}>
                         {{else if (eq (get selectedAssignMethods guiPluginIndex.name) "reuse")}}
-                          {{#power-select
-                            tagName="div"
-                            options=harvesterIndicesProxy
-                            selected=(get selectedIndices guiPluginIndex.name)
-                            onchange=(action "changeAssignValue" guiPluginIndex.name)
-                            searchEnabled=false
-                            renderInPlace=true
-                            disabled=isSaving
-                            as |index|}}
+                          <OneDropdown
+                            @tagName="div"
+                            @options={{harvesterIndicesProxy}}
+                            @selected={{get selectedIndices guiPluginIndex.name}}
+                            @onChange={{action "changeAssignValue" guiPluginIndex.name}}
+                            @renderInPlace={{true}}
+                            @disabled={{isSaving}}
+                            as |index|
+                          >
                             {{index.name}}
-                          {{/power-select}}
+                          </OneDropdown>
                         {{/if}}
                         <div class="form-message">{{get guiIndicesErrors guiPluginIndex.name}}</div>
                       {{/bsForm.group}}

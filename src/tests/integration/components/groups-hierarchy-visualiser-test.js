@@ -60,13 +60,9 @@ const GroupStub = EmberObject.extend({
     return `group.${this.get('name')}.instance:auto`;
   }),
 
-  _childList: computed(function _childList() {
-    return A();
-  }),
+  _childList: undefined,
 
-  _parentList: computed(function _childList() {
-    return A();
-  }),
+  _parentList: undefined,
 
   childList: computed('_childList', function () {
     const _childList = this.get('_childList');
@@ -85,6 +81,16 @@ const GroupStub = EmberObject.extend({
       })),
     });
   }),
+
+  init() {
+    this._super(...arguments);
+    if (!this._childList) {
+      this.set('_childList', A());
+    }
+    if (!this._parentList) {
+      this.set('_parentList', A());
+    }
+  },
 
   belongsTo(relationName) {
     const model = this;

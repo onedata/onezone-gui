@@ -26,6 +26,7 @@ import {
   raw,
   writable,
   or,
+  neq,
 } from 'ember-awesome-macros';
 import _ from 'lodash';
 import moment from 'moment';
@@ -111,66 +112,109 @@ export default EmberObject.extend({
   /**
    * Object size (in bytes). Should be overridden with a number if objectType
    * is `file`.
-   * @virtual
+   * @virtual optional
    * @type {Ember.ComputedProperty<number>|number}
    */
-  objectSize: writable(
+  objectSize: writable(conditional(
+    neq('overriddenComputedFields.objectSize', raw(undefined)),
+    'overriddenComputedFields.objectSize',
     sum(array.mapBy(
       array.rejectBy('children', raw('isCancelled')),
       raw('objectSize')
     ))
-  ),
+  ), {
+    set(value) {
+      return this.overriddenComputedFields.objectSize = value;
+    },
+  }),
 
   /**
    * Always is <= `objectSize`. Should be overridden with a number if objectType
    * is `file`.
-   * @virtual
+   * @virtual optional
    * @type {Ember.ComputedProperty<number>|number}
    */
-  bytesUploaded: writable(
+  bytesUploaded: writable(conditional(
+    neq('overriddenComputedFields.bytesUploaded', raw(undefined)),
+    'overriddenComputedFields.bytesUploaded',
     sum(array.mapBy(
       array.rejectBy('children', raw('isCancelled')),
       raw('bytesUploaded')
     ))
-  ),
+  ), {
+    set(value) {
+      return this.overriddenComputedFields.bytesUploaded = value;
+    },
+  }),
 
   /**
    * Errors related to uploading this file or nested files in directory.
-   * @virtual
+   * @virtual optional
    * @type {Ember.ComputedProperty<Array<unknown>>}
    */
   errors: writable(conditional(
-    equal('objectType', raw('file')),
-    raw([]),
-    array.reduce(
-      array.mapBy('children', raw('errors')),
-      (arr, cur) => arr.concat(cur),
-      []
+    neq('overriddenComputedFields.errors', raw(undefined)),
+    'overriddenComputedFields.errors',
+    conditional(
+      equal('objectType', raw('file')),
+      raw([]),
+      array.reduce(
+        array.mapBy('children', raw('errors')),
+        (arr, cur) => arr.concat(cur),
+        []
+      )
     )
-  )),
+  ), {
+    set(value) {
+      return this.overriddenComputedFields.errors = value;
+    },
+  }),
 
   /**
    * True if object is cancelled, false otherwise. Should be overridden with
    * a boolean if objectType is `file`.
-   * @virtual
+   * @virtual optional
    * @type {Ember.ComputedProperty<boolean>}
    */
   isCancelled: writable(conditional(
-    equal('objectType', raw('file')),
-    raw(false),
-    array.isEvery('children', raw('isCancelled'))
-  )),
+    neq('overriddenComputedFields.isCancelled', raw(undefined)),
+    'overriddenComputedFields.isCancelled',
+    conditional(
+      equal('objectType', raw('file')),
+      raw(false),
+      array.isEvery('children', raw('isCancelled'))
+    )
+  ), {
+    set(value) {
+      return this.overriddenComputedFields.isCancelled = value;
+    },
+  }),
 
   /**
    * True if object is uploading. Should be overridden with a boolean if
    * objectType is `file`.
+   * @virtual optional
    * @type {Ember.ComputedProperty<boolean>}
    */
   isUploading: writable(conditional(
-    equal('objectType', raw('file')),
-    raw(true),
-    array.isAny('children', raw('isUploading'))
-  )),
+    neq('overriddenComputedFields.isUploading', raw(undefined)),
+    'overriddenComputedFields.isUploading',
+    conditional(
+      equal('objectType', raw('file')),
+      raw(true),
+      array.isAny('children', raw('isUploading'))
+    )
+  ), {
+    set(value) {
+      return this.overriddenComputedFields.isUploading = value;
+    },
+  }),
+
+  /**
+   * Contains values used to override virtual computed fields
+   * @type {Object}
+   */
+  overriddenComputedFields: undefined,
 
   /**
    * Object name (extracted from object path)
@@ -326,7 +370,10 @@ export default EmberObject.extend({
   init() {
     this._super(...arguments);
 
-    this.set('startTime', moment().valueOf());
+    this.setProperties({
+      startTime: moment().valueOf(),
+      overriddenComputedFields: {},
+    });
   },
 
   /**
