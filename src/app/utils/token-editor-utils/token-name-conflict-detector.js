@@ -16,7 +16,7 @@ export default EmberObject.extend(OwnerInjector, {
 
   /**
    * @private
-   * @type {ComputedProperty<PromiseArray<DS.RecordArray<Models.Token>>>}
+   * @type {ComputedProperty<PromiseObject<DS.RecordArray<Models.Token>>>}
    */
   allTokens: promise.object(computed(async function allTokens() {
     return get(await this.tokenManager.getTokens(), 'list');
@@ -43,7 +43,7 @@ export default EmberObject.extend(OwnerInjector, {
 
   /**
    * @public
-   * @param {string} name
+   * @param {string} nameToCheck
    * @param {Models.Token | null} [forToken] When passed, then `nameToCheck` is
    *   considered a (new) name for `forToken`. If `nameToCheck` conflicts with
    *   the current name of the `forToken`, then it is still valid.

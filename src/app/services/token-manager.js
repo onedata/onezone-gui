@@ -32,7 +32,8 @@ const TokenManager = Service.extend({
   /**
    * Fetches collection of all tokens
    *
-   * @returns {Promise<DS.RecordArray<Models.Token>>} resolves to an array of tokens
+   * @returns {Promise<Models.TokenList>} resolves to a record containing
+   *   an array of tokens
    */
   getTokens() {
     return this.get('recordManager').getUserRecordList('token');
