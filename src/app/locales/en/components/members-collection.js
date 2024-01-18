@@ -10,5 +10,5 @@ export default {
   },
   showDescriptions: 'Show descriptions',
   memberships: 'Memberships',
-  membershipsTip: 'Memberships shows how this member belong to this resources.',
+  membershipsTip: 'Visualization of effective membership paths, showing via what groups this member inherits membership in this {{entityType}}.',
 };

@@ -1,8 +1,8 @@
 export default {
   privileges: 'Privileges',
-  privilegesTip: 'Effective privileges of a member are a sum of all privileges inherited via their effective memberships in this {{entityType}}. Only direct privileges can be modified.',
+  privilegesTip: 'Privileges regulate what actions can be performed in this {{entityType}}. Each user or group can have individual settings. In the case of a group, all the group members inherit the assigned privileges.',
   direct: 'Direct',
-  directTip: '<strong>Direct</strong> members – users/groups that have been added or invited to this {{entityType}} directly.',
+  directTip: 'Direct privileges are assigned individually to a specific direct {{entityType}} member. They constitute to effective privileges of the member.',
   effective: 'Effective',
-  effectiveTip: '<strong>Effective</strong> members – users/groups that either belong to this {{entityType}} directly, or inherit membership via one or more direct member groups to which they effectively belong.',
+  effectiveTip: 'Effective privileges of a member are a sum of all privileges assigned directly and those inherited via their groups that belong to this {{entityType}}.',
 };

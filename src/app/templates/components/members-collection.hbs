@@ -134,7 +134,10 @@
                 <div class="header-memberships-container">
                   <div class="header-memberships">
                     <div>{{tt this "memberships"}}</div>
-                    {{one-label-tip title=(tt this "membershipsTip")}}
+                    {{one-label-tip
+                      title=(tt this "membershipsTip"
+                      entityType=modelTypeTranslation)
+                    }}
                   </div>
                   <div class="show-descriptions-toggle">
                     <label for="members-show-descriptions" class="inline-label">{{tt this "showDescriptions"}}</label>
