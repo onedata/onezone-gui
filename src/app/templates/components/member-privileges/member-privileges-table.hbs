@@ -10,9 +10,7 @@
     }}
     <tbody>
       {{#each definition as |groupPrivileges|}}
-        <tr
-          onclick={{action "changeOpenGroup" groupPrivileges.name}}
-        >
+        <tr onclick={{action "changeOpenGroup" groupPrivileges.name}}>
           <td class="priv-group">
             <div class="group-privilege-text-container">
               {{#if (get isOpenedGroup groupPrivileges.name)}}
@@ -23,7 +21,7 @@
               <div>{{groupPrivileges.text}}</div>
             </div>
           </td>
-          <td class="toggle-column direct global na">{{tt this "na"}}</td>
+          <td class="toggle-column direct group na">{{tt this "na"}}</td>
           {{member-privileges/group-privileges-cell
             privileges=(get effectivePrivileges groupPrivileges.name)
             groupPrivileges=groupPrivileges

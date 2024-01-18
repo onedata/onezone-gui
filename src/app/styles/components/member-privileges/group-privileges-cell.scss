@@ -1,7 +1,7 @@
 .group-privileges-cell {
   .pill {
-    padding-left: 8px;
-    padding-right: 8px;
+    padding-left: 0.6em;
+    padding-right: 0.6em;
     border-radius: 25px;
 
     color: $main-text-color;
@@ -15,8 +15,8 @@
       background-color: lighten($color-one-yellow, 40%);
     }
     &.grey {
-      border: 1px solid lighten(#555555, 40%);
-      background-color: lighten(#555555, 55%);
+      border: 1px solid lighten($color-one-dark-gray, 40%);
+      background-color: lighten($color-one-dark-gray, 55%);
     }
   }
 }

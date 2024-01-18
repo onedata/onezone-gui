@@ -12,7 +12,7 @@ import Component from '@ember/component';
 
 export default Component.extend({
   tagName: 'td',
-  classNames: ['group-privileges-cell', 'toggle-column', 'global'],
+  classNames: ['group-privileges-cell', 'toggle-column', 'group'],
 
   /**
    * @virtual

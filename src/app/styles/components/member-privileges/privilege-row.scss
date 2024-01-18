@@ -3,7 +3,7 @@ tr.privilege-row {
   background-color: $block-background-color;
 
   td.priv:first-child {
-    padding-left: 40px;
+    padding-left: 3.4em;
     vertical-align: middle;
   }
 
@@ -20,15 +20,15 @@ tr.privilege-row {
   .effective {
     display: flex;
     justify-content: center;
-    padding: 6px;
+    padding: $padding-xs-horizontal;
 
     span {
       display: block;
     }
 
     &.not-granted {
-      padding-top: 4px;
-      padding-bottom: 4px;
+      padding-top: $padding-small-vertical;
+      padding-bottom: $padding-small-vertical;
     }
   }
   .oneicon-checked {
