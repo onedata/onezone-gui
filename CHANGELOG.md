@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11687 Fixed showing the "mismatching domain" warning for a while after successful login
 * VFS-11667 Added version to documentation links
 * VFS-11617 Upgraded EmberJS to v3.12.4
 * VFS-11680 Changed domain check on login screen to warn about mismatching domain
