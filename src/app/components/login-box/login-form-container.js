@@ -8,10 +8,10 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { notEmpty, gt, equal, reads } from '@ember/object/computed';
+import { notEmpty, gt, equal } from '@ember/object/computed';
 import { not, or } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
-import { computed } from '@ember/object';
+import { computed, observer } from '@ember/object';
 import LoginFormContainer from 'onedata-gui-common/components/login-box/login-form-container';
 import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import _ from 'lodash';
@@ -20,6 +20,7 @@ import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mix
 import DOMPurify from 'dompurify';
 import $ from 'jquery';
 import globals from 'onedata-gui-common/utils/globals';
+import { htmlSafe } from '@ember/template';
 
 const ANIMATION_TIMEOUT = 333;
 
@@ -51,6 +52,14 @@ export default LoginFormContainer.extend(
      * @type {AuthorizerInfo}
      */
     selectedAuthorizer: null,
+
+    /**
+     * Zone domain can disappear for a while when login is being done, because the
+     * connection is closed and opened and connection attributes are resetted. This
+     * property holds the last known non-empty domain.
+     * @type {string}
+     */
+    cachedZoneDomain: null,
 
     /**
      * If true, component is waiting for data to load.
@@ -151,7 +160,24 @@ export default LoginFormContainer.extend(
       return globals.location.hostname;
     }),
 
-    onezoneDomain: reads('onedataConnection.zoneDomain'),
+    onezoneDomain: computed('cachedZoneDomain', function onezoneDomain() {
+      return this.cachedZoneDomain ?? htmlSafe(`<em>${this.t('unknown')}</em>`);
+    }),
+
+    updateCachedZoneDomain: observer(
+      'onedataConnection.zoneDomain',
+      function observerCachedZoneDomain() {
+        const zoneDomain = this.onedataConnection.zoneDomain;
+        if (zoneDomain) {
+          this.set('cachedZoneDomain', zoneDomain);
+        }
+      }
+    ),
+
+    init() {
+      this._super(...arguments);
+      this.updateCachedZoneDomain();
+    },
 
     /**
      * @override

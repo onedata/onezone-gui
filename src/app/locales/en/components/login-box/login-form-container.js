@@ -13,4 +13,5 @@ export default {
   goBackToMainPage: 'Go back to the main page.',
   sessionExpired: 'Your session has expired',
   domainMismatchWarning: 'You have entered this page using a different domain ({{browserDomain}}) than the actual Onezone server domain ({{onezoneDomain}}). Some of the content will be unavailable or malfunctioning, e.g. the file upload action. Use the server domain to ensure full functionality.',
+  unknown: 'unknown',
 };
