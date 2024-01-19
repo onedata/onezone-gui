@@ -96,7 +96,7 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
 
   init() {
     this._super(...arguments);
-    const connectionChecker = new Looper({
+    const connectionChecker = Looper.create({
       immediate: false,
       interval: this.get('requestSlowInterval'),
     });

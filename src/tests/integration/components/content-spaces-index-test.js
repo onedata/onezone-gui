@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, find } from '@ember/test-helpers';
+import { render, find, click } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
@@ -14,7 +14,6 @@ import { clearStoreAfterEach } from '../../helpers/clear-store';
 import { assert } from '@ember/debug';
 import UserSpaceHelper from '../../helpers/user-space-helper';
 import { set } from '@ember/object';
-import { click } from 'ember-native-dom-helpers';
 
 const TestCurrentUser = CurrentUser.extend({
   userProxy: promiseObject(resolve({

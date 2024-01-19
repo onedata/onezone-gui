@@ -13,7 +13,6 @@ import {
   getBy,
 } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import computedT from 'onedata-gui-common/utils/computed-t';
 import { computed } from '@ember/object';
 import { dasherize } from '@ember/string';
 
@@ -60,17 +59,6 @@ export default Component.extend(I18n, {
   inviteTargetRecord: undefined,
 
   /**
-   * @virtual
-   * @type {ComputedProperty<string>}
-   */
-  inviteTargetInfoComponentName: computed(
-    'inviteTargetModelName',
-    function inviteTargetInfoComponentName() {
-      return `${dasherize(this.inviteTargetModelName)}-info-content`;
-    }
-  ),
-
-  /**
    * @virtual optional
    * @type {boolean}
    */
@@ -78,14 +66,48 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual optional
+   * @type {ComputedProperty<string>}
+   */
+  inviteTargetInfoComponentName: computed(
+    'inviteTargetModelName', {
+      get() {
+        return this.injectedInviteTargetInfoComponentName ??
+          `${dasherize(this.inviteTargetModelName)}-info-content`;
+      },
+      set(key, value) {
+        return this.injectedInviteTargetInfoComponentName = value;
+      },
+    }
+  ),
+
+  /**
+   * @virtual optional
    * @type {string|SafeString}
    */
-  placeholderUnderSubjectImage: computedT('placeholderUnderSubjectImage'),
+  placeholderUnderSubjectImage: computed({
+    get() {
+      return this.injectedPlaceholderUnderSubjectImage ??
+        this.t('placeholderUnderSubjectImage');
+    },
+    set(key, value) {
+      return this.injectedPlaceholderUnderSubjectImage = value;
+    },
+  }),
 
   /**
    * @type {'join'|'add'}
    */
   arrowLabelType: 'join',
+
+  /**
+   * @type {string | null}
+   */
+  injectedInviteTargetInfoComponentName: null,
+
+  /**
+   * @type {string | null}
+   */
+  injectedPlaceholderUnderSubjectImage: null,
 
   /**
    * @type {ComputedProperty<String>}

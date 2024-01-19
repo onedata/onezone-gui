@@ -742,7 +742,7 @@ describe('Integration | Component | token-editor', function () {
   );
 
   it('does not show "no caveats" warning when there is one caveat enabled', async function () {
-    await render(hbs `{{token-editor mode=mode}}`);
+    await render(hbs `{{token-editor mode="create"}}`);
 
     await toggleCaveatsSection();
     await toggleCaveat('expire');

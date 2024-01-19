@@ -7,7 +7,7 @@
       </h1>
       {{#if (not disableCaveatsCollapse)}}
         <a
-          class="toggle-expand caveats-expand"
+          class="toggle-expand caveats-expand clickable"
           onClick={{if (not disableCaveatsCollapse) (action "toggleCaveatsGroup")}}
         >
           {{tt this (if areAllCaveatsExpanded "hideCaveats" "showCaveats")}}
