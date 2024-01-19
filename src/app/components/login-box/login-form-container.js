@@ -164,9 +164,9 @@ export default LoginFormContainer.extend(
       return this.cachedZoneDomain ?? htmlSafe(`<em>${this.t('unknown')}</em>`);
     }),
 
-    updateCachedZoneDomain: observer(
+    cachedZoneDomainUpdater: observer(
       'onedataConnection.zoneDomain',
-      function observerCachedZoneDomain() {
+      function cachedZoneDomainUpdater() {
         const zoneDomain = this.onedataConnection.zoneDomain;
         if (zoneDomain) {
           this.set('cachedZoneDomain', zoneDomain);
@@ -176,7 +176,7 @@ export default LoginFormContainer.extend(
 
     init() {
       this._super(...arguments);
-      this.updateCachedZoneDomain();
+      this.cachedZoneDomainUpdater();
     },
 
     /**
