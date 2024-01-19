@@ -87,22 +87,23 @@
       {{#promise-proxy-container proxy=joiningRecordSelectorOptionsProxy sizeClass="sm"}}
         <p class="selector-description">{{joiningRecordSelectorDescription}}</p>
         <div class="joining-record-selector">
-          {{#one-dropdown
-            options=joiningRecordSelectorOptionsProxy
-            onchange=(action (mut selectedJoiningRecordOption))
-            selected=selectedJoiningRecordOption
-            placeholder=(tt this
+          <OneDropdown
+            @options={{joiningRecordSelectorOptionsProxy}}
+            @onChange={{action (mut selectedJoiningRecordOption)}}
+            @selected={{selectedJoiningRecordOption}}
+            @placeholder={{tt this
               (concat "recordSelectorPlaceholder." joiningRecordSelectorModelName)
-            )
+            }}
+            @searchEnabled={{true}}
             as |recordOption|
-          }}
+          >
             <div class="option-container">
               {{one-icon icon=recordOption.icon}}
               {{#truncated-string class="text"}}
                 {{name-conflict item=recordOption.value}}
               {{/truncated-string}}
             </div>
-          {{/one-dropdown}}
+          </OneDropdown>
         </div>
       {{/promise-proxy-container}}
     </div>

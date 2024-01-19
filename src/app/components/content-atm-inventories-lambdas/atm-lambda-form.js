@@ -421,19 +421,20 @@ function createFunctionResultsGroup(component, reservedNames = []) {
     name: 'entryName',
     defaultValue: '',
     customValidators: [
-      validator(function (value, options, model) {
-        if (!value) {
-          return true;
-        }
+      validator('inline', {
+        validate(value, options, model) {
+          if (!value) {
+            return true;
+          }
 
-        const field = get(model, 'field');
-        const errorMsg =
-          String(field.t(`${get(field, 'path')}.errors.notUnique`));
-        const usedEntryNames = get(model, 'field.parent.parent.usedEntryNames');
-        return usedEntryNames
-          .filter(name => name.trim() === value.trim())
-          .length <= 1 ? true : errorMsg;
-      }, {
+          const field = get(model, 'field');
+          const errorMsg =
+            String(field.t(`${get(field, 'path')}.errors.notUnique`));
+          const usedEntryNames = get(model, 'field.parent.parent.usedEntryNames');
+          return usedEntryNames
+            .filter(name => name.trim() === value.trim())
+            .length <= 1 ? true : errorMsg;
+        },
         dependentKeys: ['model.field.parent.parent.usedEntryNames'],
       }),
       validator('exclusion', { in: reservedNames }),

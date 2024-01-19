@@ -79,25 +79,38 @@ export default Service.extend({
   onedataConnection: service(),
 
   /**
+   * It is allowed to be overwritten only in tests.
    * @type {ComputedProperty<SpacesMarketplaceConfig>}
    */
   marketplaceConfig: computed(
-    'onedataConnection.{spaceMarketplaceEnabled,spaceMarketplaceMinBackoffBetweenReminders,spaceMarketplaceMinBackoffAfterRejection}',
-    function marketplaceConfig() {
-      const {
-        spaceMarketplaceEnabled,
-        spaceMarketplaceMinBackoffBetweenReminders,
-        spaceMarketplaceMinBackoffAfterRejection,
-      } = this.onedataConnection;
-      return {
-        enabled: spaceMarketplaceEnabled ?? false,
-        minBackoffBetweenReminders: spaceMarketplaceMinBackoffBetweenReminders ??
-          marketplaceFallbackBackoff,
-        minBackoffAfterRejection: spaceMarketplaceMinBackoffAfterRejection ??
-          marketplaceFallbackBackoff,
-      };
+    'onedataConnection.{spaceMarketplaceEnabled,spaceMarketplaceMinBackoffBetweenReminders,spaceMarketplaceMinBackoffAfterRejection}', {
+      get() {
+        if (this.injectedMarketplaceConfig) {
+          return this.injectedMarketplaceConfig;
+        }
+        const {
+          spaceMarketplaceEnabled,
+          spaceMarketplaceMinBackoffBetweenReminders,
+          spaceMarketplaceMinBackoffAfterRejection,
+        } = this.onedataConnection;
+        return {
+          enabled: spaceMarketplaceEnabled ?? false,
+          minBackoffBetweenReminders: spaceMarketplaceMinBackoffBetweenReminders ??
+            marketplaceFallbackBackoff,
+          minBackoffAfterRejection: spaceMarketplaceMinBackoffAfterRejection ??
+            marketplaceFallbackBackoff,
+        };
+      },
+      set(key, value) {
+        return this.injectedMarketplaceConfig = value;
+      },
     }
   ),
+
+  /**
+   * @type {SpacesMarketplaceConfig | null}
+   */
+  injectedMarketplaceConfig: null,
 
   /**
    * Fetches collection of all spaces

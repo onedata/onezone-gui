@@ -21,6 +21,7 @@ describe('Integration | Component | one-embedded-container', function () {
       layout: oneEmbeddedContainerLayout,
       iframeInjectedProperties: Object.freeze(['iprop']),
       callParentActionNames: Object.freeze(['hello']),
+      src: 'empty.html',
       actions: {
         hello,
       },
@@ -37,7 +38,6 @@ describe('Integration | Component | one-embedded-container', function () {
       <div class="embedded-iframes-container"></div>
       {{some-embedded-container
         iframeId="testId"
-        src="empty.html"
         iprop="world"
       }}
     `);

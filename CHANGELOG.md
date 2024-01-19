@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11617 Upgraded EmberJS to v3.12.4
 * VFS-11680 Changed domain check on login screen to warn about mismatching domain
 * VFS-10649 Added complex charts dashboard editor to the automation GUI
 * VFS-11578 Further improvements in providers map scaling

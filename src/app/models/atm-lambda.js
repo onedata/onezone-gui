@@ -8,7 +8,7 @@
 
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
-import { computed } from '@ember/object';
+import { computed, observer } from '@ember/object';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
@@ -43,17 +43,6 @@ export default Model.extend(GraphSingleModelMixin, {
   originalAtmLambda: belongsTo('atm-lambda'),
 
   /**
-   * ID taken from `originalAtmLambda` relation.
-   * @type {ComputedProperty<string|null>}
-   */
-  originalAtmLambdaId: computed('isLoaded', function originalAtmLambdaId() {
-    if (!this.isLoaded) {
-      return null;
-    }
-    return this.relationEntityId('originalAtmLambda');
-  }),
-
-  /**
    * @type {ComputedProperty<RevisionNumber>}
    */
   latestRevisionNumber: computed(
@@ -67,7 +56,35 @@ export default Model.extend(GraphSingleModelMixin, {
   ),
 
   /**
+   * ID taken from `originalAtmLambda` relation.
+   * @type {string | null}
+   */
+  originalAtmLambdaId: null,
+
+  /**
    * @type {ComputedProperty<AtmLambdaRevision>}
    */
   latestRevision: getBy('revisionRegistry', 'latestRevisionNumber'),
+
+  /**
+   * ID taken from `originalAtmLambda` relation.
+   * @type {ComputedProperty<string|null>}
+   */
+  originalAtmLambdaIdSetter: observer(
+    'originalAtmLambda.id',
+    function originalAtmLambdaIdSetter() {
+      const originalAtmLambdaId = this.relationEntityId('originalAtmLambda');
+      if (
+        this.originalAtmLambdaId !== originalAtmLambdaId &&
+        originalAtmLambdaId
+      ) {
+        this.set('originalAtmLambdaId', originalAtmLambdaId);
+      }
+    }
+  ),
+
+  init() {
+    this._super(...arguments);
+    this.originalAtmLambdaIdSetter();
+  },
 }).reopenClass(StaticGraphModelMixin);
