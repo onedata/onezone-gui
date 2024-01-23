@@ -2,13 +2,13 @@
  * A login-box header component specific for onezone.
  *
  * @author Michał Borzęcki
- * @copyright (C) 2017-2018 ACK CYFRONET AGH
+ * @copyright (C) 2017-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Header from 'onedata-gui-common/components/login-box/header';
 import layout from 'onezone-gui/templates/components/login-box/header';
-import { computed } from '@ember/object';
+import { computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -25,6 +25,14 @@ export default Header.extend(I18n, {
   i18nPrefix: 'components.loginBox.header',
 
   /**
+   * Brand subtitle can disappear for a while when login is being done, because the
+   * connection is closed and opened and connection attributes are resetted. This
+   * property holds the last known non-empty value.
+   * @type {string}
+   */
+  cachedBrandSubtitle: null,
+
+  /**
    * @override
    */
   brandTitle: computed('model.zoneName', function getBrandTitle() {
@@ -34,5 +42,20 @@ export default Header.extend(I18n, {
   /**
    * @override
    */
-  brandSubtitle: reads('onedataConnection.brandSubtitle'),
+  brandSubtitle: reads('cachedBrandSubtitle'),
+
+  cachedBrandSubtitleUpdater: observer(
+    'onedataConnection.brandSubtitle',
+    function cachedBrandSubtitleUpdater() {
+      const brandSubtitle = this.onedataConnection.brandSubtitle;
+      if (brandSubtitle) {
+        this.set('cachedBrandSubtitle', brandSubtitle);
+      }
+    }
+  ),
+
+  init() {
+    this._super(...arguments);
+    this.cachedBrandSubtitleUpdater();
+  },
 });
