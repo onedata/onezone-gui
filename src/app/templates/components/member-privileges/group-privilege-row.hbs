@@ -11,12 +11,12 @@
     {{else}}
       {{one-icon icon="arrow-down"}}
     {{/if}}
-    <div>{{groupPrivileges.text}}</div>
+    <div>{{privilegesGroup.text}}</div>
   </div>
 </td>
 {{member-privileges/group-privileges-cell
   privileges=privileges
-  groupPrivileges=groupPrivileges
+  groupPrivilegeName=privilegesGroup.text
   inputChanged=(action "inputChanged")
   form=form
   isDirect=true
@@ -24,8 +24,8 @@
 }}
 {{#if (not isBulkEdit)}}
   {{member-privileges/group-privileges-cell
-    privileges=effPrivileges
-    groupPrivileges=groupPrivileges
+    privileges=effectivePrivilegeValues
+    groupPrivilegeName=privilegesGroup.text
     inputChanged=(action "inputChanged")
     form=form
     isDirect=false

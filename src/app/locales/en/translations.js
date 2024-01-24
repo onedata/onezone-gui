@@ -99,6 +99,7 @@ import spaceConfiguration from './components/space-configuration';
 import joinImage from './components/join-image';
 import spaceDetailsTile from './components/space-details-tile';
 import spaceMarketplaceTile from './components/space-marketplace-tile';
+import memberPrivileges from './components/member-privileges';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
@@ -112,10 +113,6 @@ import offlineProviders from './components/errors/offline-providers';
 import apiSamplesModal from './components/modals/api-samples-modal';
 import leaveModal from './components/modals/leave-modal';
 import spacesModals from './components/modals/spaces';
-
-import tableHeader from './components/member-privileges/table-header';
-import privilegeRow from './components/member-privileges/privilege-row';
-import memberPrivilegesTable from './components/member-privileges/member-privileges-table';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
@@ -199,11 +196,6 @@ const translations = {
       shareNotFound,
       openShareFailed,
       offlineProviders,
-    },
-    memberPrivileges: {
-      tableHeader,
-      privilegeRow,
-      memberPrivilegesTable,
     },
     loginBox,
     contentTokens,
@@ -293,6 +285,7 @@ const translations = {
     joinImage,
     spaceDetailsTile,
     spaceMarketplaceTile,
+    memberPrivileges,
   },
   services: {
     tokenActions,

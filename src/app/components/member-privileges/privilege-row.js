@@ -13,6 +13,20 @@ import Component from '@ember/component';
 import DisabledPaths from 'onedata-gui-common/mixins/components/one-dynamic-tree/disabled-paths';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 
+/**
+ * @typedef {Object} PrivilegeInfo
+ * @property {string} name
+ * @property {SafeString} text
+ * @property {PrivilegeField} field
+ */
+
+/**
+ * @typedef {Object} PrivilegeField
+ * @property {boolean} allowThreeStateToggle
+ * @property {boolean} threeState
+ * @property {string} type
+ */
+
 export default Component.extend(DisabledPaths, I18n, {
   tagName: 'tr',
   classNames: ['privilege-row'],
@@ -27,7 +41,7 @@ export default Component.extend(DisabledPaths, I18n, {
 
   /**
    * @virtual
-   * @type {string}
+   * @type {PrivilegeInfo}
    */
   privilege: undefined,
 
@@ -35,25 +49,25 @@ export default Component.extend(DisabledPaths, I18n, {
    * @virtual
    * @type {boolean}
    */
-  directPrivilege: undefined,
+  directPrivilegeValue: undefined,
 
   /**
    * @virtual
    * @type {boolean}
    */
-  effectivePrivilege: undefined,
+  effectivePrivilegeValue: undefined,
 
   /**
    * @virtual
    * @type {boolean}
    */
-  oldPrivilege: undefined,
+  previousDirectPrivilegeValue: undefined,
 
   /**
    * @virtual
    * @type {string}
    */
-  groupPrivileges: undefined,
+  privilegesGroupName: undefined,
 
   /**
    * @virtual
@@ -89,8 +103,8 @@ export default Component.extend(DisabledPaths, I18n, {
    * Input classes.
    * @type {Ember.ComputedProperty<string>}
    */
-  inputClass: computed('privilege', 'groupPrivileges', function inputClass() {
-    return `field-${this.groupPrivileges}-${this.privilege} form-control`;
+  inputClass: computed('privilege', 'privilegesGroupName', function inputClass() {
+    return `field-${this.privilegesGroupName}-${this.privilege} form-control`;
   }),
 
   actions: {

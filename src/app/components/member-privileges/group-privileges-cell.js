@@ -22,9 +22,9 @@ export default Component.extend({
 
   /**
    * @virtual
-   * @type {Array<Object>}
+   * @type {string}
    */
-  groupPrivileges: undefined,
+  groupPrivilegeName: undefined,
 
   /**
    * @virtual
@@ -55,8 +55,8 @@ export default Component.extend({
    * Input classes.
    * @type {Ember.ComputedProperty<string>}
    */
-  inputClass: computed('groupPrivileges', function inputClass() {
-    return `field-${this.groupPrivileges} form-control`;
+  inputClass: computed('groupPrivilegeName', function inputClass() {
+    return `field-${this.groupPrivilegeName} form-control`;
   }),
 
   /**
@@ -80,7 +80,9 @@ export default Component.extend({
   privilegesGrantedCount: computed('privileges', function privilegesGrantedCount() {
     let privTrue = 0;
     for (const value of Object.values(this.privileges)) {
-      if (value) {
+      if (value === 2) {
+        privTrue += 0.5;
+      } else if (value) {
         privTrue++;
       }
     }

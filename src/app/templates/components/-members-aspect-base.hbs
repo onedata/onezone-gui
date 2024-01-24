@@ -11,11 +11,11 @@
         {{/bs-button}}
       </div>
       <div class="show-only-direct">
-        <label for="show-only-direct" class="inline-label">
+        <label for={{concat "show-only-direct-" elementId}} class="inline-label">
           {{tt this "showOnlyDirect"}}
         </label>
         {{one-way-toggle
-          inputId="show-only-direct"
+          inputId=(concat "show-only-direct-" elementId)
           checked=onlyDirect
           update=(action (mut onlyDirect))
         }}

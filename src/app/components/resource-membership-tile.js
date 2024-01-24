@@ -37,7 +37,6 @@ export default Component.extend(I18n, UserProxyMixin, {
    */
   queryParams: computed('currentUser.userId', function queryParams() {
     return {
-      aspect: 'memberships',
       options: serializeAspectOptions({
         member: this.currentUser.userId,
       }),

@@ -1,15 +1,10 @@
 {{#promise-proxy-container
-  proxy=recordDirectProxy.models
-  isLoading=(and recordDirectProxy.isLoading (not recordDirectProxy.hasBeenLoaded))
-  isLoaded=(and recordDirectProxy.hasBeenLoaded (not recordDirectProxy.models.isRejected))
-  isError=recordDirectProxy.fetchError
-  errorReason=recordDirectProxy.fetchError}}
-{{#promise-proxy-container
-  proxy=recordEffectiveProxy.models
-  isLoading=(and recordEffectiveProxy.isLoading (not recordEffectiveProxy.hasBeenLoaded))
-  isLoaded=(and recordEffectiveProxy.hasBeenLoaded (not recordEffectiveProxy.models.isRejected))
-  isError=recordEffectiveProxy.fetchError
-  errorReason=recordEffectiveProxy.fetchError}}
+  proxy=privilegesLoadingProxy
+  isLoading=(or (and recordDirectProxy.isLoading (not recordDirectProxy.hasBeenLoaded)) (and recordEffectiveProxy.isLoading (not recordEffectiveProxy.hasBeenLoaded)))
+  isLoaded=(and (and recordDirectProxy.hasBeenLoaded (not recordDirectProxy.models.isRejected)) (and recordEffectiveProxy.hasBeenLoaded (not recordEffectiveProxy.models.isRejected)))
+  isError=(or recordDirectProxy.fetchError recordEffectiveProxy.fetchError)
+  errorReason=(if recordDirectProxy.fetchError recordDirectProxy.fetchError recordEffectiveProxy.fetchError)
+}}
   {{#bs-form submitOnEnter=false as |form|}}
     <table class="table-privileges table table-info">
       {{member-privileges/table-header
@@ -22,36 +17,36 @@
             privileges=(get
               modifiedPrivileges
               groupPrivileges.name)
-            effPrivileges=(get
+            effectivePrivilegeValues=(get
                     effectivePrivileges
                     groupPrivileges.name)
-            groupPrivileges=groupPrivileges
-            oldPrivileges=(get directPrivileges groupPrivileges.name)
+            privilegesGroup=groupPrivileges
+            previousDirectPrivilegeValues=(get directPrivileges groupPrivileges.name)
             inputChanged=(action "inputValueChanged")
             changeOpenGroup=(action "changeOpenGroup" groupPrivileges.name)
-            isOpen=(get isOpenedGroup groupPrivileges.name)
+            isOpen=(get groupsOpenState groupPrivileges.name)
             form=form
             isDirect=true
             editionEnabled=editionEnabled
             isBulkEdit=isBulkEdit
           }}
-          {{#if (get isOpenedGroup groupPrivileges.name)}}
+          {{#if (get groupsOpenState groupPrivileges.name)}}
             {{#each groupPrivileges.subtree as |privilege|}}
               {{member-privileges/privilege-row
                 privilege=privilege
-                directPrivilege=(get
+                directPrivilegeValue=(get
                   (get modifiedPrivileges groupPrivileges.name)
                   privilege.name
                 )
-                oldPrivilege=(get
+                previousDirectPrivilegeValue=(get
                   (get directPrivileges groupPrivileges.name)
                   privilege.name
                 )
-                effectivePrivilege=(get
+                effectivePrivilegeValue=(get
                   (get effectivePrivileges groupPrivileges.name)
                   privilege.name
                 )
-                groupPrivileges=groupPrivileges.name
+                privilegesGroupName=groupPrivileges.name
                 inputChanged=(action "inputValueChanged"
                   (concat (concat groupPrivileges.name '.') privilege.name)
                 )
@@ -66,6 +61,5 @@
       </tbody>
     </table>
   {{/bs-form}}
-{{/promise-proxy-container}}
 {{/promise-proxy-container}}
 

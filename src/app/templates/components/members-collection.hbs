@@ -118,7 +118,7 @@
                   privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
                   privilegesTranslationsPath=privilegesTranslationsPath
                   recordDirectProxy=memberProxy.privilegesProxy
-                  recordEffectiveProxy=memberProxy.privilegesEffectiveProxy
+                  recordEffectiveProxy=memberProxy.effectivePrivilegesProxy
                   modelTypeTranslation=modelTypeTranslation
                 }}
               {{else}}
@@ -126,7 +126,7 @@
                   privilegesGroups=groupedPrivilegesFlags
                   privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
                   privilegesTranslationsPath=privilegesTranslationsPath
-                  recordEffectiveProxy=memberProxy.privilegesEffectiveProxy
+                  recordEffectiveProxy=memberProxy.effectivePrivilegesProxy
                   modelTypeTranslation=modelTypeTranslation
                 }}
               {{/if}}
@@ -136,12 +136,28 @@
                     <div>{{tt this "memberships"}}</div>
                     {{one-label-tip
                       title=(tt this "membershipsTip"
-                      entityType=modelTypeTranslation)
+                        entityType=modelTypeTranslation
+                      )
                     }}
                   </div>
                   <div class="show-descriptions-toggle">
-                    <label for="members-show-descriptions" class="inline-label">{{tt this "showDescriptions"}}</label>
-                    {{one-way-toggle inputId="members-show-descriptions" checked=showMembershipDescription update=(action (mut showMembershipDescription))}}
+                    <label
+                      for={{concat
+                        "members-show-descriptions-"
+                        memberProxy.member.entityId
+                      }}
+                      class="inline-label"
+                    >
+                      {{tt this "showDescriptions"}}
+                    </label>
+                    {{one-way-toggle
+                      inputId=(concat
+                        "members-show-descriptions-"
+                        memberProxy.member.entityId
+                      )
+                      checked=showMembershipDescription
+                      update=(action (mut showMembershipDescription))
+                    }}
                   </div>
                 </div>
                 <div class="body-memberships">

@@ -304,7 +304,7 @@ export default Component.extend(I18n, {
             directMembers,
             isDirect: directMembers.includes(member),
             privilegesProxy: {},
-            privilegesEffectiveProxy: {},
+            effectivePrivilegesProxy: {},
             isYou: member === currentUserMember,
             directMemberActions: itemActionsGenerator(
               member,
@@ -331,7 +331,7 @@ export default Component.extend(I18n, {
           set(proxy, 'privilegesProxy', privilegesProxy);
         }
         const effectivePrivilegesGri = this.getPrivilegesGriForMember(member, false);
-        const privilegesEffectiveProxy = PrivilegeRecordProxy.create(
+        const effectivePrivilegesProxy = PrivilegeRecordProxy.create(
           getOwner(this).ownerInjection(), {
             groupedPrivilegesFlags,
             griArray: [effectivePrivilegesGri],
@@ -339,7 +339,7 @@ export default Component.extend(I18n, {
             isReadOnly: true,
           }
         );
-        set(proxy, 'privilegesEffectiveProxy', privilegesEffectiveProxy);
+        set(proxy, 'effectivePrivilegesProxy', effectivePrivilegesProxy);
         return proxy;
       });
       this.set('membersProxyList', newMembersProxyList);
@@ -375,7 +375,7 @@ export default Component.extend(I18n, {
    * @param {string} type `group` or `user`
    * @returns {string}
    */
-  getPrivilegesGriForMember(member, isDirect) {
+  getPrivilegesGriForMember(member, isForDirectPrivileges) {
     const {
       record,
       recordType,
@@ -394,7 +394,7 @@ export default Component.extend(I18n, {
       );
       return '';
     }
-    const griAspectPrefix = isDirect ? '' : 'eff_';
+    const griAspectPrefix = isForDirectPrivileges ? '' : 'eff_';
     return this.get('privilegeManager').generateGri(
       recordType,
       recordId,

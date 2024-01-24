@@ -1,4 +1,5 @@
 .member-privileges-table {
+  position: relative;
   margin-left: $padding-base-horizontal;
   margin-top: $padding-base-vertical;
   margin-bottom: $padding-base-vertical;
@@ -15,12 +16,20 @@
 
     .header-container {
       display: flex;
-      flex-wrap: wrap;
 
       .one-label-tip {
         display: flex;
         align-items: center;
         margin-left: 0.4em;
+      }
+    }
+
+    .toggle-column {
+      padding-left: 0;
+      padding-right: 0;
+
+      .header-container {
+        justify-content: center;
       }
     }
 
@@ -30,7 +39,7 @@
 
     @media (max-width: $screen-sm) {
       .privileges-column {
-        width: 56%;
+        width: 46%;
       }
     }
 
@@ -87,6 +96,7 @@
 
     .group-privilege-text-container {
       display: flex;
+      user-select: none;
 
       .one-icon {
         display: flex;

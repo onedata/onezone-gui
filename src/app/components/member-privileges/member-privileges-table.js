@@ -60,7 +60,7 @@ export default Component.extend(I18n, {
    * for this group or not.
    * @type {object}
    */
-  isOpenedGroup: Object.freeze({}),
+  groupsOpenState: Object.freeze({}),
 
   /**
    * @type {Ember.ComputedProperty<Object>}
@@ -104,9 +104,7 @@ export default Component.extend(I18n, {
         });
         return {
           name: groupName,
-          icon: privilegesGroup.icon,
           text: this.i18n.t(this.privilegeGroupsTranslationsPath + '.' + groupName),
-          allowSubtreeCheckboxSelect: true,
           subtree: privilegesNodes,
         };
       });
@@ -122,12 +120,12 @@ export default Component.extend(I18n, {
     for (const entry of this.privilegesGroups) {
       isOpened[entry.groupName] = false;
     }
-    this.set('isOpenedGroup', isOpened);
+    this.set('groupsOpenState', isOpened);
   },
 
   actions: {
     changeOpenGroup(groupName) {
-      set(this.isOpenedGroup, groupName, !this.isOpenedGroup[groupName]);
+      set(this.groupsOpenState, groupName, !this.groupsOpenState[groupName]);
     },
   },
 });

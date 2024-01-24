@@ -13,7 +13,7 @@
         <tr onclick={{action "changeOpenGroup" groupPrivileges.name}}>
           <td class="priv-group">
             <div class="group-privilege-text-container">
-              {{#if (get isOpenedGroup groupPrivileges.name)}}
+              {{#if (get groupsOpenState groupPrivileges.name)}}
                 {{one-icon icon="arrow-up"}}
               {{else}}
                 {{one-icon icon="arrow-down"}}
@@ -24,19 +24,19 @@
           <td class="toggle-column direct group na">{{tt this "na"}}</td>
           {{member-privileges/group-privileges-cell
             privileges=(get effectivePrivileges groupPrivileges.name)
-            groupPrivileges=groupPrivileges
+            groupPrivilegeName=groupPrivileges.text
             isDirect=false
           }}
         </tr>
-        {{#if (get isOpenedGroup groupPrivileges.name)}}
+        {{#if (get groupsOpenState groupPrivileges.name)}}
           {{#each groupPrivileges.subtree as |privilege|}}
             {{member-privileges/privilege-row
               privilege=privilege
-              effectivePrivilege=(get
+              effectivePrivilegeValue=(get
                 (get effectivePrivileges groupPrivileges.name)
                 privilege.name
               )
-              groupPrivileges=groupPrivileges.name
+              privilegesGroupName=groupPrivileges.name
               isDirect=false
             }}
           {{/each}}

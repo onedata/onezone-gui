@@ -23,19 +23,19 @@ export default Component.extend({
    * @virtual
    * @type {Object}
    */
-  effPrivileges: undefined,
+  effectivePrivilegeValues: undefined,
 
   /**
    * @virtual
    * @type {Array<Object>}
    */
-  groupPrivileges: undefined,
+  privilegesGroup: undefined,
 
   /**
    * @virtual
    * @type {Object}
    */
-  oldPrivileges: undefined,
+  previousDirectPrivilegeValues: undefined,
 
   /**
    * @virtual
@@ -90,14 +90,18 @@ export default Component.extend({
   /**
    * @type {Ember.ComputedProperty<boolean>}
    */
-  isModified: computed('oldPrivileges', 'privileges', function isModified() {
-    for (const [key, value] of Object.entries(this.privileges)) {
-      if (this.oldPrivileges[key] !== value) {
-        return true;
+  isModified: computed(
+    'previousDirectPrivilegeValues',
+    'privileges',
+    function isModified() {
+      for (const [key, value] of Object.entries(this.privileges)) {
+        if (this.previousDirectPrivilegeValues[key] !== value) {
+          return true;
+        }
       }
+      return false;
     }
-    return false;
-  }),
+  ),
 
   actions: {
     /**
@@ -106,16 +110,12 @@ export default Component.extend({
      */
     inputChanged(value) {
       if (this.get('value') !== value) {
-        const parentName = this.groupPrivileges.name;
+        const parentName = this.privilegesGroup.name;
         const paths = [];
-        for (const priv of this.groupPrivileges.subtree) {
+        for (const priv of this.privilegesGroup.subtree) {
           paths.push(parentName + '.' + priv.name);
         }
-        if (value === 2) {
-          this.get('inputChanged')(paths, true);
-        } else {
-          this.get('inputChanged')(paths, value);
-        }
+        this.inputChanged(paths, Boolean(value));
       }
     },
 

@@ -10,6 +10,7 @@ import { computed, observer, get, set } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { scheduleOnce } from '@ember/runloop';
 import MemberPrivilegesTable from './member-privileges-table';
+import { promise } from 'ember-awesome-macros';
 
 export default MemberPrivilegesTable.extend({
   /**
@@ -60,6 +61,14 @@ export default MemberPrivilegesTable.extend({
   ),
 
   /**
+   * @type {ComputedProperty<PromiseObject>}
+   */
+  privilegesLoadingProxy: promise.object(promise.all(
+    'recordDirectProxy.models',
+    'recordEffectiveProxy.models'
+  )),
+
+  /**
    * Tree definition
    * @type {Ember.ComputedProperty<Array<Object>>}
    */
@@ -89,9 +98,7 @@ export default MemberPrivilegesTable.extend({
         });
         return {
           name: groupName,
-          icon: privilegesGroup.icon,
           text: this.i18n.t(this.privilegeGroupsTranslationsPath + '.' + groupName),
-          allowSubtreeCheckboxSelect: true,
           subtree: privilegesNodes,
         };
       });

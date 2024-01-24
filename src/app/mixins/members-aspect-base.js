@@ -433,23 +433,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
    * @override
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  globalActions: computed(
-    'batchPrivilegesEditAction',
-    'removeSelectedAction',
-    function globalActions() {
-      const {
-        batchPrivilegesEditAction,
-        removeSelectedAction,
-      } = this.getProperties(
-        'batchPrivilegesEditAction',
-        'removeSelectedAction'
-      );
-      const actions = [];
-      actions.push(batchPrivilegesEditAction);
-      actions.push(removeSelectedAction);
-      return actions;
-    }
-  ),
+  globalActions: collect('batchPrivilegesEditAction', 'removeSelectedAction'),
 
   /**
    * @type {ComputedProperty<String>}
