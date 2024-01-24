@@ -112,24 +112,15 @@
               </div>
             {{/if}}
             <div class="member-content">
-              {{#if memberProxy.isDirect}}
-                {{member-privileges/direct-member-privileges-table
-                  privilegesGroups=groupedPrivilegesFlags
-                  privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
-                  privilegesTranslationsPath=privilegesTranslationsPath
-                  recordDirectProxy=memberProxy.privilegesProxy
-                  recordEffectiveProxy=memberProxy.effectivePrivilegesProxy
-                  modelTypeTranslation=modelTypeTranslation
-                }}
-              {{else}}
-                {{member-privileges/member-privileges-table
-                  privilegesGroups=groupedPrivilegesFlags
-                  privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
-                  privilegesTranslationsPath=privilegesTranslationsPath
-                  recordEffectiveProxy=memberProxy.effectivePrivilegesProxy
-                  modelTypeTranslation=modelTypeTranslation
-                }}
-              {{/if}}
+              {{member-privileges/member-privileges-table
+                privilegesGroups=groupedPrivilegesFlags
+                privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
+                privilegesTranslationsPath=privilegesTranslationsPath
+                recordDirectProxy=(if memberProxy.isDirect memberProxy.privilegesProxy null)
+                recordEffectiveProxy=memberProxy.effectivePrivilegesProxy
+                modelTypeTranslation=modelTypeTranslation
+                isDirectMember=memberProxy.isDirect
+              }}
               <div class="memberships-container">
                 <div class="header-memberships-container">
                   <div class="header-memberships">
@@ -167,7 +158,6 @@
                     showDescription=showMembershipDescription
                   }}
                 </div>
-
               </div>
             </div>
           {{/render-later}}

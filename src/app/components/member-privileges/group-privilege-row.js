@@ -15,13 +15,13 @@ export default Component.extend({
 
   /**
    * @virtual
-   * @type {Object}
+   * @type {Object<string,boolean>}
    */
   privileges: undefined,
 
   /**
    * @virtual
-   * @type {Object}
+   * @type {Object<string,boolean>}
    */
   effectivePrivilegeValues: undefined,
 

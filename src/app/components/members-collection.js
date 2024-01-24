@@ -233,6 +233,7 @@ export default Component.extend(I18n, {
   membersObserver: observer(
     'members.@each.{entityId,name,username}',
     'onlyDirect',
+    'directMembers.[]',
     function membersObserver() {
       const {
         owners,
@@ -266,7 +267,6 @@ export default Component.extend(I18n, {
         get(members, 'length') > collapseForNumber) {
         this.set('isListCollapsed', true);
       }
-
       // Create ordered list of members. Records should be sorted by name except
       // current user record and owners - they should be always at the top.
       const currentUserMember =
@@ -295,29 +295,26 @@ export default Component.extend(I18n, {
       // as possible.
       const newMembersProxyList = orderedMembers.map(member => {
         let proxy = membersProxyList.findBy('member', member);
-        // If proxy has not been generated for that member, create new empty proxy.
-        if (!proxy) {
-          proxy = ItemProxy.create({
-            id: get(member, 'id'),
+        proxy = ItemProxy.create({
+          id: get(member, 'id'),
+          member,
+          owners,
+          directMembers,
+          isDirect: directMembers.includes(member),
+          privilegesProxy: {},
+          effectivePrivilegesProxy: {},
+          isYou: member === currentUserMember,
+          directMemberActions: itemActionsGenerator(
             member,
-            owners,
             directMembers,
-            isDirect: directMembers.includes(member),
-            privilegesProxy: {},
-            effectivePrivilegesProxy: {},
-            isYou: member === currentUserMember,
-            directMemberActions: itemActionsGenerator(
-              member,
-              directMembers,
-              effectiveMembers
-            ),
-            effectiveMemberActions: effectiveItemActionsGenerator(
-              member,
-              directMembers,
-              effectiveMembers
-            ),
-          });
-        }
+            effectiveMembers
+          ),
+          effectiveMemberActions: effectiveItemActionsGenerator(
+            member,
+            directMembers,
+            effectiveMembers
+          ),
+        });
         if (directMembers.includes(member)) {
           const directPrivilegesGri = this.getPrivilegesGriForMember(member, true);
           const privilegesProxy = PrivilegeRecordProxy.create(

@@ -103,8 +103,8 @@ export default Component.extend(DisabledPaths, I18n, {
    * Input classes.
    * @type {Ember.ComputedProperty<string>}
    */
-  inputClass: computed('privilege', 'privilegesGroupName', function inputClass() {
-    return `field-${this.privilegesGroupName}-${this.privilege} form-control`;
+  inputClass: computed('privilegesGroupName', function inputClass() {
+    return `field-${this.privilegesGroupName} form-control`;
   }),
 
   actions: {
