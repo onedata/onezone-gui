@@ -5,7 +5,8 @@ import { render, click, fillIn, settled, find } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
-import { Promise } from 'rsvp';
+import { Promise, resolve } from 'rsvp';
+import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 
 describe('Integration | Component | content-tokens', function () {
   setupRenderingTest();
@@ -15,6 +16,10 @@ describe('Integration | Component | content-tokens', function () {
       name: 'token name',
       revoked: false,
     });
+    sinon.stub(lookupService(this, 'record-manager'), 'getUserRecordList')
+      .withArgs('token').resolves({
+        list: promiseArray(resolve([])),
+      });
   });
 
   it('has class content-tokens', async function () {
