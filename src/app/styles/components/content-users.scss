@@ -1,5 +1,5 @@
 .content-users {
-  $linked-account-name-padding-left: $large-social-box-size + $padding-base-horizontal;
+  $linked-account-name-padding-left: $large-auth-icon-box-size + $padding-base-horizontal;
   $clipboard-line-width: 30em;
   .linked-accounts-list {
     position: relative;
@@ -10,7 +10,7 @@
   }
   .linked-account {
     position: relative;
-    min-height: $large-social-box-size + 2 * $content-row-vertical-padding;
+    min-height: $large-auth-icon-box-size + 2 * $content-row-vertical-padding;
     padding-left: $linked-account-name-padding-left;
   }
   .login-icon-box:not(.add) {
@@ -22,14 +22,14 @@
   .login-icon-box.add:hover {
     background-color: transparentize($color: #026381, $amount: 0.9)
   }
-  .social-box {
+  .auth-icon-box {
     position: absolute;
     top: $content-row-vertical-padding;
     left: 0;
   }
   .show-dropdown-description {
     display: inline-block;
-    line-height: $large-social-box-size;
+    line-height: $large-auth-icon-box-size;
     font-style: italic;
   }
   .authorizers-dropdown {
@@ -49,7 +49,7 @@
   }
   .login-icon-box.add {
     $border-width: 2px;
-    $add-box-size: $large-social-box-size - 2 * $border-width;
+    $add-box-size: $large-auth-icon-box-size - 2 * $border-width;
     background-color: $color-one-white;
     border: 2px solid $color-one-blue-gray;
     color: $color-one-blue-gray;

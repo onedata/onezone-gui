@@ -23,7 +23,7 @@ import globals from 'onedata-gui-common/utils/globals';
 
 export default Component.extend({
   tagName: 'div',
-  classNames: ['social-box'],
+  classNames: ['auth-icon-box'],
 
   /**
    * @virtual
@@ -76,17 +76,17 @@ export default Component.extend({
    * @virtual optional
    * @type {Ember.ComputedProperty<string>}
    */
-  socialIconStyle: computed('authId', 'iconPath', {
+  authIconStyle: computed('authId', 'iconPath', {
     get() {
-      if (this.injectedSocialIconStyle) {
-        return this.injectedSocialIconStyle;
+      if (this.injectedAuthIconStyle) {
+        return this.injectedAuthIconStyle;
       }
       const iconPath = this.iconPath ?? defaultIconPath;
       const style = `background-image: url(${iconPath});`;
       return htmlSafe(style);
     },
     set(key, value) {
-      return this.injectedSocialIconStyle = value;
+      return this.injectedAuthIconStyle = value;
     },
   }),
 
@@ -117,7 +117,7 @@ export default Component.extend({
   /**
    * @type {string | null}
    */
-  injectedSocialIconStyle: null,
+  injectedAuthIconStyle: null,
 
   /**
    * @type {string | null}
@@ -133,13 +133,13 @@ export default Component.extend({
     this._super(...arguments);
     const {
       aStyle,
-      socialIconStyle,
-    } = this.getProperties('aStyle', 'socialIconStyle');
+      authIconStyle,
+    } = this.getProperties('aStyle', 'authIconStyle');
     if (typeof aStyle === 'string') {
       this.set('aStyle', htmlSafe(aStyle));
     }
-    if (typeof socialIconStyle === 'string') {
-      this.set('socialIconStyle', htmlSafe(socialIconStyle));
+    if (typeof authIconStyle === 'string') {
+      this.set('authIconStyle', htmlSafe(authIconStyle));
     }
   },
 

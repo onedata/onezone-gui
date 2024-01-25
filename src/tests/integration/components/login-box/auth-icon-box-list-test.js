@@ -7,25 +7,25 @@ import sinon from 'sinon';
 import { resolve } from 'rsvp';
 import { find } from '@ember/test-helpers';
 
-describe('Integration | Component | login-box/social-box-list', function () {
+describe('Integration | Component | login-box/auth-icon-box-list', function () {
   setupRenderingTest();
 
   it('shows spinner when loading', async function () {
-    await render(hbs `{{login-box/social-box-list isLoading=true}}`);
+    await render(hbs `{{login-box/auth-icon-box-list isLoading=true}}`);
     expect(find('.spin-spinner')).to.exist;
   });
 
   it('shows error message if occurred', async function () {
     const errorMsg = 'some really bad error';
     this.set('errorMsg', errorMsg);
-    await render(hbs `{{login-box/social-box-list errorMessage=errorMsg}}`);
+    await render(hbs `{{login-box/auth-icon-box-list errorMessage=errorMsg}}`);
     expect(this.element).to.contain.text(errorMsg);
   });
 
   it('shows clickable "show more" button', async function () {
     const showMoreSpy = sinon.spy();
     this.set('showMoreSpy', showMoreSpy);
-    await render(hbs `{{login-box/social-box-list
+    await render(hbs `{{login-box/auth-icon-box-list
       showMoreButton=true
       showMoreClick=(action showMoreSpy)}}
     `);
@@ -41,7 +41,7 @@ describe('Integration | Component | login-box/social-box-list', function () {
       id: 'basicAuth',
       iconPath: '/custom/basicauth.svg',
     }]);
-    await render(hbs `{{login-box/social-box-list
+    await render(hbs `{{login-box/auth-icon-box-list
       supportedAuthorizers=supportedAuthorizers
       usernameLoginClick=(action basicAuthSpy)}}
     `);
@@ -58,7 +58,7 @@ describe('Integration | Component | login-box/social-box-list', function () {
     }, {
       id: 'provider2',
     }]);
-    await render(hbs `{{login-box/social-box-list
+    await render(hbs `{{login-box/auth-icon-box-list
       supportedAuthorizers=supportedAuthorizers
       authenticate=(action authenticateSpy)}}
     `);

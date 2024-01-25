@@ -1,5 +1,5 @@
 /**
- * Renders buttons for supported login providers. A container for social-boxes.
+ * Renders buttons for supported login providers. A container for auth-icon-boxes.
  *
  * @author Jakub Liput, Michał Borzęcki
  * @copyright (C) 2016-2017 ACK CYFRONET AGH
@@ -33,7 +33,7 @@ export default Component.extend({
   supportedAuthorizers: null,
 
   /**
-   * Action called on auth provider social-box click.
+   * Action called on auth provider auth-icon-box click.
    * @returns {RSVP.Promise}
    */
   authenticate: () => new RSVP.Promise(
@@ -57,10 +57,10 @@ export default Component.extend({
   usernameLoginClick: () => {},
 
   actions: {
-    authenticate(socialBox) {
-      socialBox.set('active', true);
-      this.get('authenticate')(get(socialBox, 'authId')).finally(() => {
-        socialBox.set('active', false);
+    authenticate(authIconBox) {
+      authIconBox.set('active', true);
+      this.get('authenticate')(get(authIconBox, 'authId')).finally(() => {
+        authIconBox.set('active', false);
       });
     },
     usernameBoxClick() {
