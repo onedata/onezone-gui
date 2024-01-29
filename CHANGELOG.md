@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11594 Fixed popovers broken position after their content size change
 * VFS-11582 Fixed showing tokens list when one of invite targets gets deleted
 * VFS-11455 Added conflicting name detector in tokens editor
 * VFS-11620 Added jVectorMap 2.0.5 to own public files
