@@ -10,13 +10,12 @@
  * @property {any} * additional options of caveat
  */
 
-import { computed, observer } from '@ember/object';
+import { get, computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
-import { resolve } from 'rsvp';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import { cancel, later } from '@ember/runloop';
@@ -256,9 +255,9 @@ export default Model.extend(
 
     /**
      * @override
-     * @returns {Promise<Models.User|Models.Group|Models.Cluster|Models.Space|Models.Harvester>}
+     * @returns {Promise<Models.User|Models.Group|Models.Cluster|Models.Space|Models.Harvester|null>}
      */
-    fetchTokenTarget() {
+    async fetchTokenTarget() {
       const {
         store,
         targetModelName,
@@ -270,7 +269,7 @@ export default Model.extend(
       );
 
       if (!targetModelName || !targetRecordId) {
-        return resolve(null);
+        return null;
       } else {
         const adapter = store.adapterFor(targetModelName);
         const entityType = adapter.getEntityTypeForModelName(targetModelName);
@@ -282,7 +281,18 @@ export default Model.extend(
           scope: 'auto',
         });
 
-        return store.findRecord(
+        const currentRecord = store.peekRecord(targetModelName, targetModelGri);
+        if (
+          currentRecord && (
+            get(currentRecord, 'isDeleted') ||
+            get(currentRecord, 'isDestroyed') ||
+            get(currentRecord, 'isDestroying')
+          )
+        ) {
+          return null;
+        }
+
+        return await store.findRecord(
           targetModelName,
           targetModelGri, {
             reload: true,
