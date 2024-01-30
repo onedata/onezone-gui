@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11608 Added resource subheaders to modals in automation
 * VFS-11455 Added conflicting name detector in tokens editor
 * VFS-11620 Added jVectorMap 2.0.5 to own public files
 * VFS-11687 Fixed showing the "mismatching domain" warning for a while after a successful login
