@@ -18,7 +18,7 @@
   {{#if _hasAuthorizersForSelect}}
     <div class="authorizers-select-container animated fast">
       <h2>{{t "components.loginBox.loginFormContainer.dropdownSubtitle"}}</h2>
-      {{login-box/social-box-list
+      {{login-box/auth-icon-box-list
         supportedAuthorizers=_authorizersForButtons
         isLoading=isLoading
         authenticate=(action "authenticate")
