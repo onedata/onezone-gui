@@ -15,6 +15,12 @@
     {{name-conflict item=item tagName="span" class="one-label"}}
   {{/truncated-string}}
   {{#status-toolbar as |toolbar|}}
+    {{#if isInMarketplace}}
+      {{toolbar.icon
+        icon="cart-checked"
+        hint=(tt this "advertisedInMarketplace")
+      }}
+    {{/if}}
     {{toolbar.icon
       outerText=_totalSupportSizeHumanReadable
       hint=(tt this "totalStorageHint" size=_totalSupportSizeHumanReadable)
@@ -24,12 +30,6 @@
       outerText=_providersCount
       hint=(tt this "supportCountHint" count=_providersCount)
     }}
-    {{#if isInMarketplace}}
-      {{toolbar.icon
-        icon="cart-checked"
-        hint=(tt this "advertisedInMarketplace")
-      }}
-    {{/if}}
   {{/status-toolbar}}
 {{/if}}
 

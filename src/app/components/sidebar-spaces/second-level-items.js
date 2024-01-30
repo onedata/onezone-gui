@@ -79,6 +79,9 @@ export default SecondLevelItems.extend(I18n, {
     const forbidden = privileges.view === false;
     return {
       id: 'shares',
+      // Note: some browser add-ons removes this button when it has "item-shares" class,
+      // so the id cannot be just "shares".
+      itemClassId: 'onedata-shares',
       label: this.t('aspects.shares'),
       icon: 'browser-share',
       forbidden,

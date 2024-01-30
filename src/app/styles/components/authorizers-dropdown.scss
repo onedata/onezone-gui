@@ -1,9 +1,9 @@
-.authorizers-dropdown-element .ember-power-select-option, 
+.authorizers-dropdown-element .ember-power-select-option,
 .authorizers-dropdown .ember-power-select-trigger {
   position: relative;
   padding-left: 50px;
   color: $main-text-color;
-  .social-box {
+  .auth-icon-box {
     position: absolute;
     left: 5px;
     top: 50%;
@@ -17,9 +17,9 @@
       border-width: 1px;
       border-style: solid;
       border-color: transparent;
-      
+
       font-size: 18px;
-      .social-icon-image {
+      .auth-icon-image {
         background-size: 20px 20px;
       }
       .one-icon {
