@@ -9,7 +9,7 @@ import attr from 'ember-data/attr';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
-import { computed } from '@ember/object';
+import { observer } from '@ember/object';
 
 export const entityType = 'atm_workflow_schema';
 
@@ -124,12 +124,26 @@ export default Model.extend(GraphSingleModelMixin, {
 
   /**
    * ID taken from `originalAtmWorkflowSchema` relation.
-   * @type {ComputedProperty<string|null>}
+   * @type {string | null}
    */
-  originalAtmWorkflowSchemaId: computed('isLoaded', function originalAtmWorkflowSchemaId() {
-    if (!this.isLoaded) {
-      return null;
+  originalAtmWorkflowSchemaId: null,
+
+  originalAtmWorkflowSchemaIdSetter: observer(
+    'originalAtmWorkflowSchema.id',
+    function originalAtmWorkflowSchemaIdSetter() {
+      const originalAtmWorkflowSchemaId =
+        this.relationEntityId('originalAtmWorkflowSchema');
+      if (
+        this.originalAtmWorkflowSchemaId !== originalAtmWorkflowSchemaId &&
+        originalAtmWorkflowSchemaId
+      ) {
+        this.set('originalAtmWorkflowSchemaId', originalAtmWorkflowSchemaId);
+      }
     }
-    return this.relationEntityId('originalAtmWorkflowSchema');
-  }),
+  ),
+
+  init() {
+    this._super(...arguments);
+    this.originalAtmWorkflowSchemaIdSetter();
+  },
 }).reopenClass(StaticGraphModelMixin);

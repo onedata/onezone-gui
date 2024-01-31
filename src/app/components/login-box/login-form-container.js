@@ -4,23 +4,23 @@
  * by backend.
  *
  * @author Michał Borzęcki, Jakub Liput
- * @copyright (C) 2016-2018 ACK CYFRONET AGH
+ * @copyright (C) 2016-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import { notEmpty, gt, equal } from '@ember/object/computed';
 import { not, or } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
-import { computed } from '@ember/object';
+import { computed, observer } from '@ember/object';
 import LoginFormContainer from 'onedata-gui-common/components/login-box/login-form-container';
 import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import _ from 'lodash';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import DOMPurify from 'dompurify';
-import isIp from 'is-ip';
 import $ from 'jquery';
 import globals from 'onedata-gui-common/utils/globals';
+import { htmlSafe } from '@ember/template';
 
 const ANIMATION_TIMEOUT = 333;
 
@@ -52,6 +52,14 @@ export default LoginFormContainer.extend(
      * @type {AuthorizerInfo}
      */
     selectedAuthorizer: null,
+
+    /**
+     * Zone domain can disappear for a while when login is being done, because the
+     * connection is closed and opened and connection attributes are resetted. This
+     * property holds the last known non-empty domain.
+     * @type {string}
+     */
+    cachedZoneDomain: null,
 
     /**
      * If true, component is waiting for data to load.
@@ -140,9 +148,36 @@ export default LoginFormContainer.extend(
     /**
      * @type {computed.boolean}
      */
-    showIpWarning: computed(function showIpWarning() {
-      return isIp(globals.location.hostname);
+    showDomainMismatchWarning: computed(
+      'browserDomain',
+      'onezoneDomain',
+      function showDomainMismatchWarning() {
+        return this.browserDomain !== this.onezoneDomain;
+      }
+    ),
+
+    browserDomain: computed(function browserDomain() {
+      return globals.location.hostname;
     }),
+
+    onezoneDomain: computed('cachedZoneDomain', function onezoneDomain() {
+      return this.cachedZoneDomain ?? htmlSafe(`<em>${this.t('unknown')}</em>`);
+    }),
+
+    cachedZoneDomainUpdater: observer(
+      'onedataConnection.zoneDomain',
+      function cachedZoneDomainUpdater() {
+        const zoneDomain = this.onedataConnection.zoneDomain;
+        if (zoneDomain) {
+          this.set('cachedZoneDomain', zoneDomain);
+        }
+      }
+    ),
+
+    init() {
+      this._super(...arguments);
+      this.cachedZoneDomainUpdater();
+    },
 
     /**
      * @override

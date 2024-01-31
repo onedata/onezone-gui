@@ -119,7 +119,7 @@ export default Component.extend({
    * @type {Ember.ComputedProperty<number>}
    */
   _providerCircleScale: computed('_mapState.scale', function () {
-    return 2 + this.get('_mapState.scale') / 3;
+    return 1 + 0.1 * this._mapState.scale;
   }),
 
   /**
@@ -128,7 +128,7 @@ export default Component.extend({
   _providersProxy: reads('providerList.list'),
 
   /**
-   * Array of all prviders
+   * Array of all providers
    * @type {Ember.ComputedProperty<DS.RecordArray<Provider>>>}
    */
   _providers: reads('_providersProxy.content'),

@@ -59,8 +59,8 @@
   <ul class="indented-row indented-row-more linked-accounts-list">
     {{#promise-proxy-container proxy=linkedAccountsProxy}}
       {{#each accountsInfo as |accountInfo|}}
-        <li class="linked-account full-social-icon content-row {{accountInfo.account.idp}}-account">
-          {{login-box/social-box-list/social-box
+        <li class="linked-account full-auth-icon content-row {{accountInfo.account.idp}}-account">
+          {{login-box/auth-icon-box-list/auth-icon-box
             authId=accountInfo.account.idp
             iconPath=accountInfo.authorizer.iconPath
             iconBackgroundColor=accountInfo.authorizer.iconBackgroundColor
@@ -77,16 +77,16 @@
           </div>
         </li>
       {{/each}}
-      <li class="linked-account full-social-icon content-row add-account">
-        {{#login-box/social-box-list/social-box
+      <li class="linked-account full-auth-icon content-row add-account">
+        {{#login-box/auth-icon-box-list/auth-icon-box
           authId="add"
-          socialIconStyle=""
+          authIconStyle=""
           aStyle=""
-          class="social-box-linked-account"
+          class="auth-icon-box-linked-account"
           click=(action "toggleAuthorizersDropdown")
         }}
           <span class="plus-icon">+</span>
-        {{/login-box/social-box-list/social-box}}
+        {{/login-box/auth-icon-box-list/auth-icon-box}}
         <div class="account-description">
           <div class="show-dropdown-description animated fast" {{action "toggleAuthorizersDropdown"}}>
             {{tt this "addAccount"}}

@@ -6,6 +6,20 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11594 Fixed popovers broken position after their content size change
+* VFS-11595 Changed classnames that were blocked by Qwant browser add-on
+* VFS-11582 Fixed showing tokens list when one of invite targets gets deleted
+* VFS-11455 Added conflicting name detector in tokens editor
+* VFS-11620 Added jVectorMap 2.0.5 to own public files
+* VFS-11687 Fixed showing the "mismatching domain" warning for a while after a successful login
+* VFS-11667 Added version to documentation links
+* VFS-11617 Upgraded EmberJS to v3.12.4
+* VFS-11680 Changed domain check on login screen to warn about mismatching domain
+* VFS-10649 Added complex charts dashboard editor to the automation GUI
+* VFS-11578 Further improvements in providers map scaling
+* VFS-11229 Added new texts about Space Marketplace
+* VFS-11592 Fixed missing translation of an empty cluster selector in Onepanel REST token template tile
+* VFS-11575 Increased max zoom of jvectormap
 * VFS-11251 Removed unused oneicons
 * VFS-11134 Added information about membership to leaving modal
 * VFS-10939 Fixed copying from provider popover in firefox

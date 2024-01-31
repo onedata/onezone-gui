@@ -30,13 +30,13 @@ const authorizerManagerStub = Service.extend({
     return [{
         id: 'google',
         displayName: 'Google+',
-        iconPath: '/test/social-google.svg',
+        iconPath: '/test/google.svg',
         iconBackgroundColor: '#fff',
       },
       {
         id: 'github',
         displayName: 'GitHub',
-        iconPath: '/test/social-github.svg',
+        iconPath: '/test/github.svg',
         iconBackgroundColor: '#123',
       },
     ];

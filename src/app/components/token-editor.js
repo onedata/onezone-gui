@@ -79,6 +79,9 @@ import recordIcon from 'onedata-gui-common/utils/record-icon';
 import {
   tokenInviteTypeToTargetModelMapping,
 } from 'onezone-gui/models/token';
+import isRecord from 'onedata-gui-common/utils/is-record';
+import TokenNameConflictDetector from 'onezone-gui/utils/token-editor-utils/token-name-conflict-detector';
+import { validator } from 'ember-cp-validations';
 
 const tokenInviteTypesWithoutTarget = [
   'registerOneprovider',
@@ -297,6 +300,17 @@ export default Component.extend(I18n, {
   )),
 
   /**
+   * @type {ComputedProperty<Utils.TokenEditorUtils.TokenNameConflictDetector | null>}
+   */
+  tokenNameConflictDetector: computed(
+    'mode',
+    function tokenNameConflictDetector() {
+      return this.mode !== 'view' ?
+        TokenNameConflictDetector.create({ ownerSource: this }) : null;
+    }
+  ),
+
+  /**
    * @type {ComputedProperty<boolean>}
    */
   disableCaveatsCollapse: notEqual('mode', raw('create')),
@@ -345,7 +359,26 @@ export default Component.extend(I18n, {
         TextField.extend({
           component,
           defaultValue: or('component.tokenDataSource.name', raw(undefined)),
-        }).create({ name: 'name' }),
+        }).create({
+          name: 'name',
+          customValidators: [
+            validator('inline', {
+              validate(value, options, model) {
+                if (!value) {
+                  return true;
+                }
+                const tokenRecord = isRecord(component.token) ? component.token : null;
+                const field = get(model, 'field');
+                const errorMsg = String(field.getTranslation('errors.notUnique'));
+                return component.tokenNameConflictDetector
+                  ?.isNameConflicting(value, tokenRecord) ? errorMsg : true;
+              },
+              dependentKeys: [
+                'model.field.component.{tokenNameConflictDetector.allTokenNames.[],token.name}',
+              ],
+            }),
+          ],
+        }),
         ToggleField.extend({
           component,
           isVisible: notEqual('component.mode', raw('create')),

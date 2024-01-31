@@ -6,7 +6,7 @@ export default {
     textIntro: 'The space will be publicly advertised in',
     spacesMarketplace: 'the Space Marketplace',
     textIntroFields: 'along with the following information: name, organization name, tags, description, creation time, provider names and total support size.',
-    textExtended: 'Once the space is advertised, anyone will be able to find it in the Marketplace and request access. Requests will be sent to the maintainer contact e-mail address by means of an automated mailing system. The maintainer decides upon acceptance or rejection of received requests. At any time, the space can be withdrawn from the Marketplace.',
+    textExtended: 'Once the space is advertised, anyone will be able to find it in the Marketplace and request access. The space maintainer is notified (by email) of every new request and then decides whether to grant or reject access.',
   },
   contactEmail: {
     label: 'Maintainer contact e-mail',

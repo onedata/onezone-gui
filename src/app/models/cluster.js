@@ -127,8 +127,9 @@ export default Model.extend(
     async fetchName() {
       await this.isLoadedDeferred.promise;
       if (this.get('type') === 'oneprovider') {
-        return this.get('provider')
-          .then(provider => provider && get(provider, 'name'));
+        return !this.isDestroyed ?
+          this.get('provider').then(provider => provider && get(provider, 'name')) :
+          '';
       } else {
         return resolve(this.get('onedataConnection.zoneName'));
       }
@@ -140,8 +141,9 @@ export default Model.extend(
     async fetchDomain() {
       await this.isLoadedDeferred.promise;
       if (this.get('type') === 'oneprovider') {
-        return this.get('provider')
-          .then(provider => provider && get(provider, 'domain'));
+        return !this.isDestroyed ?
+          this.get('provider').then(provider => provider && get(provider, 'domain')) :
+          '';
       } else {
         return resolve(this.get('onedataConnection.zoneDomain'));
       }

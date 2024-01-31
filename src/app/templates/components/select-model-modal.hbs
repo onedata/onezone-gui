@@ -13,22 +13,22 @@
   </p>
   <div class="dropdown-container">
     {{#promise-proxy-container proxy=records sizeClass="sm"}}
-      {{#power-select
-        options=recordsForDropdown
-        selected=selectedRecord
-        onchange=(action (mut selectedRecord))
-        matcher=(action "recordMatcher")
-        searchEnabled=true
-        placeholder=dropdownPlaceholder
+      <OneDropdown
+        @options={{recordsForDropdown}}
+        @selected={{selectedRecord}}
+        @onChange={{action (mut selectedRecord)}}
+        @matcher={{action "recordMatcher"}}
+        @searchEnabled={{true}}
+        @placeholder={{dropdownPlaceholder}}
         as |record|
-      }}
+      >
         <div class="option-container">
           {{#truncated-string}}
             {{one-icon icon=recordIcon}}
             <span class="text record-name">{{record.name}}</span>
           {{/truncated-string}}
         </div>
-      {{/power-select}}
+      </OneDropdown>
     {{/promise-proxy-container}}
   </div>
 {{/proceed-process-modal}}

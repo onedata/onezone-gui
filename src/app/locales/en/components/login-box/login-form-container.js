@@ -12,5 +12,6 @@ export default {
   signInTestMode: 'This is the test sign-in page — based on test.auth.config — used for sign-in simulation and diagnostics.',
   goBackToMainPage: 'Go back to the main page.',
   sessionExpired: 'Your session has expired',
-  ipWarning: 'This page has been entered using server\'s IP address, some of the content will be unavailable or malfunctioning. Please use the server domain to ensure full functionality.',
+  domainMismatchWarning: 'You have entered this page using a different domain ({{browserDomain}}) than the actual Onezone server domain ({{onezoneDomain}}). Some of the content will be unavailable or malfunctioning, e.g. the file upload action. Use the server domain to ensure full functionality.',
+  unknown: 'unknown',
 };

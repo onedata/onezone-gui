@@ -46,6 +46,12 @@ export default Component.extend({
   onOneproviderSelected: notImplementedIgnore,
 
   /**
+   * @virtual optional
+   * @type {Function}
+   */
+  onToggleExpand: undefined,
+
+  /**
    * @type {number}
    */
   mapScale: 1,
@@ -54,14 +60,6 @@ export default Component.extend({
    * @type {Object}
    */
   mapInitialState: undefined,
-
-  /**
-   * @virtual
-   * @type {Ember.ComputedProperty<Function>}
-   */
-  onToggleExpand: computed(function onToggleExpand() {
-    return (...args) => this.fallbackOnToggleExpand(...args);
-  }),
 
   /**
    * @type {Ember.ComputedProperty<Array<Object>>}
@@ -84,11 +82,14 @@ export default Component.extend({
   /**
    * @type {Ember.ComputedProperty<number>}
    */
-  oneproviderCircleScale: sum(raw(2), quotient('mapScale', raw(3))),
+  oneproviderCircleScale: sum(raw(1), quotient('mapScale', raw(10))),
 
   init() {
     this._super(...arguments);
 
+    if (!this.onToggleExpand) {
+      this.set('onToggleExpand', (...args) => this.fallbackOnToggleExpand(...args));
+    }
     this.setupMapInitialState();
   },
 

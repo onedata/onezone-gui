@@ -1,5 +1,6 @@
 import spaceTagsSelector from './space-configuration/space-tags-selector';
 import privileges from '../onedata-gui-common/common/privileges';
+import { marketplaceGeneralDescription } from './-space-marketplace';
 
 export default {
   spaceTagsSelector,
@@ -29,6 +30,7 @@ export default {
   },
   advertised: {
     label: 'Advertise in Marketplace',
+    customTip: marketplaceGeneralDescription,
     lockHint: {
       requiredFieldsEmpty: 'Requires a non-empty organization name and description.',
       marketplaceDisabled: 'Space Marketplace is disabled in this Onezone.',

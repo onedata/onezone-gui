@@ -180,9 +180,10 @@ export default Component.extend(I18n, {
           addColonToLabel: false,
           classes: 'label-after',
           customValidators: [
-            validator(function (value, options, model) {
-              return !get(model, 'field.parent.allTogglesUnchecked');
-            }, {
+            validator('inline', {
+              validate(value, options, model) {
+                return !get(model, 'field.parent.allTogglesUnchecked');
+              },
               dependentKeys: ['model.field.parent.allTogglesUnchecked'],
             }),
           ],

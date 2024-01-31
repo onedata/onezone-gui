@@ -7,25 +7,25 @@
         </div>
       {{else}}
         {{#if errorMessage}}
-          {{t "components.loginBox.socialBoxList.fetchProvidersFailed"}}: {{errorMessage}}
+          {{t "components.loginBox.authIconBoxList.fetchProvidersFailed"}}: {{errorMessage}}
         {{else}}
           <div>
             {{#each supportedAuthorizers as |authorizer|}}
-              {{login-box/social-box-list/social-box 
+              {{login-box/auth-icon-box-list/auth-icon-box
                 authId=authorizer.id
                 iconPath=authorizer.iconPath
                 iconBackgroundColor=authorizer.iconBackgroundColor
-                tip=(concat (t "components.loginBox.socialBoxList.signInUsing") authorizer.displayName)
+                tip=(concat (t "components.loginBox.authIconBoxList.signInUsing") authorizer.displayName)
                 action=(action (if (eq authorizer.id "basicAuth") "usernameBoxClick" "authenticate"))
               }}
             {{/each}}
             {{#if showMoreButton}}
-              {{login-box/social-box-list/social-box 
+              {{login-box/auth-icon-box-list/auth-icon-box
                 authId="more"
-                socialIconStyle=""
+                authIconStyle=""
                 iconBackgroundColor="#fff"
                 action=(action "showMoreClick")
-                tip=(t "components.loginBox.socialBoxList.showMore")
+                tip=(t "components.loginBox.authIconBoxList.showMore")
               }}
             {{/if}}
           </div>

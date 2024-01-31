@@ -23,7 +23,7 @@ import globals from 'onedata-gui-common/utils/globals';
 
 export default Component.extend({
   tagName: 'div',
-  classNames: ['social-box'],
+  classNames: ['auth-icon-box'],
 
   /**
    * @virtual
@@ -73,26 +73,33 @@ export default Component.extend({
   action: notImplementedIgnore,
 
   /**
+   * @virtual optional
    * @type {Ember.ComputedProperty<string>}
    */
-  socialIconStyle: computed(
-    'authId',
-    'iconPath',
-    function socialIconStyle() {
-      let iconPath = this.get('iconPath');
-      iconPath = iconPath || defaultIconPath;
+  authIconStyle: computed('authId', 'iconPath', {
+    get() {
+      if (this.injectedAuthIconStyle) {
+        return this.injectedAuthIconStyle;
+      }
+      const iconPath = this.iconPath ?? defaultIconPath;
       const style = `background-image: url(${iconPath});`;
       return htmlSafe(style);
-    }
-  ),
+    },
+    set(key, value) {
+      return this.injectedAuthIconStyle = value;
+    },
+  }),
 
   /**
+   * @virtual optional
    * @type {Ember.ComputedProperty<string>}
    */
-  aStyle: computed(
-    'iconBackgroundColor',
-    function aStyle() {
-      const iconBackgroundColor = this.get('iconBackgroundColor') ||
+  aStyle: computed('iconBackgroundColor', {
+    get() {
+      if (this.injectedAStyle) {
+        return this.injectedAStyle;
+      }
+      const iconBackgroundColor = this.iconBackgroundColor ??
         defaultIconBackgroundColor;
       const fgColor = contrast(iconBackgroundColor) === 'light' ? darkFgColor :
         lightFgColor;
@@ -101,8 +108,21 @@ export default Component.extend({
       const style =
         `background-color: ${iconBackgroundColor}; color: ${fgColor}; border-color: ${borderColor};`;
       return htmlSafe(style);
-    }
-  ),
+    },
+    set(key, value) {
+      return this.injectedAStyle = value;
+    },
+  }),
+
+  /**
+   * @type {string | null}
+   */
+  injectedAuthIconStyle: null,
+
+  /**
+   * @type {string | null}
+   */
+  injectedAStyle: null,
 
   hasLink: computed('link', function hasLink() {
     const link = this.get('link');
@@ -113,13 +133,13 @@ export default Component.extend({
     this._super(...arguments);
     const {
       aStyle,
-      socialIconStyle,
-    } = this.getProperties('aStyle', 'socialIconStyle');
+      authIconStyle,
+    } = this.getProperties('aStyle', 'authIconStyle');
     if (typeof aStyle === 'string') {
       this.set('aStyle', htmlSafe(aStyle));
     }
-    if (typeof socialIconStyle === 'string') {
-      this.set('socialIconStyle', htmlSafe(socialIconStyle));
+    if (typeof authIconStyle === 'string') {
+      this.set('authIconStyle', htmlSafe(authIconStyle));
     }
   },
 

@@ -10,10 +10,15 @@ import config from 'ember-get-config';
 import { environmentExport } from 'onedata-gui-websocket-client/utils/development-environment';
 import ProductionSymbol from 'onedata-gui-websocket-client/services/onedata-connection';
 import DevelopmentSymbol from 'onezone-gui/services/mocks/onedata-connection';
-import EmberObject, { computed } from '@ember/object';
+import EmberObject from '@ember/object';
 import { reads } from '@ember/object/computed';
 
 const OnezoneConnection = ProductionSymbol.extend({
+  /**
+   * @type {EmberObject}
+   */
+  onezoneRecord: undefined,
+
   /**
    * Name of zone instance
    * @type {ComputedProperty<String>}
@@ -94,11 +99,12 @@ const OnezoneConnection = ProductionSymbol.extend({
   ),
 
   /**
-   * @type {ComputedProperty<EmberObject>}
+   * @override
    */
-  onezoneRecord: computed(function onezoneRecord() {
-    return OnezoneModel.create({ onedataConnection: this });
-  }),
+  init() {
+    this._super(...arguments);
+    this.set('onezoneRecord', OnezoneModel.create({ onedataConnection: this }));
+  },
 });
 
 export default environmentExport(config, OnezoneConnection, DevelopmentSymbol);
