@@ -295,26 +295,29 @@ export default Component.extend(I18n, {
       // as possible.
       const newMembersProxyList = orderedMembers.map(member => {
         let proxy = membersProxyList.findBy('member', member);
-        proxy = ItemProxy.create({
-          id: get(member, 'id'),
-          member,
-          owners,
-          directMembers,
-          isDirect: directMembers.includes(member),
-          privilegesProxy: {},
-          effectivePrivilegesProxy: {},
-          isYou: member === currentUserMember,
-          directMemberActions: itemActionsGenerator(
+        // If proxy has not been generated for that member, create new empty proxy.
+        if (!proxy || proxy.isDirect != directMembers.includes(member)) {
+          proxy = ItemProxy.create({
+            id: get(member, 'id'),
             member,
+            owners,
             directMembers,
-            effectiveMembers
-          ),
-          effectiveMemberActions: effectiveItemActionsGenerator(
-            member,
-            directMembers,
-            effectiveMembers
-          ),
-        });
+            isDirect: directMembers.includes(member),
+            privilegesProxy: {},
+            effectivePrivilegesProxy: {},
+            isYou: member === currentUserMember,
+            directMemberActions: itemActionsGenerator(
+              member,
+              directMembers,
+              effectiveMembers
+            ),
+            effectiveMemberActions: effectiveItemActionsGenerator(
+              member,
+              directMembers,
+              effectiveMembers
+            ),
+          });
+        }
         if (directMembers.includes(member)) {
           const directPrivilegesGri = this.getPrivilegesGriForMember(member, true);
           const privilegesProxy = PrivilegeRecordProxy.create(
