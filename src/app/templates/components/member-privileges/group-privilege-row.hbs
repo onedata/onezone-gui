@@ -14,14 +14,18 @@
     <div>{{privilegesGroup.text}}</div>
   </div>
 </td>
-{{member-privileges/group-privileges-cell
-  privileges=privileges
-  groupPrivilegeName=privilegesGroup.text
-  inputChanged=(action "inputChanged")
-  form=form
-  isDirect=true
-  editionEnabled=editionEnabled
-}}
+{{#if isDirect}}
+  {{member-privileges/group-privileges-cell
+    privileges=privileges
+    groupPrivilegeName=privilegesGroup.text
+    inputChanged=(action "inputChanged")
+    form=form
+    isDirect=true
+    editionEnabled=editionEnabled
+  }}
+{{else}}
+  <td class="toggle-column direct group na">{{tt this "na"}}</td>
+{{/if}}
 {{#if (not isBulkEdit)}}
   {{member-privileges/group-privileges-cell
     privileges=effectivePrivilegeValues

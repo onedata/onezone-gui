@@ -1,9 +1,10 @@
-{{#promise-proxy-container
+{{#promise-proxy-container-priv
   proxy=privilegesLoadingProxy
-  isLoading=isLoadingProxy
-  isLoaded=isLoadedProxy
-  isError=isErrorProxy
-  errorReason=errorReasonProxy}}
+  injectedIsLoading=isLoadingPrivilegesProxy
+  injectedIsLoaded=isLoadedPrivilegesProxy
+  injectedIsError=isErrorPrivilegesProxy
+  injectedErrorReason=errorReasonProxy
+}}
   {{#bs-form submitOnEnter=false as |form|}}
     <table class="table-privileges table table-info">
       {{member-privileges/table-header
@@ -12,14 +13,15 @@
       }}
       <tbody>
         {{#each definition as |groupPrivileges|}}
-          {{#if isDirectMember}}
             {{member-privileges/group-privilege-row
-              privileges=(get
-                modifiedPrivileges
-                groupPrivileges.name)
+              privileges=(if recordDirectProxy
+                (get modifiedPrivileges groupPrivileges.name)
+                null
+              )
               effectivePrivilegeValues=(get
-                      effectivePrivileges
-                      groupPrivileges.name)
+                effectivePrivileges
+                groupPrivileges.name
+              )
               privilegesGroup=groupPrivileges
               previousDirectPrivilegeValues=(get directPrivileges groupPrivileges.name)
               inputChanged=(action "inputValueChanged")
@@ -30,26 +32,6 @@
               editionEnabled=editionEnabled
               isBulkEdit=isBulkEdit
             }}
-          {{else}}
-            <tr onclick={{action "changeOpenGroup" groupPrivileges.name}}>
-              <td class="priv-group">
-                <div class="group-privilege-text-container">
-                  {{#if (get groupsOpenState groupPrivileges.name)}}
-                    {{one-icon icon="arrow-up"}}
-                  {{else}}
-                    {{one-icon icon="arrow-down"}}
-                  {{/if}}
-                  <div>{{groupPrivileges.text}}</div>
-                </div>
-              </td>
-              <td class="toggle-column direct group na">{{tt this "na"}}</td>
-              {{member-privileges/group-privileges-cell
-                privileges=(get effectivePrivileges groupPrivileges.name)
-                groupPrivilegeName=groupPrivileges.text
-                isDirect=isDirectMember
-              }}
-            </tr>
-          {{/if}}
           {{#if (get groupsOpenState groupPrivileges.name)}}
             {{#each groupPrivileges.subtree as |privilege|}}
               {{member-privileges/privilege-row
@@ -87,5 +69,5 @@
       </tbody>
     </table>
   {{/bs-form}}
-{{/promise-proxy-container}}
+{{/promise-proxy-container-priv}}
 

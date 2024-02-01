@@ -67,8 +67,12 @@
         flex-direction: row;
         justify-content: flex-start;
 
-        .member-privileges-table, .memberships-container {
+        .member-privileges-table {
           width: 50%;
+          max-width: 600px;
+        }
+        .memberships-container {
+          flex-grow: 1;
         }
       }
     }
@@ -112,6 +116,8 @@
 
   .privileges-of-owner-warning {
     margin: $padding-large-horizontal;
+    margin-left: $padding-base-horizontal;
+    margin-right: $padding-base-horizontal;
   }
 
   .privileges-tree-editor {

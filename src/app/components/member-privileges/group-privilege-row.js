@@ -8,10 +8,16 @@
 
 import { computed } from '@ember/object';
 import Component from '@ember/component';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
 
-export default Component.extend({
+export default Component.extend(I18n, {
   tagName: 'tr',
   classNames: ['group-privilege-row'],
+
+  /**
+   * @override
+   */
+  i18nPrefix: 'components.memberPrivileges.groupPrivilegeRow',
 
   /**
    * @virtual
@@ -84,7 +90,10 @@ export default Component.extend({
    * @type {Ember.ComputedProperty<number>}
    */
   privilegesCount: computed('privileges', function privilegesCount() {
-    return Object.keys(this.privileges).length;
+    if (this.privileges) {
+      return Object.keys(this.privileges).length;
+    }
+    return 0;
   }),
 
   /**
@@ -94,9 +103,11 @@ export default Component.extend({
     'previousDirectPrivilegeValues',
     'privileges',
     function isModified() {
-      for (const [key, value] of Object.entries(this.privileges)) {
-        if (this.previousDirectPrivilegeValues[key] !== value) {
-          return true;
+      if (this.privileges) {
+        for (const [key, value] of Object.entries(this.privileges)) {
+          if (this.previousDirectPrivilegeValues[key] !== value) {
+            return true;
+          }
         }
       }
       return false;

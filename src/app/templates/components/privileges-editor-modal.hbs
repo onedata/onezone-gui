@@ -9,6 +9,7 @@
   proceedButtonText=(tt this "save")
   proceedDisabled=(not recordProxy.isLoaded)
   textCenter=false}}
+  {{tt this "description"}}
   <div class="bulk-edit-privileges-table-container">
     {{member-privileges/member-privileges-table
       privilegesGroups=privilegesGroups
@@ -18,7 +19,6 @@
       recordEffectiveProxy=recordProxy
       isDirect=true
       isBulkEdit=true
-      isDirectMember=true
     }}
   </div>
 {{/proceed-process-modal}}

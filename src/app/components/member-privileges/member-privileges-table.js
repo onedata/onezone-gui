@@ -7,7 +7,7 @@
  */
 
 import { computed, observer, get, set } from '@ember/object';
-import { reads } from '@ember/object/computed';
+import { reads, bool } from '@ember/object/computed';
 import { scheduleOnce } from '@ember/runloop';
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -64,10 +64,9 @@ export default Component.extend(I18n, {
   modelTypeTranslation: undefined,
 
   /**
-   * @virtual
-   * @type {boolean}
+   * @type {ComputedProperty<Boolean>}
    */
-  isDirectMember: false,
+  isDirectMember: bool('recordDirectProxy'),
 
   /**
    * @virtual optional
@@ -155,10 +154,10 @@ export default Component.extend(I18n, {
     }
   )),
 
-  isLoadingProxy: computed(
+  isLoadingPrivilegesProxy: computed(
     'recordDirectProxy.{isLoading,hasBeenLoaded}',
     'recordEffectiveProxy.{isLoading,hasBeenLoaded}',
-    function isLoadingProxy() {
+    function isLoadingPrivilegesProxy() {
       if (this.get('recordDirectProxy')) {
         return (this.get('recordDirectProxy.isLoading') &&
             !this.get('recordDirectProxy.hasBeenLoaded')) &&
@@ -171,10 +170,10 @@ export default Component.extend(I18n, {
     }
   ),
 
-  isLoadedProxy: computed(
+  isLoadedPrivilegesProxy: computed(
     'recordDirectProxy.{models.isRejected,hasBeenLoaded}',
     'recordEffectiveProxy.{models.isRejected,hasBeenLoaded}',
-    function isLoadedProxy() {
+    function isLoadedPrivilegesProxy() {
       if (this.get('recordDirectProxy')) {
         return (this.get('recordDirectProxy.hasBeenLoaded') &&
             !this.get('recordDirectProxy.models.isRejected')) &&
@@ -187,10 +186,10 @@ export default Component.extend(I18n, {
     }
   ),
 
-  isErrorProxy: computed(
+  isErrorPrivilegesProxy: computed(
     'recordDirectProxy.fetchError',
     'recordEffectiveProxy.fetchError',
-    function isErrorProxy() {
+    function isErrorPrivilegesProxy() {
       if (this.get('recordDirectProxy')) {
         return this.get('recordDirectProxy.fetchError') ||
           this.get('recordEffectiveProxy.fetchError');
