@@ -244,6 +244,7 @@ export default Component.extend(I18n, {
         'dashboardSpec'
       );
       const visualiserData = {
+        name: get(atmWorkflowSchema, 'name'),
         lanes,
         stores,
         dashboardSpec,
