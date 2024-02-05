@@ -103,7 +103,7 @@ export default Component.extend(I18n, {
     'previousDirectPrivilegeValues',
     'privileges',
     function isModified() {
-      if (this.privileges) {
+      if (this.privileges && this.previousDirectPrivilegeValues) {
         for (const [key, value] of Object.entries(this.privileges)) {
           if (this.previousDirectPrivilegeValues[key] !== value) {
             return true;
