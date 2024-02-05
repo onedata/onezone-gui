@@ -64,11 +64,6 @@ export default Component.extend(I18n, {
   modelTypeTranslation: undefined,
 
   /**
-   * @type {ComputedProperty<Boolean>}
-   */
-  isDirectMember: bool('recordDirectProxy'),
-
-  /**
    * @virtual optional
    * @type {boolean}
    */
@@ -81,6 +76,11 @@ export default Component.extend(I18n, {
    * @type {object}
    */
   groupsOpenState: Object.freeze({}),
+
+  /**
+   * @type {ComputedProperty<Boolean>}
+   */
+  isDirectMember: bool('recordDirectProxy'),
 
   /**
    * @type {Ember.ComputedProperty<Object>}

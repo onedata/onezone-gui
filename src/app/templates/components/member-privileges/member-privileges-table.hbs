@@ -1,9 +1,8 @@
-{{#promise-proxy-container-priv
-  proxy=privilegesLoadingProxy
-  injectedIsLoading=isLoadingPrivilegesProxy
-  injectedIsLoaded=isLoadedPrivilegesProxy
-  injectedIsError=isErrorPrivilegesProxy
-  injectedErrorReason=errorReasonProxy
+{{#promise-proxy-container
+  isLoading=isLoadingPrivilegesProxy
+  isLoaded=isLoadedPrivilegesProxy
+  isError=isErrorPrivilegesProxy
+  errorReason=errorReasonProxy
 }}
   {{#bs-form submitOnEnter=false as |form|}}
     <table class="table-privileges table table-info">
@@ -69,5 +68,5 @@
       </tbody>
     </table>
   {{/bs-form}}
-{{/promise-proxy-container-priv}}
+{{/promise-proxy-container}}
 

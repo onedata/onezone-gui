@@ -1,9 +1,6 @@
 .member-privileges-table {
   position: relative;
-  margin-left: $padding-base-horizontal;
-  margin-top: $padding-base-vertical;
-  margin-bottom: $padding-base-vertical;
-  margin-right: $padding-base-horizontal;
+  margin: $padding-base-vertical $padding-base-horizontal;
 
   .table-privileges {
     margin-bottom: 0;
