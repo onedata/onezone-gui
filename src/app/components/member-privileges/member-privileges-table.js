@@ -200,14 +200,13 @@ export default Component.extend(I18n, {
   ),
 
   errorReasonProxy: computed(
-    'recordDirectProxy',
-    'recordEffectiveProxy',
+    'recordDirectProxy.fetchError',
+    'recordEffectiveProxy.fetchError',
     function errorReasonProxy() {
       if (this.get('recordDirectProxy')) {
         if (this.get('recordDirectProxy.fetchError')) {
           return this.get('recordDirectProxy.fetchError');
         }
-        return this.get('recordEffectiveProxy.fetchError');
       } else {
         return this.get('recordEffectiveProxy.fetchError');
       }
