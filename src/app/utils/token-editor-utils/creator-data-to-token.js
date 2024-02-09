@@ -63,8 +63,10 @@ export default function creatorDataToToken(editorData, currentUser) {
   if (type === 'invite') {
     const inviteType = get(basic, 'inviteDetails.inviteType');
     const target = get(basic, 'inviteDetails.inviteTargetDetails.target');
-    const privileges =
-      get(basic, 'inviteDetails.inviteTargetDetails.invitePrivilegesDetails.privileges');
+    const privileges = get(
+      basic,
+      'inviteDetails.inviteTargetDetails.invitePrivilegesDetails.privileges.privileges'
+    );
     const usageLimitType = get(basic, 'inviteDetails.usageLimit.usageLimitType');
     const usageLimitNumber = get(basic, 'inviteDetails.usageLimit.usageLimitNumber');
 
