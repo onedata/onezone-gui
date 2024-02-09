@@ -6,6 +6,8 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11608 Added resource subheaders to modals in automation
+* VFS-11594 Fixed popovers broken position after their content size change
 * VFS-11595 Changed classnames that were blocked by Qwant browser add-on
 * VFS-11582 Fixed showing tokens list when one of invite targets gets deleted
 * VFS-11455 Added conflicting name detector in tokens editor
