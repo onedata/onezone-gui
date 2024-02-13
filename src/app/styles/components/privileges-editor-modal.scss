@@ -2,14 +2,18 @@
   .one-dynamic-tree {
     margin: 0 auto;
   }
-  
+
   .modal-dialog {
     max-height: 100%;
   }
 
-  .tree-container {
+  .bulk-edit-privileges-table-container {
     position: relative;
     min-height: 150px;
+
+    .member-privileges-table .table-privileges .privileges-column  {
+      width: 70%;
+    }
   }
 
   .batch-edit-tree-title {
@@ -37,5 +41,10 @@
     .one-dynamic-tree {
       margin: 0 -2em;
     }
+  }
+
+  .member-privileges-table {
+    margin-left: 0;
+    margin-right: 0;
   }
 }

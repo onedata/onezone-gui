@@ -1,0 +1,72 @@
+{{#promise-proxy-container
+  isLoading=isLoadingPrivilegesProxy
+  isLoaded=isLoadedPrivilegesProxy
+  isError=isErrorPrivilegesProxy
+  errorReason=errorReasonProxy
+}}
+  {{#bs-form submitOnEnter=false as |form|}}
+    <table class="table-privileges table table-info">
+      {{member-privileges/table-header
+        modelTypeTranslation=modelTypeTranslation
+        isBulkEdit=isBulkEdit
+      }}
+      <tbody>
+        {{#each definition as |groupPrivileges|}}
+            {{member-privileges/group-privilege-row
+              privileges=(if recordDirectProxy
+                (get modifiedPrivileges groupPrivileges.name)
+                null
+              )
+              effectivePrivilegeValues=(get
+                effectivePrivileges
+                groupPrivileges.name
+              )
+              privilegesGroup=groupPrivileges
+              previousDirectPrivilegeValues=(get directPrivileges groupPrivileges.name)
+              inputChanged=(action "inputValueChanged")
+              changeOpenGroup=(action "changeOpenGroup" groupPrivileges.name)
+              isOpen=(get groupsOpenState groupPrivileges.name)
+              form=form
+              isDirect=isDirectMember
+              editionEnabled=editionEnabled
+              isBulkEdit=isBulkEdit
+            }}
+          {{#if (get groupsOpenState groupPrivileges.name)}}
+            {{#each groupPrivileges.subtree as |privilege|}}
+              {{member-privileges/privilege-row
+                privilege=privilege
+                effectivePrivilegeValue=(get
+                  (get effectivePrivileges groupPrivileges.name)
+                  privilege.name
+                )
+                privilegesGroupName=groupPrivileges.name
+                inputChanged=(action "inputValueChanged"
+                  (concat (concat groupPrivileges.name '.') privilege.name)
+                )
+                directPrivilegeValue=(if recordDirectProxy
+                  (get
+                    (get modifiedPrivileges groupPrivileges.name)
+                    privilege.name
+                  )
+                  null
+                )
+                previousDirectPrivilegeValue=(if recordDirectProxy
+                  (get
+                    (get directPrivileges groupPrivileges.name)
+                    privilege.name
+                  )
+                  null
+                )
+                isDirect=isDirectMember
+                isBulkEdit=isBulkEdit
+                editionEnabled=editionEnabled
+                form=form
+              }}
+            {{/each}}
+          {{/if}}
+        {{/each}}
+      </tbody>
+    </table>
+  {{/bs-form}}
+{{/promise-proxy-container}}
+

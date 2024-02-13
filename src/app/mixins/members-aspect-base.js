@@ -84,13 +84,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   /**
    * @type {boolean}
    */
-  onlyDirect: true,
-
-  /**
-   * One of: privileges, memberships
-   * @type {string}
-   */
-  aspect: 'privileges',
+  onlyDirect: false,
 
   /**
    * Contains users selected on list
@@ -190,21 +184,6 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
     function isAnySelectedRecordSaving() {
       return this.get('selectedMembersProxies')
         .filter(memberProxy => get(memberProxy, 'privilegesProxy.saving')).length > 0;
-    }
-  ),
-
-  /**
-   * @type {Ember.ComputedProperty<boolean>}
-   */
-  batchPrivilegesEditAvailable: computed(
-    'aspect',
-    'onlyDirect',
-    function batchPrivilegesEditAvailable() {
-      const {
-        aspect,
-        onlyDirect,
-      } = this.getProperties('aspect', 'onlyDirect');
-      return aspect === 'privileges' && onlyDirect;
     }
   ),
 
@@ -454,28 +433,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
    * @override
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  globalActions: computed(
-    'batchPrivilegesEditAction',
-    'batchPrivilegesEditAvailable',
-    'removeSelectedAction',
-    function globalActions() {
-      const {
-        batchPrivilegesEditAvailable,
-        batchPrivilegesEditAction,
-        removeSelectedAction,
-      } = this.getProperties(
-        'batchPrivilegesEditAvailable',
-        'batchPrivilegesEditAction',
-        'removeSelectedAction'
-      );
-      const actions = [];
-      if (batchPrivilegesEditAvailable) {
-        actions.push(batchPrivilegesEditAction);
-      }
-      actions.push(removeSelectedAction);
-      return actions;
-    }
-  ),
+  globalActions: collect('batchPrivilegesEditAction', 'removeSelectedAction'),
 
   /**
    * @type {ComputedProperty<String>}
@@ -553,11 +511,6 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
 
   init() {
     this._super(...arguments);
-    const aspect = this.navigationState.queryParams.aspect;
-
-    if (['memberships', 'privileges'].includes(aspect)) {
-      this.set('aspect', aspect);
-    }
     this.selectedMemberObserver();
   },
 
@@ -685,9 +638,6 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   },
 
   actions: {
-    changeAspect(aspect) {
-      this.set('aspect', String(aspect));
-    },
     recordsLoaded() {
       this.scheduleExpandSelectedMember();
     },

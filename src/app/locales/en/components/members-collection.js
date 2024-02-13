@@ -8,4 +8,7 @@ export default {
   ownerPrivilegesWarningModels: {
     space: 'space',
   },
+  showDescriptions: 'Show descriptions',
+  memberships: 'Memberships',
+  membershipsTip: 'Visualization of effective membership paths, showing via what groups this member inherits membership in this {{entityType}}.',
 };
