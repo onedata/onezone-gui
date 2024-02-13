@@ -190,12 +190,8 @@ export default Component.extend(I18n, {
     'recordDirectProxy.fetchError',
     'recordEffectiveProxy.fetchError',
     function isErrorPrivilegesProxy() {
-      if (this.get('recordDirectProxy')) {
-        return this.get('recordDirectProxy.fetchError') ||
-          this.get('recordEffectiveProxy.fetchError');
-      } else {
-        return this.get('recordEffectiveProxy.fetchError');
-      }
+      return this.get('recordDirectProxy.fetchError') ??
+        this.get('recordEffectiveProxy.fetchError');
     }
   ),
 

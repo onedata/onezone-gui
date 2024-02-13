@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11317 Changed view of members
 * VFS-11608 Added resource subheaders to modals in automation
 * VFS-11594 Fixed popovers broken position after their content size change
 * VFS-11595 Changed classnames that were blocked by Qwant browser add-on
