@@ -129,7 +129,7 @@ const InvitePrivilegesField = PrivilegesField.extend({
   defaultValue: computed(
     'cachedPrivilegesModelName',
     'cachedPrivilegesPresetProxy.content',
-    function () {
+    function defaultValue() {
       if (this.cachedPrivilegesPresetProxy?.content) {
         return {
           privilegesTarget: this.cachedPrivilegesModelName,

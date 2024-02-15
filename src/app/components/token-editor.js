@@ -169,14 +169,14 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
-  basicGroup: computed('fields', function fields() {
+  basicGroup: computed('fields', function basicGroup() {
     return this.fields.getFieldByPath('basic');
   }),
 
   /**
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
-  caveatsGroup: computed('fields', function fields() {
+  caveatsGroup: computed('fields', function caveatsGroup() {
     return this.fields.getFieldByPath('caveats');
   }),
 
@@ -253,12 +253,16 @@ export default Component.extend(I18n, {
 
   modeObserver: observer('mode', function modeObserver() {
     if (['view', 'edit'].includes(this.mode)) {
+      // In "view" mode all fields are readonly. Similarly in "edit" mode -
+      // only a couple of fields are editable (see a few lines below).
       this.fields.changeMode('view');
     } else {
+      // In "create" mode everything is editable
       this.fields.changeMode('edit');
     }
 
     if (this.mode === 'edit') {
+      // In "edit" mode we have to make "name" and "revoked" fields editable.
       [
         this.fields.getFieldByPath('basic.name'),
         this.fields.getFieldByPath('basic.revoked'),

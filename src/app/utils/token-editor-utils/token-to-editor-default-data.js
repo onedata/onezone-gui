@@ -15,6 +15,12 @@ import moment from 'moment';
 import { createValuesContainer } from 'onedata-gui-common/utils/form-component/values-container';
 import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
 
+/**
+ * Set of converting utilities for each token caveat. Contains the name of the token
+ * in the model and function converting backend caveat format into the one
+ * used by token editor. If caveat is not specified, converter function will return
+ * default value for that caveat.
+ */
 const caveatConverters = {
   timeCaveats: {
     expire: {
@@ -35,17 +41,17 @@ const caveatConverters = {
   networkCaveats: {
     asn: {
       backendName: 'asn',
-      converter: caveat => resolve(createValuesContainer({
+      converter: async (caveat) => createValuesContainer({
         asnEnabled: Boolean(caveat),
         asn: caveat?.whitelist ?? [],
-      })),
+      }),
     },
     ip: {
       backendName: 'ip',
-      converter: caveat => resolve(createValuesContainer({
+      converter: async (caveat) => createValuesContainer({
         ipEnabled: Boolean(caveat),
         ip: caveat?.whitelist ?? [],
-      })),
+      }),
     },
   },
   endpointCaveats: {
@@ -59,18 +65,18 @@ const caveatConverters = {
     },
     interface: {
       backendName: 'interface',
-      converter: caveat => resolve(createValuesContainer({
+      converter: async (caveat) => createValuesContainer({
         interfaceEnabled: Boolean(caveat),
         interface: caveat?.interface ?? 'rest',
-      })),
+      }),
     },
   },
   dataAccessCaveats: {
     readonly: {
       backendName: 'data.readonly',
-      converter: caveat => resolve(createValuesContainer({
+      converter: async (caveat) => createValuesContainer({
         readonlyEnabled: Boolean(caveat),
-      })),
+      }),
     },
     path: {
       backendName: 'data.path',
@@ -187,32 +193,32 @@ export default async function tokenToEditorDefaultData(token, getRecord) {
   return formData;
 }
 
-function expireConverter(caveat) {
-  return resolve(createValuesContainer({
+async function expireConverter(caveat) {
+  return createValuesContainer({
     expireEnabled: Boolean(caveat?.validUntil),
     expire: caveat?.validUntil ?
       new Date(caveat.validUntil * 1000) : moment().add(1, 'day').endOf('day').toDate(),
-  }));
+  });
 }
 
-function countryConverter(caveat) {
-  return resolve(createValuesContainer({
+async function countryConverter(caveat) {
+  return createValuesContainer({
     countryEnabled: Boolean(caveat),
     country: createValuesContainer({
       countryType: caveat?.filter ?? 'whitelist',
       countryList: caveat?.list ?? [],
     }),
-  }));
+  });
 }
 
-function regionConverter(caveat) {
-  return resolve(createValuesContainer({
+async function regionConverter(caveat) {
+  return createValuesContainer({
     regionEnabled: Boolean(caveat),
     region: createValuesContainer({
       regionType: caveat?.filter ?? 'whitelist',
       regionList: caveat?.list ?? [],
     }),
-  }));
+  });
 }
 
 function consumerConverter(caveat, getRecord) {
@@ -313,7 +319,7 @@ function pathConverter(caveat, getRecord) {
   }));
 }
 
-function objectIdConverter(caveat) {
+async function objectIdConverter(caveat) {
   const whitelist = caveat?.whitelist;
   const caveatDefaultData = {
     __fieldsValueNames: [],
@@ -323,8 +329,8 @@ function objectIdConverter(caveat) {
     caveatDefaultData[valueName] = objectId;
     caveatDefaultData.__fieldsValueNames.push(valueName);
   });
-  return resolve(createValuesContainer({
+  return createValuesContainer({
     objectIdEnabled: Boolean(caveat),
     objectId: createValuesContainer(caveatDefaultData),
-  }));
+  });
 }
