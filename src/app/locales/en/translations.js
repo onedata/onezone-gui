@@ -99,6 +99,7 @@ import spaceConfiguration from './components/space-configuration';
 import joinImage from './components/join-image';
 import spaceDetailsTile from './components/space-details-tile';
 import spaceMarketplaceTile from './components/space-marketplace-tile';
+import memberPrivileges from './components/member-privileges';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
@@ -284,6 +285,7 @@ const translations = {
     joinImage,
     spaceDetailsTile,
     spaceMarketplaceTile,
+    memberPrivileges,
   },
   services: {
     tokenActions,

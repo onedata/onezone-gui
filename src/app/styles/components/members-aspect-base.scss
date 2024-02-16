@@ -12,6 +12,94 @@
     &.opened {
       min-height: 150px;
     }
+
+    .memberships-container {
+      display: flex;
+      flex-direction: column;
+      margin: $padding-base-vertical $padding-base-horizontal;
+    }
+    .header-memberships-container {
+      border: 1px solid $table-border-color;
+      border-bottom: none;
+      border-radius: $border-radius-base $border-radius-base 0 0;
+      background-color: #eaeaea;
+      @include font-semibold;
+      padding: 10px 10px 10px 16px;
+      display: flex;
+      justify-content: space-between;
+
+      .header-memberships {
+        display: flex;
+
+        .one-label-tip {
+          display: flex;
+          align-items: center;
+          margin-left: 0.4em;
+        }
+      }
+    }
+
+    .membership-visualiser {
+      min-height: 50px;
+
+      .membership-block {
+        padding-left: 1.45em;
+      }
+    }
+
+    .body-memberships {
+      border: 1px solid $table-border-color;
+      border-radius: 0 0 $border-radius-base $border-radius-base;
+    }
+
+    .show-descriptions-toggle {
+      font-size: 85%;
+      font-weight: normal;
+
+      label {
+        margin-right: 0.8em;
+      }
+    }
+
+    .member-content {
+      @media (min-width: $screen-lg-min) {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+
+        .member-privileges-table {
+          width: 50%;
+          max-width: 600px;
+        }
+        .memberships-container {
+          flex-grow: 1;
+        }
+      }
+    }
+
+    .content-row {
+      button:first-of-type {
+        margin-right: $padding-xs-horizontal;
+      }
+    }
+  }
+
+  .content-row h1 {
+    .show-only-direct {
+      float: right;
+      padding-right: 2.7em;
+      font-size: 70%;
+
+      label {
+        padding-right: 0.8em;
+        text-transform: none;
+        letter-spacing: normal;
+      }
+
+      div.one-way-toggle {
+        margin-top: -0.2em;
+      }
+    }
   }
 
   .member-item .one-collapsible-list-item-header {
@@ -27,7 +115,7 @@
   }
 
   .privileges-of-owner-warning {
-    margin: $padding-large-horizontal;
+    margin: $padding-large-horizontal $padding-base-horizontal;
   }
 
   .privileges-tree-editor {
@@ -36,7 +124,6 @@
   }
 
   .membership-visualiser {
-    margin: $padding-large-horizontal;
     .membership:last-child {
       border-bottom: 0;
     }

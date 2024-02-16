@@ -1,0 +1,38 @@
+tr.privilege-row {
+  font-size: 85%;
+  background-color: $block-background-color;
+
+  td.priv:first-child {
+    padding-left: 3.4em;
+    vertical-align: middle;
+  }
+
+  .priv-revoke {
+    font-size: 200%;
+    font-weight: bold;
+    color: #BEBEBE;
+  }
+
+  .modified-priv {
+    font-weight: bold;
+  }
+
+  .effective {
+    display: flex;
+    justify-content: center;
+    padding: $padding-xs-horizontal;
+
+    span {
+      display: block;
+    }
+
+    &.not-granted {
+      padding-top: $padding-small-vertical;
+      padding-bottom: $padding-small-vertical;
+    }
+  }
+  .oneicon-checked {
+    font-size: 240%;
+    color: $color-one-mint;
+  }
+}
