@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11724 Added new icons to the automation GUI
 * VFS-11595 Changed classnames that were blocked by Qwant browser add-on
 * VFS-11582 Fixed showing tokens list when one of invite targets gets deleted
 * VFS-11455 Added conflicting name detector in tokens editor
