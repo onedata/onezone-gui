@@ -7,6 +7,7 @@ CHANGELOG
 ### Latest changes
 
 * VFS-11696 Optimized tokens editor performance
+* VFS-11564 Added overflow handling to the chart tooltip
 * VFS-11317 Changed view of members
 * VFS-11608 Added resource subheaders to modals in automation
 * VFS-11594 Fixed popovers broken position after their content size change
