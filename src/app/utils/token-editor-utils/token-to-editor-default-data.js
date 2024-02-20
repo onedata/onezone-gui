@@ -6,41 +6,87 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import EmberObject, {
+import {
   getProperties,
-  get,
   set,
 } from '@ember/object';
 import { resolve, all as allFulfilled } from 'rsvp';
+import moment from 'moment';
+import { createValuesContainer } from 'onedata-gui-common/utils/form-component/values-container';
+import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
 
 /**
- * Set of converters for each token caveat. Used to convert array of caveats from a token
- * to a form consumable by the token editor. Its is a mapping:
- * token caveat type (from raw token) ->
- *  (rawCaveat: Object, getRecord: Function) => Promise<Object>
- * where returned promise resolves to a caveat object ready to use by token editor.
+ * Set of converting utilities for each token caveat. Contains the name of the token
+ * in the model and function converting backend caveat format into the one
+ * used by token editor. If caveat is not specified, converter function will return
+ * default value for that caveat.
  */
 const caveatConverters = {
-  'time': caveat => resolve(new Date((get(caveat, 'validUntil') || 0) * 1000)),
-  'geo.region': regionCountryConverter,
-  'geo.country': regionCountryConverter,
-  'asn': caveat => resolve(get(caveat, 'whitelist')),
-  'ip': caveat => resolve(get(caveat, 'whitelist')),
-  'consumer': consumerConverter,
-  'service': serviceConverter,
-  'interface': caveat => resolve(get(caveat, 'interface')),
-  'data.readonly': () => resolve(true),
-  'data.path': pathConverter,
-  'data.objectid': objectIdConverter,
-};
-
-const caveatNamesInEditor = {
-  'time': 'expire',
-  'geo.region': 'region',
-  'geo.country': 'country',
-  'data.readonly': 'readonly',
-  'data.path': 'path',
-  'data.objectid': 'objectId',
+  timeCaveats: {
+    expire: {
+      backendName: 'time',
+      converter: expireConverter,
+    },
+  },
+  geoCaveats: {
+    region: {
+      backendName: 'geo.region',
+      converter: regionConverter,
+    },
+    country: {
+      backendName: 'geo.country',
+      converter: countryConverter,
+    },
+  },
+  networkCaveats: {
+    asn: {
+      backendName: 'asn',
+      converter: async (caveat) => createValuesContainer({
+        asnEnabled: Boolean(caveat),
+        asn: caveat?.whitelist ?? [],
+      }),
+    },
+    ip: {
+      backendName: 'ip',
+      converter: async (caveat) => createValuesContainer({
+        ipEnabled: Boolean(caveat),
+        ip: caveat?.whitelist ?? [],
+      }),
+    },
+  },
+  endpointCaveats: {
+    consumer: {
+      backendName: 'consumer',
+      converter: consumerConverter,
+    },
+    service: {
+      backendName: 'service',
+      converter: serviceConverter,
+    },
+    interface: {
+      backendName: 'interface',
+      converter: async (caveat) => createValuesContainer({
+        interfaceEnabled: Boolean(caveat),
+        interface: caveat?.interface ?? 'rest',
+      }),
+    },
+  },
+  dataAccessCaveats: {
+    readonly: {
+      backendName: 'data.readonly',
+      converter: async (caveat) => createValuesContainer({
+        readonlyEnabled: Boolean(caveat),
+      }),
+    },
+    path: {
+      backendName: 'data.path',
+      converter: pathConverter,
+    },
+    objectId: {
+      backendName: 'data.objectid',
+      converter: objectIdConverter,
+    },
+  },
 };
 
 const prefixToConsumerModel = {
@@ -51,11 +97,7 @@ const prefixToConsumerModel = {
 
 const decodedPathRegexp = /^\/([^/]+)(.*)$/;
 
-export default function tokenToEditorDefaultData(token, getRecord) {
-  if (!token) {
-    return resolve(EmberObject.create());
-  }
-
+export default async function tokenToEditorDefaultData(token, getRecord) {
   const {
     name,
     revoked,
@@ -70,7 +112,7 @@ export default function tokenToEditorDefaultData(token, getRecord) {
     usageCount,
     caveats,
   } = getProperties(
-    token,
+    token ?? {},
     'name',
     'revoked',
     'token',
@@ -85,64 +127,102 @@ export default function tokenToEditorDefaultData(token, getRecord) {
     'caveats'
   );
 
-  const defaultData = EmberObject.create({
-    name,
-    revoked,
-    tokenString,
-    type: typeName,
-    inviteType,
-    privileges,
-    usageLimit,
-    usageCount,
-    caveats: EmberObject.create(),
+  const inviteTypeSpec = tokenInviteTypeToTargetModelMapping[inviteType];
+  let privilegesTarget = undefined;
+  if (inviteTypeSpec?.modelName && inviteTypeSpec?.hasPrivileges) {
+    privilegesTarget = inviteTypeSpec.modelName;
+  }
+
+  const formData = createValuesContainer({
+    basic: createValuesContainer({
+      name: name ?? '',
+      revoked: revoked ?? false,
+      tokenString: tokenString ?? '',
+      type: typeName ?? 'access',
+      inviteDetails: createValuesContainer({
+        inviteType: inviteType ?? 'userJoinGroup',
+        inviteTargetDetails: createValuesContainer({
+          target: await (tokenTargetProxy || resolve(undefined))
+            .catch(() => undefined)
+            .then(record => {
+              if (record) {
+                return record;
+              }
+              if (targetRecordId && targetModelName) {
+                return {
+                  constructor: {
+                    modelName: targetModelName,
+                  },
+                  entityId: targetRecordId,
+                  name: `ID: ${targetRecordId ? targetRecordId : 'unknown'}`,
+                };
+              }
+              return undefined;
+            }),
+          invitePrivilegesDetails: createValuesContainer({
+            privileges: privileges ? {
+              privilegesTarget,
+              privileges,
+            } : undefined,
+          }),
+        }),
+        usageLimit: createValuesContainer({
+          usageLimitType: Number.isInteger(usageLimit) ? 'number' : 'infinity',
+          usageLimitNumber: Number.isInteger(usageLimit) ? String(usageLimit) : '',
+        }),
+        usageCount: `${usageCount} / ${usageLimit}`,
+      }),
+    }),
+    caveats: createValuesContainer(),
   });
 
-  const inviteTargetPromise = (tokenTargetProxy || resolve(null))
-    .catch(() => null)
-    .then(record => {
-      set(defaultData, 'inviteTarget', record ? record : {
-        constructor: {
-          modelName: targetModelName,
-        },
-        entityId: targetRecordId,
-        name: `ID: ${targetRecordId ? targetRecordId : 'unknown'}`,
-      });
-    });
-
-  const caveatsPromise = allFulfilled(
-    (caveats || []).map(caveat => convertCaveat(caveat, defaultData, getRecord))
-  ).then(() =>
-    set(defaultData, 'hasCaveats', Object.keys(get(defaultData, 'caveats')).length > 0)
-  );
-
-  return allFulfilled([
-    inviteTargetPromise,
-    caveatsPromise,
-  ]).then(() => defaultData);
-}
-
-function convertCaveat(caveat, defaultDataObject, getRecord) {
-  const caveatType = get(caveat, 'type');
-  const caveatConverter = caveatConverters[caveatType];
-  if (caveatConverter) {
-    const editorCaveatName = caveatNamesInEditor[caveatType] || caveatType;
-    return caveatConverter(caveat, getRecord).then(convertedCaveat =>
-      set(defaultDataObject, `caveats.${editorCaveatName}`, convertedCaveat)
-    );
-  } else {
-    return resolve();
+  const caveatPromises = [];
+  for (const [sectionName, nestedCaveats] of Object.entries(caveatConverters)) {
+    set(formData.caveats, sectionName, createValuesContainer());
+    for (
+      const [caveatName, { backendName, converter }] of Object.entries(nestedCaveats)
+    ) {
+      const caveatValue = caveats?.find(({ type }) => type === backendName);
+      caveatPromises.push(converter(caveatValue, getRecord).then((val) =>
+        set(formData.caveats[sectionName], `${caveatName}Caveat`, val)
+      ));
+    }
   }
+
+  await allFulfilled(caveatPromises);
+  return formData;
 }
 
-function regionCountryConverter(caveat) {
-  return resolve(EmberObject.create({
-    type: get(caveat, 'filter'),
-    list: get(caveat, 'list'),
-  }));
+async function expireConverter(caveat) {
+  return createValuesContainer({
+    expireEnabled: Boolean(caveat?.validUntil),
+    expire: caveat?.validUntil ?
+      new Date(caveat.validUntil * 1000) : moment().add(1, 'day').endOf('day').toDate(),
+  });
+}
+
+async function countryConverter(caveat) {
+  return createValuesContainer({
+    countryEnabled: Boolean(caveat),
+    country: createValuesContainer({
+      countryType: caveat?.filter ?? 'whitelist',
+      countryList: caveat?.list ?? [],
+    }),
+  });
+}
+
+async function regionConverter(caveat) {
+  return createValuesContainer({
+    regionEnabled: Boolean(caveat),
+    region: createValuesContainer({
+      regionType: caveat?.filter ?? 'whitelist',
+      regionList: caveat?.list ?? [],
+    }),
+  });
 }
 
 function consumerConverter(caveat, getRecord) {
-  const whitelist = get(caveat, 'whitelist') || [];
+  const whitelist = caveat?.whitelist || [];
   return allFulfilled(whitelist.map(recordIdentifier => {
     const [modelAbbrev, entityId] = recordIdentifier.split('-');
     const modelName = prefixToConsumerModel[modelAbbrev];
@@ -165,11 +245,14 @@ function consumerConverter(caveat, getRecord) {
           model: modelName,
         }));
     }
-  })).then(consumers => consumers.compact());
+  })).then(consumers => createValuesContainer({
+    consumerEnabled: Boolean(caveat),
+    consumer: consumers.compact(),
+  }));
 }
 
 function serviceConverter(caveat, getRecord) {
-  const whitelist = get(caveat, 'whitelist') || [];
+  const whitelist = caveat?.whitelist || [];
   return allFulfilled(whitelist.map(recordIdentifier => {
     const [modelAbbrev, entityId] = recordIdentifier.split('-');
     const editorModelName = ['opp', 'ozp'].includes(modelAbbrev) ?
@@ -192,29 +275,32 @@ function serviceConverter(caveat, getRecord) {
           model: editorModelName,
         }));
     }
+  })).then((services) => createValuesContainer({
+    serviceEnabled: Boolean(caveat),
+    service: services,
   }));
 }
 
 function pathConverter(caveat, getRecord) {
-  const whitelist = get(caveat, 'whitelist');
+  const whitelist = caveat?.whitelist;
   const caveatDefaultData = {
     __fieldsValueNames: [],
   };
   const spacesFetchPromises = [];
-  whitelist.forEach((encodedPath, index) => {
+  whitelist?.forEach((encodedPath, index) => {
     const valueName = `pathEntry${index}`;
     const decodedPath = atob(encodedPath);
     let [, spaceEntityId, pathString] = decodedPath.match(decodedPathRegexp);
     pathString = pathString || '/';
     const spaceFetchPromise = getRecord('space', spaceEntityId)
       .then(pathSpace => {
-        caveatDefaultData[valueName] = {
+        caveatDefaultData[valueName] = createValuesContainer({
           pathSpace,
           pathString,
-        };
+        });
       })
       .catch(() => {
-        caveatDefaultData[valueName] = {
+        caveatDefaultData[valueName] = createValuesContainer({
           pathSpace: {
             constructor: {
               modelName: 'space',
@@ -222,23 +308,29 @@ function pathConverter(caveat, getRecord) {
             entityId: spaceEntityId,
           },
           pathString,
-        };
+        });
       });
     spacesFetchPromises.push(spaceFetchPromise);
     caveatDefaultData.__fieldsValueNames.push(valueName);
   });
-  return allFulfilled(spacesFetchPromises).then(() => caveatDefaultData);
+  return allFulfilled(spacesFetchPromises).then(() => createValuesContainer({
+    pathEnabled: Boolean(caveat),
+    path: createValuesContainer(caveatDefaultData),
+  }));
 }
 
-function objectIdConverter(caveat) {
-  const whitelist = get(caveat, 'whitelist');
+async function objectIdConverter(caveat) {
+  const whitelist = caveat?.whitelist;
   const caveatDefaultData = {
     __fieldsValueNames: [],
   };
-  whitelist.forEach((objectId, index) => {
+  whitelist?.forEach((objectId, index) => {
     const valueName = `objectIdEntry${index}`;
     caveatDefaultData[valueName] = objectId;
     caveatDefaultData.__fieldsValueNames.push(valueName);
   });
-  return resolve(caveatDefaultData);
+  return createValuesContainer({
+    objectIdEnabled: Boolean(caveat),
+    objectId: createValuesContainer(caveatDefaultData),
+  });
 }

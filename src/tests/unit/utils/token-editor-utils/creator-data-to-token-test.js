@@ -154,7 +154,9 @@ describe('Unit | Utility | token-editor-utils/creator-data-to-token', function (
                 inviteType,
                 inviteTargetDetails: {
                   invitePrivilegesDetails: {
-                    privileges: ['space_view'],
+                    privileges: {
+                      privileges: ['space_view'],
+                    },
                   },
                 },
               },
@@ -174,7 +176,9 @@ describe('Unit | Utility | token-editor-utils/creator-data-to-token', function (
                 inviteType,
                 inviteTargetDetails: {
                   invitePrivilegesDetails: {
-                    privileges: ['space_view'],
+                    privileges: {
+                      privileges: ['space_view'],
+                    },
                   },
                 },
               },
@@ -204,7 +208,9 @@ describe('Unit | Utility | token-editor-utils/creator-data-to-token', function (
                   entityId: 'abc',
                 },
                 invitePrivilegesDetails: {
-                  privileges: ['space_view'],
+                  privileges: {
+                    privileges: ['space_view'],
+                  },
                 },
               },
             },

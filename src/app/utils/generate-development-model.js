@@ -616,12 +616,22 @@ function createTokensRecords(store) {
       type: {
         inviteToken: { inviteType },
       },
+      metadata: {
+        creationTime: moment().subtract(1, 'hour').unix(),
+        usageLimit: 20,
+        usageCount: 10,
+      },
     }).save();
     const notExpiredInviteTokenPromise = store.createRecord('token', {
       name: 'Not expired invite token ' + i,
       revoked: false,
       type: {
         inviteToken: { inviteType },
+      },
+      metadata: {
+        creationTime: moment().subtract(1, 'hour').unix(),
+        usageLimit: 20,
+        usageCount: 10,
       },
     }).save();
     promises.push(

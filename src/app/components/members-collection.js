@@ -1,5 +1,5 @@
 /**
- * Renders list of members with additional features specified by `aspect` property.
+ * Renders list of members.
  * Yields list when there are no items to present.
  *
  * @author Michał Borzęcki
@@ -72,6 +72,12 @@ export default Component.extend(I18n, {
   owners: undefined,
 
   /**
+   * @virtual
+   * @type {string}
+   */
+  modelTypeTranslation: undefined,
+
+  /**
    * If greater than 0, autocollapses list on init if number of records is over
    * `collapseForNumber`. If equal to 0, list is never autocollapsed.
    * @type {number}
@@ -124,22 +130,17 @@ export default Component.extend(I18n, {
   privilegesTranslationsPath: undefined,
 
   /**
+   * If true, only direct members of the record will be visible
+   * @type {boolean}
+   * @virtual
+   */
+  onlyDirect: false,
+
+  /**
    * Is calculated by `membersObserver`
    * @type {Array<Utils/MembersCollection/ItemProxy>}
    */
   membersProxyList: Object.freeze([]),
-
-  /**
-   * One of: privileges, memberships
-   * @type {string}
-   */
-  aspect: 'privileges',
-
-  /**
-   * If true, only direct members of the record will be visible
-   * @type {boolean}
-   */
-  onlyDirect: true,
 
   /**
    * If true, membership-visualiser component will show path descriptions
@@ -216,7 +217,7 @@ export default Component.extend(I18n, {
 
   /**
    * One of `directMembers`, `effectiveMembers` depending on
-   * `onlyDirect` flag
+   *`onlyDirect` flag
    * @type {Ember.ComputedProperty<PromiseArray<DS.ManyArray<GraphSingleModel>>>}
    */
   members: computed(
@@ -229,21 +230,10 @@ export default Component.extend(I18n, {
     }
   ),
 
-  /**
-   * Controls whether save/cancel buttons should be rendered or not
-   * @type {Ember.ComputedProperty<boolean>}
-   */
-  showSaveCancel: computed('aspect', 'onlyDirect', function showSaveCancel() {
-    const {
-      aspect,
-      onlyDirect,
-    } = this.getProperties('aspect', 'onlyDirect');
-    return aspect === 'privileges' && onlyDirect;
-  }),
-
   membersObserver: observer(
     'members.@each.{entityId,name,username}',
     'onlyDirect',
+    'directMembers.[]',
     function membersObserver() {
       const {
         owners,
@@ -253,7 +243,6 @@ export default Component.extend(I18n, {
         members,
         membersProxyList,
         groupedPrivilegesFlags,
-        onlyDirect,
         currentUser,
         isListCollapsed,
         collapseForNumber,
@@ -267,7 +256,6 @@ export default Component.extend(I18n, {
         'members',
         'membersProxyList',
         'groupedPrivilegesFlags',
-        'onlyDirect',
         'currentUser',
         'isListCollapsed',
         'collapseForNumber',
@@ -279,7 +267,6 @@ export default Component.extend(I18n, {
         get(members, 'length') > collapseForNumber) {
         this.set('isListCollapsed', true);
       }
-
       // Create ordered list of members. Records should be sorted by name except
       // current user record and owners - they should be always at the top.
       const currentUserMember =
@@ -293,6 +280,7 @@ export default Component.extend(I18n, {
         } = getProperties(member, 'entityId', 'name', 'username');
         let key = member === currentUserMember ? '0\n' : '1\n';
         key += (owners || []).includes(member) ? '0\n' : '1\n';
+        key += this.directMembers.includes(member) ? '0\n' : '1\n';
         key += `${name}\n`;
         if (subjectType === 'user') {
           key += `${username || '\n'}\n`;
@@ -308,13 +296,15 @@ export default Component.extend(I18n, {
       const newMembersProxyList = orderedMembers.map(member => {
         let proxy = membersProxyList.findBy('member', member);
         // If proxy has not been generated for that member, create new empty proxy.
-        if (!proxy) {
+        if (!proxy || proxy.isDirect != directMembers.includes(member)) {
           proxy = ItemProxy.create({
             id: get(member, 'id'),
             member,
             owners,
             directMembers,
+            isDirect: directMembers.includes(member),
             privilegesProxy: {},
+            effectivePrivilegesProxy: {},
             isYou: member === currentUserMember,
             directMemberActions: itemActionsGenerator(
               member,
@@ -328,19 +318,28 @@ export default Component.extend(I18n, {
             ),
           });
         }
-        // If privileges mode is different, generate new privileges object.
-        if (get(proxy, 'privilegesProxy.direct') !== onlyDirect) {
-          const privilegesGri = this.getPrivilegesGriForMember(member);
+        if (directMembers.includes(member)) {
+          const directPrivilegesGri = this.getPrivilegesGriForMember(member, true);
           const privilegesProxy = PrivilegeRecordProxy.create(
             getOwner(this).ownerInjection(), {
               groupedPrivilegesFlags,
-              griArray: [privilegesGri],
-              direct: onlyDirect,
-              isReadOnly: !onlyDirect,
+              griArray: [directPrivilegesGri],
+              direct: true,
+              isReadOnly: false,
             }
           );
           set(proxy, 'privilegesProxy', privilegesProxy);
         }
+        const effectivePrivilegesGri = this.getPrivilegesGriForMember(member, false);
+        const effectivePrivilegesProxy = PrivilegeRecordProxy.create(
+          getOwner(this).ownerInjection(), {
+            groupedPrivilegesFlags,
+            griArray: [effectivePrivilegesGri],
+            direct: false,
+            isReadOnly: true,
+          }
+        );
+        set(proxy, 'effectivePrivilegesProxy', effectivePrivilegesProxy);
         return proxy;
       });
       this.set('membersProxyList', newMembersProxyList);
@@ -349,15 +348,6 @@ export default Component.extend(I18n, {
       }
     }
   ),
-
-  aspectObserver: observer('aspect', function aspectObserver() {
-    // Reset privileges modification state after aspect change
-    this.get('membersProxyList').forEach(memberProxy => {
-      if (get(memberProxy, 'privilegesProxy.isModified')) {
-        get(memberProxy, 'privilegesProxy').resetModifications();
-      }
-    });
-  }),
 
   init() {
     this._super(...arguments);
@@ -385,13 +375,12 @@ export default Component.extend(I18n, {
    * @param {string} type `group` or `user`
    * @returns {string}
    */
-  getPrivilegesGriForMember(member) {
+  getPrivilegesGriForMember(member, isForDirectPrivileges) {
     const {
       record,
       recordType,
       griAspect,
-      onlyDirect,
-    } = this.getProperties('record', 'recordType', 'griAspect', 'onlyDirect');
+    } = this.getProperties('record', 'recordType', 'griAspect');
     let recordId;
     let subjectId;
     try {
@@ -405,7 +394,7 @@ export default Component.extend(I18n, {
       );
       return '';
     }
-    const griAspectPrefix = onlyDirect ? '' : 'eff_';
+    const griAspectPrefix = isForDirectPrivileges ? '' : 'eff_';
     return this.get('privilegeManager').generateGri(
       recordType,
       recordId,

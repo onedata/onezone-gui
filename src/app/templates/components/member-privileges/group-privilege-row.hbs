@@ -1,0 +1,37 @@
+<td
+  onclick={{action "changeOpenGroup"}}
+  class={{concat-classes
+    "priv-group"
+    (if isModified "modified-priv")
+  }}
+>
+  <div class="group-privilege-text-container">
+    {{#if isOpen}}
+      {{one-icon icon="arrow-up"}}
+    {{else}}
+      {{one-icon icon="arrow-down"}}
+    {{/if}}
+    <div>{{privilegesGroup.text}}</div>
+  </div>
+</td>
+{{#if isDirect}}
+  {{member-privileges/group-privileges-cell
+    privileges=privileges
+    groupPrivilegeName=privilegesGroup.text
+    inputChanged=(action "inputChanged")
+    form=form
+    isDirect=true
+    editionEnabled=editionEnabled
+  }}
+{{else}}
+  <td class="toggle-column direct group na">{{tt this "na"}}</td>
+{{/if}}
+{{#if (not isBulkEdit)}}
+  {{member-privileges/group-privileges-cell
+    privileges=effectivePrivilegeValues
+    groupPrivilegeName=privilegesGroup.text
+    inputChanged=(action "inputChanged")
+    form=form
+    isDirect=false
+  }}
+{{/if}}

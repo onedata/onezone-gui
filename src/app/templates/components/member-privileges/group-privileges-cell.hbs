@@ -1,0 +1,26 @@
+{{#if isDirect}}
+  {{#form.group}}
+    {{one-way-toggle
+      class=inputClass
+      inputId=inputId
+      checked=state
+      threeState=true
+      allowThreeStateToggle=true
+      showLockForReadOnly=false
+      isReadOnly=false
+      update=(action "inputChanged")
+      isReadOnly=(not editionEnabled)
+    }}
+  {{/form.group}}
+{{else}}
+  <span
+    class={{concat-classes
+      "pill"
+      (if (eq state false) "grey")
+      (if (eq state 2) "yellow")
+      (if (eq state true) "green")
+    }}
+  >
+    {{privilegesGrantedCount}}/{{privilegesCount}}
+  </span>
+{{/if}}
