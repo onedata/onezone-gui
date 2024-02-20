@@ -1,7 +1,7 @@
 {{#promise-proxy-container proxy=tokenDataSource}}
   <form class="form form-horizontal form-component">
     {{form-component/field-renderer field=basicGroup}}
-    {{#if (or (eq mode "create") tokenDataSource.hasCaveats)}}
+    {{#if (or (eq mode "create") hasVisibleCaveats)}}
       <h1 class="caveats-header">
         {{tt this "fields.caveats.header"}}
       </h1>
@@ -16,7 +16,7 @@
             class="toggle-icon"
           }}
         </a>
-        {{#if (and (not areAllCaveatsExpanded) (not hasExpandedCaveats))}}
+        {{#if (and (not areAllCaveatsExpanded) (not hasVisibleCaveats))}}
           <p class="no-caveats-warning">
             {{tt this "noCaveatsBeforeExpand"}}
             <a onClick={{action "toggleCaveatsGroup"}}>{{tt this "noCaveatsExpand"}}</a>

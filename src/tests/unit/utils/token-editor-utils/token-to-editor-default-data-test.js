@@ -6,37 +6,42 @@ import _ from 'lodash';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { resolve, reject } from 'rsvp';
 import moment from 'moment';
+import plainCopy from 'onedata-gui-common/utils/plain-copy';
 
 describe('Unit | Utility | token-editor-utils/token-to-editor-default-data', function () {
   it('converts name', function () {
     return tokenToEditorDefaultData({ name: 't1' })
-      .then(result => expect(get(result, 'name')).to.equal('t1'));
+      .then(result => expect(get(result, 'basic.name')).to.equal('t1'));
   });
 
   it('converts revoked', function () {
     return tokenToEditorDefaultData({ revoked: true })
-      .then(result => expect(get(result, 'revoked')).to.be.true);
+      .then(result => expect(get(result, 'basic.revoked')).to.be.true);
   });
 
   it('converts token string', function () {
     return tokenToEditorDefaultData({ token: 'abc' })
-      .then(result => expect(get(result, 'tokenString')).to.equal('abc'));
+      .then(result => expect(get(result, 'basic.tokenString')).to.equal('abc'));
   });
 
   it('converts type', function () {
     return tokenToEditorDefaultData({ typeName: 'identity' })
-      .then(result => expect(get(result, 'type')).to.equal('identity'));
+      .then(result => expect(get(result, 'basic.type')).to.equal('identity'));
   });
 
   it('converts invite type', function () {
     return tokenToEditorDefaultData({ inviteType: 'userJoinSpace' })
-      .then(result => expect(get(result, 'inviteType')).to.equal('userJoinSpace'));
+      .then(result =>
+        expect(get(result, 'basic.inviteDetails.inviteType')).to.equal('userJoinSpace')
+      );
   });
 
   it('converts invite target (fetch success)', function () {
     const tokenTargetProxy = PromiseObject.create({ promise: resolve('sth') });
     return tokenToEditorDefaultData({ tokenTargetProxy })
-      .then(result => expect(get(result, 'inviteTarget')).to.equal('sth'));
+      .then(result => expect(
+        get(result, 'basic.inviteDetails.inviteTargetDetails.target')
+      ).to.equal('sth'));
   });
 
   it('converts invite target (id not specified, fetched null)', function () {
@@ -44,13 +49,9 @@ describe('Unit | Utility | token-editor-utils/token-to-editor-default-data', fun
     return tokenToEditorDefaultData({
       tokenTargetProxy,
       targetModelName: 'space',
-    }).then(result => expect(get(result, 'inviteTarget')).to.deep.equal({
-      constructor: {
-        modelName: 'space',
-      },
-      entityId: undefined,
-      name: 'ID: unknown',
-    }));
+    }).then(result => expect(
+      get(result, 'basic.inviteDetails.inviteTargetDetails.target')
+    ).to.be.undefined);
   });
 
   it('converts invite target (id specified, fetched null)', function () {
@@ -59,7 +60,9 @@ describe('Unit | Utility | token-editor-utils/token-to-editor-default-data', fun
       tokenTargetProxy,
       targetModelName: 'space',
       targetRecordId: 'space1',
-    }).then(result => expect(get(result, 'inviteTarget')).to.deep.equal({
+    }).then(result => expect(
+      get(result, 'basic.inviteDetails.inviteTargetDetails.target')
+    ).to.deep.equal({
       constructor: {
         modelName: 'space',
       },
@@ -74,7 +77,9 @@ describe('Unit | Utility | token-editor-utils/token-to-editor-default-data', fun
       tokenTargetProxy,
       targetModelName: 'space',
       targetRecordId: 'space1',
-    }).then(result => expect(get(result, 'inviteTarget')).to.deep.equal({
+    }).then(result => expect(
+      get(result, 'basic.inviteDetails.inviteTargetDetails.target')
+    ).to.deep.equal({
       constructor: {
         modelName: 'space',
       },
@@ -85,27 +90,26 @@ describe('Unit | Utility | token-editor-utils/token-to-editor-default-data', fun
 
   it('converts privileges', function () {
     const privileges = ['space_view'];
-    return tokenToEditorDefaultData({ privileges })
-      .then(result => expect(get(result, 'privileges')).to.equal(privileges));
+    return tokenToEditorDefaultData({ inviteType: 'userJoinSpace', privileges })
+      .then(result => expect(get(
+        result,
+        'basic.inviteDetails.inviteTargetDetails.invitePrivilegesDetails.privileges'
+      )).to.deep.equal({
+        privilegesTarget: 'space',
+        privileges,
+      }));
   });
 
-  it('converts usageLimit', function () {
-    return tokenToEditorDefaultData({ usageLimit: 4 })
-      .then(result => expect(get(result, 'usageLimit')).to.equal(4));
+  it('converts usageLimit and usageCount', function () {
+    return tokenToEditorDefaultData({ usageLimit: 4, usageCount: 3 })
+      .then(result => {
+        expect(get(result, 'basic.inviteDetails.usageLimit.usageLimitType'))
+          .to.equal('number');
+        expect(get(result, 'basic.inviteDetails.usageLimit.usageLimitNumber'))
+          .to.equal('4');
+        expect(get(result, 'basic.inviteDetails.usageCount')).to.equal('3 / 4');
+      });
   });
-
-  it('converts usageCount', function () {
-    return tokenToEditorDefaultData({ usageCount: 3 })
-      .then(result => expect(get(result, 'usageCount')).to.equal(3));
-  });
-
-  it(
-    'returns result with empty caveats object, when no caveats were passed',
-    function () {
-      return tokenToEditorDefaultData({ caveats: [] })
-        .then(result => expect(Object.keys(get(result, 'caveats'))).to.be.empty);
-    }
-  );
 
   it('converts time caveat', function () {
     const expireTimestamp = Math.floor(new Date().valueOf() / 1000);
@@ -116,7 +120,7 @@ describe('Unit | Utility | token-editor-utils/token-to-editor-default-data', fun
         validUntil: expireTimestamp,
       }],
     }).then(result => {
-      const caveatValue = get(result, 'caveats.expire');
+      const caveatValue = get(result, 'caveats.timeCaveats.expireCaveat.expire');
       expect(caveatValue).to.be.an.instanceof(Date);
       expect(moment(caveatValue).unix()).to.equal(expireTimestamp);
     });
@@ -136,9 +140,10 @@ describe('Unit | Utility | token-editor-utils/token-to-editor-default-data', fun
           list,
         }],
       }).then(result => {
-        const caveatValue = get(result, `caveats.${caveatName}`);
-        expect(get(caveatValue, 'type')).to.equal('blacklist');
-        expect(get(caveatValue, 'list')).to.equal(list);
+        const caveatValue =
+          get(result, `caveats.geoCaveats.${caveatName}Caveat.${caveatName}`);
+        expect(get(caveatValue, `${caveatName}Type`)).to.equal('blacklist');
+        expect(get(caveatValue, `${caveatName}List`)).to.equal(list);
       });
     });
   });
@@ -155,7 +160,9 @@ describe('Unit | Utility | token-editor-utils/token-to-editor-default-data', fun
           type: caveatName,
           whitelist,
         }],
-      }).then(result => expect(get(result, `caveats.${caveatName}`)).to.equal(whitelist));
+      }).then(result => expect(
+        get(result, `caveats.networkCaveats.${caveatName}Caveat.${caveatName}`)
+      ).to.equal(whitelist));
     });
   });
 
@@ -192,7 +199,8 @@ describe('Unit | Utility | token-editor-utils/token-to-editor-default-data', fun
           model: modelName,
         }])
       );
-      expect(get(result, 'caveats.consumer')).to.deep.equal(correctResult);
+      expect(get(result, 'caveats.endpointCaveats.consumerCaveat.consumer'))
+        .to.deep.equal(correctResult);
     });
   });
 
@@ -251,7 +259,8 @@ describe('Unit | Utility | token-editor-utils/token-to-editor-default-data', fun
         },
         model: 'serviceOnepanel',
       }];
-      expect(get(result, 'caveats.service')).to.deep.equal(correctResult);
+      expect(get(result, 'caveats.endpointCaveats.serviceCaveat.service'))
+        .to.deep.equal(correctResult);
     });
   });
 
@@ -261,7 +270,10 @@ describe('Unit | Utility | token-editor-utils/token-to-editor-default-data', fun
         type: 'interface',
         interface: 'oneclient',
       }],
-    }).then(result => expect(get(result, 'caveats.interface')).to.equal('oneclient'));
+    }).then(result =>
+      expect(get(result, 'caveats.endpointCaveats.interfaceCaveat.interface'))
+      .to.equal('oneclient')
+    );
   });
 
   it('converts readonly caveat', function () {
@@ -269,7 +281,10 @@ describe('Unit | Utility | token-editor-utils/token-to-editor-default-data', fun
       caveats: [{
         type: 'data.readonly',
       }],
-    }).then(result => expect(get(result, 'caveats.readonly')).to.equal(true));
+    }).then(result =>
+      expect(get(result, 'caveats.dataAccessCaveats.readonlyCaveat.readonlyEnabled'))
+      .to.equal(true)
+    );
   });
 
   it('converts path caveat', function () {
@@ -283,30 +298,31 @@ describe('Unit | Utility | token-editor-utils/token-to-editor-default-data', fun
         ],
       }],
     }, getRecordMock).then(result => {
-      expect(get(result, 'caveats.path')).to.deep.equal({
-        pathEntry0: {
-          pathSpace: {
-            entityId: 's1',
-          },
-          pathString: '/abc/def',
-        },
-        pathEntry1: {
-          pathSpace: {
-            entityId: 's1',
-          },
-          pathString: '/',
-        },
-        pathEntry2: {
-          pathSpace: {
-            constructor: {
-              modelName: 'space',
+      expect(plainCopy(get(result, 'caveats.dataAccessCaveats.pathCaveat.path')))
+        .to.deep.equal({
+          pathEntry0: {
+            pathSpace: {
+              entityId: 's1',
             },
-            entityId: 'unknown',
+            pathString: '/abc/def',
           },
-          pathString: '/abc/def/ghi',
-        },
-        __fieldsValueNames: ['pathEntry0', 'pathEntry1', 'pathEntry2'],
-      });
+          pathEntry1: {
+            pathSpace: {
+              entityId: 's1',
+            },
+            pathString: '/',
+          },
+          pathEntry2: {
+            pathSpace: {
+              constructor: {
+                modelName: 'space',
+              },
+              entityId: 'unknown',
+            },
+            pathString: '/abc/def/ghi',
+          },
+          __fieldsValueNames: ['pathEntry0', 'pathEntry1', 'pathEntry2'],
+        });
     });
   });
 
@@ -319,11 +335,14 @@ describe('Unit | Utility | token-editor-utils/token-to-editor-default-data', fun
           'def',
         ],
       }],
-    }).then(result => expect(get(result, 'caveats.objectId')).to.deep.equal({
-      objectIdEntry0: 'abc',
-      objectIdEntry1: 'def',
-      __fieldsValueNames: ['objectIdEntry0', 'objectIdEntry1'],
-    }));
+    }).then(result =>
+      expect(plainCopy(get(result, 'caveats.dataAccessCaveats.objectIdCaveat.objectId')))
+      .to.deep.equal({
+        objectIdEntry0: 'abc',
+        objectIdEntry1: 'def',
+        __fieldsValueNames: ['objectIdEntry0', 'objectIdEntry1'],
+      })
+    );
   });
 });
 
