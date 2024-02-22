@@ -107,6 +107,14 @@ export default Component.extend(DisabledPaths, I18n, {
     return `field-${this.privilegesGroupName} form-control`;
   }),
 
+  isModifiedPriv: computed(
+    'previousDirectPrivilegeValue',
+    'directPrivilegeValue',
+    function isModifiedPriv() {
+      return this.previousDirectPrivilegeValue !== this.directPrivilegeValue;
+    }
+  ),
+
   actions: {
     /**
      * Notifies about change in input.

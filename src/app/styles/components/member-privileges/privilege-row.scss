@@ -7,10 +7,17 @@ tr.privilege-row {
     vertical-align: middle;
   }
 
-  .priv-revoke {
-    font-size: 200%;
+  .priv-revoke, .priv-unknown {
     font-weight: bold;
     color: #BEBEBE;
+  }
+
+  .priv-unknown {
+    font-size: 170%;
+  }
+
+  .priv-revoke {
+    font-size: 200%;
   }
 
   .modified-priv {

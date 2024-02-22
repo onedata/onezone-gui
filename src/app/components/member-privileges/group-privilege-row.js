@@ -114,6 +114,31 @@ export default Component.extend(I18n, {
     }
   ),
 
+  /**
+   * @type {Ember.ComputedProperty<number>}
+   */
+  modifiedEffPriv: computed(
+    'previousDirectPrivilegeValues',
+    'privileges',
+    'effectivePrivilegeValues',
+    function modifiedEffPriv() {
+      let result = 0;
+      if (this.privileges && this.previousDirectPrivilegeValues) {
+        for (const [key, value] of Object.entries(this.privileges)) {
+          if (this.previousDirectPrivilegeValues[key] !== value) {
+            if (value && !this.effectivePrivilegeValues[key]) {
+              result += 1;
+            } else if (!value && this.effectivePrivilegeValues[key]) {
+              result = -1;
+              return result;
+            }
+          }
+        }
+      }
+      return result;
+    }
+  ),
+
   actions: {
     /**
      * Notifies about change in input.

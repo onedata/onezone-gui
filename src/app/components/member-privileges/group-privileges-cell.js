@@ -45,6 +45,12 @@ export default Component.extend({
   form: undefined,
 
   /**
+   * @virtual
+   * @type {number}
+   */
+  modifiedEffPriv: undefined,
+
+  /**
    * Input changed action.
    * @virtual
    * @type {Function}
@@ -77,17 +83,40 @@ export default Component.extend({
   /**
    * @type {Ember.ComputedProperty<number>}
    */
-  privilegesGrantedCount: computed('privileges', function privilegesGrantedCount() {
-    let privTrue = 0;
-    for (const value of Object.values(this.privileges)) {
-      if (value === 2) {
-        privTrue += 0.5;
-      } else if (value) {
-        privTrue++;
+  privilegesGrantedCount: computed(
+    'privileges',
+    'modifiedEffPriv',
+    function privilegesGrantedCount() {
+      let privTrue = 0;
+      if (this.modifiedEffPriv) {
+        console.log(this.modifiedEffPriv);
+        privTrue = this.modifiedEffPriv;
+      }
+      for (const value of Object.values(this.privileges)) {
+        if (value === 2) {
+          privTrue += 0.5;
+        } else if (value) {
+          privTrue++;
+        }
+      }
+      return privTrue;
+    }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<number|string>}
+   */
+  grantedText: computed(
+    'modifiedEffPriv',
+    'privilegesGrantedCount',
+    function grantedText() {
+      if (this.modifiedEffPriv === -1) {
+        return '?';
+      } else {
+        return this.privilegesGrantedCount;
       }
     }
-    return privTrue;
-  }),
+  ),
 
   /**
    * @type {Ember.ComputedProperty<number>}

@@ -1,6 +1,6 @@
 <td class={{concat-classes
     "priv"
-    (if (not (eq previousDirectPrivilegeValue directPrivilegeValue)) "modified-priv")
+    (if isModifiedPriv "modified-priv")
   }}
 >
   {{privilege.text}}
@@ -28,11 +28,14 @@
   <td
     class={{concat-classes
       "toggle-column effective"
-      (if (not effectivePrivilegeValue) "not-granted")
+      (if (and (not isModifiedPriv) (not effectivePrivilegeValue)) "not-granted")
     }}
   >
-    {{#if effectivePrivilegeValue}}
+    {{#if (or (and isModifiedPriv directPrivilegeValue) (and (not isModifiedPriv) effectivePrivilegeValue))}}
       {{one-icon icon="checked"}}
+    {{else if isModifiedPriv}}
+      <div class="priv-unknown">?</div>
+      {{one-tooltip title="Blabla..."}}
     {{else}}
       <div class="priv-revoke">–</div>
     {{/if}}
