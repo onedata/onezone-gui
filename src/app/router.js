@@ -8,15 +8,13 @@
 
 import OnedataRouter from 'onedata-gui-common/utils/onedata-router';
 import onedataRouterSetup from 'onedata-gui-common/utils/onedata-router-setup';
-import globals from 'onedata-gui-common/utils/globals';
 import config from './config/environment';
+import isCrossOriginIframe from 'onedata-gui-common/utils/is-cross-origin-iframe';
 
 const Router = OnedataRouter.extend({
   location: config.locationType,
   rootURL: config.rootURL,
 });
-
-const isInIframe = globals.window.parent !== globals.window;
 
 /**
  * Should be bound to the router as a "public" method.
@@ -37,7 +35,7 @@ function setupActionRoutes() {
 
 // eslint-disable-next-line array-callback-return
 Router.map(function () {
-  if (isInIframe) {
+  if (isCrossOriginIframe()) {
     this.route('public', function () {
       setupPublicRoutes.bind(this)();
     });

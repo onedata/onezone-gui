@@ -10,8 +10,6 @@
 
 import ApplicationError from 'onedata-gui-common/templates/application-error';
 import IframedOnedataError from 'onedata-gui-common/templates/iframed-onedata-error';
-import globals from 'onedata-gui-common/utils/globals';
+import isCrossOriginIframe from 'onedata-gui-common/utils/is-cross-origin-iframe';
 
-const isInIframe = globals.window.parent !== globals.window;
-
-export default isInIframe ? IframedOnedataError : ApplicationError;
+export default isCrossOriginIframe() ? IframedOnedataError : ApplicationError;
