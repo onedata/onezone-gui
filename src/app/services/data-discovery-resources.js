@@ -202,7 +202,7 @@ export default Service.extend({
    * @param {String} cdmiObjectId
    * @returns {Promise<String>}
    */
-  getFileBrowserUrl(cdmiObjectId) {
+  async getFileBrowserUrl(cdmiObjectId) {
     return GoToFileUrlActionHandler.create({ ownerSource: this })
       .generatePrettyUrl({ fileId: cdmiObjectId, fileAction: 'show' });
   },
