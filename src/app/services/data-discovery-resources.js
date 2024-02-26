@@ -23,6 +23,11 @@ export default Service.extend({
   router: service(),
 
   /**
+   * @type {GoToFileUrlActionHandler}
+   */
+  goToFileUrlActionHandler: undefined,
+
+  /**
    * Actual harvester, that should be used as a context for all data discovery
    * related requests
    * @type {Ember.ComputedProperty<models.Harvester|undefined>}
@@ -67,6 +72,14 @@ export default Service.extend({
       promise,
     });
   }),
+
+  init() {
+    this._super(...arguments);
+    const goToFileUrlActionHandler = GoToFileUrlActionHandler.create({
+      ownerSource: this,
+    });
+    this.set('goToFileUrlActionHandler', goToFileUrlActionHandler);
+  },
 
   /**
    * @returns {Object}
@@ -203,8 +216,10 @@ export default Service.extend({
    * @returns {Promise<String>}
    */
   async getFileBrowserUrl(cdmiObjectId) {
-    return GoToFileUrlActionHandler.create({ ownerSource: this })
-      .generatePrettyUrl({ fileId: cdmiObjectId, fileAction: 'show' });
+    return this.goToFileUrlActionHandler.generatePrettyUrl({
+      fileId: cdmiObjectId,
+      fileAction: 'show',
+    });
   },
 
   /**
