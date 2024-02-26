@@ -2,7 +2,7 @@
  * Defines resources that could be used by external harvester application.
  *
  * @author Michał Borzęcki
- * @copyright (C) 2019 ACK CYFRONET AGH
+ * @copyright (C) 2019-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -13,10 +13,8 @@ import { inject as service } from '@ember/service';
 import { reject, resolve } from 'rsvp';
 import _ from 'lodash';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
-import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
-import cdmiObjectIdToGuid from 'onedata-gui-common/utils/cdmi-object-id-to-guid';
-import { getSpaceIdFromGuid } from 'onedata-gui-common/utils/file-guid-parsers';
 import globals from 'onedata-gui-common/utils/globals';
+import GoToFileUrlActionHandler from 'onezone-gui/utils/url-action-handlers/go-to-file';
 
 export default Service.extend({
   navigationState: service(),
@@ -205,28 +203,8 @@ export default Service.extend({
    * @returns {Promise<String>}
    */
   getFileBrowserUrl(cdmiObjectId) {
-    let fileGuid;
-    let spaceId;
-    try {
-      fileGuid = cdmiObjectIdToGuid(cdmiObjectId);
-      spaceId = getSpaceIdFromGuid(fileGuid);
-    } catch (error) {
-      console.error(error);
-      return resolve('');
-    }
-
-    return this.getOnezoneUrl().then(onezoneUrl => {
-      const onezoneRoute = this.get('router').urlFor(
-        'onedata.sidebar.content.aspect',
-        'spaces',
-        spaceId,
-        'data', {
-          queryParams: {
-            options: serializeAspectOptions({ selected: fileGuid }),
-          },
-        });
-      return onezoneRoute ? `${onezoneUrl}${onezoneRoute}` : '';
-    });
+    return GoToFileUrlActionHandler.create({ ownerSource: this })
+      .generatePrettyUrl({ fileId: cdmiObjectId, fileAction: 'show' });
   },
 
   /**
