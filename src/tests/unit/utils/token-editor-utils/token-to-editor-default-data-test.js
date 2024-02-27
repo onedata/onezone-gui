@@ -107,7 +107,7 @@ describe('Unit | Utility | token-editor-utils/token-to-editor-default-data', fun
           .to.equal('number');
         expect(get(result, 'basic.inviteDetails.usageLimit.usageLimitNumber'))
           .to.equal('4');
-        expect(get(result, 'basic.inviteDetails.usageCount')).to.equal('3 / 4');
+        expect(String(get(result, 'basic.inviteDetails.usageCount'))).to.equal('3 / 4');
       });
   });
 
