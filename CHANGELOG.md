@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10083 Added better formatting of large numbers
 * VFS-11724 Added new icons to the automation GUI
 * VFS-11696 Optimized tokens editor performance
 * VFS-11564 Added overflow handling to the chart tooltip

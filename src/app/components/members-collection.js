@@ -30,6 +30,8 @@ import _ from 'lodash';
 import ItemProxy from 'onezone-gui/utils/members-collection/item-proxy';
 import { scheduleOnce } from '@ember/runloop';
 import { promise } from 'ember-awesome-macros';
+import { htmlSafe } from '@ember/template';
+import { formatNumber } from 'onedata-gui-common/helpers/format-number';
 
 const fallbackActionsGenerator = () => [];
 
@@ -177,6 +179,20 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   isListCollapsed: undefined,
+
+  /**
+   * @type {SafeString | string}
+   */
+  effListHeader: computed('listHeader', 'members.length', function effListHeader() {
+    if (!this.listHeader) {
+      return '';
+    }
+
+    const membersCount = formatNumber(this.members?.length ?? 0);
+    return htmlSafe(
+      `${typeof this.listHeader === 'string' ? _.escape(this.listHeader) : this.listHeader} (${membersCount})`
+    );
+  }),
 
   /**
    * @type {Ember.ComputedProperty<string>}

@@ -14,6 +14,9 @@ import { resolve, all as allFulfilled } from 'rsvp';
 import moment from 'moment';
 import { createValuesContainer } from 'onedata-gui-common/utils/form-component/values-container';
 import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
+import { formatNumber } from 'onedata-gui-common/helpers/format-number';
+import { htmlSafe } from '@ember/template';
+import _ from 'lodash';
 
 /**
  * Set of converting utilities for each token caveat. Contains the name of the token
@@ -170,7 +173,9 @@ export default async function tokenToEditorDefaultData(token, getRecord) {
           usageLimitType: Number.isInteger(usageLimit) ? 'number' : 'infinity',
           usageLimitNumber: Number.isInteger(usageLimit) ? String(usageLimit) : '',
         }),
-        usageCount: `${usageCount} / ${usageLimit}`,
+        usageCount: htmlSafe(
+          `${formatNumber(usageCount ?? 0)} / ${Number.isInteger(usageLimit) ? formatNumber(usageLimit) : _.escape(usageLimit)}`
+        ),
       }),
     }),
     caveats: createValuesContainer(),
