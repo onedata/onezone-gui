@@ -161,35 +161,19 @@ describe('Unit | Service | data-discovery-resources', function () {
 
   it('injects info about how file browser url looks like for specific file',
     async function () {
+      const service = this.owner.lookup('service:data-discovery-resources');
       const cdmiObjectId =
         '000000000046600A67756964236532663736356461333239633230636262353930613534656233613731333264233833393832313965633065323236303435636437643836633239383034313061';
-      const guid =
-        'Z3VpZCNlMmY3NjVkYTMyOWMyMGNiYjU5MGE1NGViM2E3MTMyZCM4Mzk4MjE5ZWMwZTIyNjA0NWNkN2Q4NmMyOTgwNDEwYQ';
-      const router = lookupService(this, 'router');
-      const urlFor = sinon.stub(router, 'urlFor');
-      urlFor.withArgs(
-          'onedata.sidebar.content.aspect',
-          'spaces',
-          '8398219ec0e226045cd7d86c2980410a',
-          'data',
-          sinon.match({
-            queryParams: sinon.match({
-              options: `selected.${guid}`,
-            }),
-          })
-        )
-        .returns('#browser');
+      const expectedUrl = `https://example.com/file/${cdmiObjectId}`;
 
-      const service = this.owner.lookup('service:data-discovery-resources');
-      globals.mock('location', {
-        origin: 'https://abcdef.com',
-        pathname: '/ghi',
-      });
+      sinon.stub(service, 'getFileBrowserUrl')
+        .withArgs(cdmiObjectId)
+        .returns(expectedUrl);
 
       const appProxy = service.createAppProxyObject();
 
       const url = await appProxy.fileBrowserUrlRequest(cdmiObjectId);
-      expect(url).to.equal('https://abcdef.com/ghi#browser');
+      expect(url).to.equal(expectedUrl);
     }
   );
 
