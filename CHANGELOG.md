@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11685 Added loading and changing effective privileges during modification
 * VFS-10083 Added better formatting of large numbers
 * VFS-11710 Added possibility to embed Onedata Web GUI in an iframe on foreign domain
 * VFS-11724 Added new icons to the automation GUI
