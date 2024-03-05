@@ -51,6 +51,18 @@ export default Component.extend({
   modifiedEffPriv: undefined,
 
   /**
+   * @virtual
+   * @type {boolean}
+   */
+  areEffPrivilegesRecalculated: undefined,
+
+  /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  arePrivilegesReloaded: true,
+
+  /**
    * Input changed action.
    * @virtual
    * @type {Function}
@@ -89,7 +101,6 @@ export default Component.extend({
     function privilegesGrantedCount() {
       let privTrue = 0;
       if (this.modifiedEffPriv) {
-        console.log(this.modifiedEffPriv);
         privTrue = this.modifiedEffPriv;
       }
       for (const value of Object.values(this.privileges)) {
@@ -110,7 +121,7 @@ export default Component.extend({
     'modifiedEffPriv',
     'privilegesGrantedCount',
     function grantedText() {
-      if (this.modifiedEffPriv === -1) {
+      if (this.modifiedEffPriv === -1 || !this.arePrivilegesReloaded) {
         return '?';
       } else {
         return this.privilegesGrantedCount;

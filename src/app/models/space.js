@@ -48,6 +48,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   description: attr('string'),
   tags: attr('array', { defaultValue: () => [] }),
   marketplaceContactEmail: attr('string'),
+  areEffPrivilegesRecalculated: attr('boolean'),
 
   /**
    * Maps: provider name => capacity in bytes provided for this space

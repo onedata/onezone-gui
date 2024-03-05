@@ -39,6 +39,7 @@ export default Component.extend(I18n, {
   privilegeActions: service(),
   privilegeManager: service(),
   currentUser: service(),
+  recordManager: service(),
 
   /**
    * @override
@@ -177,6 +178,11 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   isListCollapsed: undefined,
+
+  /**
+   * @type {boolean}
+   */
+  arePrivilegesJustSaved: false,
 
   /**
    * @type {Ember.ComputedProperty<string>}
@@ -403,11 +409,20 @@ export default Component.extend(I18n, {
     );
   },
 
+  arePrivilegesReloadedObserver: observer('arePrivilegesJustSaved',
+    function arePrivilegesReloadedObserver() {
+      if (this.arePrivilegesJustSaved) {
+        this.recordManager.reloadRecordById(this.record.entityType, this.record.entityId);
+      }
+    }
+  ),
+
   actions: {
     discardChanges(memberProxy) {
       get(memberProxy, 'privilegesProxy').resetModifications();
     },
-    savePrivileges(memberProxy) {
+    async savePrivileges(memberProxy) {
+      this.set('arePrivilegesJustSaved', true);
       return this.get('privilegeActions')
         .handleSave(get(memberProxy, 'privilegesProxy').save(true))
         .then(() => memberProxy);

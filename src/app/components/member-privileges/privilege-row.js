@@ -94,6 +94,12 @@ export default Component.extend(DisabledPaths, I18n, {
   form: undefined,
 
   /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  arePrivilegesReloaded: true,
+
+  /**
    * Input changed action.
    * @type {Function}
    */
@@ -112,6 +118,21 @@ export default Component.extend(DisabledPaths, I18n, {
     'directPrivilegeValue',
     function isModifiedPriv() {
       return this.previousDirectPrivilegeValue !== this.directPrivilegeValue;
+    }
+  ),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isDisplayedEffectivePrivGranted: computed(
+    'directPrivilegeValue',
+    'effectivePrivilegeValue',
+    'isModifiedPriv',
+    'arePrivilegesReloaded',
+    function isDisplayedEffectivePrivGranted() {
+      return this.directPrivilegeValue ||
+        ((!this.isModifiedPriv && this.arePrivilegesReloaded) &&
+          this.effectivePrivilegeValue);
     }
   ),
 

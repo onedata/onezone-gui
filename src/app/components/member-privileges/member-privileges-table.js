@@ -70,6 +70,11 @@ export default Component.extend(I18n, {
   isBulkEdit: false,
 
   /**
+   * @type {boolean}
+   */
+  arePrivilegesReloaded: true,
+
+  /**
    * Object with name of group privileges with information about
    * it should be expanded in table and show more specific privileges
    * for this group or not.
@@ -242,6 +247,25 @@ export default Component.extend(I18n, {
           subtree: privilegesNodes,
         };
       });
+    }
+  ),
+
+  effectivePrivilegesObserver: observer('effectivePrivileges',
+    function effectivePrivilegesObserver() {
+      if (this.areEffPrivilegesRecalculated) {
+        this.set('arePrivilegesReloaded', true);
+        this.set('arePrivilegesJustSaved', false);
+      }
+    }
+  ),
+
+  arePrivilegesReloadedObserver: observer(
+    'areEffPrivilegesRecalculated',
+    'arePrivilegesJustSaved',
+    function arePrivilegesReloadedObserver() {
+      if (!this.areEffPrivilegesRecalculated || this.arePrivilegesJustSaved) {
+        this.set('arePrivilegesReloaded', false);
+      }
     }
   ),
 

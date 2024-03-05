@@ -28,16 +28,27 @@
   <td
     class={{concat-classes
       "toggle-column effective"
-      (if (and (not isModifiedPriv) (not effectivePrivilegeValue)) "not-granted")
+      (if
+        (and
+          (or (not isModifiedPriv) arePrivilegesReloaded)
+          (not effectivePrivilegeValue)
+        )
+        "revoke"
+      )
     }}
   >
-    {{#if (or (and isModifiedPriv directPrivilegeValue) (and (not isModifiedPriv) effectivePrivilegeValue))}}
+    {{#if isDisplayedEffectivePrivGranted}}
       {{one-icon icon="checked"}}
-    {{else if isModifiedPriv}}
+    {{else if (or
+      isModifiedPriv (and (not arePrivilegesReloaded) effectivePrivilegeValue)
+    )}}
       <div class="priv-unknown">?</div>
       {{one-tooltip title="Blabla..."}}
     {{else}}
       <div class="priv-revoke">–</div>
+    {{/if}}
+    {{#if (not arePrivilegesReloaded)}}
+      {{spin-spinner-block sizeClass="xxs"}}
     {{/if}}
   </td>
 {{/if}}

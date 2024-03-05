@@ -74,6 +74,17 @@ export default Component.extend(I18n, {
   isBulkEdit: false,
 
   /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  arePrivilegesReloaded: true,
+
+  /**
+   * @type {number}
+   */
+  modifiedEffPrivPrev: undefined,
+
+  /**
    * Input changed action.
    * @virtual
    * @type {Function}
@@ -121,7 +132,11 @@ export default Component.extend(I18n, {
     'previousDirectPrivilegeValues',
     'privileges',
     'effectivePrivilegeValues',
+    'arePrivilegesReloaded',
     function modifiedEffPriv() {
+      if (!this.arePrivilegesReloaded && this.modifiedEffPrivPrev !== undefined) {
+        return this.modifiedEffPrivPrev;
+      }
       let result = 0;
       if (this.privileges && this.previousDirectPrivilegeValues) {
         for (const [key, value] of Object.entries(this.privileges)) {
@@ -135,6 +150,7 @@ export default Component.extend(I18n, {
           }
         }
       }
+      this.set('modifiedEffPrivPrev', result);
       return result;
     }
   ),

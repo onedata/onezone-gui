@@ -28,14 +28,20 @@ tr.privilege-row {
     display: flex;
     justify-content: center;
     padding: $padding-xs-horizontal;
+    position: relative;
 
     span {
       display: block;
     }
 
-    &.not-granted {
+    &.revoke {
       padding-top: $padding-small-vertical;
       padding-bottom: $padding-small-vertical;
+    }
+    .spin-spinner-block {
+      position: absolute;
+      top: 14px;
+      right: 9px;
     }
   }
   .oneicon-checked {

@@ -23,4 +23,7 @@
   >
     {{grantedText}}/{{privilegesCount}}
   </span>
+  {{#if (not arePrivilegesReloaded)}}
+    {{spin-spinner-block sizeClass="xxs"}}
+  {{/if}}
 {{/if}}
