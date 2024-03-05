@@ -5,7 +5,10 @@
         {{tt this "lastActivity"}}: <strong class="animated activity-indicator">
           {{#if lastUpdateTime}}
             {{lastUpdateTime}}{{else}}{{tt this "unknown"}}{{/if}}</strong>{{#unless (eq previousSeqSum null)}},
-            <strong class="animated activity-indicator">{{changesCounter}}</strong> {{tt this "changes"}}.
+            <strong class="animated activity-indicator">
+              {{format-number changesCounter}}
+            </strong>
+            {{tt this "changes"}}.
           {{/unless}}
       </div>
     {{/if}}
