@@ -36,11 +36,11 @@
     {{#if effectivePrivilegeValue}}
       {{one-icon icon="checked"}}
       {{#promise-proxy-container
-        proxy=privilegesArray
+        proxy=filteredMembersWithPrivilegesList
         sizeClass="xxs"
       }}
         {{#promise-proxy-container
-          proxy=groups
+          proxy=highlightedRecordsLoadedList
           sizeClass="xxs"
         }}
           {{one-tooltip title=tooltipText}}
