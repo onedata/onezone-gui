@@ -111,6 +111,12 @@ export default Component.extend(DisabledPaths, I18n, {
   members: undefined,
 
   /**
+   * @virtual
+   * @type {string}
+   */
+  resourceType: undefined,
+
+  /**
    * @virtual optional
    * @type {Function}
    */
@@ -228,25 +234,45 @@ export default Component.extend(DisabledPaths, I18n, {
     }
   ),
 
-  tooltipText: computed('highlightedRecordsLoadedList', function tooltipText() {
-    let groupsText = '';
-    let text = '';
-    for (const group of this.highlightedRecordsLoadedList.content) {
-      if (groupsText !== '') {
-        groupsText += ', ';
-      }
-      groupsText += `${group.name} (${group.entityId})`;
-    }
-    if (this.directPrivilegeValue) {
-      text = 'This effective privilege is granted due to direct privilege on this member and ';
-    }
-    if (groupsText !== '') {
-      text += 'due to granted privilege on groups: ';
-      text += groupsText;
-    }
-
-    return text;
+  /**
+   * @type {ComputedProperty<string>}
+   */
+  resourceTypeTranslation: computed('resourceType', function resourceTypeTranslation() {
+    return this.i18n.t(`common.modelNames.${this.resourceType}`);
   }),
+
+  /**
+   * @type {Ember.ComputedProperty<string>}
+   */
+  tooltipText: computed(
+    'highlightedRecordsLoadedList',
+    'directPrivilegeValue',
+    function tooltipText() {
+      let groupsText = '';
+      for (const group of this.highlightedRecordsLoadedList.content) {
+        if (groupsText !== '') {
+          groupsText += ', ';
+        }
+        groupsText += `${group.name}`;
+      }
+      if (this.directPrivilegeValue && groupsText === '') {
+        return this.tt('onlyDirectTooltip');
+      }
+      if (this.directPrivilegeValue && groupsText !== '') {
+        return this.tt('directEffectiveTooltip', {
+          resourceType: this.resourceTypeTranslation.string,
+          groupsList: groupsText,
+        });
+      }
+      if (groupsText !== '') {
+        return this.tt('onlyEffectiveTooltip', {
+          resourceType: this.resourceTypeTranslation.string,
+          groupsList: groupsText,
+        });
+      }
+      return '';
+    }
+  ),
 
   actions: {
     /**
