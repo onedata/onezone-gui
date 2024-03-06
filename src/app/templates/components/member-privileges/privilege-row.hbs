@@ -30,9 +30,22 @@
       "toggle-column effective"
       (if (not effectivePrivilegeValue) "not-granted")
     }}
+    onmouseover={{action "highlightMembers"}}
+    onmouseleave={{action "resetHighlights"}}
   >
     {{#if effectivePrivilegeValue}}
       {{one-icon icon="checked"}}
+      {{#promise-proxy-container
+        proxy=privilegesArray
+        sizeClass="xxs"
+      }}
+        {{#promise-proxy-container
+          proxy=groups
+          sizeClass="xxs"
+        }}
+          {{one-tooltip title=tooltipText}}
+        {{/promise-proxy-container}}
+      {{/promise-proxy-container}}
     {{else}}
       <div class="priv-revoke">–</div>
     {{/if}}

@@ -10,7 +10,9 @@
         searchString=searchString
         visibleBlocks=visibleBlocks
         showDescription=showDescription
-        isCondensed=isCondensed}}
+        isCondensed=isCondensed
+        isHighlighted=(contains path.griPath.firstObject highlightedMembers)
+      }}
     {{/each}}
     {{#if (and (gte paths.length maxPathsNumber) (not isCondensed))}}
       <div class="membership-row limit-info collapse-animation collapse-medium {{if searchString "collapse-hidden"}}">

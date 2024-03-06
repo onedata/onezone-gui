@@ -119,6 +119,10 @@
                 recordDirectProxy=(if memberProxy.isDirect memberProxy.privilegesProxy null)
                 recordEffectiveProxy=memberProxy.effectivePrivilegesProxy
                 modelTypeTranslation=modelTypeTranslation
+                contextRecord=memberProxy.member
+                targetRecord=record
+                members=membersProxyList
+                highlightMembers=(action "highlightMembers")
               }}
               <div class="memberships-container">
                 <div class="header-memberships-container">
@@ -155,6 +159,7 @@
                     contextRecord=memberProxy.member
                     targetRecord=record
                     showDescription=showMembershipDescription
+                    highlightedMembers=highlightedMembers
                   }}
                 </div>
               </div>

@@ -156,6 +156,11 @@ export default Component.extend(I18n, {
   collectionActions: undefined,
 
   /**
+   * @type {Array<string>}
+   */
+  highlightedMembers: undefined,
+
+  /**
    * @virtual
    * @type {Function}
    * @param {Models.User|Models.Group} member
@@ -430,6 +435,9 @@ export default Component.extend(I18n, {
     },
     listCollapsed(isCollapsed) {
       this.set('isListCollapsed', isCollapsed);
+    },
+    highlightMembers(groups) {
+      this.set('highlightedMembers', groups);
     },
   },
 });

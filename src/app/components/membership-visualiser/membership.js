@@ -24,6 +24,7 @@ export default Component.extend(I18n, {
   classNameBindings: [
     'isFilteredOut:filtered-out',
     'showDescription:with-description',
+    'isHighlighted:highlighted',
     'longPath',
   ],
 
@@ -34,6 +35,12 @@ export default Component.extend(I18n, {
    * @override
    */
   i18nPrefix: 'components.membershipVisualiser.membership',
+
+  /**
+   * @type {boolean}
+   * @virtual
+   */
+  isHighlighted: false,
 
   /**
    * @type {User|Group}
