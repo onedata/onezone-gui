@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9080 Introduced new global modal control callbacks
 * VFS-11431 Added better validation errors propagation to charts dashboard editor
 * VFS-10083 Added better formatting of large numbers
 * VFS-11710 Added possibility to embed Onedata Web GUI in an iframe on foreign domain
