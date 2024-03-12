@@ -436,7 +436,7 @@ export default Component.extend(I18n, {
     listCollapsed(isCollapsed) {
       this.set('isListCollapsed', isCollapsed);
     },
-    highlightMembers(groups) {
+    highlightMemberShips(groups) {
       this.set('highlightedMembers', groups);
     },
   },

@@ -90,7 +90,7 @@ export default Component.extend(I18n, {
    * @virtual optional
    * @type {Function}
    */
-  highlightMembers: notImplementedIgnore,
+  highlightMemberShips: notImplementedIgnore,
 
   /**
    * @virtual optional
@@ -335,8 +335,8 @@ export default Component.extend(I18n, {
       }
       this.get('recordDirectProxy').setNewPrivileges(privileges);
     },
-    highlightMembers(groups) {
-      this.get('highlightMembers')(groups);
+    highlightMemberShips(groups) {
+      this.get('highlightMemberShips')(groups);
     },
   },
 });

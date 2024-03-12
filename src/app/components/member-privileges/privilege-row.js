@@ -15,6 +15,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { promise } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import { Promise } from 'rsvp';
 
 /**
  * @typedef {Object} PrivilegeInfo
@@ -120,7 +121,7 @@ export default Component.extend(DisabledPaths, I18n, {
    * @virtual optional
    * @type {Function}
    */
-  highlightMembers: notImplementedIgnore,
+  highlightMemberShips: notImplementedIgnore,
 
   /**
    * @type {boolean}
@@ -132,6 +133,14 @@ export default Component.extend(DisabledPaths, I18n, {
    * @type {Function}
    */
   inputChanged: () => {},
+
+  /**
+   * @type {ComputedProperty<PromiseObject>}
+   */
+  dataLoadingProxy: promise.object(promise.all(
+    'filteredMembersWithPrivilegesList',
+    'highlightedRecordsLoadedList'
+  )),
 
   /**
    * Input classes.
@@ -146,22 +155,19 @@ export default Component.extend(DisabledPaths, I18n, {
     'directlyParentsToMember',
     'privilege.name',
     async function filteredMembersWithPrivilegesList() {
-      const membersList = [];
-      for (const groupId of this.directlyParentsToMember) {
-        for (const member of this.members) {
-          let memberRecord = member.effectivePrivilegesProxy;
-          if (groupId === member.id) {
+      return Promise.all(this.directlyParentsToMember.map(groupId => {
+        return this.members.filter(member => groupId === member.id)
+          .map(member => {
             if (
               !member.effectivePrivilegesProxy.isLoaded &&
               !member.effectivePrivilegesProxy.isLoading
             ) {
-              memberRecord = await member.effectivePrivilegesProxy.reloadRecords();
+              return member.effectivePrivilegesProxy.reloadRecords()
+                .then(effectivePrivilegesProxy => effectivePrivilegesProxy);
             }
-            membersList.push(memberRecord);
-          }
-        }
-      }
-      return membersList;
+            return member.effectivePrivilegesProxy;
+          });
+      }));
     }
   )),
 
@@ -248,25 +254,20 @@ export default Component.extend(DisabledPaths, I18n, {
     'highlightedRecordsLoadedList',
     'directPrivilegeValue',
     function tooltipText() {
-      let groupsText = '';
-      for (const group of this.highlightedRecordsLoadedList.content) {
-        if (groupsText !== '') {
-          groupsText += ', ';
-        }
-        groupsText += `${group.name}`;
-      }
+      const groupsText = (this.highlightedRecordsLoadedList.content ?? [])
+        .map((g) => g.name).join(', ');
       if (this.directPrivilegeValue && groupsText === '') {
         return this.tt('onlyDirectTooltip');
       }
       if (this.directPrivilegeValue && groupsText !== '') {
         return this.tt('directEffectiveTooltip', {
-          resourceType: this.resourceTypeTranslation.string,
+          resourceType: this.resourceTypeTranslation,
           groupsList: groupsText,
         });
       }
       if (groupsText !== '') {
         return this.tt('onlyEffectiveTooltip', {
-          resourceType: this.resourceTypeTranslation.string,
+          resourceType: this.resourceTypeTranslation,
           groupsList: groupsText,
         });
       }
@@ -284,11 +285,11 @@ export default Component.extend(DisabledPaths, I18n, {
         this.get('inputChanged')(value);
       }
     },
-    highlightMembers() {
-      this.get('highlightMembers')(this.highlightedIdMembersList);
+    highlightMemberShips() {
+      this.get('highlightMemberShips')(this.highlightedIdMembersList);
     },
     resetHighlights() {
-      this.get('highlightMembers')([]);
+      this.get('highlightMemberShips')([]);
     },
   },
 });
