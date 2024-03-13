@@ -180,7 +180,7 @@ export default Component.extend(DisabledPaths, I18n, {
       for (const member of effPrivilegesAffectorInfos) {
         const privileges =
           member.effectivePrivilegesProxy.persistedPrivilegesSnapshot[0];
-        if (privileges[this.privilegesGroupName][this.privilege.name]) {
+        if (privileges && privileges[this.privilegesGroupName][this.privilege.name]) {
           affectorRecords.push({ id: member.id, name: member.member.name });
         }
       }
@@ -192,18 +192,20 @@ export default Component.extend(DisabledPaths, I18n, {
    * @type {ComputedProperty<Array<string>>}
    */
   membershipsToHighlight: computed(
-    'effPrivilegesRealAffectorRecords',
+    'effPrivilegesRealAffectorRecords.content',
     'directPrivilegeValue',
     'isDirect',
     'effPrivilegesAffectorGris',
     function membershipsToHighlight() {
       const recordsIds = [];
-
+      const affectorRecords = this.effPrivilegesRealAffectorRecords?.content;
       if (this.isDirect && this.directPrivilegeValue) {
         recordsIds.push(this.targetRecord.gri);
       }
-      for (const record of this.effPrivilegesRealAffectorRecords.content) {
-        recordsIds.push(record.id);
+      if (affectorRecords) {
+        for (const record of affectorRecords) {
+          recordsIds.push(record.id);
+        }
       }
       return recordsIds;
     }

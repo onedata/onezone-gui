@@ -61,6 +61,13 @@ export default Component.extend(I18n, {
   griAspect: undefined,
 
   /**
+   * `aspect` part of gri for group used to generate gri for privileges records.
+   * @virtual
+   * @type {string}
+   */
+  griGroupAspects: undefined,
+
+  /**
    * Type of model, which permissions are processed.
    * One of: user, group
    * @virtual
@@ -295,6 +302,7 @@ export default Component.extend(I18n, {
         itemActionsGenerator,
         effectiveItemActionsGenerator,
         griAspect,
+        griGroupAspects,
       } = this.getProperties(
         'owners',
         'directMembers',
@@ -309,6 +317,7 @@ export default Component.extend(I18n, {
         'itemActionsGenerator',
         'effectiveItemActionsGenerator',
         'griAspect',
+        'griGroupAspects',
       );
       if (isListCollapsed === undefined && collapseForNumber &&
         get(members, 'length') > collapseForNumber) {
@@ -394,7 +403,7 @@ export default Component.extend(I18n, {
         return proxy;
       });
       this.set('membersProxyList', newMembersProxyList);
-      if (griAspect === 'child') {
+      if (griAspect === griGroupAspects) {
         this.set('groupsProxyList', newMembersProxyList);
       }
       if (get(members, 'isFulfilled')) {
@@ -414,6 +423,7 @@ export default Component.extend(I18n, {
         groupsProxyList,
         groupedPrivilegesFlags,
         griAspect,
+        griGroupAspects,
         effectiveItemActionsGenerator,
       } = this.getProperties(
         'directMembers',
@@ -422,14 +432,15 @@ export default Component.extend(I18n, {
         'groupsProxyList',
         'groupedPrivilegesFlags',
         'griAspect',
+        'griGroupAspects',
         'effectiveItemActionsGenerator',
       );
 
-      if (griAspect === 'child') {
+      if (griAspect === griGroupAspects) {
         return null;
       }
 
-      // Create list of member proxies reusing already generated ones as much
+      // Create list of group proxies reusing already generated ones as much
       // as possible.
       const newMembersProxyList = directGroups.map(member => {
         let proxy = groupsProxyList.findBy('member', member);
@@ -448,7 +459,7 @@ export default Component.extend(I18n, {
           });
         }
         const effectivePrivilegesGri = this.getPrivilegesGriForMember(
-          member, false, 'child'
+          member, false, griGroupAspects
         );
         const effectivePrivilegesProxy = PrivilegeRecordProxy.create(
           getOwner(this).ownerInjection(), {
