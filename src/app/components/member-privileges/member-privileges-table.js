@@ -279,21 +279,6 @@ export default Component.extend(I18n, {
     }
   ),
 
-  /**
-   * @type {ComputedProperty<Array<string>>}
-   */
-  directlyParentsToMember: computed(
-    'membership.intermediaries',
-    'isDirectMember',
-    'targetRecord',
-    function directlyParentsToMember() {
-      if (this.isDirectMember) {
-        return [this.targetRecord.gri].concat(this.membership.intermediaries);
-      }
-      return this.membership.intermediaries;
-    }
-  ),
-
   init() {
     this._super(...arguments);
 

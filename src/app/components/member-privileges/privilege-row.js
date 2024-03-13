@@ -103,7 +103,7 @@ export default Component.extend(DisabledPaths, I18n, {
    * @virtual
    * @type {Array<string>}
    */
-  directlyParentsToMember: undefined,
+  effPrivilegesAffectorGris: undefined,
 
   /**
    * @virtual
@@ -113,20 +113,15 @@ export default Component.extend(DisabledPaths, I18n, {
 
   /**
    * @virtual
-   * @type {string}
+   * @type {Group|Space|Cluster|Provider}
    */
-  resourceType: undefined,
+  targetRecord: undefined,
 
   /**
    * @virtual optional
    * @type {Function}
    */
   highlightMemberShips: notImplementedIgnore,
-
-  /**
-   * @type {boolean}
-   */
-  isLoaded: false,
 
   /**
    * Input changed action.
@@ -138,8 +133,8 @@ export default Component.extend(DisabledPaths, I18n, {
    * @type {ComputedProperty<PromiseObject>}
    */
   dataLoadingProxy: promise.object(promise.all(
-    'filteredMembersWithPrivilegesList',
-    'highlightedRecordsLoadedList'
+    'effPrivilegesAffectorInfos',
+    'effPrivilegesRealAffectorRecords',
   )),
 
   /**
@@ -150,111 +145,87 @@ export default Component.extend(DisabledPaths, I18n, {
     return `field-${this.privilegesGroupName} form-control`;
   }),
 
-  filteredMembersWithPrivilegesList: promise.object(computed(
+  /**
+   * @type {ComputedProperty<PromiseObject>}
+   */
+  effPrivilegesAffectorInfos: promise.object(computed(
     'members',
-    'directlyParentsToMember',
+    'effPrivilegesAffectorGris',
     'privilege.name',
-    async function filteredMembersWithPrivilegesList() {
-      return Promise.all(this.directlyParentsToMember.map(groupId => {
-        return this.members.filter(member => groupId === member.id)
-          .map(member => {
-            if (
-              !member.effectivePrivilegesProxy.isLoaded &&
-              !member.effectivePrivilegesProxy.isLoading
-            ) {
-              return member.effectivePrivilegesProxy.reloadRecords()
-                .then(effectivePrivilegesProxy => effectivePrivilegesProxy);
-            }
-            return member.effectivePrivilegesProxy;
-          });
+    async function effPrivilegesAffectorInfos() {
+      return Promise.all(this.effPrivilegesAffectorGris.map(groupId => {
+        const affectorInfo = this.members.find(member => groupId === member.id);
+        if (!affectorInfo.effectivePrivilegesProxy.isLoaded) {
+          return affectorInfo.effectivePrivilegesProxy.reloadRecords().then(
+            () => affectorInfo
+          );
+        } else {
+          return affectorInfo;
+        }
       }));
     }
   )),
 
   /**
-   * @type {ComputedProperty<Array<Object>>}
+   * @type {ComputedProperty<PromiseObject>}
    */
-  highlightedMembersList: computed(
+  effPrivilegesRealAffectorRecords: promise.object(computed(
     'members.@each.effectivePrivilegesProxy',
-    'directlyParentsToMember',
+    'effPrivilegesAffectorGris',
     'privilege.name',
-    'filteredMembersWithPrivilegesList',
-    'isLoaded.isLoaded',
-    function highlightedMembersList() {
-      const membersList = [];
-      let isLoaded = true;
-      for (const groupId of this.directlyParentsToMember) {
-        for (const member of this.members) {
-          if (groupId === member.id) {
-            if (member.effectivePrivilegesProxy.isLoaded) {
-              const privileges =
-                member.effectivePrivilegesProxy.persistedPrivilegesSnapshot[0];
-              if (privileges[this.privilegesGroupName][this.privilege.name]) {
-                membersList.push(member);
-              }
-            } else {
-              isLoaded = member.effectivePrivilegesProxy;
-            }
-          }
+    'effPrivilegesAffectorInfos',
+    async function effPrivilegesRealAffectorRecords() {
+      const affectorRecords = [];
+      const effPrivilegesAffectorInfos = await this.effPrivilegesAffectorInfos;
+      for (const member of effPrivilegesAffectorInfos) {
+        const privileges =
+          member.effectivePrivilegesProxy.persistedPrivilegesSnapshot[0];
+        if (privileges[this.privilegesGroupName][this.privilege.name]) {
+          affectorRecords.push({ id: member.id, name: member.member.name });
         }
       }
-      this.set('isLoaded', isLoaded);
-      return membersList;
-    }
-  ),
-
-  /**
-   * @type {ComputedProperty<Array<Object>>}
-   */
-  highlightedRecordsLoadedList: promise.object(computed(
-    'highlightedMembersList',
-    'directPrivilegeValue',
-    async function highlightedRecordsLoadedList() {
-      const groups = [];
-      let groupRecord;
-      for (const group of this.highlightedMembersList) {
-        groupRecord = await this.groupManager.getRecord(group.id);
-        groups.push(groupRecord);
-      }
-      return groups;
+      return affectorRecords;
     }
   )),
 
   /**
    * @type {ComputedProperty<Array<string>>}
    */
-  highlightedIdMembersList: computed(
-    'highlightedMembersList',
+  membershipsToHighlight: computed(
+    'effPrivilegesRealAffectorRecords',
     'directPrivilegeValue',
     'isDirect',
-    'directlyParentsToMember',
-    function highlightedIdMembersList() {
-      const membersId = [];
+    'effPrivilegesAffectorGris',
+    function membershipsToHighlight() {
+      const recordsIds = [];
+
       if (this.isDirect && this.directPrivilegeValue) {
-        membersId.push(this.directlyParentsToMember[0]);
+        recordsIds.push(this.targetRecord.gri);
       }
-      for (const member of this.highlightedMembersList) {
-        membersId.push(member.id);
+      for (const record of this.effPrivilegesRealAffectorRecords.content) {
+        recordsIds.push(record.id);
       }
-      return membersId;
+      return recordsIds;
     }
   ),
 
   /**
    * @type {ComputedProperty<string>}
    */
-  resourceTypeTranslation: computed('resourceType', function resourceTypeTranslation() {
-    return this.i18n.t(`common.modelNames.${this.resourceType}`);
-  }),
+  resourceTypeTranslation: computed('targetRecord.entityType',
+    function resourceTypeTranslation() {
+      return this.i18n.t(`common.modelNames.${this.targetRecord.entityType}`);
+    }
+  ),
 
   /**
    * @type {Ember.ComputedProperty<string>}
    */
   tooltipText: computed(
-    'highlightedRecordsLoadedList',
+    'effPrivilegesRealAffectorRecords',
     'directPrivilegeValue',
     function tooltipText() {
-      const groupsText = (this.highlightedRecordsLoadedList.content ?? [])
+      const groupsText = (this.effPrivilegesRealAffectorRecords.content ?? [])
         .map((g) => g.name).join(', ');
       if (this.directPrivilegeValue && groupsText === '') {
         return this.tt('onlyDirectTooltip');
@@ -286,7 +257,7 @@ export default Component.extend(DisabledPaths, I18n, {
       }
     },
     highlightMemberShips() {
-      this.get('highlightMemberShips')(this.highlightedIdMembersList);
+      this.get('highlightMemberShips')(this.membershipsToHighlight);
     },
     resetHighlights() {
       this.get('highlightMemberShips')([]);
