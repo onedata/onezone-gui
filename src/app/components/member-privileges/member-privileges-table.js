@@ -84,13 +84,13 @@ export default Component.extend(I18n, {
    * @virtual
    * @type {Array<Utils/MembersCollection/ItemProxy>}
    */
-  members: undefined,
+  directGroupMembers: undefined,
 
   /**
    * @virtual optional
    * @type {Function}
    */
-  highlightMemberShips: notImplementedIgnore,
+  highlightMemberships: notImplementedIgnore,
 
   /**
    * @virtual optional
@@ -279,6 +279,28 @@ export default Component.extend(I18n, {
     }
   ),
 
+  /**
+   * @type {ComputedProperty<PromiseObject>}
+   */
+  effPrivilegesAffectorInfos: promise.object(computed(
+    'directGroupMembers',
+    'membership.intermediaries',
+    async function effPrivilegesAffectorInfos() {
+      return Promise.all(this.membership.intermediaries.map(groupId => {
+        const affectorInfo = this.directGroupMembers.find(
+          member => groupId === member.id
+        );
+        if (!affectorInfo.effectivePrivilegesProxy.isLoaded) {
+          return affectorInfo.effectivePrivilegesProxy.reloadRecords().then(
+            () => affectorInfo
+          );
+        } else {
+          return affectorInfo;
+        }
+      }));
+    }
+  )),
+
   init() {
     this._super(...arguments);
 
@@ -320,8 +342,8 @@ export default Component.extend(I18n, {
       }
       this.get('recordDirectProxy').setNewPrivileges(privileges);
     },
-    highlightMemberShips(groups) {
-      this.get('highlightMemberShips')(groups);
+    highlightMemberships(groups) {
+      this.get('highlightMemberships')(groups);
     },
   },
 });

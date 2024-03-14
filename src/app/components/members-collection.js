@@ -155,7 +155,7 @@ export default Component.extend(I18n, {
    * Is calculated by `membersObserver`
    * @type {Array<Utils/MembersCollection/ItemProxy>}
    */
-  groupsProxyList: Object.freeze([]),
+  directGroupsProxyList: Object.freeze([]),
 
   /**
    * If true, membership-visualiser component will show path descriptions
@@ -404,7 +404,7 @@ export default Component.extend(I18n, {
       });
       this.set('membersProxyList', newMembersProxyList);
       if (griAspect === griGroupAspects) {
-        this.set('groupsProxyList', newMembersProxyList);
+        this.set('directGroupsProxyList', newMembersProxyList);
       }
       if (get(members, 'isFulfilled')) {
         scheduleOnce('afterRender', this, 'membersLoaded');
@@ -414,48 +414,36 @@ export default Component.extend(I18n, {
 
   groupsObserver: observer(
     'directGroups.@each.{entityId,name,username}',
-    'directMembers.[]',
     function groupsObserver() {
       const {
-        directMembers,
-        effectiveMembers,
         directGroups,
-        groupsProxyList,
+        directGroupsProxyList,
         groupedPrivilegesFlags,
         griAspect,
         griGroupAspects,
-        effectiveItemActionsGenerator,
       } = this.getProperties(
-        'directMembers',
-        'effectiveMembers',
         'directGroups',
-        'groupsProxyList',
+        'directGroupsProxyList',
         'groupedPrivilegesFlags',
         'griAspect',
         'griGroupAspects',
-        'effectiveItemActionsGenerator',
       );
 
       if (griAspect === griGroupAspects) {
-        return null;
+        return;
       }
 
       // Create list of group proxies reusing already generated ones as much
       // as possible.
       const newMembersProxyList = directGroups.map(member => {
-        let proxy = groupsProxyList.findBy('member', member);
+        let proxy = directGroupsProxyList.findBy('member', member);
         // If proxy has not been generated for that member, create new empty proxy.
-        if (!proxy || proxy.isDirect != directMembers.includes(member)) {
+        if (!proxy || !proxy.isDirect) {
           proxy = ItemProxy.create({
             id: get(member, 'id'),
             member,
-            isDirect: directMembers.includes(member),
+            isDirect: true,
             effectivePrivilegesProxy: {},
-            effectiveMemberActions: effectiveItemActionsGenerator(
-              member,
-              directMembers,
-              effectiveMembers
-            ),
           });
         }
         const effectivePrivilegesGri = this.getPrivilegesGriForMember(
@@ -472,7 +460,7 @@ export default Component.extend(I18n, {
         set(proxy, 'effectivePrivilegesProxy', effectivePrivilegesProxy);
         return proxy;
       });
-      this.set('groupsProxyList', newMembersProxyList);
+      this.set('directGroupsProxyList', newMembersProxyList);
     }
   ),
 
@@ -542,7 +530,7 @@ export default Component.extend(I18n, {
     listCollapsed(isCollapsed) {
       this.set('isListCollapsed', isCollapsed);
     },
-    highlightMemberShips(groups) {
+    highlightMemberships(groups) {
       this.set('highlightedMembers', groups);
     },
   },

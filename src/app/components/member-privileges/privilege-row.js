@@ -15,7 +15,6 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { promise } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
-import { Promise } from 'rsvp';
 
 /**
  * @typedef {Object} PrivilegeInfo
@@ -106,10 +105,15 @@ export default Component.extend(DisabledPaths, I18n, {
   effPrivilegesAffectorGris: undefined,
 
   /**
+   * @type {PromiseObject}
+   */
+  effPrivilegesAffectorInfos: undefined,
+
+  /**
    * @virtual
    * @type {Array<Utils/MembersCollection/ItemProxy>}
    */
-  members: undefined,
+  directGroupMembers: undefined,
 
   /**
    * @virtual
@@ -121,21 +125,13 @@ export default Component.extend(DisabledPaths, I18n, {
    * @virtual optional
    * @type {Function}
    */
-  highlightMemberShips: notImplementedIgnore,
+  highlightMemberships: notImplementedIgnore,
 
   /**
    * Input changed action.
    * @type {Function}
    */
   inputChanged: () => {},
-
-  /**
-   * @type {ComputedProperty<PromiseObject>}
-   */
-  dataLoadingProxy: promise.object(promise.all(
-    'effPrivilegesAffectorInfos',
-    'effPrivilegesRealAffectorRecords',
-  )),
 
   /**
    * Input classes.
@@ -148,35 +144,19 @@ export default Component.extend(DisabledPaths, I18n, {
   /**
    * @type {ComputedProperty<PromiseObject>}
    */
-  effPrivilegesAffectorInfos: promise.object(computed(
-    'members',
-    'effPrivilegesAffectorGris',
-    'privilege.name',
-    async function effPrivilegesAffectorInfos() {
-      return Promise.all(this.effPrivilegesAffectorGris.map(groupId => {
-        const affectorInfo = this.members.find(member => groupId === member.id);
-        if (!affectorInfo.effectivePrivilegesProxy.isLoaded) {
-          return affectorInfo.effectivePrivilegesProxy.reloadRecords().then(
-            () => affectorInfo
-          );
-        } else {
-          return affectorInfo;
-        }
-      }));
-    }
-  )),
-
-  /**
-   * @type {ComputedProperty<PromiseObject>}
-   */
   effPrivilegesRealAffectorRecords: promise.object(computed(
-    'members.@each.effectivePrivilegesProxy',
+    'directGroupMembers.@each.effectivePrivilegesProxy',
     'effPrivilegesAffectorGris',
     'privilege.name',
     'effPrivilegesAffectorInfos',
     async function effPrivilegesRealAffectorRecords() {
       const affectorRecords = [];
-      const effPrivilegesAffectorInfos = await this.effPrivilegesAffectorInfos;
+      let effPrivilegesAffectorInfos;
+      try {
+        effPrivilegesAffectorInfos = await this.effPrivilegesAffectorInfos;
+      } catch (error) {
+        effPrivilegesAffectorInfos = [];
+      }
       for (const member of effPrivilegesAffectorInfos) {
         const privileges =
           member.effectivePrivilegesProxy.persistedPrivilegesSnapshot[0];
@@ -258,11 +238,11 @@ export default Component.extend(DisabledPaths, I18n, {
         this.get('inputChanged')(value);
       }
     },
-    highlightMemberShips() {
-      this.get('highlightMemberShips')(this.membershipsToHighlight);
+    highlightMemberships() {
+      this.get('highlightMemberships')(this.membershipsToHighlight);
     },
     resetHighlights() {
-      this.get('highlightMemberShips')([]);
+      this.get('highlightMemberships')([]);
     },
   },
 });

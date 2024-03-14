@@ -30,13 +30,13 @@
       "toggle-column effective"
       (if (not effectivePrivilegeValue) "not-granted")
     }}
-    onmouseover={{action "highlightMemberShips"}}
+    onmouseover={{action "highlightMemberships"}}
     onmouseleave={{action "resetHighlights"}}
   >
     {{#if effectivePrivilegeValue}}
       {{one-icon icon="checked"}}
       {{#promise-proxy-container
-        proxy=dataLoadingProxy
+        proxy=effPrivilegesRealAffectorRecords
         sizeClass="xxs"
       }}
         {{one-tooltip title=tooltipText}}
