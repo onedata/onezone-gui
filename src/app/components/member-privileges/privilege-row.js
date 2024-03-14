@@ -97,7 +97,7 @@ export default Component.extend(DisabledPaths, I18n, {
    * @virtual optional
    * @type {boolean}
    */
-  arePrivilegesReloaded: true,
+  arePrivilegesUpToDate: true,
 
   /**
    * Input changed action.
@@ -128,10 +128,10 @@ export default Component.extend(DisabledPaths, I18n, {
     'directPrivilegeValue',
     'effectivePrivilegeValue',
     'isModifiedPriv',
-    'arePrivilegesReloaded',
+    'arePrivilegesUpToDate',
     function isDisplayedEffectivePrivGranted() {
       return this.directPrivilegeValue ||
-        ((!this.isModifiedPriv && this.arePrivilegesReloaded) &&
+        ((!this.isModifiedPriv && this.arePrivilegesUpToDate) &&
           this.effectivePrivilegeValue);
     }
   ),

@@ -72,7 +72,7 @@ export default Component.extend(I18n, {
   /**
    * @type {boolean}
    */
-  arePrivilegesReloaded: true,
+  arePrivilegesUpToDate: true,
 
   /**
    * Object with name of group privileges with information about
@@ -250,21 +250,23 @@ export default Component.extend(I18n, {
     }
   ),
 
-  effectivePrivilegesObserver: observer('effectivePrivileges',
+  effectivePrivilegesObserver: observer(
+    'effectivePrivileges',
+    'areEffPrivilegesRecalculated',
     function effectivePrivilegesObserver() {
       if (this.areEffPrivilegesRecalculated) {
-        this.set('arePrivilegesReloaded', true);
+        this.set('arePrivilegesUpToDate', true);
         this.set('arePrivilegesJustSaved', false);
       }
     }
   ),
 
-  arePrivilegesReloadedObserver: observer(
+  arePrivilegesUpToDateObserver: observer(
     'areEffPrivilegesRecalculated',
     'arePrivilegesJustSaved',
-    function arePrivilegesReloadedObserver() {
+    function arePrivilegesUpToDateObserver() {
       if (!this.areEffPrivilegesRecalculated || this.arePrivilegesJustSaved) {
-        this.set('arePrivilegesReloaded', false);
+        this.set('arePrivilegesUpToDate', false);
       }
     }
   ),

@@ -425,10 +425,11 @@ export default Component.extend(I18n, {
     );
   },
 
-  arePrivilegesReloadedObserver: observer('arePrivilegesJustSaved',
-    function arePrivilegesReloadedObserver() {
-      if (this.arePrivilegesJustSaved) {
-        this.recordManager.reloadRecordById(this.record.entityType, this.record.entityId);
+  effectivePrivilegesObserver: observer(
+    'memberProxy.effectivePrivilegesProxy.effectivePrivilegesSnapshot',
+    function effectivePrivilegesObserver() {
+      if (this.areEffPrivilegesRecalculated) {
+        this.set('arePrivilegesJustSaved', false);
       }
     }
   ),
@@ -441,7 +442,8 @@ export default Component.extend(I18n, {
       this.set('arePrivilegesJustSaved', true);
       return this.get('privilegeActions')
         .handleSave(get(memberProxy, 'privilegesProxy').save(true))
-        .then(() => memberProxy);
+        .then(() => memberProxy)
+        .then(() => this.record.reload());
     },
     listCollapsed(isCollapsed) {
       this.set('isListCollapsed', isCollapsed);

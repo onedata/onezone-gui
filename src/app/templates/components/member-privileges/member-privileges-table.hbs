@@ -30,7 +30,7 @@
               isDirect=isDirectMember
               editionEnabled=editionEnabled
               isBulkEdit=isBulkEdit
-              arePrivilegesReloaded=arePrivilegesReloaded
+              arePrivilegesUpToDate=arePrivilegesUpToDate
             }}
           {{#if (get groupsOpenState groupPrivileges.name)}}
             {{#each groupPrivileges.subtree as |privilege|}}
@@ -62,7 +62,7 @@
                 isBulkEdit=isBulkEdit
                 editionEnabled=editionEnabled
                 form=form
-                arePrivilegesReloaded=arePrivilegesReloaded
+                arePrivilegesUpToDate=arePrivilegesUpToDate
               }}
             {{/each}}
           {{/if}}

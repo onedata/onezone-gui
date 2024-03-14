@@ -23,7 +23,7 @@
   >
     {{grantedText}}/{{privilegesCount}}
   </span>
-  {{#if (not arePrivilegesReloaded)}}
+  {{#if (not arePrivilegesUpToDate)}}
     {{spin-spinner-block sizeClass="xxs"}}
   {{/if}}
 {{/if}}

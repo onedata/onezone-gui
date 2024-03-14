@@ -48,7 +48,13 @@ export default Component.extend({
    * @virtual
    * @type {number}
    */
-  modifiedEffPriv: undefined,
+  newGrantedEffPrivCount: undefined,
+
+  /**
+   * @virtual
+   * @type {boolean}
+   */
+  isUnknownEffPrivStatus: false,
 
   /**
    * @virtual
@@ -60,7 +66,7 @@ export default Component.extend({
    * @virtual optional
    * @type {boolean}
    */
-  arePrivilegesReloaded: true,
+  arePrivilegesUpToDate: true,
 
   /**
    * Input changed action.
@@ -80,28 +86,35 @@ export default Component.extend({
   /**
    * @type {Ember.ComputedProperty<boolean>}
    */
-  state: computed('privilegesGrantedCount', 'privilegesCount', function state() {
-    if (
-      this.privilegesGrantedCount &&
-      this.privilegesGrantedCount < this.privilegesCount
-    ) {
-      return 2;
-    } else if (this.privilegesGrantedCount) {
-      return true;
+  state: computed(
+    'isUnknownEffPrivStatus',
+    'privilegesGrantedCount',
+    'privilegesCount',
+    function state() {
+      if (
+        (this.privilegesGrantedCount &&
+          this.privilegesGrantedCount < this.privilegesCount) ||
+        this.isUnknownEffPrivStatus
+      ) {
+        return 2;
+      } else if (this.privilegesGrantedCount) {
+        return true;
+      }
+      return false;
     }
-    return false;
-  }),
+  ),
 
   /**
    * @type {Ember.ComputedProperty<number>}
    */
   privilegesGrantedCount: computed(
     'privileges',
-    'modifiedEffPriv',
+    'newGrantedEffPrivCount',
+    'isUnknownEffPrivStatus',
     function privilegesGrantedCount() {
       let privTrue = 0;
-      if (this.modifiedEffPriv) {
-        privTrue = this.modifiedEffPriv;
+      if (this.isUnknownEffPrivStatus) {
+        return -1;
       }
       for (const value of Object.values(this.privileges)) {
         if (value === 2) {
@@ -110,6 +123,7 @@ export default Component.extend({
           privTrue++;
         }
       }
+      privTrue += this.newGrantedEffPrivCount;
       return privTrue;
     }
   ),
@@ -118,10 +132,10 @@ export default Component.extend({
    * @type {Ember.ComputedProperty<number|string>}
    */
   grantedText: computed(
-    'modifiedEffPriv',
     'privilegesGrantedCount',
+    'isUnknownEffPrivStatus',
     function grantedText() {
-      if (this.modifiedEffPriv === -1 || !this.arePrivilegesReloaded) {
+      if (this.isUnknownEffPrivStatus || !this.arePrivilegesUpToDate) {
         return '?';
       } else {
         return this.privilegesGrantedCount;
