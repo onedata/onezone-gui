@@ -63,6 +63,12 @@ export default Component.extend({
   areEffPrivilegesRecalculated: undefined,
 
   /**
+   * @virtual
+   * @type {boolean}
+   */
+  isPrivilegesAreModifying: false,
+
+  /**
    * @virtual optional
    * @type {boolean}
    */
@@ -111,20 +117,31 @@ export default Component.extend({
     'privileges',
     'newGrantedEffPrivCount',
     'isUnknownEffPrivStatus',
+    'isDirect',
     function privilegesGrantedCount() {
       let privTrue = 0;
       if (this.isUnknownEffPrivStatus) {
         return -1;
       }
-      for (const value of Object.values(this.privileges)) {
-        if (value === 2) {
-          privTrue += 0.5;
-        } else if (value) {
-          privTrue++;
+      if (this.isDirect) {
+        for (const value of Object.values(this.privileges)) {
+          if (value === 2) {
+            privTrue += 0.5;
+          } else if (value) {
+            privTrue++;
+          }
         }
+        return privTrue;
       }
-      privTrue += this.newGrantedEffPrivCount;
-      return privTrue;
+      // for (const value of Object.values(this.privileges)) {
+      //   if (value === 2) {
+      //     privTrue += 0.5;
+      //   } else if (value) {
+      //     privTrue++;
+      //   }
+      // }
+      // privTrue += this.newGrantedEffPrivCount;
+      return this.newGrantedEffPrivCount;
     }
   ),
 
@@ -134,8 +151,9 @@ export default Component.extend({
   grantedText: computed(
     'privilegesGrantedCount',
     'isUnknownEffPrivStatus',
+    'arePrivilegesUpToDate',
     function grantedText() {
-      if (this.isUnknownEffPrivStatus || !this.arePrivilegesUpToDate) {
+      if (this.isUnknownEffPrivStatus) {
         return '?';
       } else {
         return this.privilegesGrantedCount;

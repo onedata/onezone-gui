@@ -31,6 +31,7 @@
               editionEnabled=editionEnabled
               isBulkEdit=isBulkEdit
               arePrivilegesUpToDate=arePrivilegesUpToDate
+              isPrivilegesAreModifying=recordDirectProxy.isModified
             }}
           {{#if (get groupsOpenState groupPrivileges.name)}}
             {{#each groupPrivileges.subtree as |privilege|}}
@@ -58,6 +59,7 @@
                   )
                   null
                 )
+                isPrivilegesAreModifying=recordDirectProxy.isModified
                 isDirect=isDirectMember
                 isBulkEdit=isBulkEdit
                 editionEnabled=editionEnabled

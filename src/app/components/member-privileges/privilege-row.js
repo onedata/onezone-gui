@@ -94,6 +94,12 @@ export default Component.extend(DisabledPaths, I18n, {
   form: undefined,
 
   /**
+   * @virtual
+   * @type {boolean}
+   */
+  isPrivilegesAreModifying: false,
+
+  /**
    * @virtual optional
    * @type {boolean}
    */
@@ -116,8 +122,11 @@ export default Component.extend(DisabledPaths, I18n, {
   isModifiedPriv: computed(
     'previousDirectPrivilegeValue',
     'directPrivilegeValue',
+    'isPrivilegesAreModifying',
     function isModifiedPriv() {
-      return this.previousDirectPrivilegeValue !== this.directPrivilegeValue;
+      return (this.isPrivilegesAreModifying &&
+        this.previousDirectPrivilegeValue !== this.directPrivilegeValue
+      );
     }
   ),
 
@@ -129,10 +138,28 @@ export default Component.extend(DisabledPaths, I18n, {
     'effectivePrivilegeValue',
     'isModifiedPriv',
     'arePrivilegesUpToDate',
+    'isPrivilegesAreModifying',
+    'previousDirectPrivilegeValue',
     function isDisplayedEffectivePrivGranted() {
-      return this.directPrivilegeValue ||
+      return (!this.isPrivilegesAreModifying && this.previousDirectPrivilegeValue) ||
+        (this.isPrivilegesAreModifying && this.directPrivilegeValue) ||
         ((!this.isModifiedPriv && this.arePrivilegesUpToDate) &&
           this.effectivePrivilegeValue);
+    }
+  ),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isDisplayedDirectPrivGranted: computed(
+    'directPrivilegeValue',
+    'isPrivilegesAreModifying',
+    'previousDirectPrivilegeValue',
+    function isDisplayedDirectPrivGranted() {
+      if (this.isPrivilegesAreModifying) {
+        return this.directPrivilegeValue;
+      }
+      return this.previousDirectPrivilegeValue;
     }
   ),
 

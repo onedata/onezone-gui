@@ -74,6 +74,12 @@ export default Component.extend(I18n, {
   isBulkEdit: false,
 
   /**
+   * @virtual
+   * @type {boolean}
+   */
+  isPrivilegesAreModifying: false,
+
+  /**
    * @virtual optional
    * @type {boolean}
    */
@@ -115,8 +121,11 @@ export default Component.extend(I18n, {
   isModified: computed(
     'previousDirectPrivilegeValues',
     'privileges',
+    'isPrivilegesAreModifying',
     function isModified() {
-      if (this.privileges && this.previousDirectPrivilegeValues) {
+      if (this.isPrivilegesAreModifying &&
+        this.privileges && this.previousDirectPrivilegeValues
+      ) {
         for (const [key, value] of Object.entries(this.privileges)) {
           if (this.previousDirectPrivilegeValues[key] !== value) {
             return true;
@@ -135,6 +144,7 @@ export default Component.extend(I18n, {
     'privileges',
     'effectivePrivilegeValues',
     'arePrivilegesUpToDate',
+    'isModified',
     function newGrantedEffPrivCount() {
       if (!this.arePrivilegesUpToDate && this.newGrantedEffPrivCountCache !== undefined) {
         return this.newGrantedEffPrivCountCache;
@@ -142,7 +152,11 @@ export default Component.extend(I18n, {
       let result = 0;
       if (this.privileges && this.previousDirectPrivilegeValues) {
         for (const [key, value] of Object.entries(this.privileges)) {
-          if (this.previousDirectPrivilegeValues[key] !== value) {
+          if (this.effectivePrivilegeValues[key]) {
+            result += 1;
+          } else if (this.isModified &&
+            this.previousDirectPrivilegeValues[key] !== value
+          ) {
             if (value && !this.effectivePrivilegeValues[key]) {
               result += 1;
             }
@@ -159,11 +173,12 @@ export default Component.extend(I18n, {
     'privileges',
     'effectivePrivilegeValues',
     'arePrivilegesUpToDate',
+    'isModified',
     function isUnknownEffPrivStatus() {
       if (!this.arePrivilegesUpToDate && this.isUnknownEffPrivStatusCache !== undefined) {
         return this.isUnknownEffPrivStatusCache;
       }
-      if (this.privileges && this.previousDirectPrivilegeValues) {
+      if (this.isModified && this.privileges && this.previousDirectPrivilegeValues) {
         for (const [key, value] of Object.entries(this.privileges)) {
           if (this.previousDirectPrivilegeValues[key] !== value) {
             if (!value && this.effectivePrivilegeValues[key]) {

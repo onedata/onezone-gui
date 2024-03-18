@@ -250,23 +250,15 @@ export default Component.extend(I18n, {
     }
   ),
 
-  effectivePrivilegesObserver: observer(
-    'effectivePrivileges',
-    'areEffPrivilegesRecalculated',
-    function effectivePrivilegesObserver() {
-      if (this.areEffPrivilegesRecalculated) {
-        this.set('arePrivilegesUpToDate', true);
-        this.set('arePrivilegesJustSaved', false);
-      }
-    }
-  ),
-
   arePrivilegesUpToDateObserver: observer(
     'areEffPrivilegesRecalculated',
     'arePrivilegesJustSaved',
     function arePrivilegesUpToDateObserver() {
       if (!this.areEffPrivilegesRecalculated || this.arePrivilegesJustSaved) {
         this.set('arePrivilegesUpToDate', false);
+      }
+      if (!this.arePrivilegesJustSaved && this.areEffPrivilegesRecalculated) {
+        this.set('arePrivilegesUpToDate', true);
       }
     }
   ),
