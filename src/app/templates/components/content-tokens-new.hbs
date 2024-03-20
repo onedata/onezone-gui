@@ -11,8 +11,10 @@
     <div class="row content-row header-row hidden-xs">
       <h1 class="with-back relative nowrap">
         <a class="content-back-link" {{action "backToTemplates"}}>
-          {{one-icon icon="tokens" class="content-back-resource-icon"}}
-          {{one-icon icon="arrow-left" class="content-back-arrow-icon"}}
+          {{one-icon
+            icon="tokens"
+            class="content-back-resource-icon"
+          }}{{one-icon icon="arrow-left" class="content-back-arrow-icon"}}
         </a>
         <div class="resource-name">
           {{tt this "header"}}
