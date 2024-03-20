@@ -37,10 +37,10 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.membershipVisualiser.membership',
 
   /**
-   * @type {boolean}
+   * @type {Array<string>}
    * @virtual
    */
-  isHighlighted: false,
+  highlightedMembers: undefined,
 
   /**
    * @type {User|Group}
@@ -143,6 +143,22 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<boolean>}
    */
   longPath: gt('recordsProxy.length', 1),
+
+  /**
+   * @type {boolean}
+   */
+  isHighlighted: computed('highlightedMembers', 'path.griPath', function isHighlighted() {
+    if (!this.highlightedMembers) {
+      return false;
+    }
+    if (this.path.griPath.length < 2) {
+      return this.highlightedMembers.includes(this.path.griPath.firstObject);
+    } else {
+      return this.highlightedMembers.includes(
+        this.path.griPath[this.path.griPath.length - 2]
+      );
+    }
+  }),
 
   /**
    * @type {Ember.ComputedProperty<Array<Object>>}
