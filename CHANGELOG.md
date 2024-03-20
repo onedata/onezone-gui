@@ -7,6 +7,7 @@ CHANGELOG
 ### Latest changes
 
 * VFS-11264 Added tooltips to chart dashboard editor
+* VFS-11818 Fixed incorrect changes counter in the harvester indexing progress
 * VFS-9080 Introduced new global modal control callbacks
 * VFS-11431 Added better validation errors propagation to chart dashboard editor
 * VFS-10083 Added better formatting of large numbers
