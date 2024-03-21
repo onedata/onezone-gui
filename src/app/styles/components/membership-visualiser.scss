@@ -81,7 +81,7 @@
         opacity: 1;
       }
       &::after {
-        content: $oneicon-settings;
+        content: oneicon-content('settings');
         position: absolute;
         left: 0;
         transition: transition-linear(opacity, 'short');
