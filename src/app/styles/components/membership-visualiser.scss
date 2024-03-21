@@ -246,5 +246,8 @@
         opacity: 1;
       }
     }
+    &.highlighted {
+      background-color: $color-one-gray-sand;
+    }
   }
 }
