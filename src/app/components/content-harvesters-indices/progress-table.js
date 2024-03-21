@@ -402,6 +402,14 @@ export default Component.extend(I18n, WindowResizeHandler, {
   },
 
   recalculateChanges() {
+    if (!this.progressData.length) {
+      this.setProperties({
+        currentSeqSum: null,
+        previousSeqSum: null,
+      });
+      return;
+    }
+
     let sum = 0;
     this.progressData.forEach(({ progress }) =>
       progress
