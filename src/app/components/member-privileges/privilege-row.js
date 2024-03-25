@@ -146,6 +146,11 @@ export default Component.extend(DisabledPaths, I18n, {
   isModifiedPriv: false,
 
   /**
+   * @type {boolean}
+   */
+  effPrivilegeStateCache: undefined,
+
+  /**
    * Input changed action.
    * @type {Function}
    */
@@ -162,15 +167,27 @@ export default Component.extend(DisabledPaths, I18n, {
   /**
    * @type {ComputedProperty<boolean>}
    */
-  isDisplayedEffectivePrivGranted: computed(
-    'directPrivilegeValue',
-    'effectivePrivilegeValue',
-    'isModifiedPriv',
+  effPrivilegeState: computed(
     'arePrivilegesUpToDate',
-    function isDisplayedEffectivePrivGranted() {
-      return this.directPrivilegeValue ||
-        ((!this.isModifiedPriv && this.arePrivilegesUpToDate) &&
-          this.effectivePrivilegeValue);
+    'directPrivilegeValue',
+    'isModifiedPriv',
+    'effectivePrivilegeValue',
+    function effPrivilegeState() {
+      if (!this.arePrivilegesUpToDate && this.effPrivilegeStateCache !== undefined) {
+        return this.effPrivilegeStateCache;
+      }
+      let state;
+      if (this.directPrivilegeValue ||
+        (!this.isModifiedPriv && this.effectivePrivilegeValue)
+      ) {
+        state = true;
+      } else if (this.isModifiedPriv && this.effectivePrivilegeValue) {
+        state = 2;
+      } else {
+        state = false;
+      }
+      this.set('effPrivilegeStateCache', state);
+      return state;
     }
   ),
 
@@ -182,6 +199,7 @@ export default Component.extend(DisabledPaths, I18n, {
     'effPrivilegesAffectorGris',
     'privilege.name',
     'effPrivilegesAffectorInfos',
+    'effPrivilegeState',
     async function effPrivilegesRealAffectorRecords() {
       const affectorRecords = [];
       let effPrivilegesAffectorInfos;

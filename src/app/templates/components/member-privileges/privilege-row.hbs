@@ -28,18 +28,15 @@
   <td
     class={{concat-classes
       "toggle-column effective"
-      (if
-        (and (and
-          (or (not isModifiedPriv) arePrivilegesUpToDate)
-          (not effectivePrivilegeValue)
-        ) (not isDisplayedEffectivePrivGranted))
-        "revoke"
-      )
+      (if (not effPrivilegeState) "revoke")
     }}
     onmouseover={{action "highlightMemberships"}}
     onmouseleave={{action "resetHighlights"}}
   >
-    {{#if isDisplayedEffectivePrivGranted}}
+    {{#if (eq effPrivilegeState 2)}}
+      <div class="priv-unknown">?</div>
+      {{one-tooltip title=(tt this "unknownPrivilege")}}
+    {{else if effPrivilegeState}}
       {{one-icon icon="checked"}}
       {{#promise-proxy-container
         proxy=effPrivilegesRealAffectorRecords
@@ -47,11 +44,6 @@
       }}
         {{one-tooltip title=tooltipText}}
       {{/promise-proxy-container}}
-    {{else if (or
-      isModifiedPriv (and (not arePrivilegesUpToDate) effectivePrivilegeValue)
-    )}}
-      <div class="priv-unknown">?</div>
-      {{one-tooltip title=(tt this "unknownPrivilege")}}
     {{else}}
       <div class="priv-revoke">–</div>
     {{/if}}
