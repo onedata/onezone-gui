@@ -70,7 +70,6 @@ export default Component.extend(I18n, {
   spaceManager: service(),
   recordManager: service(),
   globalNotify: service(),
-  modalManager: service(),
   alert: service(),
 
   /**
@@ -84,6 +83,12 @@ export default Component.extend(I18n, {
    * @type {ConfirmJoinRequestModalOptions}
    */
   modalOptions: undefined,
+
+  /**
+   * @virtual
+   * @type {ModalInstanceApi}
+   */
+  modalApi: undefined,
 
   //#region state
 
@@ -290,7 +295,7 @@ export default Component.extend(I18n, {
       this.set('isProcessing', true);
       try {
         await this.onGrant(this.userId);
-        this.modalManager.hide(this.modalId);
+        this.modalApi.close();
       } catch (error) {
         this.globalNotify.backendError(this.t('grantingSpaceAccess'), error);
       } finally {
@@ -306,7 +311,7 @@ export default Component.extend(I18n, {
         await this.onReject({
           rejectionReason: this.rejectionRootField.dumpValue().message,
         });
-        this.modalManager.hide(this.modalId);
+        this.modalApi.close();
       } catch (error) {
         this.globalNotify.backendError(this.t('rejectingSpaceAccess'), error);
       } finally {
@@ -314,7 +319,7 @@ export default Component.extend(I18n, {
       }
     },
     decideLater() {
-      this.modalManager.hide(this.modalId);
+      this.modalApi.close();
       const text = this.t('decideLaterModal.bodyText');
       this.alert.info(htmlSafe(`<p>${text}</p>`), {
         header: this.t('decideLaterModal.header'),

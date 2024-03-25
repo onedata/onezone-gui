@@ -13,9 +13,14 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { promise } from 'ember-awesome-macros';
 import { Promise } from 'rsvp';
+import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import { inject as service } from '@ember/service';
+import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 
 export default Component.extend(I18n, {
   classNames: ['member-privileges-table'],
+
+  recordManager: service(),
 
   /**
    * @override
@@ -64,6 +69,30 @@ export default Component.extend(I18n, {
   modelTypeTranslation: undefined,
 
   /**
+   * @virtual
+   * @type {User|Group}
+   */
+  contextRecord: null,
+
+  /**
+   * @virtual
+   * @type {Group|Space|Cluster|Provider}
+   */
+  targetRecord: null,
+
+  /**
+   * @virtual
+   * @type {Array<Utils/MembersCollection/ItemProxy>}
+   */
+  directGroupMembers: undefined,
+
+  /**
+   * @virtual optional
+   * @type {Function}
+   */
+  highlightMemberships: notImplementedIgnore,
+
+  /**
    * @virtual optional
    * @type {boolean}
    */
@@ -73,6 +102,11 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   arePrivilegesUpToDate: true,
+
+  /**
+   * @type {Membership}
+   */
+  membership: undefined,
 
   /**
    * Object with name of group privileges with information about
@@ -250,6 +284,28 @@ export default Component.extend(I18n, {
     }
   ),
 
+  /**
+   * @type {ComputedProperty<PromiseObject>}
+   */
+  effPrivilegesAffectorInfos: promise.object(computed(
+    'directGroupMembers',
+    'membership.intermediaries',
+    async function effPrivilegesAffectorInfos() {
+      return Promise.all(this.membership.intermediaries.map(groupId => {
+        const affectorInfo = this.directGroupMembers.find(
+          member => groupId === member.id
+        );
+        if (!affectorInfo.effectivePrivilegesProxy.isLoaded) {
+          return affectorInfo.effectivePrivilegesProxy.reloadRecords().then(
+            () => affectorInfo
+          );
+        } else {
+          return affectorInfo;
+        }
+      }));
+    }
+  )),
+
   arePrivilegesUpToDateObserver: observer(
     'areEffPrivilegesRecalculated',
     'arePrivilegesJustSaved',
@@ -277,12 +333,25 @@ export default Component.extend(I18n, {
 
     scheduleOnce('afterRender', this, 'recordEffectiveProxyObserver');
     scheduleOnce('afterRender', this, 'recordDirectProxyObserver');
+    this.fetchMembership();
 
     const isOpened = {};
     for (const entry of this.privilegesGroups) {
       isOpened[entry.groupName] = false;
     }
     this.set('groupsOpenState', isOpened);
+  },
+
+  async fetchMembership() {
+    const membership = await this.recordManager.getMembership(
+      this.contextRecord,
+      this.targetRecord, {
+        reload: true,
+      }
+    );
+    safeExec(this, () => {
+      this.set('membership', membership);
+    });
   },
 
   actions: {
@@ -299,6 +368,9 @@ export default Component.extend(I18n, {
         }
       }
       this.get('recordDirectProxy').setNewPrivileges(privileges);
+    },
+    highlightMemberships(groups) {
+      this.get('highlightMemberships')(groups);
     },
   },
 });

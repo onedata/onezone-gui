@@ -12,6 +12,9 @@ import { computed, observer } from '@ember/object';
 import Component from '@ember/component';
 import DisabledPaths from 'onedata-gui-common/mixins/components/one-dynamic-tree/disabled-paths';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import { promise } from 'ember-awesome-macros';
+import { inject as service } from '@ember/service';
+import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 
 /**
  * @typedef {Object} PrivilegeInfo
@@ -33,6 +36,8 @@ export default Component.extend(DisabledPaths, I18n, {
   classNameBindings: [
     'isDirect:direct-member-privilege-row:effective-member-privilege-row',
   ],
+
+  groupManager: service(),
 
   /**
    * @override
@@ -100,15 +105,45 @@ export default Component.extend(DisabledPaths, I18n, {
   hasUnsavedPrivileges: false,
 
   /**
-   * @type {boolean}
-   */
-  isModifiedPriv: false,
-
-  /**
-   * @virtual optional
+   * @virtual
    * @type {boolean}
    */
   arePrivilegesUpToDate: true,
+
+  /**
+   * @virtual
+   * @type {Array<string>}
+   */
+  effPrivilegesAffectorGris: undefined,
+
+  /**
+   * @virtual
+   * @type {PromiseObject}
+   */
+  effPrivilegesAffectorInfos: undefined,
+
+  /**
+   * @virtual
+   * @type {Array<Utils/MembersCollection/ItemProxy>}
+   */
+  directGroupMembers: undefined,
+
+  /**
+   * @virtual
+   * @type {Group|Space|Cluster|Provider}
+   */
+  targetRecord: undefined,
+
+  /**
+   * @virtual optional
+   * @type {Function}
+   */
+  highlightMemberships: notImplementedIgnore,
+
+  /**
+   * @type {boolean}
+   */
+  isModifiedPriv: false,
 
   /**
    * Input changed action.
@@ -139,6 +174,93 @@ export default Component.extend(DisabledPaths, I18n, {
     }
   ),
 
+  /**
+   * @type {ComputedProperty<PromiseObject>}
+   */
+  effPrivilegesRealAffectorRecords: promise.object(computed(
+    'directGroupMembers.@each.effectivePrivilegesProxy',
+    'effPrivilegesAffectorGris',
+    'privilege.name',
+    'effPrivilegesAffectorInfos',
+    async function effPrivilegesRealAffectorRecords() {
+      const affectorRecords = [];
+      let effPrivilegesAffectorInfos;
+      try {
+        effPrivilegesAffectorInfos = await this.effPrivilegesAffectorInfos;
+      } catch (error) {
+        effPrivilegesAffectorInfos = [];
+      }
+      for (const member of effPrivilegesAffectorInfos) {
+        const privileges =
+          member.effectivePrivilegesProxy.persistedPrivilegesSnapshot[0];
+        if (privileges && privileges[this.privilegesGroupName][this.privilege.name]) {
+          affectorRecords.push({ id: member.id, name: member.member.name });
+        }
+      }
+      return affectorRecords;
+    }
+  )),
+
+  /**
+   * @type {ComputedProperty<Array<string>>}
+   */
+  membershipsToHighlight: computed(
+    'effPrivilegesRealAffectorRecords.content',
+    'directPrivilegeValue',
+    'isDirect',
+    'effPrivilegesAffectorGris',
+    function membershipsToHighlight() {
+      const recordsIds = [];
+      const affectorRecords = this.effPrivilegesRealAffectorRecords?.content;
+      if (this.isDirect && this.directPrivilegeValue) {
+        recordsIds.push(this.targetRecord.gri);
+      }
+      if (affectorRecords) {
+        for (const record of affectorRecords) {
+          recordsIds.push(record.id);
+        }
+      }
+      return recordsIds;
+    }
+  ),
+
+  /**
+   * @type {ComputedProperty<string>}
+   */
+  resourceTypeTranslation: computed('targetRecord.entityType',
+    function resourceTypeTranslation() {
+      return this.i18n.t(`common.modelNames.${this.targetRecord.entityType}`);
+    }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<string>}
+   */
+  tooltipText: computed(
+    'effPrivilegesRealAffectorRecords',
+    'directPrivilegeValue',
+    function tooltipText() {
+      const groupsText = (this.effPrivilegesRealAffectorRecords.content ?? [])
+        .map((g) => g.name).join(', ');
+      if (this.directPrivilegeValue && groupsText === '') {
+        return this.tt('onlyDirectTooltip');
+      }
+      if (this.directPrivilegeValue && groupsText !== '') {
+        return this.tt('directEffectiveTooltip', {
+          resourceType: this.resourceTypeTranslation,
+          groupsList: groupsText,
+        });
+      }
+      if (groupsText !== '') {
+        return this.tt('onlyEffectiveTooltip', {
+          resourceType: this.resourceTypeTranslation,
+          groupsList: groupsText,
+        });
+      }
+      return '';
+    }
+  ),
+
   hasUnsavedPrivilegesObserver: observer(
     'hasUnsavedPrivileges',
     function hasUnsavedPrivilegesObserver() {
@@ -165,6 +287,12 @@ export default Component.extend(DisabledPaths, I18n, {
       } else {
         this.set('isModifiedPriv', false);
       }
+    },
+    highlightMemberships() {
+      this.get('highlightMemberships')(this.membershipsToHighlight);
+    },
+    resetHighlights() {
+      this.get('highlightMemberships')([]);
     },
   },
 });

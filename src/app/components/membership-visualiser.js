@@ -132,6 +132,12 @@ export default Component.extend(I18n, {
   searchString: '',
 
   /**
+   * @virtual
+   * @type {Array<String>}
+   */
+  highlightedMembers: undefined,
+
+  /**
    * Max number of blocks, that will be rendered in membership path.
    * 0 means no limit.
    * @type {number}

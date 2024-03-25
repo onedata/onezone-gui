@@ -36,9 +36,17 @@
         "revoke"
       )
     }}
+    onmouseover={{action "highlightMemberships"}}
+    onmouseleave={{action "resetHighlights"}}
   >
     {{#if isDisplayedEffectivePrivGranted}}
       {{one-icon icon="checked"}}
+      {{#promise-proxy-container
+        proxy=effPrivilegesRealAffectorRecords
+        sizeClass="xxs"
+      }}
+        {{one-tooltip title=tooltipText}}
+      {{/promise-proxy-container}}
     {{else if (or
       isModifiedPriv (and (not arePrivilegesUpToDate) effectivePrivilegeValue)
     )}}

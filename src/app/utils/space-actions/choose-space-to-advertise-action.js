@@ -14,7 +14,6 @@ import ActionResult from 'onedata-gui-common/utils/action-result';
 export default Action.extend({
   modalManager: service(),
   router: service(),
-  gloalNotify: service(),
 
   /**
    * @override
@@ -42,7 +41,7 @@ export default Action.extend({
         onSubmit: async (spaceId) => {
           try {
             await result.interceptPromise(this.configureSpace(spaceId));
-            this.modalManager.hide(modalInstance.id);
+            modalInstance.api.close();
           } catch {
             this.notifyFailure(result);
           }

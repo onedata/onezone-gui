@@ -121,6 +121,10 @@
                 modelTypeTranslation=modelTypeTranslation
                 areEffPrivilegesRecalculated=record.areEffPrivilegesRecalculated
                 arePrivilegesJustSaved=arePrivilegesJustSaved
+                contextRecord=memberProxy.member
+                targetRecord=record
+                directGroupMembers=directGroupsProxyList
+                highlightMemberships=(action "highlightMemberships")
               }}
               <div class="memberships-container">
                 <div class="header-memberships-container">
@@ -157,6 +161,7 @@
                     contextRecord=memberProxy.member
                     targetRecord=record
                     showDescription=showMembershipDescription
+                    highlightedMembers=highlightedMembers
                   }}
                 </div>
               </div>

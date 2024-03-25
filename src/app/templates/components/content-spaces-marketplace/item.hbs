@@ -36,8 +36,7 @@
       <div class={{concat-classes "access-info-col" accessInfoColClassName}}>
         {{#if (eq status MarketplaceSpaceStatusEnum.Available)}}
           {{#one-button size="sm" onClick=(action "requestAccess")}}
-            {{one-icon icon="cart"}}
-            <span class="text">{{tt this "requestAccess"}}</span>
+            {{one-icon icon="cart"}}<span class="text">{{tt this "requestAccess"}}</span>
           {{/one-button}}
         {{else if (eq status MarketplaceSpaceStatusEnum.Outdated)}}
           {{#one-icon icon="sign-warning-rounded" class="status-btn-external-icon"}}
@@ -50,8 +49,7 @@
             }}
           {{/one-icon}}
           {{#one-button size="sm" onClick=(action "requestAccess")}}
-            {{one-icon icon="cart"}}
-            <span class="text">{{tt this "requestAccess"}}</span>
+            {{one-icon icon="cart"}}<span class="text">{{tt this "requestAccess"}}</span>
           {{/one-button}}
         {{else if (eq status MarketplaceSpaceStatusEnum.AvailableAfterReject)}}
           {{#one-icon icon="sign-warning-rounded" class="status-btn-external-icon"}}
@@ -61,14 +59,12 @@
             }}
           {{/one-icon}}
           {{#one-button size="sm" onClick=(action "requestAccess")}}
-            {{one-icon icon="cart"}}
-            <span class="text">{{tt this "requestAccess"}}</span>
+            {{one-icon icon="cart"}}<span class="text">{{tt this "requestAccess"}}</span>
           {{/one-button}}
         {{else if (eq status MarketplaceSpaceStatusEnum.Pending)}}
           <div class="btn-tooltip-container">
             {{#one-button class="request-pending-btn" size="sm" disabled=true}}
-              {{one-icon icon="cart"}}
-              <span class="text">{{tt this "requestSent"}}</span>
+              {{one-icon icon="cart"}}<span class="text">{{tt this "requestSent"}}</span>
             {{/one-button}}
             {{one-tooltip
               class="tooltip-lg tooltip-text-left"
