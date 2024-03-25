@@ -263,6 +263,15 @@ export default Component.extend(I18n, {
     }
   ),
 
+  directPrivilegesObserver: observer(
+    'directPrivileges',
+    function directPrivilegesObserver() {
+      if (!this.recordDirectProxy.isModified) {
+        this.recordDirectProxy.resetModifications();
+      }
+    }
+  ),
+
   init() {
     this._super(...arguments);
 

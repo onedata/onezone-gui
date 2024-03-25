@@ -8,7 +8,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { computed } from '@ember/object';
+import { computed, observer } from '@ember/object';
 import Component from '@ember/component';
 import DisabledPaths from 'onedata-gui-common/mixins/components/one-dynamic-tree/disabled-paths';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -100,6 +100,11 @@ export default Component.extend(DisabledPaths, I18n, {
   isPrivilegesAreModifying: false,
 
   /**
+   * @type {boolean}
+   */
+  isModifiedPriv: false,
+
+  /**
    * @virtual optional
    * @type {boolean}
    */
@@ -118,17 +123,6 @@ export default Component.extend(DisabledPaths, I18n, {
   inputClass: computed('privilegesGroupName', function inputClass() {
     return `field-${this.privilegesGroupName} form-control`;
   }),
-
-  isModifiedPriv: computed(
-    'previousDirectPrivilegeValue',
-    'directPrivilegeValue',
-    'isPrivilegesAreModifying',
-    function isModifiedPriv() {
-      return (this.isPrivilegesAreModifying &&
-        this.previousDirectPrivilegeValue !== this.directPrivilegeValue
-      );
-    }
-  ),
 
   /**
    * @type {ComputedProperty<boolean>}
@@ -163,14 +157,31 @@ export default Component.extend(DisabledPaths, I18n, {
     }
   ),
 
+  isPrivilegesAreModifyingObserver: observer(
+    'isPrivilegesAreModifying',
+    function isPrivilegesAreModifyingObserver() {
+      if (!this.isPrivilegesAreModifying) {
+        this.set('isModifiedPriv', false);
+      }
+    }
+  ),
+
+  init() {
+    this._super(...arguments);
+    this.isPrivilegesAreModifyingObserver();
+  },
+
   actions: {
     /**
      * Notifies about change in input.
      * @param {*} value Changed value.
      */
     inputChanged(value) {
-      if (this.get('value') !== value) {
-        this.get('inputChanged')(value);
+      this.get('inputChanged')(value);
+      if (this.get('previousDirectPrivilegeValue') !== value) {
+        this.set('isModifiedPriv', true);
+      } else {
+        this.set('isModifiedPriv', false);
       }
     },
   },
