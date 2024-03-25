@@ -106,16 +106,6 @@ export default Component.extend(I18n, {
   changeOpenGroup: () => {},
 
   /**
-   * @type {Ember.ComputedProperty<number>}
-   */
-  privilegesCount: computed('privileges', function privilegesCount() {
-    if (this.privileges) {
-      return Object.keys(this.privileges).length;
-    }
-    return 0;
-  }),
-
-  /**
    * @type {Ember.ComputedProperty<boolean>}
    */
   isModified: computed(
@@ -154,12 +144,8 @@ export default Component.extend(I18n, {
         for (const [key, value] of Object.entries(this.privileges)) {
           if (this.effectivePrivilegeValues[key]) {
             result += 1;
-          } else if (this.isModified &&
-            this.previousDirectPrivilegeValues[key] !== value
-          ) {
-            if (value && !this.effectivePrivilegeValues[key]) {
-              result += 1;
-            }
+          } else if (this.isModified && value) {
+            result += 1;
           }
         }
       }

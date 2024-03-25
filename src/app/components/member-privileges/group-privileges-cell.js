@@ -114,27 +114,19 @@ export default Component.extend({
     'isDirect',
     function privilegesGrantedCount() {
       let privTrue = 0;
-      if (this.isUnknownEffPrivStatus) {
-        return -1;
-      }
       if (this.isDirect) {
         for (const value of Object.values(this.privileges)) {
           if (value === 2) {
-            privTrue += 0.5;
+            return 0.5;
           } else if (value) {
             privTrue++;
           }
         }
         return privTrue;
       }
-      // for (const value of Object.values(this.privileges)) {
-      //   if (value === 2) {
-      //     privTrue += 0.5;
-      //   } else if (value) {
-      //     privTrue++;
-      //   }
-      // }
-      // privTrue += this.newGrantedEffPrivCount;
+      if (this.isUnknownEffPrivStatus) {
+        return -1;
+      }
       return this.newGrantedEffPrivCount;
     }
   ),

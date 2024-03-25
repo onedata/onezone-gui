@@ -132,11 +132,8 @@ export default Component.extend(DisabledPaths, I18n, {
     'effectivePrivilegeValue',
     'isModifiedPriv',
     'arePrivilegesUpToDate',
-    'hasUnsavedPrivileges',
-    'previousDirectPrivilegeValue',
     function isDisplayedEffectivePrivGranted() {
-      return (!this.hasUnsavedPrivileges && this.previousDirectPrivilegeValue) ||
-        (this.hasUnsavedPrivileges && this.directPrivilegeValue) ||
+      return this.directPrivilegeValue ||
         ((!this.isModifiedPriv && this.arePrivilegesUpToDate) &&
           this.effectivePrivilegeValue);
     }

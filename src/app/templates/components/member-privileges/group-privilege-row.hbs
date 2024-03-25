@@ -16,7 +16,7 @@
 </td>
 {{#if isDirect}}
   {{member-privileges/group-privileges-cell
-    privileges=(if hasUnsavedPrivileges privileges previousDirectPrivilegeValues)
+    privileges=privileges
     groupPrivilegeName=privilegesGroup.text
     inputChanged=(action "inputChanged")
     form=form
