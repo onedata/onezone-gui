@@ -97,7 +97,7 @@ export default Component.extend(DisabledPaths, I18n, {
    * @virtual
    * @type {boolean}
    */
-  isPrivilegesAreModifying: false,
+  hasUnsavedPrivileges: false,
 
   /**
    * @type {boolean}
@@ -132,35 +132,20 @@ export default Component.extend(DisabledPaths, I18n, {
     'effectivePrivilegeValue',
     'isModifiedPriv',
     'arePrivilegesUpToDate',
-    'isPrivilegesAreModifying',
+    'hasUnsavedPrivileges',
     'previousDirectPrivilegeValue',
     function isDisplayedEffectivePrivGranted() {
-      return (!this.isPrivilegesAreModifying && this.previousDirectPrivilegeValue) ||
-        (this.isPrivilegesAreModifying && this.directPrivilegeValue) ||
+      return (!this.hasUnsavedPrivileges && this.previousDirectPrivilegeValue) ||
+        (this.hasUnsavedPrivileges && this.directPrivilegeValue) ||
         ((!this.isModifiedPriv && this.arePrivilegesUpToDate) &&
           this.effectivePrivilegeValue);
     }
   ),
 
-  /**
-   * @type {ComputedProperty<boolean>}
-   */
-  isDisplayedDirectPrivGranted: computed(
-    'directPrivilegeValue',
-    'isPrivilegesAreModifying',
-    'previousDirectPrivilegeValue',
-    function isDisplayedDirectPrivGranted() {
-      if (this.isPrivilegesAreModifying) {
-        return this.directPrivilegeValue;
-      }
-      return this.previousDirectPrivilegeValue;
-    }
-  ),
-
-  isPrivilegesAreModifyingObserver: observer(
-    'isPrivilegesAreModifying',
-    function isPrivilegesAreModifyingObserver() {
-      if (!this.isPrivilegesAreModifying) {
+  hasUnsavedPrivilegesObserver: observer(
+    'hasUnsavedPrivileges',
+    function hasUnsavedPrivilegesObserver() {
+      if (!this.hasUnsavedPrivileges) {
         this.set('isModifiedPriv', false);
       }
     }
@@ -168,7 +153,7 @@ export default Component.extend(DisabledPaths, I18n, {
 
   init() {
     this._super(...arguments);
-    this.isPrivilegesAreModifyingObserver();
+    this.hasUnsavedPrivilegesObserver();
   },
 
   actions: {

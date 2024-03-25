@@ -63,12 +63,6 @@ export default Component.extend({
   areEffPrivilegesRecalculated: undefined,
 
   /**
-   * @virtual
-   * @type {boolean}
-   */
-  isPrivilegesAreModifying: false,
-
-  /**
    * @virtual optional
    * @type {boolean}
    */

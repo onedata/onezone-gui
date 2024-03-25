@@ -77,7 +77,7 @@ export default Component.extend(I18n, {
    * @virtual
    * @type {boolean}
    */
-  isPrivilegesAreModifying: false,
+  hasUnsavedPrivileges: false,
 
   /**
    * @virtual optional
@@ -121,9 +121,9 @@ export default Component.extend(I18n, {
   isModified: computed(
     'previousDirectPrivilegeValues',
     'privileges',
-    'isPrivilegesAreModifying',
+    'hasUnsavedPrivileges',
     function isModified() {
-      if (this.isPrivilegesAreModifying &&
+      if (this.hasUnsavedPrivileges &&
         this.privileges && this.previousDirectPrivilegeValues
       ) {
         for (const [key, value] of Object.entries(this.privileges)) {

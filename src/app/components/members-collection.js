@@ -32,6 +32,8 @@ import { scheduleOnce } from '@ember/runloop';
 import { promise } from 'ember-awesome-macros';
 import { htmlSafe } from '@ember/template';
 import { formatNumber } from 'onedata-gui-common/helpers/format-number';
+import { later, cancel } from '@ember/runloop';
+import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 const fallbackActionsGenerator = () => [];
 
@@ -185,6 +187,12 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   arePrivilegesJustSaved: false,
+
+  /**
+   * Ember timer object
+   * @type {any}
+   */
+  afterPrivilegesSaveTimer: undefined,
 
   /**
    * @type {SafeString | string}
@@ -431,11 +439,17 @@ export default Component.extend(I18n, {
     },
     async savePrivileges(memberProxy) {
       this.set('arePrivilegesJustSaved', true);
+      cancel(this.afterPrivilegesSaveTimer);
       return this.get('privilegeActions')
         .handleSave(get(memberProxy, 'privilegesProxy').save(true))
         .then(() => memberProxy)
         .then(() => this.record.reload())
-        .then(() => setTimeout(() => this.set('arePrivilegesJustSaved', false), 5000));
+        .then(() => this.set(
+          'afterPrivilegesSaveTimer',
+          later(() =>
+            safeExec(this, () => this.set('arePrivilegesJustSaved', false)), 5000
+          )
+        ));
     },
     listCollapsed(isCollapsed) {
       this.set('isListCollapsed', isCollapsed);

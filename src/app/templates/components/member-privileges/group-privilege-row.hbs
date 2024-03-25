@@ -16,7 +16,7 @@
 </td>
 {{#if isDirect}}
   {{member-privileges/group-privileges-cell
-    privileges=(if isPrivilegesAreModifying privileges previousDirectPrivilegeValues)
+    privileges=(if hasUnsavedPrivileges privileges previousDirectPrivilegeValues)
     groupPrivilegeName=privilegesGroup.text
     inputChanged=(action "inputChanged")
     form=form
@@ -25,7 +25,6 @@
     newGrantedEffPrivCount=0
     arePrivilegesUpToDate=true
     isUnknownEffPrivStatus=false
-    isPrivilegesAreModifying=isPrivilegesAreModifying
   }}
 {{else}}
   <td class="toggle-column direct group na">{{tt this "na"}}</td>
@@ -40,6 +39,5 @@
     newGrantedEffPrivCount=newGrantedEffPrivCount
     arePrivilegesUpToDate=arePrivilegesUpToDate
     isUnknownEffPrivStatus=isUnknownEffPrivStatus
-    isPrivilegesAreModifying=isPrivilegesAreModifying
   }}
 {{/if}}
