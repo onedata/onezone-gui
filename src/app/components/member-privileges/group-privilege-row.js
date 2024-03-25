@@ -90,6 +90,9 @@ export default Component.extend(I18n, {
    */
   newGrantedEffPrivCountCache: undefined,
 
+  /**
+   * @type {boolean}
+   */
   isUnknownEffPrivStatusCache: undefined,
 
   /**
@@ -140,13 +143,11 @@ export default Component.extend(I18n, {
         return this.newGrantedEffPrivCountCache;
       }
       let result = 0;
-      if (this.privileges && this.previousDirectPrivilegeValues) {
-        for (const [key, value] of Object.entries(this.privileges)) {
-          if (this.effectivePrivilegeValues[key]) {
-            result += 1;
-          } else if (this.isModified && value) {
-            result += 1;
-          }
+      for (const [key, value] of Object.entries(this.effectivePrivilegeValues)) {
+        if (value) {
+          result += 1;
+        } else if (this.isModified && this.privileges[key]) {
+          result += 1;
         }
       }
       this.set('newGrantedEffPrivCountCache', result);
@@ -154,6 +155,9 @@ export default Component.extend(I18n, {
     }
   ),
 
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
   isUnknownEffPrivStatus: computed(
     'previousDirectPrivilegeValues',
     'privileges',
