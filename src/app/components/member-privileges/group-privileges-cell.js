@@ -57,12 +57,6 @@ export default Component.extend({
   isUnknownEffPrivStatus: false,
 
   /**
-   * @virtual
-   * @type {boolean}
-   */
-  areEffPrivilegesRecalculated: undefined,
-
-  /**
    * @virtual optional
    * @type {boolean}
    */

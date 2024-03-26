@@ -306,16 +306,14 @@ export default Component.extend(I18n, {
     }
   )),
 
-  arePrivilegesUpToDateObserver: observer(
+  arePrivilegesUpToDateSetter: observer(
     'areEffPrivilegesRecalculated',
     'arePrivilegesJustSaved',
-    function arePrivilegesUpToDateObserver() {
-      if (!this.areEffPrivilegesRecalculated || this.arePrivilegesJustSaved) {
-        this.set('arePrivilegesUpToDate', false);
-      }
-      if (!this.arePrivilegesJustSaved && this.areEffPrivilegesRecalculated) {
-        this.set('arePrivilegesUpToDate', true);
-      }
+    function arePrivilegesUpToDateSetter() {
+      this.set(
+        'arePrivilegesUpToDate',
+        !this.arePrivilegesJustSaved && this.areEffPrivilegesRecalculated
+      );
     }
   ),
 

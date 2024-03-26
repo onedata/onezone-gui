@@ -543,12 +543,12 @@ export default Component.extend(I18n, {
         .handleSave(get(memberProxy, 'privilegesProxy').save(true))
         .then(() => memberProxy)
         .then(() => this.record.reload())
-        .then(() => this.set(
+        .then(() => safeExec(this, () => this.set(
           'afterPrivilegesSaveTimer',
           later(() =>
             safeExec(this, () => this.set('arePrivilegesJustSaved', false)), 5000
           )
-        ));
+        )));
     },
     listCollapsed(isCollapsed) {
       this.set('isListCollapsed', isCollapsed);
