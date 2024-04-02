@@ -284,6 +284,10 @@ export default Component.extend(DisabledPaths, I18n, {
     function hasUnsavedPrivilegesObserver() {
       if (!this.hasUnsavedPrivileges) {
         this.set('isModifiedPriv', false);
+      } else if (this.hasUnsavedPrivileges &&
+        this.previousDirectPrivilegeValue != this.directPrivilegeValue
+      ) {
+        this.set('isModifiedPriv', true);
       }
     }
   ),
