@@ -37,6 +37,7 @@ export default Component.extend(I18n, {
   classNames: [
     'spaces-marketplace-item',
     'iconified-block',
+    'modern-iconified-block',
     // implements infinite scroll list row
     'data-row',
   ],

@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11632 Applied common changes from EDM GUI branch
 * VFS-11685 Added loading and changing effective privileges during modification
 * VFS-11684 Added tooltips for effective privileges
 * VFS-11434 Added new file attributes to atm file data spec
