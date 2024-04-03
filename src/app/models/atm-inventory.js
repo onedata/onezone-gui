@@ -21,6 +21,7 @@ export default Model.extend(GraphSingleModelMixin, {
   scope: attr('string'),
   currentUserEffPrivileges: attr('array', { defaultValue: () => [] }),
   directMembership: attr('boolean', { defaultValue: false }),
+  areEffPrivilegesRecalculated: attr('boolean'),
 
   groupList: belongsTo('groupList'),
   userList: belongsTo('userList'),

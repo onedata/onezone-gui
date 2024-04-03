@@ -21,6 +21,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   scope: attr('string'),
   canViewPrivileges: attr('boolean', { defaultValue: false }),
   directMembership: attr('boolean', { defaultValue: false }),
+  areEffPrivilegesRecalculated: attr('boolean'),
 
   /**
    * @type {string}

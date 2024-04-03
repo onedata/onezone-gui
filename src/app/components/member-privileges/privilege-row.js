@@ -8,7 +8,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { computed } from '@ember/object';
+import { computed, observer } from '@ember/object';
 import Component from '@ember/component';
 import DisabledPaths from 'onedata-gui-common/mixins/components/one-dynamic-tree/disabled-paths';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -100,11 +100,24 @@ export default Component.extend(DisabledPaths, I18n, {
 
   /**
    * @virtual
+   * @type {boolean}
+   */
+  hasUnsavedPrivileges: false,
+
+  /**
+   * @virtual
+   * @type {boolean}
+   */
+  arePrivilegesUpToDate: true,
+
+  /**
+   * @virtual
    * @type {Array<string>}
    */
   effPrivilegesAffectorGris: undefined,
 
   /**
+   * @virtual
    * @type {PromiseObject}
    */
   effPrivilegesAffectorInfos: undefined,
@@ -128,6 +141,16 @@ export default Component.extend(DisabledPaths, I18n, {
   highlightMemberships: notImplementedIgnore,
 
   /**
+   * @type {boolean}
+   */
+  isModifiedPriv: false,
+
+  /**
+   * @type {boolean}
+   */
+  effPrivilegeStateCache: undefined,
+
+  /**
    * Input changed action.
    * @type {Function}
    */
@@ -142,6 +165,33 @@ export default Component.extend(DisabledPaths, I18n, {
   }),
 
   /**
+   * @type {ComputedProperty<boolean>}
+   */
+  effPrivilegeState: computed(
+    'arePrivilegesUpToDate',
+    'directPrivilegeValue',
+    'isModifiedPriv',
+    'effectivePrivilegeValue',
+    function effPrivilegeState() {
+      if (!this.arePrivilegesUpToDate && this.effPrivilegeStateCache !== undefined) {
+        return this.effPrivilegeStateCache;
+      }
+      let state;
+      if (this.directPrivilegeValue ||
+        (!this.isModifiedPriv && this.effectivePrivilegeValue)
+      ) {
+        state = true;
+      } else if (this.isModifiedPriv && this.effectivePrivilegeValue) {
+        state = 2;
+      } else {
+        state = false;
+      }
+      this.set('effPrivilegeStateCache', state);
+      return state;
+    }
+  ),
+
+  /**
    * @type {ComputedProperty<PromiseObject>}
    */
   effPrivilegesRealAffectorRecords: promise.object(computed(
@@ -149,6 +199,7 @@ export default Component.extend(DisabledPaths, I18n, {
     'effPrivilegesAffectorGris',
     'privilege.name',
     'effPrivilegesAffectorInfos',
+    'effPrivilegeState',
     async function effPrivilegesRealAffectorRecords() {
       const affectorRecords = [];
       let effPrivilegesAffectorInfos;
@@ -228,14 +279,35 @@ export default Component.extend(DisabledPaths, I18n, {
     }
   ),
 
+  hasUnsavedPrivilegesObserver: observer(
+    'hasUnsavedPrivileges',
+    function hasUnsavedPrivilegesObserver() {
+      if (!this.hasUnsavedPrivileges) {
+        this.set('isModifiedPriv', false);
+      } else if (this.hasUnsavedPrivileges &&
+        this.previousDirectPrivilegeValue != this.directPrivilegeValue
+      ) {
+        this.set('isModifiedPriv', true);
+      }
+    }
+  ),
+
+  init() {
+    this._super(...arguments);
+    this.hasUnsavedPrivilegesObserver();
+  },
+
   actions: {
     /**
      * Notifies about change in input.
      * @param {*} value Changed value.
      */
     inputChanged(value) {
-      if (this.get('value') !== value) {
-        this.get('inputChanged')(value);
+      this.get('inputChanged')(value);
+      if (this.get('previousDirectPrivilegeValue') !== value) {
+        this.set('isModifiedPriv', true);
+      } else {
+        this.set('isModifiedPriv', false);
       }
     },
     highlightMemberships() {

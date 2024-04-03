@@ -99,6 +99,11 @@ export default Component.extend(I18n, {
   isBulkEdit: false,
 
   /**
+   * @type {boolean}
+   */
+  arePrivilegesUpToDate: true,
+
+  /**
    * @type {Membership}
    */
   membership: undefined,
@@ -300,6 +305,26 @@ export default Component.extend(I18n, {
       }));
     }
   )),
+
+  arePrivilegesUpToDateSetter: observer(
+    'areEffPrivilegesRecalculated',
+    'arePrivilegesJustSaved',
+    function arePrivilegesUpToDateSetter() {
+      this.set(
+        'arePrivilegesUpToDate',
+        !this.arePrivilegesJustSaved && this.areEffPrivilegesRecalculated
+      );
+    }
+  ),
+
+  directPrivilegesObserver: observer(
+    'directPrivileges',
+    function directPrivilegesObserver() {
+      if (!this.recordDirectProxy.isModified) {
+        this.recordDirectProxy.resetModifications();
+      }
+    }
+  ),
 
   init() {
     this._super(...arguments);
