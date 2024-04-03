@@ -51,6 +51,7 @@ export default Model.extend(
     userList: belongsTo('userList'),
     effGroupList: belongsTo('groupList'),
     effUserList: belongsTo('userList'),
+    areEffPrivilegesRecalculated: attr('boolean'),
 
     /**
      * Fields:

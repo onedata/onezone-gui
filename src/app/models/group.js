@@ -25,6 +25,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   scope: attr('string'),
   directMembership: attr('boolean', { defaultValue: false }),
   canViewPrivileges: attr('boolean', { defaultValue: false }),
+  areEffPrivilegesRecalculated: attr('boolean'),
 
   /**
    * Information about group. Available fields:

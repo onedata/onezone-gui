@@ -21,6 +21,9 @@
       (if (eq state true) "green")
     }}
   >
-    {{privilegesGrantedCount}}/{{privilegesCount}}
+    {{grantedText}}/{{privilegesCount}}
   </span>
+  {{#if (not arePrivilegesUpToDate)}}
+    {{spin-spinner-block sizeClass="xxs"}}
+  {{/if}}
 {{/if}}
