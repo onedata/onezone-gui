@@ -14,7 +14,7 @@ import { computed, get } from '@ember/object';
 import { collect } from '@ember/object/computed';
 import { resolve } from 'rsvp';
 import { promise } from 'ember-awesome-macros';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 
 export default Component.extend(I18n, GlobalActions, {

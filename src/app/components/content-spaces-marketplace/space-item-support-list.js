@@ -9,7 +9,7 @@
 import Component from '@ember/component';
 import { reads } from '@ember/object/computed';
 import ContentOverflowDetector from 'onedata-gui-common/mixins/content-overflow-detector';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 
 const mixins = [
   I18n,

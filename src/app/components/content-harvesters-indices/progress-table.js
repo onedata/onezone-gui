@@ -19,7 +19,7 @@ import { A } from '@ember/array';
 import { reject } from 'rsvp';
 import { inject as service } from '@ember/service';
 import _ from 'lodash';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import WindowResizeHandler from 'onedata-gui-common/mixins/components/window-resize-handler';
 import moment from 'moment';

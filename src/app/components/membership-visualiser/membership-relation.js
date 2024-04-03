@@ -11,7 +11,7 @@ import Component from '@ember/component';
 import { computed, get } from '@ember/object';
 import { collect } from '@ember/object/computed';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import { inject as service } from '@ember/service';
 
 export default Component.extend(I18n, {

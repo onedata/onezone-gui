@@ -11,7 +11,7 @@ import { inject as service } from '@ember/service';
 import layout from 'onedata-gui-common/templates/components/one-sidebar/second-level-items';
 import { computed, defineProperty } from '@ember/object';
 import { reads, collect } from '@ember/object/computed';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 import recordIcon from 'onedata-gui-common/utils/record-icon';
 

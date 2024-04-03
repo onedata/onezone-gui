@@ -11,7 +11,7 @@ import { computed, getProperties } from '@ember/object';
 import { equal, and, reads } from '@ember/object/computed';
 import { htmlSafe } from '@ember/string';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import $ from 'jquery';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import { inject as service } from '@ember/service';

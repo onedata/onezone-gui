@@ -16,7 +16,7 @@ import EmberObject, {
   observer,
 } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import { inject as service } from '@ember/service';
 import Messages from 'ember-cp-validations/validators/messages';
 import { hash, Promise, reject } from 'rsvp';
