@@ -186,6 +186,6 @@ export default EmberObject.extend(...mixins, {
    */
   generatePrettyUrl({ fileId, fileAction } = {}) {
     const path = this.generatePrettyPath({ fileId, fileAction });
-    return path && (globals.location.origin + path);
+    return path && (globals.location.origin + '/' + path);
   },
 });
