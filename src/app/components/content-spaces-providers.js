@@ -10,7 +10,7 @@
 import { reads } from '@ember/object/computed';
 import { computed, get } from '@ember/object';
 import { inject as service } from '@ember/service';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import { or, raw } from 'ember-awesome-macros';
 import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';

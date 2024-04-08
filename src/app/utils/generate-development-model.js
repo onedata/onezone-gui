@@ -546,6 +546,7 @@ function createSpacesRecords(store) {
       scope: 'private',
       currentUserEffPrivileges: spacePrivilegesFlags,
       directMembership: true,
+      areEffPrivilegesRecalculated: true,
       info: {
         creatorType: 'user',
         creatorId: USER_ID,
@@ -652,6 +653,7 @@ function createGroupsRecords(store) {
       type: 'team',
       directMembership: true,
       canViewPrivileges: true,
+      areEffPrivilegesRecalculated: true,
     }).save();
   }));
 }
@@ -677,6 +679,7 @@ function createClusterRecords(store) {
       name: 'PL-Grid',
       onepanelProxy: true,
       scope: 'private',
+      areEffPrivilegesRecalculated: true,
       info: {
         creatorType: 'root',
         creatorId: '',
@@ -706,6 +709,7 @@ function createHarvesterRecords(store) {
       harvestingBackendEndpoint: '127.0.0.1:9200',
       directMembership: true,
       canViewPrivileges: true,
+      areEffPrivilegesRecalculated: true,
       public: false,
       info: {
         creationTime: 1540995468,
@@ -771,6 +775,7 @@ function createAtmInventoryRecords(store) {
       scope: 'private',
       directMembership: true,
       currentUserEffPrivileges: atmInventoryPrivilegesFlags,
+      areEffPrivilegesRecalculated: true,
     }).save();
   }));
 }

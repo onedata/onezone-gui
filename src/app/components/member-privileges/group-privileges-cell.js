@@ -45,6 +45,24 @@ export default Component.extend({
   form: undefined,
 
   /**
+   * @virtual
+   * @type {number}
+   */
+  newGrantedEffPrivCount: undefined,
+
+  /**
+   * @virtual
+   * @type {boolean}
+   */
+  isUnknownEffPrivStatus: false,
+
+  /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  arePrivilegesUpToDate: true,
+
+  /**
    * Input changed action.
    * @virtual
    * @type {Function}
@@ -62,32 +80,66 @@ export default Component.extend({
   /**
    * @type {Ember.ComputedProperty<boolean>}
    */
-  state: computed('privilegesGrantedCount', 'privilegesCount', function state() {
-    if (
-      this.privilegesGrantedCount &&
-      this.privilegesGrantedCount < this.privilegesCount
-    ) {
-      return 2;
-    } else if (this.privilegesGrantedCount) {
-      return true;
+  state: computed(
+    'isUnknownEffPrivStatus',
+    'privilegesGrantedCount',
+    'privilegesCount',
+    function state() {
+      if (
+        (this.privilegesGrantedCount &&
+          this.privilegesGrantedCount < this.privilegesCount) ||
+        this.isUnknownEffPrivStatus
+      ) {
+        return 2;
+      } else if (this.privilegesGrantedCount) {
+        return true;
+      }
+      return false;
     }
-    return false;
-  }),
+  ),
 
   /**
    * @type {Ember.ComputedProperty<number>}
    */
-  privilegesGrantedCount: computed('privileges', function privilegesGrantedCount() {
-    let privTrue = 0;
-    for (const value of Object.values(this.privileges)) {
-      if (value === 2) {
-        privTrue += 0.5;
-      } else if (value) {
-        privTrue++;
+  privilegesGrantedCount: computed(
+    'privileges',
+    'newGrantedEffPrivCount',
+    'isUnknownEffPrivStatus',
+    'isDirect',
+    function privilegesGrantedCount() {
+      let privTrue = 0;
+      if (this.isDirect) {
+        for (const value of Object.values(this.privileges)) {
+          if (value === 2) {
+            return 0.5;
+          } else if (value) {
+            privTrue++;
+          }
+        }
+        return privTrue;
+      }
+      if (this.isUnknownEffPrivStatus) {
+        return -1;
+      }
+      return this.newGrantedEffPrivCount;
+    }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<number|string>}
+   */
+  grantedText: computed(
+    'privilegesGrantedCount',
+    'isUnknownEffPrivStatus',
+    'arePrivilegesUpToDate',
+    function grantedText() {
+      if (this.isUnknownEffPrivStatus) {
+        return '?';
+      } else {
+        return this.privilegesGrantedCount;
       }
     }
-    return privTrue;
-  }),
+  ),
 
   /**
    * @type {Ember.ComputedProperty<number>}

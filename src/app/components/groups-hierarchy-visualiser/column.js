@@ -16,7 +16,7 @@ import {
 } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { htmlSafe } from '@ember/string';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import $ from 'jquery';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 

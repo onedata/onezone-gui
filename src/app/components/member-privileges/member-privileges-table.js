@@ -10,7 +10,7 @@ import { computed, observer, get, set } from '@ember/object';
 import { reads, bool } from '@ember/object/computed';
 import { scheduleOnce } from '@ember/runloop';
 import Component from '@ember/component';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import { promise } from 'ember-awesome-macros';
 import { Promise } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
@@ -97,6 +97,11 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   isBulkEdit: false,
+
+  /**
+   * @type {boolean}
+   */
+  arePrivilegesUpToDate: true,
 
   /**
    * @type {Membership}
@@ -300,6 +305,26 @@ export default Component.extend(I18n, {
       }));
     }
   )),
+
+  arePrivilegesUpToDateSetter: observer(
+    'areEffPrivilegesRecalculated',
+    'arePrivilegesJustSaved',
+    function arePrivilegesUpToDateSetter() {
+      this.set(
+        'arePrivilegesUpToDate',
+        !this.arePrivilegesJustSaved && this.areEffPrivilegesRecalculated
+      );
+    }
+  ),
+
+  directPrivilegesObserver: observer(
+    'directPrivileges',
+    function directPrivilegesObserver() {
+      if (!this.recordDirectProxy.isModified) {
+        this.recordDirectProxy.resetModifications();
+      }
+    }
+  ),
 
   init() {
     this._super(...arguments);

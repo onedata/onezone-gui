@@ -9,7 +9,7 @@
 import Service, { inject } from '@ember/service';
 import { collect } from '@ember/object/computed';
 import { computed, get } from '@ember/object';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import { next } from '@ember/runloop';
 
 export default Service.extend(I18n, {

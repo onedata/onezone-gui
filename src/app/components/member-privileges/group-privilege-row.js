@@ -8,7 +8,7 @@
 
 import { computed } from '@ember/object';
 import Component from '@ember/component';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 
 export default Component.extend(I18n, {
   tagName: 'tr',
@@ -74,6 +74,28 @@ export default Component.extend(I18n, {
   isBulkEdit: false,
 
   /**
+   * @virtual
+   * @type {boolean}
+   */
+  hasUnsavedPrivileges: false,
+
+  /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  arePrivilegesUpToDate: true,
+
+  /**
+   * @type {number}
+   */
+  newGrantedEffPrivCountCache: undefined,
+
+  /**
+   * @type {boolean}
+   */
+  isUnknownEffPrivStatusCache: undefined,
+
+  /**
    * Input changed action.
    * @virtual
    * @type {Function}
@@ -87,29 +109,76 @@ export default Component.extend(I18n, {
   changeOpenGroup: () => {},
 
   /**
-   * @type {Ember.ComputedProperty<number>}
-   */
-  privilegesCount: computed('privileges', function privilegesCount() {
-    if (this.privileges) {
-      return Object.keys(this.privileges).length;
-    }
-    return 0;
-  }),
-
-  /**
    * @type {Ember.ComputedProperty<boolean>}
    */
   isModified: computed(
     'previousDirectPrivilegeValues',
     'privileges',
+    'hasUnsavedPrivileges',
     function isModified() {
-      if (this.privileges && this.previousDirectPrivilegeValues) {
+      if (this.hasUnsavedPrivileges &&
+        this.privileges && this.previousDirectPrivilegeValues
+      ) {
         for (const [key, value] of Object.entries(this.privileges)) {
           if (this.previousDirectPrivilegeValues[key] !== value) {
             return true;
           }
         }
       }
+      return false;
+    }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<number>}
+   */
+  newGrantedEffPrivCount: computed(
+    'previousDirectPrivilegeValues',
+    'privileges',
+    'effectivePrivilegeValues',
+    'arePrivilegesUpToDate',
+    'isModified',
+    function newGrantedEffPrivCount() {
+      if (!this.arePrivilegesUpToDate && this.newGrantedEffPrivCountCache !== undefined) {
+        return this.newGrantedEffPrivCountCache;
+      }
+      let result = 0;
+      for (const [key, value] of Object.entries(this.effectivePrivilegeValues)) {
+        if (value) {
+          result += 1;
+        } else if (this.isModified && this.privileges[key]) {
+          result += 1;
+        }
+      }
+      this.set('newGrantedEffPrivCountCache', result);
+      return result;
+    }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  isUnknownEffPrivStatus: computed(
+    'previousDirectPrivilegeValues',
+    'privileges',
+    'effectivePrivilegeValues',
+    'arePrivilegesUpToDate',
+    'isModified',
+    function isUnknownEffPrivStatus() {
+      if (!this.arePrivilegesUpToDate && this.isUnknownEffPrivStatusCache !== undefined) {
+        return this.isUnknownEffPrivStatusCache;
+      }
+      if (this.isModified && this.privileges && this.previousDirectPrivilegeValues) {
+        for (const [key, value] of Object.entries(this.privileges)) {
+          if (this.previousDirectPrivilegeValues[key] !== value) {
+            if (!value && this.effectivePrivilegeValues[key]) {
+              this.set('isUnknownEffPrivStatusCache', true);
+              return true;
+            }
+          }
+        }
+      }
+      this.set('isUnknownEffPrivStatusCache', false);
       return false;
     }
   ),

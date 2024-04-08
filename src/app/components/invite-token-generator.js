@@ -11,7 +11,7 @@ import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { reads, bool } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';

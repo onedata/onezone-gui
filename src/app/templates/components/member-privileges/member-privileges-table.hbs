@@ -30,6 +30,8 @@
               isDirect=isDirectMember
               editionEnabled=editionEnabled
               isBulkEdit=isBulkEdit
+              arePrivilegesUpToDate=arePrivilegesUpToDate
+              hasUnsavedPrivileges=recordDirectProxy.isModified
             }}
           {{#if (get groupsOpenState groupPrivileges.name)}}
             {{#each groupPrivileges.subtree as |privilege|}}
@@ -57,10 +59,12 @@
                   )
                   null
                 )
+                hasUnsavedPrivileges=recordDirectProxy.isModified
                 isDirect=isDirectMember
                 isBulkEdit=isBulkEdit
                 editionEnabled=editionEnabled
                 form=form
+                arePrivilegesUpToDate=arePrivilegesUpToDate
                 effPrivilegesAffectorGris=membership.intermediaries
                 directGroupMembers=directGroupMembers
                 highlightMemberships=(action "highlightMemberships")

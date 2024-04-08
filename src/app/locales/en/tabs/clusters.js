@@ -1,5 +1,9 @@
 export default {
   menuItem: 'Clusters',
+  specialResources: {
+    empty: 'No clusters',
+    add: 'Create new Oneprovider cluster',
+  },
   aspects: {
     index: 'Cluster',
     overview: 'Overview',

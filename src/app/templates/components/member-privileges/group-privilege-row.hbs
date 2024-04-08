@@ -22,6 +22,9 @@
     form=form
     isDirect=true
     editionEnabled=editionEnabled
+    newGrantedEffPrivCount=0
+    arePrivilegesUpToDate=true
+    isUnknownEffPrivStatus=false
   }}
 {{else}}
   <td class="toggle-column direct group na">{{tt this "na"}}</td>
@@ -33,5 +36,8 @@
     inputChanged=(action "inputChanged")
     form=form
     isDirect=false
+    newGrantedEffPrivCount=newGrantedEffPrivCount
+    arePrivilegesUpToDate=arePrivilegesUpToDate
+    isUnknownEffPrivStatus=isUnknownEffPrivStatus
   }}
 {{/if}}

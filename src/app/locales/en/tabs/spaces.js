@@ -1,5 +1,10 @@
 export default {
   menuItem: 'Data',
+  specialResources: {
+    empty: 'No spaces',
+    new: 'Create new space',
+    join: 'Marketplace',
+  },
   aspects: {
     index: 'Space overview',
     data: 'Files',
