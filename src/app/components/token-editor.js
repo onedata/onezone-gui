@@ -233,7 +233,7 @@ export default Component.extend(I18n, {
     // service caveat is disabled or is enabled and empty, or is enabled with
     // Onezone service selected
     or(
-      not('fields.valuesSource.caveats.endpointCaveats,serviceCaveat.serviceEnabled'),
+      not('fields.valuesSource.caveats.endpointCaveats.serviceCaveat.serviceEnabled'),
       isEmpty('fields.valuesSource.caveats.endpointCaveats.serviceCaveat.service'),
       array.find(
         'fields.valuesSource.caveats.endpointCaveats.serviceCaveat.service',
