@@ -16,7 +16,7 @@ import { findCurrentDefaultOneprovider } from 'onezone-gui/mixins/choose-default
 import EmberObject from '@ember/object';
 import { inject as service } from '@ember/service';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 
 /**
  * @typedef {'show'|'download'} GoToFileUrlActionHandler.GoToFileActionType

@@ -8,7 +8,7 @@
 
 import Service, { inject as service } from '@ember/service';
 import { get } from '@ember/object';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import ToggleBeingOwnerAction from 'onezone-gui/utils/user-actions/toggle-being-owner-action';
 import LeaveAction from 'onezone-gui/utils/user-actions/leave-action';
 

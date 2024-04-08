@@ -7,7 +7,7 @@
  */
 
 import Component from '@ember/component';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import { inject as service } from '@ember/service';
 import EmberObject, {
   computed,
@@ -233,7 +233,7 @@ export default Component.extend(I18n, {
     // service caveat is disabled or is enabled and empty, or is enabled with
     // Onezone service selected
     or(
-      not('fields.valuesSource.caveats.endpointCaveats,serviceCaveat.serviceEnabled'),
+      not('fields.valuesSource.caveats.endpointCaveats.serviceCaveat.serviceEnabled'),
       isEmpty('fields.valuesSource.caveats.endpointCaveats.serviceCaveat.service'),
       array.find(
         'fields.valuesSource.caveats.endpointCaveats.serviceCaveat.service',

@@ -11,7 +11,7 @@ import layout from 'onezone-gui/templates/components/login-box/header';
 import { computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject } from '@ember/service';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 
 export default Header.extend(I18n, {
   layout,

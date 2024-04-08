@@ -10,7 +10,7 @@ import Component from '@ember/component';
 import { computed, get, trySet } from '@ember/object';
 import { collect } from '@ember/object/computed';
 import { scheduleOnce } from '@ember/runloop';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import { inject as service } from '@ember/service';
 import RevisionActionsFactory from 'onezone-gui/utils/atm-workflow/atm-workflow-schema/revision-actions-factory';
 

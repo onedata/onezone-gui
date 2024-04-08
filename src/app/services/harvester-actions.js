@@ -9,7 +9,7 @@
 import Service, { inject as service } from '@ember/service';
 import { computed, get } from '@ember/object';
 import { collect } from '@ember/object/computed';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import { next } from '@ember/runloop';
 import RemoveSpaceFromHarvesterAction from 'onezone-gui/utils/harvester-actions/remove-space-from-harvester-action';
 

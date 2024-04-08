@@ -11,7 +11,7 @@ import { computed, get, set } from '@ember/object';
 import { reads, collect } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import { reject, resolve } from 'rsvp';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 // TODO: VFS-7655 Better inventory icon - now it is too light comparing to other,

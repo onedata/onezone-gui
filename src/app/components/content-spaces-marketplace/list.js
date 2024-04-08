@@ -8,7 +8,7 @@
 
 import Component from '@ember/component';
 import { reads } from '@ember/object/computed';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import InfiniteScroll from 'onedata-gui-common/utils/infinite-scroll';
 import { and } from 'ember-awesome-macros';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';

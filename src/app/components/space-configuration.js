@@ -20,7 +20,7 @@ import {
   conditional,
   raw,
 } from 'ember-awesome-macros';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import computedT from 'onedata-gui-common/utils/computed-t';
 import { Promise, all as allFulfilled } from 'rsvp';
 import { buildValidations } from 'ember-cp-validations';

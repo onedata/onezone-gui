@@ -8,7 +8,7 @@
 
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import EmberObject, { get, computed, set, getProperties, observer } from '@ember/object';
 import { reads, gt } from '@ember/object/computed';
 import { reject } from 'rsvp';
