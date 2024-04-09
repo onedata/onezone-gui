@@ -65,6 +65,13 @@ export default Component.extend(I18n, {
   showDetailsInTargetInfoPopover: false,
 
   /**
+   * @type {ComputedProperty<String>}
+   */
+  recordIdInfoTriggerId: computed('elementId', function recordIdInfoTriggerId() {
+    return this.elementId + '-record-id-info-trigger';
+  }),
+
+  /**
    * @virtual optional
    * @type {ComputedProperty<string>}
    */
