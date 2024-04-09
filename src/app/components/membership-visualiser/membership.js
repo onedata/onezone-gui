@@ -15,7 +15,7 @@ import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import MembershipRelation from 'onedata-gui-websocket-client/utils/membership-relation';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import _ from 'lodash';
 import $ from 'jquery';
 

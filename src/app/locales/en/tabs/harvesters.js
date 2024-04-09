@@ -1,5 +1,9 @@
 export default {
   menuItem: 'Discovery',
+  specialResources: {
+    empty: 'No harvesters',
+    new: 'Create new harvester',
+  },
   aspects: {
     plugin: 'Data discovery',
     config: 'Configuration',

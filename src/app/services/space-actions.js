@@ -8,7 +8,7 @@
 
 import Service, { inject as service } from '@ember/service';
 import { computed, get } from '@ember/object';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import { collect } from '@ember/object/computed';
 import { conditional } from 'ember-awesome-macros';
 import RemoveSpaceAction from 'onezone-gui/utils/space-actions/remove-space-action';

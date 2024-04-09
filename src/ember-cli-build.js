@@ -2,6 +2,9 @@
 'use strict';
 
 const EmberApp = require('ember-cli/lib/broccoli/ember-app');
+const suppressNodeBuildErrors = require(
+  './lib/onedata-gui-common/addon/utils/suppress-node-build-errors'
+);
 const defineSassColors = require(
   './lib/onedata-gui-common/addon/utils/define-sass-colors'
 );
@@ -17,6 +20,8 @@ const sass = require('sass-embedded');
 const environment = EmberApp.env();
 
 module.exports = function (defaults) {
+  suppressNodeBuildErrors();
+
   const app = new EmberApp(defaults, {
     'fingerprint': {
       extensions: [

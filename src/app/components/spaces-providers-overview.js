@@ -10,7 +10,7 @@ import { reads } from '@ember/object/computed';
 import { get, computed } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import ProvidersColors from 'onedata-gui-common/mixins/components/providers-colors';
 import { collect, conditional } from 'ember-awesome-macros';

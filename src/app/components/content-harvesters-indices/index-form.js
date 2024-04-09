@@ -8,7 +8,7 @@
 
 import Component from '@ember/component';
 import { computed, observer, get, trySet } from '@ember/object';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
 import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields-group';
 import TextField from 'onedata-gui-common/utils/form-component/text-field';

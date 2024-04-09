@@ -10,7 +10,7 @@ import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import { computed, set, get, observer } from '@ember/object';
 import { collect } from '@ember/object/computed';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import { resolve } from 'rsvp';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import computedT from 'onedata-gui-common/utils/computed-t';

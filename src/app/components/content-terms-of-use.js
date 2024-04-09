@@ -9,7 +9,7 @@
 import Component from '@ember/component';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import computedT from 'onedata-gui-common/utils/computed-t';
 
 export default Component.extend(I18n, {

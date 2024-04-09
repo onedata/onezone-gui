@@ -10,7 +10,7 @@
 import Component from '@ember/component';
 import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { htmlSafe } from '@ember/string';
 import isDirectlyClicked from 'onedata-gui-common/utils/is-directly-clicked';

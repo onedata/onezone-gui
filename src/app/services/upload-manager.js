@@ -26,7 +26,7 @@ import {
   conditional,
   collect,
 } from 'ember-awesome-macros';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import _ from 'lodash';
 import preventPageUnload from 'onedata-gui-common/utils/prevent-page-unload';
