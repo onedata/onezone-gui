@@ -33,7 +33,7 @@
     }
 
     .token-type {
-      padding-bottom: 3 * $padding-base-vertical;
+      padding-bottom: $padding-base-vertical;
       margin: 0;
 
       .record-info-icon {
@@ -41,6 +41,10 @@
         font-size: 150%;
         vertical-align: bottom;
       }
+    }
+    .alert-warning {
+      font-size: $font-size-base;
+      margin-bottom: 3.5em;
     }
   }
 

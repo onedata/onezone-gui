@@ -56,13 +56,18 @@
         {{/if}}
       </p>
       {{#if hasUnresolvedTargetName}}
-        <p>
-          <img
-            class="warning-icon {{elementId}}-warning-icon"
-            src={{root-url "assets/images/sign-warning-large.svg"}}
-          >
-          {{tt this "unresolvedTargetWarning" targetModelName=inviteTargetModelNameTranslation}}
-        </p>
+        <div class="invalid-token-message alert alert-warning" role="alert">
+          <p class="unresolved-target-warning">
+            {{tt this "unresolvedTargetWarning"
+              targetModelName=inviteTargetModelNameTranslation
+            }}
+          </p>
+          <p class="unresolved-target-warning-details">
+            {{tt this "unresolvedTargetWarningDetails"
+              targetModelName=inviteTargetModelNameTranslation
+            }}
+          </p>
+        </div>
       {{/if}}
       {{#unless (or (media "isMobile") noJoinMessage)}}
         {{join-image
