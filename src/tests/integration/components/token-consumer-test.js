@@ -13,7 +13,6 @@ import { Promise, resolve, reject } from 'rsvp';
 import _ from 'lodash';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { selectChoose, clickTrigger } from 'ember-power-select/test-support/helpers';
-import OneTooltipHelper from '../../helpers/one-tooltip';
 import { dasherize } from '@ember/string';
 import { suppressRejections } from '../../helpers/suppress-rejections';
 
