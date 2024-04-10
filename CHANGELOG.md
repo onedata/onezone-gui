@@ -7,6 +7,9 @@ CHANGELOG
 ### Latest changes
 
 * VFS-11715 Changed consume token view when invitation token is to deleted resources
+* VFS-11845 Fixed exiting `ember serve` on error and SCSS hot reloading
+* VFS-10262 Added content names for special resources in mobile mode
+* VFS-11810 Changed global file URL to be prettier
 * VFS-11685 Added loading and changing effective privileges during modification
 * VFS-11684 Added tooltips for effective privileges
 * VFS-11434 Added new file attributes to atm file data spec

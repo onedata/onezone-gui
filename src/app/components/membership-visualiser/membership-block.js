@@ -9,7 +9,7 @@
 
 import Component from '@ember/component';
 import { computed } from '@ember/object';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import recordIcon from 'onedata-gui-common/utils/record-icon';
 import { inject as service } from '@ember/service';
 

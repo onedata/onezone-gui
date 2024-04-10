@@ -16,7 +16,7 @@ import { collect } from 'ember-awesome-macros';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import bytesToString from 'onedata-gui-common/utils/bytes-to-string';
 import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 
 export default Component.extend(I18n, UserProxyMixin, {
   tagName: '',

@@ -9,7 +9,7 @@
  */
 
 import Component from '@ember/component';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
 import TextareaField from 'onedata-gui-common/utils/form-component/textarea-field';

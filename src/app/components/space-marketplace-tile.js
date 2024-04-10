@@ -7,7 +7,7 @@
  */
 
 import Component from '@ember/component';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { conditional, raw, and, collect } from 'ember-awesome-macros';

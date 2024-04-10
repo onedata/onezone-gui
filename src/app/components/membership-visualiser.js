@@ -69,7 +69,7 @@ import {
 import { sort } from '@ember/object/computed';
 import { A } from '@ember/array';
 import { inject as service } from '@ember/service';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import { reject, Promise } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';

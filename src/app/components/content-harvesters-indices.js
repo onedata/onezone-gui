@@ -15,7 +15,7 @@ import {
   set,
 } from '@ember/object';
 import { collect } from '@ember/object/computed';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';

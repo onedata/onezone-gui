@@ -17,7 +17,7 @@
 import Component from '@ember/component';
 import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import { inject as service } from '@ember/service';
 import { promise, bool, and, not, collect } from 'ember-awesome-macros';
 import { htmlSafe } from '@ember/string';

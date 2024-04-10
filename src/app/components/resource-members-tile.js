@@ -11,7 +11,7 @@ import Component from '@ember/component';
 import EmberObject, { computed, get } from '@ember/object';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { Promise } from 'rsvp';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 
 export default Component.extend(I18n, {
   tagName: '',

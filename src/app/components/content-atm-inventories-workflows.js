@@ -21,7 +21,7 @@ import ActionsFactory from 'onedata-gui-common/utils/workflow-visualiser/actions
 import { Promise } from 'rsvp';
 import { scheduleOnce } from '@ember/runloop';
 import preventPageUnload from 'onedata-gui-common/utils/prevent-page-unload';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { serializeAspectOptions, parseAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import _ from 'lodash';

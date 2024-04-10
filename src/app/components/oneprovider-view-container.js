@@ -30,7 +30,7 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { next } from '@ember/runloop';
 import { inject as service } from '@ember/service';
 import createPropertyComparator from 'onedata-gui-common/utils/create-property-comparator';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { guidFor } from '@ember/object/internals';
 import isStandaloneGuiOneprovider from 'onedata-gui-common/utils/is-standalone-gui-oneprovider';

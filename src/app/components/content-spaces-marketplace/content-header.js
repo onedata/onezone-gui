@@ -11,7 +11,7 @@ import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { collect, conditional } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import Action from 'onedata-gui-common/utils/action';
 
 export default Component.extend(I18n, {

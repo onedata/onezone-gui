@@ -11,7 +11,7 @@ import {
   inject as service,
 } from '@ember/service';
 import { get } from '@ember/object';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import OpenCreateTokenViewAction from 'onezone-gui/utils/token-actions/open-create-token-view-action';
 import CreateTokenAction from 'onezone-gui/utils/token-actions/create-token-action';
 import ModifyTokenAction from 'onezone-gui/utils/token-actions/modify-token-action';
