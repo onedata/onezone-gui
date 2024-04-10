@@ -54,6 +54,12 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
+   * @type {string}
+   */
+  inviteTargetModelNameTranslation: undefined,
+
+  /**
+   * @virtual
    * @type {BasicRecordInfo}
    */
   inviteTargetRecord: undefined,

@@ -39,7 +39,7 @@
       .record-info-icon {
         color: $color-one-light-gray;
         font-size: 150%;
-        vertical-align: text-bottom;
+        vertical-align: bottom;
       }
     }
   }
@@ -72,4 +72,8 @@
       padding-top: 2 * $padding-base-vertical;
     }
   }
+}
+
+.id-info .control-label:first-letter {
+  text-transform: uppercase;
 }

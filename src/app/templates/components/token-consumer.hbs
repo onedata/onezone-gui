@@ -29,38 +29,41 @@
     <div class="type-info">
       <p class="token-type">
         {{typeText}}
-        {{#if hasUnresolvedTargetName}}
+        {{#if (media "isMobile")}}
+          {{one-icon
+            id=recordIdInfoTriggerId
+            icon="circle-id"
+            class="record-info-icon id-icon icon-trigger id-trigger clickable"
+          }}
+          {{#one-webui-popover
+            class="id-info"
+            popoverStyle="id-info"
+            triggerSelector=(concat "#" recordIdInfoTriggerId)
+            as |popover|
+          }}
+            <div class="form-group without-margin">
+              <label class="control-label">
+                {{tt this "recordId" targetModelName=inviteTargetModelNameTranslation}}:
+              </label>
+              {{one-clipboard-line
+                size="sm"
+                value=inviteTargetRecord.entityId
+                showText=false
+                btnType="default"
+              }}
+            </div>
+          {{/one-webui-popover}}
+        {{/if}}
+      </p>
+      {{#if hasUnresolvedTargetName}}
+        <p>
           <img
             class="warning-icon {{elementId}}-warning-icon"
             src={{root-url "assets/images/sign-warning-large.svg"}}
           >
-          {{one-tooltip
-            title=(tt this "unresolvedTargetWarning")
-            triggerElement=(concat "." elementId "-warning-icon")
-            triggerEvent="hover"
-          }}
-        {{/if}}
-        {{#if (media "isMobile")}}
-          {{one-icon
-            icon="browser-info"
-            class="record-info-icon target-record-info-trigger popover-info-trigger"
-            click=(action
-              (mut targetRecordInfoOpened)
-              (not targetRecordInfoOpened)
-              bubbles=false
-            )
-          }}
-          {{#record-info-popover
-            isOpened=targetRecordInfoOpened
-            triggerSelector=(local-selector elementId ".target-record-info-trigger")
-          }}
-            {{component inviteTargetInfoComponentName
-              record=inviteTargetRecord
-              showDetails=false
-            }}
-          {{/record-info-popover}}
-        {{/if}}
-      </p>
+          {{tt this "unresolvedTargetWarning" targetModelName=inviteTargetModelNameTranslation}}
+        </p>
+      {{/if}}
       {{#unless (or (media "isMobile") noJoinMessage)}}
         {{join-image
           class="consume-token-image"
@@ -70,6 +73,7 @@
             currentUser
           )
           inviteTargetModelName=inviteTargetModelName
+          inviteTargetModelNameTranslation=inviteTargetModelNameTranslation
           inviteTargetRecord=inviteTargetRecord
           arrowLabelType=(if spaceHarvesterRelationToken "add" "join")
           placeholderUnderSubjectImage=(tt this "placeholderUnderSubjectImage")

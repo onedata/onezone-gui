@@ -79,7 +79,9 @@
           as |popover|
         }}
           <div class="form-group without-margin">
-            <label class="control-label">{{tt this "recordId"}}:</label>
+            <label class="control-label">
+              {{tt this "recordId" targetModelName=inviteTargetModelNameTranslation}}:
+            </label>
             {{one-clipboard-line
               size="sm"
               value=inviteTargetRecord.entityId
