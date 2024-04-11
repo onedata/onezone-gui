@@ -7,7 +7,7 @@
  */
 
 import Service, { inject as service } from '@ember/service';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 
 export default Service.extend(I18n, {
   globalNotify: service(),

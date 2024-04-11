@@ -12,7 +12,7 @@ import TabBarLi from 'onedata-gui-common/components/one-tab-bar/tab-bar-li';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import Version from 'onedata-gui-common/utils/version';
 
 export default TabBarLi.extend(I18n, {

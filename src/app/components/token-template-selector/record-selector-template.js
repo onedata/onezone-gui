@@ -10,7 +10,7 @@
 import Component from '@ember/component';
 import { get, computed, observer, defineProperty } from '@ember/object';
 import { tag } from 'ember-awesome-macros';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import { inject as service } from '@ember/service';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve } from 'rsvp';

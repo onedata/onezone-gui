@@ -10,7 +10,7 @@ import Component from '@ember/component';
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
 import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import { inject as service } from '@ember/service';
 import { tag, not } from 'ember-awesome-macros';
 

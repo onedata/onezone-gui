@@ -9,7 +9,7 @@
 import Component from '@ember/component';
 import { computed, observer, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import _ from 'lodash';

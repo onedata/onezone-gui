@@ -15,7 +15,7 @@ import { computed, observer } from '@ember/object';
 import LoginFormContainer from 'onedata-gui-common/components/login-box/login-form-container';
 import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import _ from 'lodash';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import DOMPurify from 'dompurify';
 import $ from 'jquery';

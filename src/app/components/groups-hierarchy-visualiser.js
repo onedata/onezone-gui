@@ -175,7 +175,7 @@ import EmberObject, {
   observer,
 } from '@ember/object';
 import { A } from '@ember/array';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { Promise, resolve, reject } from 'rsvp';

@@ -10,7 +10,7 @@ import Component from '@ember/component';
 import { computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import I18n from 'onedata-gui-common/mixins/i18n';
 import { dateFormat } from 'onedata-gui-common/helpers/date-format';
 import { or, and, raw } from 'ember-awesome-macros';
 import { htmlSafe } from '@ember/string';
