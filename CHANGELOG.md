@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11761 Added support for opening specific tab in shares view using URL
 * VFS-11845 Fixed exiting `ember serve` on error and SCSS hot reloading
 * VFS-10262 Added content names for special resources in mobile mode
 * VFS-11810 Changed global file URL to be prettier
