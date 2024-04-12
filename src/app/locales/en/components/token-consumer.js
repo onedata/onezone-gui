@@ -65,9 +65,9 @@ export default {
   },
   unknownTargetName: 'unknown',
   unresolvedTargetWarning: 'Cannot resolve target {{targetModelName}} name.',
-  unresolvedTargetWarningDetails: 'The {{targetModelName}} may has been deleted or the token is outdated or invalid.',
+  unresolvedTargetWarningDetails: 'The {{targetModelName}} may have been deleted or the token is outdated or invalid.',
   invalidTokenMessage: 'Provided token is invalid.',
   confirmBtn: 'Confirm',
   cancelBtn: 'Cancel',
-  recordId: '{{targetModelName}} id',
+  recordId: '{{targetModelName}} ID',
 };
