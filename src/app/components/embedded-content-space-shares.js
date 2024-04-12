@@ -1,8 +1,11 @@
 /**
  * Proxy component for Oneprovider's `content-space-shares`.
  *
+ * It should be displayed for Data > Space > Shares tab. The global Shares tab for
+ * authenticated user is in the another component - `EmbeddedContentPrivateShare`.
+ *
  * @author Jakub Liput
- * @copyright (C) 2019-2020 ACK CYFRONET AGH
+ * @copyright (C) 2019-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -51,6 +54,12 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
   dirId: reads('navigationState.aspectOptions.dirId'),
 
   /**
+   * See oneprovider-gui `ShareShowTabId` type for available tabs.
+   * @type {string}
+   */
+  tabId: reads('navigationState.aspectOptions.tabId'),
+
+  /**
    * @override
    */
   embeddedBrowserType: 'share',
@@ -73,6 +82,7 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
     'spaceId',
     'shareId',
     'dirId',
+    'tabId',
   ]),
 
   /**
@@ -96,7 +106,7 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
         shareId,
       });
     },
-    getShareUrl({ shareId, dirId = null } = {}) {
+    getShareUrl({ shareId, dirId = null, tabId = null } = {}) {
       const {
         router,
         navigationState,
@@ -106,7 +116,7 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
         'shares', {
           queryParams: {
             options: serializeAspectOptions(
-              navigationState.mergedAspectOptions({ shareId, dirId })
+              navigationState.mergedAspectOptions({ shareId, dirId, tabId })
             ),
           },
         }
