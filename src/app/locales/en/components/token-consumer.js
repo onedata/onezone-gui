@@ -64,8 +64,10 @@ export default {
     harvester: 'Select harvester...',
   },
   unknownTargetName: 'unknown',
-  unresolvedTargetWarning: 'Cannot resolve invite target name, this token might be outdated or invalid.',
+  unresolvedTargetWarning: 'Cannot resolve target {{targetModelName}} name.',
+  unresolvedTargetWarningDetails: 'The {{targetModelName}} may have been deleted or the token is outdated or invalid.',
   invalidTokenMessage: 'Provided token is invalid.',
   confirmBtn: 'Confirm',
   cancelBtn: 'Cancel',
+  recordId: '{{targetModelName}} ID',
 };

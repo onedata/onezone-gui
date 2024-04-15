@@ -246,6 +246,15 @@ export default Component.extend(I18n, {
   inviteTargetModelName: reads('inviteTypeSpec.modelName'),
 
   /**
+   * @type {ComputedProperty<String>}
+   */
+  inviteTargetModelNameTranslation: computed(
+    'inviteTargetModelName',
+    function inviteTargetModelNameTranslation() {
+      return this.tt('targetModelName.' + this.inviteTargetModelName);
+    }),
+
+  /**
    * @type {ComputedProperty<boolean>}
    */
   hasUnresolvedTargetName: and(
@@ -253,6 +262,13 @@ export default Component.extend(I18n, {
     notEqual('type.inviteToken.inviteType', raw('registerOneprovider')),
     isEmpty('inviteTargetName')
   ),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  recordIdInfoTriggerId: computed('elementId', function recordIdInfoTriggerId() {
+    return this.elementId + '-record-id-info-trigger';
+  }),
 
   /**
    * @type {ComputedProperty<String>}

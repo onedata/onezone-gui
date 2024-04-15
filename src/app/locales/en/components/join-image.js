@@ -4,4 +4,5 @@ export default {
     add: 'add',
   },
   placeholderUnderSubjectImage: 'unknown',
+  recordId: '{{targetModelName}} ID',
 };
