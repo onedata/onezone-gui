@@ -1,8 +1,11 @@
 /**
  * Proxy component for Oneprovider's `content-private-share`.
  *
+ * It should be displayed for Shares > Share tab. The Space > Shares tab for
+ * authenticated user is in the another component - `EmbeddedContentSpaceShares`.
+ *
  * @author Jakub Liput
- * @copyright (C) 2019-2020 ACK CYFRONET AGH
+ * @copyright (C) 2019-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -50,6 +53,12 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
   dirId: reads('navigationState.aspectOptions.dirId'),
 
   /**
+   * See oneprovider-gui `ShareShowTabId` type for available tabs.
+   * @type {string}
+   */
+  tabId: reads('navigationState.aspectOptions.tabId'),
+
+  /**
    * @override
    */
   embeddedBrowserType: 'share',
@@ -72,6 +81,7 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
     'shareId',
     'spaceId',
     'dirId',
+    'tabId',
   ]),
 
   /**

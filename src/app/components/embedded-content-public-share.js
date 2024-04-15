@@ -43,6 +43,12 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
   dirId: reads('navigationState.aspectOptions.dirId'),
 
   /**
+   * See oneprovider-gui `ShareShowTabId` type for available tabs.
+   * @type {string}
+   */
+  tabId: reads('navigationState.aspectOptions.tabId'),
+
+  /**
    * @override
    */
   embeddedBrowserType: 'share',
@@ -64,6 +70,7 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
   iframeInjectedProperties: Object.freeze([
     'shareId',
     'dirId',
+    'tabId',
   ]),
 
   /**
