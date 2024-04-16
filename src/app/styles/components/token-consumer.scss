@@ -33,14 +33,18 @@
     }
 
     .token-type {
-      padding-bottom: 3 * $padding-base-vertical;
+      padding-bottom: $padding-base-vertical;
       margin: 0;
 
       .record-info-icon {
         color: $color-one-light-gray;
         font-size: 150%;
-        vertical-align: text-bottom;
+        vertical-align: bottom;
       }
+    }
+    .alert-warning {
+      font-size: $font-size-base;
+      margin-bottom: 3.5em;
     }
   }
 
@@ -72,4 +76,8 @@
       padding-top: 2 * $padding-base-vertical;
     }
   }
+}
+
+.token-invite-target-id-info .control-label:first-letter {
+  text-transform: uppercase;
 }

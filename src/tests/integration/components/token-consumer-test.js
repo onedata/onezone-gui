@@ -13,7 +13,6 @@ import { Promise, resolve, reject } from 'rsvp';
 import _ from 'lodash';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { selectChoose, clickTrigger } from 'ember-power-select/test-support/helpers';
-import OneTooltipHelper from '../../helpers/one-tooltip';
 import { dasherize } from '@ember/string';
 import { suppressRejections } from '../../helpers/suppress-rejections';
 
@@ -427,12 +426,8 @@ describe('Integration | Component | token-consumer', function () {
       await fillIn('.token-string', 'token');
       expect(find('.token-type'))
         .to.have.trimmed.text('Invitation to join a space');
-      const warningIcon = find('.type-info .warning-icon');
-      expect(warningIcon).to.exist;
-      const tooltipText = await new OneTooltipHelper(warningIcon).getText();
-      expect(tooltipText).to.equal(
-        'Cannot resolve invite target name, this token might be outdated or invalid.'
-      );
+      expect(find('.unresolved-target-warning'))
+        .to.have.trimmed.text('Cannot resolve target space name.');
     }
   );
 
