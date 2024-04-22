@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11946 Added new type to the automation - group
 * VFS-11715 Changed consume token view when invitation token is to deleted resources
 * VFS-11761 Added support for opening specific tab in shares view using URL
 * VFS-11845 Fixed exiting `ember serve` on error and SCSS hot reloading
