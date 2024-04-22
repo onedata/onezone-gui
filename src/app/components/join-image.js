@@ -54,6 +54,12 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
+   * @type {string}
+   */
+  inviteTargetModelNameTranslation: undefined,
+
+  /**
+   * @virtual
    * @type {BasicRecordInfo}
    */
   inviteTargetRecord: undefined,
@@ -63,6 +69,13 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   showDetailsInTargetInfoPopover: false,
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  recordIdInfoTriggerId: computed('elementId', function recordIdInfoTriggerId() {
+    return this.elementId + '-record-id-info-trigger';
+  }),
 
   /**
    * @virtual optional

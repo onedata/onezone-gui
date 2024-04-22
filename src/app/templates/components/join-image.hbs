@@ -41,27 +41,56 @@
   <img class="subject-image" src={{root-url inviteTargetModelImagePath}}>
   <figcaption class="subject-image-label subject-name">
     <div class="subject-description">
-      {{#truncated-string class="text"}}
-        {{inviteTargetRecord.name}}
-      {{/truncated-string}}
-      {{one-icon
-        icon="browser-info"
-        class="record-info-icon target-record-info-trigger popover-info-trigger"
-        click=(action
-          (mut targetRecordInfoOpened)
-          (not targetRecordInfoOpened)
-          bubbles=false
-        )
-      }}
-      {{#record-info-popover
-        isOpened=targetRecordInfoOpened
-        triggerSelector=(local-selector elementId ".target-record-info-trigger")
-      }}
-        {{component inviteTargetInfoComponentName
-          record=inviteTargetRecord
-          showDetails=showDetailsInTargetInfoPopover
+      {{#if inviteTargetRecord.name}}
+        {{#truncated-string class="text"}}
+          {{inviteTargetRecord.name}}
+        {{/truncated-string}}
+        {{one-icon
+          icon="browser-info"
+          class="record-info-icon target-record-info-trigger popover-info-trigger"
+          click=(action
+            (mut targetRecordInfoOpened)
+            (not targetRecordInfoOpened)
+            bubbles=false
+          )
         }}
-      {{/record-info-popover}}
+        {{#record-info-popover
+          isOpened=targetRecordInfoOpened
+          triggerSelector=(local-selector elementId ".target-record-info-trigger")
+        }}
+          {{component inviteTargetInfoComponentName
+            record=inviteTargetRecord
+            showDetails=showDetailsInTargetInfoPopover
+          }}
+        {{/record-info-popover}}
+      {{else}}
+        {{#truncated-string class="text unknown-text"}}
+          {{tt this "placeholderUnderSubjectImage"}}
+        {{/truncated-string}}
+        {{one-icon
+          id=recordIdInfoTriggerId
+          icon="circle-id"
+          class="record-info-icon id-icon icon-trigger id-trigger clickable"
+        }}
+        {{#one-webui-popover
+          class="id-info"
+          popoverStyle="id-info token-invite-target-id-info"
+          triggerSelector=(concat "#" recordIdInfoTriggerId)
+          as |popover|
+        }}
+          <div class="form-group without-margin">
+            <label class="control-label">
+              {{tt this "recordId" targetModelName=inviteTargetModelNameTranslation}}:
+            </label>
+            {{one-clipboard-line
+              size="sm"
+              value=inviteTargetRecord.entityId
+              showText=false
+              btnType="default"
+            }}
+          </div>
+        {{/one-webui-popover}}
+      {{/if}}
     </div>
   </figcaption>
 </figure>

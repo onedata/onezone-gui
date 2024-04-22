@@ -29,38 +29,46 @@
     <div class="type-info">
       <p class="token-type">
         {{typeText}}
-        {{#if hasUnresolvedTargetName}}
-          <img
-            class="warning-icon {{elementId}}-warning-icon"
-            src={{root-url "assets/images/sign-warning-large.svg"}}
-          >
-          {{one-tooltip
-            title=(tt this "unresolvedTargetWarning")
-            triggerElement=(concat "." elementId "-warning-icon")
-            triggerEvent="hover"
-          }}
-        {{/if}}
         {{#if (media "isMobile")}}
           {{one-icon
-            icon="browser-info"
-            class="record-info-icon target-record-info-trigger popover-info-trigger"
-            click=(action
-              (mut targetRecordInfoOpened)
-              (not targetRecordInfoOpened)
-              bubbles=false
-            )
+            id=recordIdInfoTriggerId
+            icon="circle-id"
+            class="record-info-icon id-icon icon-trigger id-trigger clickable"
           }}
-          {{#record-info-popover
-            isOpened=targetRecordInfoOpened
-            triggerSelector=(local-selector elementId ".target-record-info-trigger")
+          {{#one-webui-popover
+            class="id-info"
+            popoverStyle="id-info token-invite-target-id-info"
+            triggerSelector=(concat "#" recordIdInfoTriggerId)
+            as |popover|
           }}
-            {{component inviteTargetInfoComponentName
-              record=inviteTargetRecord
-              showDetails=false
-            }}
-          {{/record-info-popover}}
+            <div class="form-group without-margin">
+              <label class="control-label">
+                {{tt this "recordId" targetModelName=inviteTargetModelNameTranslation}}:
+              </label>
+              {{one-clipboard-line
+                size="sm"
+                value=inviteTargetRecord.entityId
+                showText=false
+                btnType="default"
+              }}
+            </div>
+          {{/one-webui-popover}}
         {{/if}}
       </p>
+      {{#if hasUnresolvedTargetName}}
+        <div class="invalid-token-message alert alert-warning" role="alert">
+          <p class="unresolved-target-warning">
+            {{tt this "unresolvedTargetWarning"
+              targetModelName=inviteTargetModelNameTranslation
+            }}
+          </p>
+          <p class="unresolved-target-warning-details">
+            {{tt this "unresolvedTargetWarningDetails"
+              targetModelName=inviteTargetModelNameTranslation
+            }}
+          </p>
+        </div>
+      {{/if}}
       {{#unless (or (media "isMobile") noJoinMessage)}}
         {{join-image
           class="consume-token-image"
@@ -70,6 +78,7 @@
             currentUser
           )
           inviteTargetModelName=inviteTargetModelName
+          inviteTargetModelNameTranslation=inviteTargetModelNameTranslation
           inviteTargetRecord=inviteTargetRecord
           arrowLabelType=(if spaceHarvesterRelationToken "add" "join")
           placeholderUnderSubjectImage=(tt this "placeholderUnderSubjectImage")
