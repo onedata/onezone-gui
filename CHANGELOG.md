@@ -6,7 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
-* VFS-11632 Applied common changes from EDM GUI branch
+* VFS-11912 Applied common changes from EDM GUI branch
 * VFS-11715 Changed consume token view when invitation token is to deleted resources
 * VFS-11761 Added support for opening specific tab in shares view using URL
 * VFS-11845 Fixed exiting `ember serve` on error and SCSS hot reloading
