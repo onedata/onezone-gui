@@ -111,6 +111,10 @@
     }
   }
 
+  .one-collapsible-list-header .collapse-hidden {
+    opacity: 1 !important;
+  }
+
   .right-container {
     @include vertical-align-middle();
     right: 50px;
