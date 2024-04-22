@@ -167,6 +167,20 @@ export default Mixin.create({
     },
 
     /**
+     * @param {Object} options
+     * @param {String} options.groupId
+     * @returns {String} URL to the group dedicated page
+     */
+    getGroupUrl(options) {
+      return globals.location.origin + globals.location.pathname + this.router.urlFor(
+        'onedata.sidebar.content.aspect',
+        'groups',
+        options?.groupId,
+        'index'
+      );
+    },
+
+    /**
      * @returns {String} URL to create token view
      */
     getAccessTokenUrl() {
