@@ -9,6 +9,7 @@
 import { computed } from '@ember/object';
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/i18n';
+import { promise } from 'ember-awesome-macros';
 
 export default Component.extend(I18n, {
   tagName: 'tr',
@@ -78,6 +79,12 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   hasUnsavedPrivileges: false,
+
+  /**
+   * @virtual
+   * @type {PromiseObject}
+   */
+  effPrivilegesAffectorInfos: undefined,
 
   /**
    * @virtual optional
@@ -158,20 +165,36 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<boolean>}
    */
-  isUnknownEffPrivStatus: computed(
+  isUnknownEffPrivStatus: promise.object(computed(
     'previousDirectPrivilegeValues',
     'privileges',
     'effectivePrivilegeValues',
     'arePrivilegesUpToDate',
     'isModified',
-    function isUnknownEffPrivStatus() {
+    'effPrivilegesAffectorInfos',
+    'privilegesGroup.name',
+    async function isUnknownEffPrivStatus() {
       if (!this.arePrivilegesUpToDate && this.isUnknownEffPrivStatusCache !== undefined) {
         return this.isUnknownEffPrivStatusCache;
+      }
+      let effPrivilegesAffectorInfos;
+      try {
+        effPrivilegesAffectorInfos = await this.effPrivilegesAffectorInfos;
+      } catch (error) {
+        effPrivilegesAffectorInfos = [];
       }
       if (this.isModified && this.privileges && this.previousDirectPrivilegeValues) {
         for (const [key, value] of Object.entries(this.privileges)) {
           if (this.previousDirectPrivilegeValues[key] !== value) {
             if (!value && this.effectivePrivilegeValues[key]) {
+              for (const member of effPrivilegesAffectorInfos) {
+                const privileges =
+                  member.effectivePrivilegesProxy.persistedPrivilegesSnapshot[0];
+                if (privileges && privileges[this.privilegesGroup.name][key]) {
+                  this.set('isUnknownEffPrivStatusCache', false);
+                  return false;
+                }
+              }
               this.set('isUnknownEffPrivStatusCache', true);
               return true;
             }
@@ -181,7 +204,7 @@ export default Component.extend(I18n, {
       this.set('isUnknownEffPrivStatusCache', false);
       return false;
     }
-  ),
+  )),
 
   actions: {
     /**
