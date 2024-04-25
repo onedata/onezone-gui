@@ -38,6 +38,7 @@ const resultTypes = [
   'Object',
   'File',
   'Dataset',
+  'Group',
   'Range',
   'Array',
   'Time series measurement',
