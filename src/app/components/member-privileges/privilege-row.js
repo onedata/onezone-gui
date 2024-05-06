@@ -202,6 +202,8 @@ export default Component.extend(DisabledPaths, I18n, {
     'effPrivilegesAffectorGris',
     'privilege.name',
     'effPrivilegesAffectorInfos',
+    'effectivePrivilegeValue',
+    'directPrivilegeValue',
     async function effPrivilegesRealAffectorRecords() {
       const affectorRecords = [];
       let effPrivilegesAffectorInfos;
