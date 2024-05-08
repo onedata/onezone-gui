@@ -32,15 +32,15 @@ const testConvenientTypes = [
 ];
 
 const resultTypes = [
-  'Number',
-  'Boolean',
-  'String',
-  'Object',
-  'File',
-  'Dataset',
-  'Group',
-  'Range',
   'Array',
+  'Boolean',
+  'Dataset',
+  'File',
+  'Group',
+  'Number',
+  'Object',
+  'Range',
+  'String',
   'Time series measurement',
 ];
 
