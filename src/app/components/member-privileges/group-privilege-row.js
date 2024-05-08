@@ -9,6 +9,7 @@
 import { computed } from '@ember/object';
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/i18n';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 
 export default Component.extend(I18n, {
   tagName: 'tr',
@@ -78,6 +79,12 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   hasUnsavedPrivileges: false,
+
+  /**
+   * @virtual
+   * @type {PromiseObject}
+   */
+  effPrivilegesAffectorInfos: undefined,
 
   /**
    * @virtual optional
@@ -156,7 +163,7 @@ export default Component.extend(I18n, {
   ),
 
   /**
-   * @type {Ember.ComputedProperty<boolean>}
+   * @type {ComputedProperty<PromiseObject<boolean>>}
    */
   isUnknownEffPrivStatus: computed(
     'previousDirectPrivilegeValues',
@@ -164,22 +171,42 @@ export default Component.extend(I18n, {
     'effectivePrivilegeValues',
     'arePrivilegesUpToDate',
     'isModified',
+    'effPrivilegesAffectorInfos',
+    'privilegesGroup.name',
     function isUnknownEffPrivStatus() {
-      if (!this.arePrivilegesUpToDate && this.isUnknownEffPrivStatusCache !== undefined) {
-        return this.isUnknownEffPrivStatusCache;
-      }
-      if (this.isModified && this.privileges && this.previousDirectPrivilegeValues) {
-        for (const [key, value] of Object.entries(this.privileges)) {
-          if (this.previousDirectPrivilegeValues[key] !== value) {
-            if (!value && this.effectivePrivilegeValues[key]) {
-              this.set('isUnknownEffPrivStatusCache', true);
-              return true;
+      return promiseObject((async () => {
+        if (!this.arePrivilegesUpToDate &&
+          this.isUnknownEffPrivStatusCache !== undefined
+        ) {
+          return this.isUnknownEffPrivStatusCache;
+        }
+        let effPrivilegesAffectorInfos;
+        try {
+          effPrivilegesAffectorInfos = await this.effPrivilegesAffectorInfos;
+        } catch (error) {
+          effPrivilegesAffectorInfos = [];
+        }
+        if (this.isModified && this.privileges && this.previousDirectPrivilegeValues) {
+          for (const [key, value] of Object.entries(this.privileges)) {
+            if (this.previousDirectPrivilegeValues[key] !== value) {
+              if (!value && this.effectivePrivilegeValues[key]) {
+                for (const member of effPrivilegesAffectorInfos) {
+                  const privileges =
+                    member.effectivePrivilegesProxy.persistedPrivilegesSnapshot[0];
+                  if (privileges && privileges[this.privilegesGroup.name][key]) {
+                    this.set('isUnknownEffPrivStatusCache', false);
+                    return false;
+                  }
+                }
+                this.set('isUnknownEffPrivStatusCache', true);
+                return true;
+              }
             }
           }
         }
-      }
-      this.set('isUnknownEffPrivStatusCache', false);
-      return false;
+        this.set('isUnknownEffPrivStatusCache', false);
+        return false;
+      })());
     }
   ),
 
