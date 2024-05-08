@@ -12,27 +12,28 @@
       }}
       <tbody>
         {{#each definition as |groupPrivileges|}}
-            {{member-privileges/group-privilege-row
-              privileges=(if recordDirectProxy
-                (get modifiedPrivileges groupPrivileges.name)
-                null
-              )
-              effectivePrivilegeValues=(get
-                effectivePrivileges
-                groupPrivileges.name
-              )
-              privilegesGroup=groupPrivileges
-              previousDirectPrivilegeValues=(get directPrivileges groupPrivileges.name)
-              inputChanged=(action "inputValueChanged")
-              changeOpenGroup=(action "changeOpenGroup" groupPrivileges.name)
-              isOpen=(get groupsOpenState groupPrivileges.name)
-              form=form
-              isDirect=isDirectMember
-              editionEnabled=editionEnabled
-              isBulkEdit=isBulkEdit
-              arePrivilegesUpToDate=arePrivilegesUpToDate
-              hasUnsavedPrivileges=recordDirectProxy.isModified
-            }}
+          {{member-privileges/group-privilege-row
+            privileges=(if recordDirectProxy
+              (get modifiedPrivileges groupPrivileges.name)
+              null
+            )
+            effectivePrivilegeValues=(get
+              effectivePrivileges
+              groupPrivileges.name
+            )
+            privilegesGroup=groupPrivileges
+            previousDirectPrivilegeValues=(get directPrivileges groupPrivileges.name)
+            inputChanged=(action "inputValueChanged")
+            changeOpenGroup=(action "changeOpenGroup" groupPrivileges.name)
+            isOpen=(get groupsOpenState groupPrivileges.name)
+            form=form
+            isDirect=isDirectMember
+            editionEnabled=editionEnabled
+            isBulkEdit=isBulkEdit
+            arePrivilegesUpToDate=arePrivilegesUpToDate
+            hasUnsavedPrivileges=recordDirectProxy.isModified
+            effPrivilegesAffectorInfos=effPrivilegesAffectorInfos
+          }}
           {{#if (get groupsOpenState groupPrivileges.name)}}
             {{#each groupPrivileges.subtree as |privilege|}}
               {{member-privileges/privilege-row

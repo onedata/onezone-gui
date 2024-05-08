@@ -33,20 +33,20 @@
     onmouseover={{action "highlightMemberships"}}
     onmouseleave={{action "resetHighlights"}}
   >
-    {{#if (eq effPrivilegeState 2)}}
-      <div class="priv-unknown">?</div>
-      {{one-tooltip title=(tt this "unknownPrivilege")}}
-    {{else if effPrivilegeState}}
-      {{one-icon icon="checked"}}
-      {{#promise-proxy-container
-        proxy=effPrivilegesRealAffectorRecords
-        sizeClass="xxs"
-      }}
+    {{#promise-proxy-container
+      proxy=effPrivilegesRealAffectorRecords
+      sizeClass="xxs"
+    }}
+      {{#if (eq effPrivilegeState 2)}}
+        <div class="priv-unknown">?</div>
+        {{one-tooltip title=(tt this "unknownPrivilege")}}
+      {{else if effPrivilegeState}}
+        {{one-icon icon="checked"}}
         {{one-tooltip title=tooltipText}}
-      {{/promise-proxy-container}}
-    {{else}}
-      <div class="priv-revoke">–</div>
-    {{/if}}
+      {{else}}
+        <div class="priv-revoke">–</div>
+      {{/if}}
+    {{/promise-proxy-container}}
     {{#if (not arePrivilegesUpToDate)}}
       {{spin-spinner-block sizeClass="xxs"}}
     {{/if}}
