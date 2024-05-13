@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11080 Updated onedata-websocket-gui-client with list update after delete record fix
 * VFS-11915 Removed question mark during modification of privileges in some cases
 * VFS-11912 Applied common changes from EDM GUI branch
 * VFS-11715 Changed consume token view when invitation token is to deleted resources
