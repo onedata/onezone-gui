@@ -30,14 +30,19 @@
   <td class="toggle-column direct group na">{{tt this "na"}}</td>
 {{/if}}
 {{#if (not isBulkEdit)}}
-  {{member-privileges/group-privileges-cell
-    privileges=effectivePrivilegeValues
-    groupPrivilegeName=privilegesGroup.text
-    inputChanged=(action "inputChanged")
-    form=form
-    isDirect=false
-    newGrantedEffPrivCount=newGrantedEffPrivCount
-    arePrivilegesUpToDate=arePrivilegesUpToDate
-    isUnknownEffPrivStatus=isUnknownEffPrivStatus
+  {{#promise-proxy-container
+    proxy=isUnknownEffPrivStatus
+    sizeClass="xxs"
   }}
+    {{member-privileges/group-privileges-cell
+      privileges=effectivePrivilegeValues
+      groupPrivilegeName=privilegesGroup.text
+      inputChanged=(action "inputChanged")
+      form=form
+      isDirect=false
+      newGrantedEffPrivCount=newGrantedEffPrivCount
+      arePrivilegesUpToDate=arePrivilegesUpToDate
+      isUnknownEffPrivStatus=isUnknownEffPrivStatus.content
+    }}
+  {{/promise-proxy-container}}
 {{/if}}

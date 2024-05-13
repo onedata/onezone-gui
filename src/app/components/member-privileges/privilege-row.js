@@ -172,13 +172,16 @@ export default Component.extend(DisabledPaths, I18n, {
     'directPrivilegeValue',
     'isModifiedPriv',
     'effectivePrivilegeValue',
+    'effPrivilegesRealAffectorRecords.content',
     function effPrivilegeState() {
       if (!this.arePrivilegesUpToDate && this.effPrivilegeStateCache !== undefined) {
         return this.effPrivilegeStateCache;
       }
       let state;
+      const affectorRecordsCount = this.effPrivilegesRealAffectorRecords?.content?.length;
       if (this.directPrivilegeValue ||
-        (!this.isModifiedPriv && this.effectivePrivilegeValue)
+        (!this.isModifiedPriv && this.effectivePrivilegeValue) ||
+        (this.isModifiedPriv && this.effectivePrivilegeValue && affectorRecordsCount)
       ) {
         state = true;
       } else if (this.isModifiedPriv && this.effectivePrivilegeValue) {
@@ -199,7 +202,8 @@ export default Component.extend(DisabledPaths, I18n, {
     'effPrivilegesAffectorGris',
     'privilege.name',
     'effPrivilegesAffectorInfos',
-    'effPrivilegeState',
+    'effectivePrivilegeValue',
+    'directPrivilegeValue',
     async function effPrivilegesRealAffectorRecords() {
       const affectorRecords = [];
       let effPrivilegesAffectorInfos;

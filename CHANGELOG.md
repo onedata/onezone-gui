@@ -7,6 +7,9 @@ CHANGELOG
 ### Latest changes
 
 * VFS-11744 Changed "Provider" to "Provider configuration" cluster sidebar item
+* VFS-11080 Updated onedata-websocket-gui-client with list update after delete record fix
+* VFS-11915 Removed question mark during modification of privileges in some cases
+* VFS-11912 Applied common changes from EDM GUI branch
 * VFS-11715 Changed consume token view when invitation token is to deleted resources
 * VFS-11761 Added support for opening specific tab in shares view using URL
 * VFS-11845 Fixed exiting `ember serve` on error and SCSS hot reloading
