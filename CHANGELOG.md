@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-11760 Fixed global shares sidebar crashing when user has no view privilege for some space
 * VFS-11744 Changed "Provider" to "Provider configuration" cluster sidebar item
 * VFS-11080 Updated onedata-websocket-gui-client with list update after delete record fix
 * VFS-11915 Removed question mark during modification of privileges in some cases
