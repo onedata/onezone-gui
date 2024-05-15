@@ -2,7 +2,7 @@
  * Provides data and backend operations associated with shares.
  *
  * @author Jakub Liput
- * @copyright (C) 2020 ACK CYFRONET AGH
+ * @copyright (C) 2020-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -19,6 +19,8 @@ import { all as allFulfilled } from 'rsvp';
 import _ from 'lodash';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import addConflictLabels from 'onedata-gui-common/utils/add-conflict-labels';
+import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
+import onlyFulfilledValues from 'onedata-gui-common/utils/only-fulfilled-values';
 
 /**
  * This object MUST BE initialzed asychronuosly using `asyncInit()`, eg.
@@ -58,12 +60,15 @@ export const VirtualShareList = EmberObject.extend({
     })
   ),
 
-  shareListRelations: promise.array(
-    computed('shareLists.@each.list', function shareListRelations() {
-      return this.get('shareLists')
-        .then(shareLists => allFulfilled(shareLists.mapBy('list')));
-    })
-  ),
+  shareListRelations: computed('shareLists.@each.list', function shareListRelations() {
+    const fulfilledListPromises = (async () => {
+      const shareLists = await this.shareLists;
+      return await onlyFulfilledValues(
+        shareLists.map(shareList => shareList && get(shareList, 'list')).filter(Boolean)
+      );
+    })();
+    return promiseArray(fulfilledListPromises);
+  }),
 
   list: promise.array(computed('shareListRelations.@each.[]',
     function list() {
@@ -138,25 +143,23 @@ export default Service.extend(UserProxyMixin, {
    * @param {Models.Share} share
    * @returns {Promise<Models.Space>}
    */
-  getSpaceForShare(share) {
-    return this.get('userProxy')
-      .then(user => get(user, 'spaceList'))
-      .then(spaceList => get(spaceList, 'list'))
-      .then(spaces =>
-        allFulfilled(spaces.mapBy('shareList')).then(sl => sl.mapBy('list'))
-        .then(shares => _.zip(
-          spaces.toArray(),
-          shares,
-        ))
-      )
-      .then(spacesWithShares => {
-        const spaceSharesPair = spacesWithShares
-          .find(([, shares]) => shares.includes(share));
-        if (spaceSharesPair) {
-          return spaceSharesPair[0];
-        } else {
-          throw new Error('space not found for share');
-        }
-      });
+  async getSpaceForShare(share) {
+    const shareGri = get(share, 'id');
+    const user = await this.userProxy;
+    const spaceList = await get(user, 'spaceList');
+    const spaces = await get(spaceList, 'list');
+
+    for (const space of spaces.toArray()) {
+      let shareList;
+      try {
+        shareList = await get(space, 'shareList');
+      } catch {
+        continue;
+      }
+      if (shareList.hasMany('list')?.ids().includes(shareGri)) {
+        return space;
+      }
+    }
+    throw new Error(`space not found for share (${shareGri})`);
   },
 });
