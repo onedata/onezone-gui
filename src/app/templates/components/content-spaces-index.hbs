@@ -13,8 +13,8 @@
       {{#one-tile
         class="text-center resource-browse-tile"
         title=(tt this "tileDataTitle")
+        aspect=(if (not dataProviderProxy.content) "data" null)
         customLink=(if dataProviderProxy.content oneproviderHrefProxy.content null)
-        aspect=(if (gt (not dataProviderProxy.content)) "data" null)
         moreText=(tt this "browseFiles")}}
         <figure class="main-figure">
           <img class="main-image" src="assets/images/space-data.svg">
