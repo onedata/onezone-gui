@@ -163,22 +163,25 @@ export default SecondLevelItems.extend(I18n, {
     };
   }),
 
-  itemAutomation: computed('space.privileges.view', function itemAutomation() {
-    const i18n = this.get('i18n');
-    const privileges = this.get('space.privileges');
-    const forbidden = privileges.view === false;
-    return {
-      id: 'automation',
-      label: this.t('aspects.automation'),
-      icon: recordIcon('atmInventory'),
-      forbidden,
-      tip: forbidden ? insufficientPrivilegesMessage({
-        i18n,
-        modelName: 'space',
-        privilegeFlag: 'space_view',
-      }) : undefined,
-    };
-  }),
+  itemAutomation: computed(
+    'space.privileges.viewAtmWorkflowExecutions',
+    function itemAutomation() {
+      const i18n = this.get('i18n');
+      const privileges = this.get('space.privileges');
+      const forbidden = privileges.viewAtmWorkflowExecutions === false;
+      return {
+        id: 'automation',
+        label: this.t('aspects.automation'),
+        icon: recordIcon('atmInventory'),
+        forbidden,
+        tip: forbidden ? insufficientPrivilegesMessage({
+          i18n,
+          modelName: 'space',
+          privilegeFlag: 'space_view_atm_workflow_executions',
+        }) : undefined,
+      };
+    }
+  ),
 
   spaceSecondLevelItems: collect(
     'itemIndex',
