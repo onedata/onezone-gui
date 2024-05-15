@@ -9,4 +9,5 @@ export default {
   addSupport: 'Add support',
   browseFiles: 'Browse files',
   sharesCount: 'Shares',
+  providersOfflineText: 'Supporting providers are offline',
 };
