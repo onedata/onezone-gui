@@ -20,14 +20,13 @@
       .one-label {
         position: relative;
       }
-      .one-icon {
-        position: absolute;
-        bottom: 3px;
-        left: 0;
+      .offline-warning-icon {
         color: $color-one-warning;
       }
-      .offline-text {
-        margin-right: -20px;
+      .offline-warning {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
       }
     }
   }
