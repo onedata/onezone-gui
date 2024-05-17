@@ -15,4 +15,23 @@
       justify-content: space-between;
     }
   }
+  .resource-browse-tile {
+    .main-figure {
+      .one-label {
+        position: relative;
+      }
+      .offline-warning-icon {
+        color: $color-one-warning;
+      }
+      .offline-warning {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-left: -4px;
+        padding-left: 2px;
+        margin-right: -4px;
+        padding-right: 2px;
+      }
+    }
+  }
 }
