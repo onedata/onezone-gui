@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12016 Changed fetching records to start with no auth hint
 * VFS-11969 Added providers offline info on data tile on space overview
 * VFS-12006 Fixed missing attributes in file/group data spec editor during lambda creation
 * VFS-11760 Fixed global shares sidebar crashing when user has no view privilege for some space
