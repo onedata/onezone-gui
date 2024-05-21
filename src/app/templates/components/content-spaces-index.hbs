@@ -7,16 +7,31 @@
 
 <div class="row content-row">
   <div class="one-tile-container">
-    {{#if (and dataProviderProxy.isFulfilled dataProviderProxy.content)}}
+    {{#if (and
+      dataProviderProxy.isFulfilled
+      (or dataProviderProxy.content (gt providersProxy.length 0))
+    )}}
       {{#one-tile
         class="text-center resource-browse-tile"
         title=(tt this "tileDataTitle")
-        customLink=oneproviderHrefProxy.content
+        aspect=(if (not dataProviderProxy.content) "data" null)
+        customLink=(if dataProviderProxy.content oneproviderHrefProxy.content null)
         moreText=(tt this "browseFiles")}}
         <figure class="main-figure">
           <img class="main-image" src="assets/images/space-data.svg">
-          {{#truncated-string tagName="span" class="one-label"}}
-            {{dataProviderProxy.name}}
+          {{#truncated-string
+            tagName="span"
+            class=(concat-classes
+              "one-label"
+              (if (not dataProviderProxy.content) "offline-warning")
+            )
+          }}
+            {{#if dataProviderProxy.content}}
+              {{dataProviderProxy.name}}
+            {{else}}
+              {{one-icon icon="sign-warning-rounded" class="offline-warning-icon"}}
+              <span class="offline-text">{{tt this "providersOfflineText"}}</span>
+            {{/if}}
           {{/truncated-string}}
         </figure>
       {{/one-tile}}
