@@ -1,6 +1,8 @@
 SRC_DIR	 ?= src
 REL_DIR	 ?= rel
 XVFB_ARGS ?= --server-args="-screen 0, 1366x768x24"
+EMBER_CMD = npx --no-install ember
+XVFB_CMD = xvfb-run $(XVFB_ARGS)
 
 .PHONY: deps build_mock build_dev build_prod run_tests run_tests_xunit_output dev mock rel test test_xunit_output clean lint submodules
 
@@ -12,19 +14,19 @@ src/node_modules: src/package.json
 deps: src/node_modules
 
 build_mock:
-	cd $(SRC_DIR) && ember build --environment=development --output-path=../$(REL_DIR)
+	cd $(SRC_DIR) && $(EMBER_CMD) build --environment=development --output-path=../$(REL_DIR)
 
 build_dev:
-	cd $(SRC_DIR) && ember build --environment=development-backend --output-path=../$(REL_DIR)
+	cd $(SRC_DIR) && $(EMBER_CMD) build --environment=development-backend --output-path=../$(REL_DIR)
 
 build_prod:
-	cd $(SRC_DIR) && ember build --environment=production --output-path=../$(REL_DIR)
+	cd $(SRC_DIR) && $(EMBER_CMD) build --environment=production --output-path=../$(REL_DIR)
 
 run_tests:
-	cd $(SRC_DIR) && xvfb-run $(XVFB_ARGS) ember test
+	cd $(SRC_DIR) && $(XVFB_CMD) $(EMBER_CMD) test
 
 run_tests_xunit_output:
-	cd $(SRC_DIR) && xvfb-run $(XVFB_ARGS) ember test -r xunit
+	cd $(SRC_DIR) && $(XVFB_CMD) $(EMBER_CMD) test -r xunit
 
 dev: deps build_dev
 
