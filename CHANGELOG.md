@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12016 Changed fetching records to start with no auth hint
 * VFS-11764 Changed documentation links to use topics
 * VFS-11681 Updated builder docker image and using "npx ember"
 * VFS-9157 Added support for generating file-related URLs on embedded space automation view
