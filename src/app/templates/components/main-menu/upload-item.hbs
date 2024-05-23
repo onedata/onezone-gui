@@ -6,4 +6,4 @@
       style={{progressBarWidthStyle}}></div>
   </div>
 {{/unless}}
-{{partial "components/main-menu-item"}}
+<MainMenuItemBody @icon={{@item.icon}} @name={{this.name}} @tip={{@item.tip}} />
