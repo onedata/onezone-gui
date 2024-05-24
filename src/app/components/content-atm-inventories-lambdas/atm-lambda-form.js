@@ -361,6 +361,17 @@ export default Component.extend(I18n, {
     this.fieldsResetter();
   },
 
+  /**
+   * @override
+   */
+  willDestroyElement() {
+    try {
+      this.cacheFor('fields')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
   actions: {
     cancel() {
       this.get('onCancel')();

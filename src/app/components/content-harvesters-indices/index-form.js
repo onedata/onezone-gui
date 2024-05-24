@@ -274,6 +274,17 @@ export default Component.extend(I18n, {
     this.indexObserver();
   },
 
+  /**
+   * @override
+   */
+  willDestroyElement() {
+    try {
+      this.cacheFor('fields')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
   setupFieldsMode() {
     const {
       mode,

@@ -225,6 +225,17 @@ export default Component.extend(I18n, {
   /**
    * @override
    */
+  willDestroyElement() {
+    try {
+      this.cacheFor('fields')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
+  /**
+   * @override
+   */
   submit(event) {
     this._super(...arguments);
     event.preventDefault();

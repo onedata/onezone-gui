@@ -156,6 +156,17 @@ export default Component.extend(I18n, {
     ]));
   },
 
+  /**
+   * @override
+   */
+  willDestroyElement() {
+    try {
+      this.cacheFor('rootField')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
   actions: {
     /**
      * @param {(data: SpaceAccessRequestMessageData) => void} modalSubmitCallback

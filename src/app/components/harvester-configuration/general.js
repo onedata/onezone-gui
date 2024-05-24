@@ -363,6 +363,17 @@ export default Component.extend(I18n, {
     }
   },
 
+  /**
+   * @override
+   */
+  willDestroyElement() {
+    try {
+      this.cacheFor('fields')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
   actions: {
     edit() {
       this.set('mode', 'edit');

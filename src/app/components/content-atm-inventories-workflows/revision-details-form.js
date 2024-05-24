@@ -133,6 +133,17 @@ export default Component.extend(I18n, {
     this.formValuesUpdater();
   },
 
+  /**
+   * @override
+   */
+  willDestroyElement() {
+    try {
+      this.cacheFor('fields')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
   updateFormValues() {
     const { state = 'draft', description = '' } = this.get('revision') || {};
 

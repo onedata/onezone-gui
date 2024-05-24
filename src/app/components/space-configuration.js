@@ -388,6 +388,7 @@ export default Component.extend(validations, I18n, {
     try {
       this.unregisterRouteChangeHandler();
       this.unregisterPageUnloadHandler();
+      this.cacheFor('contactEmailRootField')?.destroy();
     } finally {
       this._super(...arguments);
     }

@@ -287,6 +287,17 @@ export default Component.extend(I18n, {
       });
   }),
 
+  /**
+   * @override
+   */
+  willDestroyElement() {
+    try {
+      this.cacheFor('rejectionRootField')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
   actions: {
     async grant() {
       if (!this.isProceedAvailable) {
