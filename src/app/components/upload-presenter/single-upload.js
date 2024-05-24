@@ -97,6 +97,11 @@ export default Component.extend({
   scheduledMinimalization: undefined,
 
   /**
+   * @type {(() => void) | null}
+   */
+  mouseEnterHandler: null,
+
+  /**
    * @type {Ember.ComputedProperty<boolean>}
    */
   isCancelled: reads('uploadObject.isCancelled'),
@@ -128,25 +133,33 @@ export default Component.extend({
     if (this.get('floatingMode')) {
       this.send('toggleExpand', true);
     }
+
+    if (!this.element) {
+      return;
+    }
+
+    this.set('mouseEnterHandler', () => {
+      if (this.get('state') === 'uploaded') {
+        const {
+          isMinimized,
+          minimizeTargetSelector,
+        } = this.getProperties('isMinimized', 'minimizeTargetSelector');
+        if (!isMinimized && minimizeTargetSelector) {
+          this.cancelScheduledMinimalization();
+        }
+      }
+    });
+    this.element.addEventListener('mouseenter', this.mouseEnterHandler);
   },
 
   willDestroyElement() {
     try {
       this.cancelScheduledMinimalization();
+      if (this.mouseEnterHandler) {
+        this.element?.removeEventListener('mouseenter', this.mouseEnterHandler);
+      }
     } finally {
       this._super(...arguments);
-    }
-  },
-
-  mouseEnter() {
-    if (this.get('state') === 'uploaded') {
-      const {
-        isMinimized,
-        minimizeTargetSelector,
-      } = this.getProperties('isMinimized', 'minimizeTargetSelector');
-      if (!isMinimized && minimizeTargetSelector) {
-        this.cancelScheduledMinimalization();
-      }
     }
   },
 
