@@ -2,7 +2,7 @@
   <div class="cookies-consent break-word">
     <h1>{{tt this "header"}}</h1>
     <p>{{content}}</p>
-    {{#bs-button onClick=(action "acceptCookies") size="sm" type="primary" class="pull-right accept-cookies"}}{{tt this "acceptButton"}}{{/bs-button}}
+    {{#one-button onClick=(action "acceptCookies") size="sm" type="primary" class="pull-right accept-cookies"}}{{tt this "acceptButton"}}{{/one-button}}
   </div>
 {{/if}}
 {{yield}}

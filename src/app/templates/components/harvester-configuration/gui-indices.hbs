@@ -4,9 +4,9 @@
   {{#if (and manifestProxy.manifest harvesterIndicesProxy.isFulfilled)}}
     <div class="pull-right header-buttons">
       {{#if (eq mode "view")}}
-        {{#bs-button type="default" size="sm" onClick=(action "edit")}}{{tt this "edit"}}{{/bs-button}}
+        {{#one-button type="default" size="sm" onClick=(action "edit")}}{{tt this "edit"}}{{/one-button}}
       {{else}}
-        {{#bs-button type="default" size="sm" onClick=(action "cancel") disabled=isSaving}}{{tt this "cancel"}}{{/bs-button}}
+        {{#one-button type="default" size="sm" onClick=(action "cancel") disabled=isSaving}}{{tt this "cancel"}}{{/one-button}}
         {{#one-button
           type="primary"
           buttonType="submit"

@@ -119,12 +119,12 @@
   {{/if}}
   {{#if showJoinBtn}}
     <div class="option-buttons">
-      {{#bs-button
+      {{#one-button
         class="discard-btn btn btn-lg btn-warning"
         onClick=(action "cancel")
       }}
         {{tt this "cancelBtn"}}
-      {{/bs-button}}
+      {{/one-button}}
       {{#one-button
         type="primary"
         size="lg"

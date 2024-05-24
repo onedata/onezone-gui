@@ -2,13 +2,13 @@
   {{form-component/field-renderer field=fields}}
   {{#if (eq mode "create")}}
     <div class="btn-toolbar">
-      {{#bs-button
+      {{#one-button
         class="cancel-btn"
         disabled=isCreating
         onClick=onCancel
       }}
         {{tt this "cancelBtnText"}}
-      {{/bs-button}}
+      {{/one-button}}
       {{#one-button
         type="primary"
         class="create-btn"

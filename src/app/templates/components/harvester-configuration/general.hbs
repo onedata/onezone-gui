@@ -5,13 +5,13 @@
     {{#if (eq mode "view")}}
       <div class="form-group edit-btn-form-group">
         <div class="control-label"></div>
-        {{#bs-button
+        {{#one-button
           type="default"
           onClick=(action "edit")
           class="edit-btn"
         }}
           {{tt this "edit"}}
-        {{/bs-button}}
+        {{/one-button}}
       </div>
     {{else}}
       {{#one-button
@@ -25,14 +25,14 @@
       {{/one-button}}
 
       {{#if (eq mode "edit")}}
-        {{#bs-button
+        {{#one-button
           type="default"
           onClick=(action "cancel")
           disabled=disabled
           class="cancel-btn"
         }}
           {{tt this "cancel"}}
-        {{/bs-button}}
+        {{/one-button}}
       {{/if}}
     {{/if}}
     </div>

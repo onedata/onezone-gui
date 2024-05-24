@@ -37,7 +37,7 @@
       header=(tt this "noLambdasHeader")
       text=(tt this "noLambdasText")
     }}
-      {{#bs-button
+      {{#one-button
         type="primary"
         size="lg"
         class=(concat-classes
@@ -54,7 +54,7 @@
         {{#if addNewAtmLambdaAction.tip}}
           {{one-tooltip title=addNewAtmLambdaAction.tip}}
         {{/if}}
-      {{/bs-button}}
+      {{/one-button}}
     {{/content-info}}
   {{/if}}
 {{/promise-proxy-container}}

@@ -126,14 +126,14 @@
         {{/one-button}}
       {{/if}}
       {{#if (eq mode "edit")}}
-        {{#bs-button
+        {{#one-button
           type="warning"
           class="cancel-edition"
           disabled=isSubmitting
           onClick=onCancel
         }}
           {{tt this "cancel"}}
-        {{/bs-button}}
+        {{/one-button}}
       {{/if}}
     </div>
   </form>

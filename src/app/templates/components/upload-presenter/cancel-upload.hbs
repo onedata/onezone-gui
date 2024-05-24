@@ -24,13 +24,13 @@
         <h1>{{tt this "ackHeader"}}</h1>
         <p>{{tt this "ackMessage"}}</p>
         <div class="text-right">
-          {{#bs-button type="default" size="sm" onClick=(action "toggleAckPopover" false)}}
+          {{#one-button type="default" size="sm" onClick=(action "toggleAckPopover" false)}}
             {{tt this "ackNo"}}
-          {{/bs-button}}
-          {{#bs-button type="danger" size="sm" onClick=(action "cancel")}}
+          {{/one-button}}
+          {{#one-button type="danger" size="sm" onClick=(action "cancel")}}
             {{one-icon icon="ban-left"}}
             <span class="text">{{tt this "ackYes"}}</span>
-          {{/bs-button}}
+          {{/one-button}}
         </div>
       {{/click-outside}}
     {{/one-webui-popover}}

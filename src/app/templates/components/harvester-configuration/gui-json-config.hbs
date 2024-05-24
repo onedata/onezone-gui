@@ -4,15 +4,15 @@
   {{#if dataLoadingProxy.isFulfilled}}
     <div class="pull-right header-buttons">
       {{#if (eq mode "view")}}
-        {{#bs-button type="default" size="sm" onClick=(action "edit")}}{{tt this "edit"}}{{/bs-button}}
+        {{#one-button type="default" size="sm" onClick=(action "edit")}}{{tt this "edit"}}{{/one-button}}
       {{else}}
-        {{#bs-button type="default" size="sm" onClick=(action "useDefaults") disabled=(not isUseDefaultsEnabled)}}
+        {{#one-button type="default" size="sm" onClick=(action "useDefaults") disabled=(not isUseDefaultsEnabled)}}
           {{#if (and (not isSaving) (not defaultConfiguration))}}
             {{one-tooltip title=(tt this "noDefaults")}}
           {{/if}}
           {{tt this "useDefaults"}}
-        {{/bs-button}}
-        {{#bs-button type="default" size="sm" onClick=(action "cancel") disabled=isSaving}}{{tt this "cancel"}}{{/bs-button}}
+        {{/one-button}}
+        {{#one-button type="default" size="sm" onClick=(action "cancel") disabled=isSaving}}{{tt this "cancel"}}{{/one-button}}
         {{#one-button
           type="primary"
           buttonType="submit"
