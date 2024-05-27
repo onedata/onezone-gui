@@ -77,9 +77,14 @@ export default Action.extend({
   /**
    * @type {ComputedProperty<boolean>}
    */
-  isCurrentUserOwner: array.includes(
-    array.mapBy('owners', raw('entityId')),
-    'currentUser.entityId'
+  isCurrentUserOwner: computed(
+    'owners.@each.entityId',
+    'currentUser.entityId',
+    function isCurrentUserOwner() {
+      const currentUserEntityId = this.get('currentUser.entityId');
+      return this.owners
+        ?.some((owner) => get(owner, 'entityId') === currentUserEntityId) ?? false;
+    }
   ),
 
   /**

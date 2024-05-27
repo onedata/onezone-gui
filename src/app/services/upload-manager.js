@@ -66,8 +66,11 @@ export default Service.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Ember.A<Models.Provider>>}
    */
-  uploadingOneproviders: array.uniq(
-    array.mapBy('uploadRootObjects', raw('oneprovider'))
+  uploadingOneproviders: computed(
+    'uploadRootObjects.@each.oneprovider',
+    function uploadingOneproviders() {
+      return _.uniq(this.uploadRootObjects?.map((obj) => obj.oneprovider) ?? []);
+    }
   ),
 
   /**
@@ -107,7 +110,12 @@ export default Service.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Array<Utils.UploadObject>>}
    */
-  activeUploads: array.filterBy('uploadRootObjects', raw('isUploading')),
+  activeUploads: computed(
+    'uploadRootObjects.@each.isUploading',
+    function activeUploads() {
+      return this.uploadRootObjects?.filter((obj) => obj.isUploading) ?? [];
+    }
+  ),
 
   /**
    * @type {Ember.ComputedProperty<boolean>}

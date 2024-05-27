@@ -183,7 +183,12 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Boolean>}
    */
-  hasVisibleCaveats: array.isAny('caveatsGroup.fields', raw('hasVisibleCaveats')),
+  hasVisibleCaveats: computed(
+    'caveatsGroup.fields.@each.hasVisibleCaveats',
+    function hasVisibleCaveats() {
+      return this.caveatsGroup.fields.any((field) => field.hasVisibleCaveats);
+    }
+  ),
 
   /**
    * @type {ComputedProperty<String>}

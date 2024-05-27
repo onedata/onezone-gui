@@ -8,10 +8,6 @@
  */
 
 import Component from '@ember/component';
-import {
-  raw,
-  getBy,
-} from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import { computed } from '@ember/object';
 import { dasherize } from '@ember/string';
@@ -125,10 +121,20 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<String>}
    */
-  invitedModelImagePath: getBy(raw(recordImages), 'joiningModelName'),
+  invitedModelImagePath: computed(
+    'joiningModelName',
+    function invitedModelImagePath() {
+      return recordImages[this.joiningModelName];
+    }
+  ),
 
   /**
    * @type {ComputedProperty<String>}
    */
-  inviteTargetModelImagePath: getBy(raw(recordImages), 'inviteTargetModelName'),
+  inviteTargetModelImagePath: computed(
+    'inviteTargetModelName',
+    function inviteTargetModelImagePath() {
+      return recordImages[this.inviteTargetModelName];
+    }
+  ),
 });
