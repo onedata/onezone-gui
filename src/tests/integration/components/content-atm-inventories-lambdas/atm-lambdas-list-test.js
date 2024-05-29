@@ -72,10 +72,10 @@ describe(
     before(function () {
       // Instatiate Action class to make its `prototype.execute` available for
       // mocking.
-      CopyRecordIdAction.create();
-      UnlinkAtmLambdaAction.create();
-      DuplicateAtmRecordRevisionAction.create();
-      DumpAtmLambdaRevisionAction.create();
+      CopyRecordIdAction.create().destroy();
+      UnlinkAtmLambdaAction.create().destroy();
+      DuplicateAtmRecordRevisionAction.create().destroy();
+      DumpAtmLambdaRevisionAction.create().destroy();
     });
 
     beforeEach(function () {

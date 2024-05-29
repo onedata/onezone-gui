@@ -102,7 +102,7 @@ export default Component.extend(I18n, {
    */
   isRevisionConflictWarningVisible: computed(
     'selectedOperation',
-    'revisionRegistry',
+    'selectedTargetAtmRecord.revisionRegistry',
     'revisionNumber',
     function isRevisionConflictWarningVisible() {
       return this.selectedOperation === 'merge' &&

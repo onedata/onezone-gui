@@ -695,9 +695,10 @@ export default Component.extend(I18n, {
     },
     scheduleRelationRemoval(relationToRemove) {
       if (this.currentUser.userId === relationToRemove.child?.entityId) {
-        this.userActions.createLeaveAction({
+        const action = this.userActions.createLeaveAction({
           recordToLeave: relationToRemove.parent,
-        }).execute();
+        });
+        action.execute().finally(() => action.destroy());
       } else {
         this.set('relationToRemove', relationToRemove);
       }

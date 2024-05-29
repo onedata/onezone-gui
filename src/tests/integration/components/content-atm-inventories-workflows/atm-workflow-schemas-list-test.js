@@ -76,13 +76,13 @@ describe('Integration | Component | content-atm-inventories-workflows/atm-workfl
     before(function () {
       // Instatiate Action class to make its `prototype.execute` available for
       // mocking.
-      ModifyAtmWorkflowSchemaAction.create();
-      RemoveAtmWorkflowSchemaAction.create();
-      CopyRecordIdAction.create();
-      CreateAtmWorkflowSchemaRevisionAction.create();
-      DuplicateAtmRecordRevisionAction.create();
-      DumpAtmWorkflowSchemaRevisionAction.create();
-      RemoveAtmWorkflowSchemaRevisionAction.create();
+      ModifyAtmWorkflowSchemaAction.create().destroy();
+      RemoveAtmWorkflowSchemaAction.create().destroy();
+      CopyRecordIdAction.create().destroy();
+      CreateAtmWorkflowSchemaRevisionAction.create().destroy();
+      DuplicateAtmRecordRevisionAction.create().destroy();
+      DumpAtmWorkflowSchemaRevisionAction.create().destroy();
+      RemoveAtmWorkflowSchemaRevisionAction.create().destroy();
     });
 
     beforeEach(function () {

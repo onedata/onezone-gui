@@ -11,7 +11,7 @@ import { settled } from '@ember/test-helpers';
 describe(
   'Integration | Utility | workflow-actions/create-atm-workflow-schema-action',
   function () {
-    setupRenderingTest();
+    const { afterEach } = setupRenderingTest();
 
     beforeEach(function () {
       const workflowManager = lookupService(this, 'workflow-manager');
@@ -41,6 +41,10 @@ describe(
       });
     });
 
+    afterEach(function () {
+      this.action?.destroy();
+    });
+
     it('executes creating workflow schema (success scenario)', async function () {
       const {
         createAtmWorkflowSchemaStub,
@@ -59,7 +63,7 @@ describe(
       createAtmWorkflowSchemaStub
         .withArgs(atmInventory.entityId, sinon.match(completeRawAtmWorkflowSchema))
         .resolves(atmWorkflowSchemaRecord);
-      const action = CreateAtmWorkflowSchemaAction.create({
+      this.action = CreateAtmWorkflowSchemaAction.create({
         ownerSource: this.owner,
         context: {
           atmInventory,
@@ -67,7 +71,7 @@ describe(
         },
       });
 
-      const actionResult = await action.execute();
+      const actionResult = await this.action.execute();
       expect(get(actionResult, 'status')).to.equal('done');
       expect(get(actionResult, 'result')).to.equal(atmWorkflowSchemaRecord);
       expect(successNotifySpy).to.be.calledWith(
@@ -87,7 +91,7 @@ describe(
         'atmInventory',
         'rawAtmWorkflowSchema'
       );
-      const action = CreateAtmWorkflowSchemaAction.create({
+      this.action = CreateAtmWorkflowSchemaAction.create({
         ownerSource: this.owner,
         context: {
           atmInventory,
@@ -99,7 +103,7 @@ describe(
         new Promise((resolve, reject) => rejectCreate = reject)
       );
 
-      const actionResultPromise = action.execute();
+      const actionResultPromise = this.action.execute();
       rejectCreate('someError');
       await settled();
       const actionResult = await actionResultPromise;

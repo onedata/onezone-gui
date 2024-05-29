@@ -58,6 +58,11 @@ export default Component.extend(I18n, {
   group: reads('item'),
 
   /**
+   * @type {ComputedProperty<Record<string, Utils.Action>>}
+   */
+  actionsCache: computed(() => ({})),
+
+  /**
    * @type {Ember.ComputedProperty<Action>}
    */
   renameAction: computed('isRenaming', function renameAction() {
@@ -74,10 +79,12 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<Action>}
    */
   leaveAction: computed('group', function leaveAction() {
+    this.actionsCache.leaveAction?.destroyAfterAllExecutions();
     const action = this.userActions.createLeaveAction({
       recordToLeave: this.group,
     });
     set(action, 'className', `${action.className} leave-group-action`);
+    this.actionsCache.leaveAction = action;
     return action;
   }),
 
@@ -97,12 +104,14 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<Action>}
    */
   copyIdAction: computed('group', function copyIdAction() {
+    this.actionsCache.copyIdAction?.destroyAfterAllExecutions();
     const {
       group,
       clipboardActions,
     } = this.getProperties('group', 'clipboardActions');
 
-    return clipboardActions.createCopyRecordIdAction({ record: group });
+    return this.actionsCache.copyIdAction =
+      clipboardActions.createCopyRecordIdAction({ record: group });
   }),
 
   /**
@@ -114,6 +123,20 @@ export default Component.extend(I18n, {
     'leaveAction',
     'copyIdAction'
   ),
+
+  /**
+   * @override
+   */
+  willDestroyElement() {
+    try {
+      [
+        'leaveAction',
+        'copyIdAction',
+      ].forEach((action) => this.cacheFor(action)?.destroyAfterAllExecutions());
+    } finally {
+      this._super(...arguments);
+    }
+  },
 
   /**
    * If actual group disappeared from the sidebar, redirects to groups main page

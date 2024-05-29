@@ -31,6 +31,11 @@ export default EmberObject.extend({
   workspace: undefined,
 
   /**
+   * @type {Set<Utils.GroupsHierarchyVisualiser.Column>}
+   */
+  createdColumnsSet: undefined,
+
+  /**
    * @type {Ember.A<Utils/GroupHierarchyVisualiser/Column>}
    */
   columns: computed(function columns() {
@@ -84,8 +89,17 @@ export default EmberObject.extend({
 
   init() {
     this._super(...arguments);
+    this.set('createdColumnsSet', new Set());
     this.columnsObserver();
     this.addMissingColumns();
+  },
+
+  willDestroy() {
+    try {
+      this.createdColumnsSet.forEach((col) => col.destroy());
+    } finally {
+      this._super(...arguments);
+    }
   },
 
   /**
@@ -155,12 +169,16 @@ export default EmberObject.extend({
     switch (relationType) {
       case 'parents':
         for (let i = oldColumnIndex - 1; i >= 0; i--) {
-          columns.replace(i, 1, [Column.create()]);
+          const newColumn = Column.create();
+          this.createdColumnsSet.add(newColumn);
+          columns.replace(i, 1, [new Column]);
         }
         break;
       case 'children':
         for (let i = oldColumnIndex + 1, l = get(columns, 'length'); i < l; i++) {
-          columns.replace(i, 1, [Column.create()]);
+          const newColumn = Column.create();
+          this.createdColumnsSet.add(newColumn);
+          columns.replace(i, 1, [newColumn]);
         }
         break;
     }
@@ -227,6 +245,7 @@ export default EmberObject.extend({
         workspace: this.get('workspace'),
         relationType: 'empty',
       });
+      this.createdColumnsSet.add(column);
       columns.pushObject(column);
     }
   },

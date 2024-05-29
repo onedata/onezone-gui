@@ -22,7 +22,11 @@ const atmInventoryId = 'invid';
 describe(
   'Integration | Utility | workflow-actions/duplicate-atm-record-revision-action',
   function () {
-    setupRenderingTest();
+    const { afterEach } = setupRenderingTest();
+
+    afterEach(function () {
+      this.action?.destroy();
+    });
 
     context('when atmModelName is "atmLambda"', function () {
       beforeEach(function () {

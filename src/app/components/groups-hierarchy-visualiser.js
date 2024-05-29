@@ -335,6 +335,11 @@ export default Component.extend(I18n, {
   workspace: undefined,
 
   /**
+   * @type {Set<Utils.GroupsHierarchyVisualiser.Column>}
+   */
+  createdColumnsSet: undefined,
+
+  /**
    * Column manager instance
    * @type {Ember.ComputedProperty<Utils/GroupsHierarchyVisualiser/ColumnManager>}
    */
@@ -526,6 +531,7 @@ export default Component.extend(I18n, {
    */
   init() {
     this._super(...arguments);
+    this.set('createdColumnsSet', new Set());
     if (!this.workspace) {
       this.set('workspace', Workspace.create());
     }
@@ -547,6 +553,8 @@ export default Component.extend(I18n, {
   willDestroyElement() {
     try {
       globals.window.removeEventListener('resize', this.windowResizeHandler);
+      this.createdColumnsSet.forEach((col) => col.destroy());
+      this.cacheFor('columnManager').destroy();
     } finally {
       this._super(...arguments);
     }
@@ -634,6 +642,7 @@ export default Component.extend(I18n, {
       relationType: relationType,
       relatedGroup,
     });
+    this.createdColumnsSet.add(column);
     column.set('model', this.createColumnModel(column));
     return column;
   },
@@ -834,6 +843,7 @@ export default Component.extend(I18n, {
         recordToLeave: group,
       });
       const result = await action.execute();
+      action.destroy();
       if (result.status === 'done') {
         safeExec(this, 'reloadModel');
       }

@@ -42,6 +42,13 @@ export default RecordSelectorTemplate.extend({
     return this.get('userManager').getAllKnownUsers().then(users => ArrayProxy.extend({
       users,
       content: array.sort('users', ['name', 'username']),
+      destroy() {
+        try {
+          this.users?.destroy();
+        } finally {
+          this._super(...arguments);
+        }
+      },
     }).create());
   },
 

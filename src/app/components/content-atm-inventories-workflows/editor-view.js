@@ -117,6 +117,11 @@ export default Component.extend(I18n, {
   unchangedDetailsData: undefined,
 
   /**
+   * @type {Utils.Action | null}
+   */
+  dumpActionCache: null,
+
+  /**
    * @override
    */
   globalActions: collect('dumpAction'),
@@ -194,6 +199,7 @@ export default Component.extend(I18n, {
     'atmWorkflowSchema',
     'isRevisionModified',
     function dumpAction() {
+      this.dumpActionCache?.destroy();
       const {
         workflowActions,
         atmWorkflowSchema,
@@ -205,15 +211,15 @@ export default Component.extend(I18n, {
         'revisionNumber',
         'isRevisionModified'
       );
-      const action = workflowActions.createDumpAtmWorkflowSchemaRevisionAction({
+      this.dumpActionCache = workflowActions.createDumpAtmWorkflowSchemaRevisionAction({
         atmWorkflowSchema,
         revisionNumber,
       });
-      setProperties(action, {
+      setProperties(this.dumpActionCache, {
         disabled: isRevisionModified,
         tip: isRevisionModified ? this.t('cannotDumpModified') : undefined,
       });
-      return action;
+      return this.dumpActionCache;
     }
   ),
 
@@ -290,6 +296,7 @@ export default Component.extend(I18n, {
   willDestroyElement() {
     try {
       this.registerViewActions(true);
+      this.cacheFor('dumpAction')?.destroy();
     } finally {
       this._super(...arguments);
     }
@@ -336,7 +343,11 @@ export default Component.extend(I18n, {
       }
     });
 
-    return await action.execute();
+    try {
+      return await action.execute();
+    } finally {
+      action.destroy();
+    }
   },
 
   actions: {

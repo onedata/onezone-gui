@@ -19,7 +19,7 @@ import { suppressRejections } from '../../../helpers/suppress-rejections';
 describe(
   'Integration | Utility | space-actions/remove-harvester-from-space-action',
   function () {
-    setupRenderingTest();
+    const { afterEach } = setupRenderingTest();
 
     beforeEach(function () {
       this.set('context', {
@@ -34,8 +34,12 @@ describe(
       });
     });
 
+    afterEach(function () {
+      this.action?.destroy();
+    });
+
     it('has correct className, icon and title', function () {
-      const action = RemoveHarvesterFromSpaceAction.create({
+      this.action = RemoveHarvesterFromSpaceAction.create({
         ownerSource: this.owner,
         context: this.get('context'),
       });
@@ -44,20 +48,20 @@ describe(
         className,
         icon,
         title,
-      } = getProperties(action, 'className', 'icon', 'title');
+      } = getProperties(this.action, 'className', 'icon', 'title');
       expect(className).to.equal('remove-harvester-from-space-trigger');
       expect(icon).to.equal('close');
       expect(String(title)).to.equal('Remove this harvester');
     });
 
     it('shows modal on execute', async function () {
-      const action = RemoveHarvesterFromSpaceAction.create({
+      this.action = RemoveHarvesterFromSpaceAction.create({
         ownerSource: this.owner,
         context: this.get('context'),
       });
 
       await render(hbs `{{global-modal-mounter}}`);
-      action.execute();
+      this.action.execute();
       await settled();
 
       expect(getModal()).to.have.class('question-modal');
@@ -75,13 +79,13 @@ describe(
     it(
       'returns promise with cancelled ActionResult after execute() and modal close using "Cancel"',
       async function () {
-        const action = RemoveHarvesterFromSpaceAction.create({
+        this.action = RemoveHarvesterFromSpaceAction.create({
           ownerSource: this.owner,
           context: this.get('context'),
         });
 
         await render(hbs `{{global-modal-mounter}}`);
-        const resultPromise = action.execute();
+        const resultPromise = this.action.execute();
         await settled();
 
         await click(getModalFooter().querySelector('.question-no'));
@@ -93,7 +97,7 @@ describe(
     it(
       'executes removing harvester from space on submit (success scenario)',
       async function () {
-        const action = RemoveHarvesterFromSpaceAction.create({
+        this.action = RemoveHarvesterFromSpaceAction.create({
           ownerSource: this.owner,
           context: this.get('context'),
         });
@@ -107,7 +111,7 @@ describe(
         );
 
         await render(hbs `{{global-modal-mounter}}`);
-        const actionResultPromise = action.execute();
+        const actionResultPromise = this.action.execute();
         await settled();
 
         await click(getModalFooter().querySelector('.question-yes'));
@@ -126,7 +130,7 @@ describe(
       'executes removing harvester from space on submit (failure scenario)',
       async function () {
         suppressRejections();
-        const action = RemoveHarvesterFromSpaceAction.create({
+        this.action = RemoveHarvesterFromSpaceAction.create({
           ownerSource: this.owner,
           context: this.get('context'),
         });
@@ -139,7 +143,7 @@ describe(
         );
 
         await render(hbs `{{global-modal-mounter}}`);
-        const actionResultPromise = action.execute();
+        const actionResultPromise = this.action.execute();
         await settled();
 
         await click(getModalFooter().querySelector('.question-yes'));

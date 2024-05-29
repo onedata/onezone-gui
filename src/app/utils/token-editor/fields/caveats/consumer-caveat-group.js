@@ -60,6 +60,18 @@ const ConsumerField = ModelTagsField.extend({
     return this.recordManager.getUserRecordList('provider')
       .then((providers) => get(providers, 'list'));
   })),
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.cacheFor('usersProxy')?.destroy();
+      this.cacheFor('groupsProxy')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
 });
 
 export const ConsumerCaveatGroup = createCaveatGroup('consumer', {}, [ConsumerField]);

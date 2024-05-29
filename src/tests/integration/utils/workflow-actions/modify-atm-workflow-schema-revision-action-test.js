@@ -10,7 +10,7 @@ import { get, set } from '@ember/object';
 describe(
   'Integration | Utility | workflow-actions/modify-atm-workflow-schema-revision-action',
   function () {
-    setupRenderingTest();
+    const { afterEach } = setupRenderingTest();
 
     beforeEach(function () {
       const revisionNumber = 2;
@@ -36,6 +36,10 @@ describe(
         revision,
         workflowSchemaId,
       });
+    });
+
+    afterEach(function () {
+      this.action?.destroy();
     });
 
     it('executes modifying workflow revision (success scenario)', async function () {

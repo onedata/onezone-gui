@@ -23,7 +23,7 @@ describe('Integration | Component | content-atm-inventories-workflows/list-view'
     before(function () {
       // Instatiate Action class to make its `prototype.execute` available for
       // mocking.
-      CreateAtmWorkflowSchemaRevisionAction.create();
+      CreateAtmWorkflowSchemaRevisionAction.create().destroy();
     });
 
     beforeEach(function () {

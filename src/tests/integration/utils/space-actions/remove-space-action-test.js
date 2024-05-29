@@ -18,7 +18,7 @@ import {
 describe(
   'Integration | Utility | space-actions/remove-space-action',
   function () {
-    setupRenderingTest();
+    const { afterEach } = setupRenderingTest();
 
     beforeEach(function () {
       this.set('context', {
@@ -29,8 +29,12 @@ describe(
       });
     });
 
+    afterEach(function () {
+      this.action?.destroy();
+    });
+
     it('has correct className, icon and title', function () {
-      const action = RemoveSpaceAction.create({
+      this.action = RemoveSpaceAction.create({
         ownerSource: this.owner,
         context: this.get('context'),
       });
@@ -39,20 +43,20 @@ describe(
         className,
         icon,
         title,
-      } = getProperties(action, 'className', 'icon', 'title');
+      } = getProperties(this.action, 'className', 'icon', 'title');
       expect(className).to.equal('remove-space-trigger');
       expect(icon).to.equal('browser-delete');
       expect(String(title)).to.equal('Remove');
     });
 
     it('shows modal on execute', async function () {
-      const action = RemoveSpaceAction.create({
+      this.action = RemoveSpaceAction.create({
         ownerSource: this.owner,
         context: this.get('context'),
       });
 
       await render(hbs `{{global-modal-mounter}}`);
-      action.execute();
+      this.action.execute();
       await settled();
 
       expect(getModal()).to.have.class('question-modal');
@@ -71,13 +75,13 @@ describe(
     it(
       'returns promise with cancelled ActionResult after execute() and modal close using "Cancel"',
       async function () {
-        const action = RemoveSpaceAction.create({
+        this.action = RemoveSpaceAction.create({
           ownerSource: this.owner,
           context: this.get('context'),
         });
 
         await render(hbs `{{global-modal-mounter}}`);
-        const resultPromise = action.execute();
+        const resultPromise = this.action.execute();
         await settled();
 
         await click(getModalFooter().querySelector('.question-no'));
@@ -89,7 +93,7 @@ describe(
     it(
       'executes removing space on submit - success status and notification on success',
       async function () {
-        const action = RemoveSpaceAction.create({
+        this.action = RemoveSpaceAction.create({
           ownerSource: this.owner,
           context: this.get('context'),
         });
@@ -106,7 +110,7 @@ describe(
         );
 
         await render(hbs `{{global-modal-mounter}}`);
-        const actionResultPromise = action.execute();
+        const actionResultPromise = this.action.execute();
         await settled();
 
         await click(getModalBody().querySelector('.one-checkbox'));
@@ -126,7 +130,7 @@ describe(
     it(
       'executes removing space on submit - error status and notification on failure',
       async function () {
-        const action = RemoveSpaceAction.create({
+        this.action = RemoveSpaceAction.create({
           ownerSource: this.owner,
           context: this.get('context'),
         });
@@ -139,7 +143,7 @@ describe(
         );
 
         await render(hbs `{{global-modal-mounter}}`);
-        const actionResultPromise = action.execute();
+        const actionResultPromise = this.action.execute();
         await settled();
 
         await click(getModalBody().querySelector('.one-checkbox'));

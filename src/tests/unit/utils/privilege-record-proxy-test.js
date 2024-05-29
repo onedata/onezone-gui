@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
+import { describe, it, beforeEach, afterEach } from 'mocha';
 import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
 import Service from '@ember/service';
 import { resolve } from 'rsvp';
@@ -58,14 +58,18 @@ describe('Unit | Utility | privilege-record-proxy', function () {
     }];
   });
 
+  afterEach(function () {
+    this.proxy?.destroy();
+  });
+
   it('calculates effectivePrivilegesSnapshot for a single record', function () {
-    const proxy = PrivilegeRecordProxy.create({
+    this.proxy = PrivilegeRecordProxy.create({
       store: this.store,
       griArray: ['a'],
       groupedPrivilegesFlags: this.groupedPrivileges,
     });
-    return proxy.reloadRecords().then(() => {
-      expect(get(proxy, 'effectivePrivilegesSnapshot')).to.be.deep.equal({
+    return this.proxy.reloadRecords().then(() => {
+      expect(get(this.proxy, 'effectivePrivilegesSnapshot')).to.be.deep.equal({
         g1: { 'g1.1': true, 'g1.2': false },
         g2: { 'g2.1': true, 'g2.2': true },
         g3: { 'g3.1': false },
@@ -74,14 +78,14 @@ describe('Unit | Utility | privilege-record-proxy', function () {
   });
 
   it('calculates effectivePrivilegesSnapshot for two records', function () {
-    const proxy = PrivilegeRecordProxy.create({
+    this.proxy = PrivilegeRecordProxy.create({
       store: this.store,
       sumPrivileges: true,
       griArray: ['a', 'b'],
       groupedPrivilegesFlags: this.groupedPrivileges,
     });
-    return proxy.reloadRecords().then(() => {
-      expect(get(proxy, 'effectivePrivilegesSnapshot')).to.be.deep.equal({
+    return this.proxy.reloadRecords().then(() => {
+      expect(get(this.proxy, 'effectivePrivilegesSnapshot')).to.be.deep.equal({
         g1: { 'g1.1': true, 'g1.2': false },
         g2: { 'g2.1': true, 'g2.2': 2 },
         g3: { 'g3.1': false },
@@ -92,17 +96,17 @@ describe('Unit | Utility | privilege-record-proxy', function () {
   it(
     'changes isModified to true after replacing privileges with different ones',
     function () {
-      const proxy = PrivilegeRecordProxy.create({
+      this.proxy = PrivilegeRecordProxy.create({
         store: this.store,
         griArray: ['a'],
         groupedPrivilegesFlags: this.groupedPrivileges,
       });
-      return proxy.reloadRecords().then(() => {
+      return this.proxy.reloadRecords().then(() => {
         const newPrivileges =
-          _.cloneDeep(get(proxy, 'effectivePrivilegesSnapshot'));
+          _.cloneDeep(get(this.proxy, 'effectivePrivilegesSnapshot'));
         newPrivileges['g1']['g1.1'] = false;
-        proxy.setNewPrivileges(newPrivileges);
-        expect(get(proxy, 'isModified')).to.be.true;
+        this.proxy.setNewPrivileges(newPrivileges);
+        expect(get(this.proxy, 'isModified')).to.be.true;
       });
     }
   );
@@ -110,33 +114,33 @@ describe('Unit | Utility | privilege-record-proxy', function () {
   it(
     'changes isModified to false after replacing privileges with the same ones',
     function () {
-      const proxy = PrivilegeRecordProxy.create({
+      this.proxy = PrivilegeRecordProxy.create({
         store: this.store,
         griArray: ['a'],
         groupedPrivilegesFlags: this.groupedPrivileges,
       });
-      return proxy.reloadRecords().then(() => {
+      return this.proxy.reloadRecords().then(() => {
         const newPrivileges =
-          _.cloneDeep(get(proxy, 'effectivePrivilegesSnapshot'));
-        proxy.setNewPrivileges(newPrivileges);
-        expect(get(proxy, 'isModified')).to.be.false;
+          _.cloneDeep(get(this.proxy, 'effectivePrivilegesSnapshot'));
+        this.proxy.setNewPrivileges(newPrivileges);
+        expect(get(this.proxy, 'isModified')).to.be.false;
       });
     }
   );
 
   it('updates privileges snapshot', function () {
-    const proxy = PrivilegeRecordProxy.create({
+    this.proxy = PrivilegeRecordProxy.create({
       store: this.store,
       griArray: ['a'],
       groupedPrivilegesFlags: this.groupedPrivileges,
     });
-    return proxy.reloadRecords().then(() => {
+    return this.proxy.reloadRecords().then(() => {
       set(
         get(this.store, 'privilegeRecords')['a'],
         'privileges', ['g2.1', 'g2.2']
       );
-      proxy.updateSnapshot();
-      expect(get(proxy, 'effectivePrivilegesSnapshot')).to.be.deep.equal({
+      this.proxy.updateSnapshot();
+      expect(get(this.proxy, 'effectivePrivilegesSnapshot')).to.be.deep.equal({
         g1: { 'g1.1': false, 'g1.2': false },
         g2: { 'g2.1': true, 'g2.2': true },
         g3: { 'g3.1': false },
@@ -145,34 +149,34 @@ describe('Unit | Utility | privilege-record-proxy', function () {
   });
 
   it('allows to reset modifications', function () {
-    const proxy = PrivilegeRecordProxy.create({
+    this.proxy = PrivilegeRecordProxy.create({
       store: this.store,
       griArray: ['a'],
       groupedPrivilegesFlags: this.groupedPrivileges,
     });
-    return proxy.reloadRecords().then(() => {
+    return this.proxy.reloadRecords().then(() => {
       const newPrivileges =
-        _.cloneDeep(get(proxy, 'effectivePrivilegesSnapshot'));
+        _.cloneDeep(get(this.proxy, 'effectivePrivilegesSnapshot'));
       newPrivileges['g1']['g1.1'] = false;
-      proxy.setNewPrivileges(newPrivileges);
-      proxy.resetModifications();
-      expect(get(proxy, 'isModified')).to.be.false;
+      this.proxy.setNewPrivileges(newPrivileges);
+      this.proxy.resetModifications();
+      expect(get(this.proxy, 'isModified')).to.be.false;
     });
   });
 
   it('allows to reload records', function () {
-    const proxy = PrivilegeRecordProxy.create({
+    this.proxy = PrivilegeRecordProxy.create({
       store: this.store,
       griArray: ['a'],
       groupedPrivilegesFlags: this.groupedPrivileges,
     });
-    return proxy.reloadRecords()
+    return this.proxy.reloadRecords()
       .then(() => {
-        set(proxy, 'griArray', ['b']);
-        return proxy.reloadRecords();
+        set(this.proxy, 'griArray', ['b']);
+        return this.proxy.reloadRecords();
       })
       .then(() => {
-        expect(get(proxy, 'effectivePrivilegesSnapshot')).to.be.deep.equal({
+        expect(get(this.proxy, 'effectivePrivilegesSnapshot')).to.be.deep.equal({
           g1: { 'g1.1': true, 'g1.2': false },
           g2: { 'g2.1': true, 'g2.2': false },
           g3: { 'g3.1': false },
@@ -181,33 +185,33 @@ describe('Unit | Utility | privilege-record-proxy', function () {
   });
 
   it('does not persist changes if nothing is modified', function () {
-    const proxy = PrivilegeRecordProxy.create({
+    this.proxy = PrivilegeRecordProxy.create({
       store: this.store,
       onedataGraph: this.onedataGraph,
       griArray: ['a'],
       groupedPrivilegesFlags: this.groupedPrivileges,
     });
     const requestSpy = sinon.spy(this.onedataGraph, 'request');
-    return proxy.reloadRecords()
-      .then(() => proxy.save())
+    return this.proxy.reloadRecords()
+      .then(() => this.proxy.save())
       .then(() => expect(requestSpy).to.not.be.called);
   });
 
   it('perists changes if there are modifications', function () {
-    const proxy = PrivilegeRecordProxy.create({
+    this.proxy = PrivilegeRecordProxy.create({
       store: this.store,
       onedataGraph: this.onedataGraph,
       griArray: ['a'],
       groupedPrivilegesFlags: this.groupedPrivileges,
     });
     const requestSpy = sinon.spy(this.onedataGraph, 'request');
-    return proxy.reloadRecords()
+    return this.proxy.reloadRecords()
       .then(() => {
         const newPrivileges =
-          _.cloneDeep(get(proxy, 'effectivePrivilegesSnapshot'));
+          _.cloneDeep(get(this.proxy, 'effectivePrivilegesSnapshot'));
         newPrivileges['g1']['g1.1'] = false;
-        proxy.setNewPrivileges(newPrivileges);
-        return proxy.save();
+        this.proxy.setNewPrivileges(newPrivileges);
+        return this.proxy.save();
       })
       .then(() => {
         expect(requestSpy).to.be.calledOnce;

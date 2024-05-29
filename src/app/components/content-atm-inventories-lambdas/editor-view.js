@@ -96,6 +96,11 @@ export default Component.extend(I18n, {
   activeRevisionNumber: undefined,
 
   /**
+   * @type {Utils.Action | null}
+   */
+  dumpActionCache: null,
+
+  /**
    * @type {AtmLambdaRevision|undefined}
    */
   activeRevision: computed(
@@ -145,10 +150,12 @@ export default Component.extend(I18n, {
     'atmLambda',
     'atmLambdaRevisionNumber',
     function dumpAction() {
-      return this.workflowActions.createDumpAtmLambdaRevisionAction({
-        atmLambda: this.atmLambda,
-        revisionNumber: this.atmLambdaRevisionNumber,
-      });
+      this.dumpActionCache?.destroy();
+      return this.dumpActionCache =
+        this.workflowActions.createDumpAtmLambdaRevisionAction({
+          atmLambda: this.atmLambda,
+          revisionNumber: this.atmLambdaRevisionNumber,
+        });
     }
   ),
 
@@ -211,6 +218,7 @@ export default Component.extend(I18n, {
   willDestroyElement() {
     try {
       this.registerViewActions(true);
+      this.cacheFor('dumpAction')?.destroy();
     } finally {
       this._super(...arguments);
     }
@@ -281,6 +289,7 @@ export default Component.extend(I18n, {
           return;
       }
       const actionResult = await action.execute();
+      action.destroy();
 
       const {
         status,

@@ -6,6 +6,7 @@ import RemoveSpaceAction from 'onezone-gui/utils/space-actions/remove-space-acti
 import sinon from 'sinon';
 import { get } from '@ember/object';
 import { settled } from '@ember/test-helpers';
+import { resolve } from 'rsvp';
 
 describe('Integration | Service | url-action-runner', function () {
   setupRenderingTest();
@@ -23,10 +24,11 @@ describe('Integration | Service | url-action-runner', function () {
 
     // Create an empty instance of action to load methods of the class. Without this line
     // RemoveSpaceAction has no property 'prototype.execute'.
-    RemoveSpaceAction.create();
+    RemoveSpaceAction.create().destroy();
     const executeStub = sinon.stub(RemoveSpaceAction.prototype, 'execute')
       .callsFake(function () {
         expect(this.get('context.space')).to.equal(space);
+        return resolve();
       });
 
     const service = lookupService(this, 'url-action-runner');

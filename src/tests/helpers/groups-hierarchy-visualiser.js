@@ -20,7 +20,7 @@ export default class GroupsHierarchyVisualiserHelper {
   }
 
   async clickRelationActions(groupBox, actionSelector) {
-    await triggerEvent(groupBox.querySelector('.group-box-line'), 'mouseover');
+    await triggerEvent(groupBox.querySelector('.group-box-line'), 'mouseenter');
     await click(groupBox.querySelector('.group-box-line .actions-trigger'));
     await click(globals.document.querySelector('.webui-popover.in ' + actionSelector));
   }

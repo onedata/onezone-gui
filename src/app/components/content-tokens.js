@@ -77,6 +77,14 @@ export default Component.extend(I18n, GlobalActions, {
     }
   }),
 
+  willDestroyElement() {
+    try {
+      this.cacheFor('editTriggerAction')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
   actions: {
     saveToken(tokenDiff) {
       const {

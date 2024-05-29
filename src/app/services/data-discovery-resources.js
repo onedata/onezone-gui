@@ -82,6 +82,17 @@ export default Service.extend({
   },
 
   /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.goToFileUrlActionHandler.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
+  /**
    * @returns {Object}
    */
   createAppProxyObject() {

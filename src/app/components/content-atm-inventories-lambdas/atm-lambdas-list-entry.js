@@ -80,6 +80,11 @@ export default Component.extend(I18n, {
   areActionsOpened: false,
 
   /**
+   * @type {Utils.AtmWorkflow.AtmLambda.RevisionActionsFactory | null}
+   */
+  revisionActionsFactoryCache: null,
+
+  /**
    * @type {ComputedProperty<Array<RevisionsTableColumnSpec>>}
    */
   revisionCustomColumnSpecs: computed('mode', function revisionCustomColumnSpecs() {
@@ -135,7 +140,8 @@ export default Component.extend(I18n, {
     'onRevisionCreate',
     'onRevisionCreated',
     function revisionActionsFactory() {
-      return RevisionActionsFactory.create({
+      this.revisionActionsFactoryCache?.destroy();
+      return this.revisionActionsFactoryCache = RevisionActionsFactory.create({
         ownerSource: this,
         atmInventory: this.atmInventory,
         atmLambda: this.atmLambda,
@@ -182,6 +188,19 @@ export default Component.extend(I18n, {
     collect('copyIdAction'),
     collect('unlinkAction', 'copyIdAction')
   ),
+
+  /**
+   * @override
+   */
+  willDestroyElement() {
+    try {
+      this.cacheFor('unlinkAction')?.destroy();
+      this.cacheFor('copyIdAction')?.destroy();
+      this.cacheFor('revisionActionsFactory')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
 
   actions: {
     clickRevision(revisionNumber) {

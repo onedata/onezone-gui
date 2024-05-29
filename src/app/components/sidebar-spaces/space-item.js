@@ -123,13 +123,20 @@ export default Component.extend(I18n, {
   isInMarketplace: reads('space.advertisedInMarketplace'),
 
   /**
+   * @type {ComputedProperty<Record<string, Utils.Action>>}
+   */
+  actionsCache: computed(() => ({})),
+
+  /**
    * @type {Ember.ComputedProperty<Utils.Action>}
    */
   leaveAction: computed('space', function leaveAction() {
+    this.actionsCache.leaveAction?.destroyAfterAllExecutions();
     const action = this.userActions.createLeaveAction({
       recordToLeave: this.space,
     });
     set(action, 'className', `${action.className} leave-record-trigger`);
+    this.actionsCache.leaveAction = action;
     return action;
   }),
 
@@ -137,26 +144,30 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<Utils.Action>}
    */
   openApiSamplesAction: computed('space', function openApiSamplesAction() {
+    this.actionsCache.openApiSamplesAction?.destroyAfterAllExecutions();
     const {
       space,
       apiSamplesActions,
     } = this.getProperties('space', 'apiSamplesActions');
-    return apiSamplesActions.createShowApiSamplesAction({
-      record: space,
-      apiSubject: 'space',
-    });
+    return this.actionsCache.openApiSamplesAction =
+      apiSamplesActions.createShowApiSamplesAction({
+        record: space,
+        apiSubject: 'space',
+      });
   }),
 
   /**
    * @type {Ember.ComputedProperty<Utils.Action>}
    */
   removeAction: computed('space', function removeAction() {
+    this.actionsCache.removeAction?.destroyAfterAllExecutions();
     const {
       spaceActions,
       space,
     } = this.getProperties('spaceActions', 'space');
 
-    return spaceActions.createRemoveSpaceAction({ space });
+    return this.actionsCache.removeAction =
+      spaceActions.createRemoveSpaceAction({ space });
   }),
 
   /**
@@ -176,12 +187,14 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<Action>}
    */
   copyIdAction: computed('space', function copyIdAction() {
+    this.actionsCache.copyIdAction?.destroyAfterAllExecutions();
     const {
       space,
       clipboardActions,
     } = this.getProperties('space', 'clipboardActions');
 
-    return clipboardActions.createCopyRecordIdAction({ record: space });
+    return this.actionsCache.copyIdAction =
+      clipboardActions.createCopyRecordIdAction({ record: space });
   }),
 
   /**
@@ -194,6 +207,22 @@ export default Component.extend(I18n, {
     'copyIdAction',
     'openApiSamplesAction'
   ),
+
+  /**
+   * @override
+   */
+  willDestroyElement() {
+    try {
+      [
+        'leaveAction',
+        'openApiSamplesAction',
+        'removeAction',
+        'copyIdAction',
+      ].forEach((action) => this.cacheFor(action)?.destroyAfterAllExecutions());
+    } finally {
+      this._super(...arguments);
+    }
+  },
 
   actions: {
     editorClick(event) {

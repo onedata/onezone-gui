@@ -9,7 +9,11 @@ import { reject } from 'rsvp';
 import { A } from '@ember/array';
 
 describe('Integration | Utility | user-actions/toggle-being-owner-action', function () {
-  setupRenderingTest();
+  const { afterEach } = setupRenderingTest();
+
+  afterEach(function () {
+    this.action?.destroy();
+  });
 
   beforeEach(function () {
     const currentUser = {
@@ -38,18 +42,18 @@ describe('Integration | Utility | user-actions/toggle-being-owner-action', funct
   });
 
   it('has className "toggle-being-owner-trigger"', function () {
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner });
+    this.action = ToggleBeingOwnerAction.create({ ownerSource: this.owner });
 
-    expect(get(action, 'className')).to.equal('toggle-being-owner-trigger');
+    expect(get(this.action, 'className')).to.equal('toggle-being-owner-trigger');
   });
 
   it('has title "Make an owner" when ownerRecord is not an owner', function () {
     const context = this.get('context');
     context.owners = context.owners.without(context.ownerRecord);
 
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
+    this.action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
-    expect(String(get(action, 'title'))).to.equal('Make an owner');
+    expect(String(get(this.action, 'title'))).to.equal('Make an owner');
   });
 
   it('has title "Remove ownership" when ownerRecord is an owner', function () {
@@ -59,18 +63,18 @@ describe('Integration | Utility | user-actions/toggle-being-owner-action', funct
     } = this.getProperties('context', 'ownerRecord');
     context.owners = [ownerRecord];
 
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
+    this.action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
-    expect(String(get(action, 'title'))).to.equal('Remove ownership');
+    expect(String(get(this.action, 'title'))).to.equal('Remove ownership');
   });
 
   it('is not disabled when `owners` is not provided', function () {
     const context = this.get('context');
     context.owners = null;
 
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
+    this.action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
-    expect(get(action, 'disabled')).to.be.false;
+    expect(get(this.action, 'disabled')).to.be.false;
   });
 
   it(
@@ -83,9 +87,9 @@ describe('Integration | Utility | user-actions/toggle-being-owner-action', funct
       } = this.getProperties('context', 'ownerRecord', 'currentUser');
       context.owners = [ownerRecord, currentUser, {}];
 
-      const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
+      this.action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
-      expect(get(action, 'disabled')).to.be.false;
+      expect(get(this.action, 'disabled')).to.be.false;
     }
   );
 
@@ -97,10 +101,10 @@ describe('Integration | Utility | user-actions/toggle-being-owner-action', funct
     context.ownerRecord = currentUser;
     context.owners = A([currentUser]);
 
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
+    this.action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
-    expect(get(action, 'disabled')).to.be.true;
-    expect(String(get(action, 'tip')))
+    expect(get(this.action, 'disabled')).to.be.true;
+    expect(String(get(this.action, 'tip')))
       .to.equal('Cannot revoke this ownership ‐ there must be at least one owner.');
   });
 
@@ -111,33 +115,33 @@ describe('Integration | Utility | user-actions/toggle-being-owner-action', funct
     } = this.getProperties('context', 'currentUser');
     context.owners = A([currentUser]);
 
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
+    this.action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
-    expect(get(action, 'disabled')).to.be.false;
+    expect(get(this.action, 'disabled')).to.be.false;
   });
 
   it('is disabled when current user is not an owner', function () {
     const context = this.get('context');
     context.owners = A([context.ownerRecord, {}]);
 
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
+    this.action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
-    expect(get(action, 'disabled')).to.be.true;
-    expect(String(get(action, 'tip')))
+    expect(get(this.action, 'disabled')).to.be.true;
+    expect(String(get(this.action, 'tip')))
       .to.equal('Ownership can only be managed by owners.');
   });
 
   it('has icon "role-holders"', function () {
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner });
+    this.action = ToggleBeingOwnerAction.create({ ownerSource: this.owner });
 
-    expect(get(action, 'icon')).to.equal('role-holders');
+    expect(get(this.action, 'icon')).to.equal('role-holders');
   });
 
   it('notifies success on adding owner action success', function () {
     const context = this.get('context');
     context.owners = context.owners.without(context.ownerRecord);
 
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
+    this.action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
     const addOwnerStub = sinon.stub(
       lookupService(this, 'record-manager'),
@@ -148,7 +152,7 @@ describe('Integration | Utility | user-actions/toggle-being-owner-action', funct
       'success'
     );
 
-    return action.execute()
+    return this.action.execute()
       .then(actionResult => {
         expect(addOwnerStub).to.be.calledOnce;
         expect(successNotifySpy).to.be.calledWith(sinon.match.has(
@@ -161,7 +165,7 @@ describe('Integration | Utility | user-actions/toggle-being-owner-action', funct
   it('notifies success on removing owner action success', function () {
     const context = this.get('context');
 
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
+    this.action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
     const addOwnerStub = sinon.stub(
       lookupService(this, 'record-manager'),
@@ -172,7 +176,7 @@ describe('Integration | Utility | user-actions/toggle-being-owner-action', funct
       'success'
     );
 
-    return action.execute()
+    return this.action.execute()
       .then(actionResult => {
         expect(addOwnerStub).to.be.calledOnce;
         expect(successNotifySpy).to.be.calledWith(sinon.match.has(
@@ -187,7 +191,7 @@ describe('Integration | Utility | user-actions/toggle-being-owner-action', funct
     const context = this.get('context');
     context.owners = context.owners.without(context.ownerRecord);
 
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
+    this.action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
     const addOwnerStub = sinon.stub(
       lookupService(this, 'record-manager'),
@@ -203,7 +207,7 @@ describe('Integration | Utility | user-actions/toggle-being-owner-action', funct
       'backendError'
     );
 
-    return action.execute()
+    return this.action.execute()
       .then(actionResult => {
         expect(addOwnerStub).to.be.calledOnce;
         expect(failureNotifySpy).to.be.calledWith(
@@ -218,7 +222,7 @@ describe('Integration | Utility | user-actions/toggle-being-owner-action', funct
     const error = { id: 'err' };
     const context = this.get('context');
 
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
+    this.action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
     const addOwnerStub = sinon.stub(
       lookupService(this, 'record-manager'),
@@ -234,7 +238,7 @@ describe('Integration | Utility | user-actions/toggle-being-owner-action', funct
       'backendError'
     );
 
-    return action.execute()
+    return this.action.execute()
       .then(actionResult => {
         expect(addOwnerStub).to.be.calledOnce;
         expect(failureNotifySpy).to.be.calledWith(

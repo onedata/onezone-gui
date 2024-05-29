@@ -22,7 +22,7 @@ import { selectChoose, clickTrigger } from 'ember-power-select/test-support/help
 describe(
   'Integration | Utility | space-actions/add-harvester-to-space-action',
   function () {
-    setupRenderingTest();
+    const { afterEach } = setupRenderingTest();
 
     beforeEach(function () {
       const recordManager = lookupService(this, 'record-manager');
@@ -46,8 +46,12 @@ describe(
       });
     });
 
+    afterEach(function () {
+      this.action?.destroy();
+    });
+
     it('has correct className, icon and title', function () {
-      const action = AddHarvesterToSpaceAction.create({
+      this.action = AddHarvesterToSpaceAction.create({
         ownerSource: this.owner,
         context: this.get('context'),
       });
@@ -56,20 +60,20 @@ describe(
         className,
         icon,
         title,
-      } = getProperties(action, 'className', 'icon', 'title');
+      } = getProperties(this.action, 'className', 'icon', 'title');
       expect(className).to.equal('add-harvester-to-space-trigger');
       expect(icon).to.equal('plus');
       expect(String(title)).to.equal('Add one of your harvesters');
     });
 
     it('shows modal with a list of harvesters on execute', async function () {
-      const action = AddHarvesterToSpaceAction.create({
+      this.action = AddHarvesterToSpaceAction.create({
         ownerSource: this.owner,
         context: this.get('context'),
       });
 
       await render(hbs `{{global-modal-mounter}}`);
-      action.execute();
+      this.action.execute();
       await settled();
       expect(getModal()).to.have.class('record-selector-modal');
       expect(getModalHeader().querySelector('h1'))
@@ -90,7 +94,7 @@ describe(
     it(
       'executes adding harvester to space on submit (success scenario)',
       async function () {
-        const action = AddHarvesterToSpaceAction.create({
+        this.action = AddHarvesterToSpaceAction.create({
           ownerSource: this.owner,
           context: this.get('context'),
         });
@@ -104,7 +108,7 @@ describe(
         );
 
         await render(hbs `{{global-modal-mounter}}`);
-        const actionResultPromise = action.execute();
+        const actionResultPromise = this.action.execute();
         await settled();
 
         await selectChoose('.record-selector-modal', 'harvester1');
@@ -124,7 +128,7 @@ describe(
       'executes adding harvester to space tokens on submit (failure scenario)',
       async function () {
         suppressRejections();
-        const action = AddHarvesterToSpaceAction.create({
+        this.action = AddHarvesterToSpaceAction.create({
           ownerSource: this.owner,
           context: this.get('context'),
         });
@@ -137,7 +141,7 @@ describe(
         );
 
         await render(hbs `{{global-modal-mounter}}`);
-        const actionResultPromise = action.execute();
+        const actionResultPromise = this.action.execute();
         await settled();
 
         await selectChoose('.record-selector-modal', 'harvester1');
