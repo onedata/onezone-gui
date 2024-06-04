@@ -22,7 +22,11 @@ export default Component.extend(I18n, {
 
   actions: {
     advertiseSpace() {
-      this.spaceActions.createChooseSpaceToAdvertiseAction().execute();
+      const action = this.spaceActions.createChooseSpaceToAdvertiseAction();
+      (async () => {
+        await action.execute();
+        action.destroy();
+      })();
     },
   },
 });

@@ -36,6 +36,8 @@ export default Component.extend(I18n, {
    */
   viewModel: undefined,
 
+  refreshAdvertisedSpacesListActionCache: undefined,
+
   chooseSpaceToAdvertiseAction: computed(function chooseSpaceToAdvertiseAction() {
     return this.spaceActions.createChooseSpaceToAdvertiseAction();
   }),
@@ -43,7 +45,8 @@ export default Component.extend(I18n, {
   refreshAdvertisedSpacesListAction: computed(
     'viewModel',
     function refreshAdvertisedSpacesListAction() {
-      return Action
+      this.refreshAdvertisedSpacesListActionCache?.destroy();
+      const action = Action
         .extend({
           disabled: reads('viewModel.isRefreshing'),
         }).create({
@@ -56,6 +59,19 @@ export default Component.extend(I18n, {
             return await this.viewModel.refreshList();
           },
         });
+      return this.set('refreshAdvertisedSpacesListActionCache', action);
     }
   ),
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.cacheFor('chooseSpaceToAdvertiseAction')?.destroy();
+      this.cacheFor('refreshAdvertisedSpacesListAction')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
 });

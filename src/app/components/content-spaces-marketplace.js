@@ -54,6 +54,8 @@ export default Component.extend({
   },
 
   /**
+   * This method should be used only one-time to not produce dangling objects.
+   * @private
    * @returns {ComputedProperty<Utils.SpacesMarketplaceViewModel>}
    */
   createViewModel() {
@@ -61,5 +63,16 @@ export default Component.extend({
       ownerSource: this,
       selectedSpaceId: this.navigationState.aspectOptions.selectedSpace,
     });
+  },
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.viewModel?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
   },
 });
