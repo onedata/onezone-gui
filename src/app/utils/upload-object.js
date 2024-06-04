@@ -249,6 +249,7 @@ export default EmberObject.extend({
   numberOfFiles: computed(
     'objectType',
     'children.@each.numberOfFiles',
+    'isCancelled',
     function numberOfFiles() {
       if (this.objectType === 'file') {
         return this.isCancelled ? 0 : 1;
