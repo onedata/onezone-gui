@@ -207,6 +207,15 @@ export default Component.extend(I18n, {
     }
   ),
 
+  init() {
+    this._super(...arguments);
+    this.relationLoader();
+    this.clickHandlerObserver();
+  },
+
+  /**
+   * @override
+   */
   doubleClick() {
     if (this.get('relationIsRejected')) {
       this.get('globalNotify').backendError(
@@ -214,12 +223,6 @@ export default Component.extend(I18n, {
         this.get('relationError')
       );
     }
-  },
-
-  init() {
-    this._super(...arguments);
-    this.relationLoader();
-    this.clickHandlerObserver();
   },
 
   /**

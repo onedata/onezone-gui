@@ -158,7 +158,7 @@ export default EmberObject.extend({
   replaceColumn(oldColumn, newColumn) {
     const columns = this.get('columns');
     const oldColumnIndex = columns.indexOf(oldColumn);
-    columns.replace(oldColumnIndex, 1, [newColumn]);
+    this.replaceColumnObject(oldColumnIndex, newColumn);
 
     // Depending on relationType, clear all left/right columns starting from
     // oldColumnIndex
@@ -169,16 +169,12 @@ export default EmberObject.extend({
     switch (relationType) {
       case 'parents':
         for (let i = oldColumnIndex - 1; i >= 0; i--) {
-          const newColumn = Column.create();
-          this.createdColumnsSet.add(newColumn);
-          columns.replace(i, 1, [new Column]);
+          this.replaceColumnObject(i, Column.create());
         }
         break;
       case 'children':
         for (let i = oldColumnIndex + 1, l = get(columns, 'length'); i < l; i++) {
-          const newColumn = Column.create();
-          this.createdColumnsSet.add(newColumn);
-          columns.replace(i, 1, [newColumn]);
+          this.replaceColumnObject(i, Column.create());
         }
         break;
     }
@@ -248,5 +244,16 @@ export default EmberObject.extend({
       this.createdColumnsSet.add(column);
       columns.pushObject(column);
     }
+  },
+
+  /**
+   * @private
+   */
+  replaceColumnObject(index, newColumn) {
+    const columns = this.columns;
+    this.createdColumnsSet.add(newColumn);
+    this.createdColumnsSet.delete(columns[index]);
+    columns[index].destroy();
+    columns.replace(index, 1, [newColumn]);
   },
 });

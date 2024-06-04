@@ -124,6 +124,11 @@ export default Component.extend(I18n, {
   isCondensed: false,
 
   /**
+   * @type {Set<MembershipRelation>}
+   */
+  createdMembershipRelations: undefined,
+
+  /**
    * @type {Ember.ComputedProperty<string>}
    */
   currentUserId: reads('currentUser.userId'),
@@ -159,8 +164,6 @@ export default Component.extend(I18n, {
       );
     }
   }),
-
-  createdMembershipRelations: undefined,
 
   /**
    * @type {Ember.ComputedProperty<Array<Object>>}
