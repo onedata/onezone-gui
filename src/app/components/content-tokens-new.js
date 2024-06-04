@@ -115,7 +115,7 @@ export default Component.extend(I18n, {
       const createTokenAction = this.get('tokenActions')
         .createCreateTokenAction({ rawToken });
 
-      return createTokenAction.execute().finally(() => createTokenAction.destroy());
+      return createTokenAction.execute().finally(() => createTokenAction.destroy?.());
     },
   },
 });

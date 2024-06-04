@@ -71,10 +71,16 @@ export default Component.extend(I18n, {
   popoverApi: undefined,
 
   /**
+   * @type {Object<string, Array<SpaceTag>>}
+   */
+  availableTagsByCategoryCache: undefined,
+
+  /**
    * Maps: categoryName -> Array of available tags objects for tags input.
    * @returns {Object<string, Array<SpaceTag>>}
    */
   availableTagsByCategory: computed('usedTagLabels', function availableTagsByCategory() {
+    this.availableTagsByCategoryCache?.forEach(obj => obj.destroy());
     const availableSpaceTags = this.spaceManager.getAvailableSpaceTags();
     const result = [];
     for (const categoryName in availableSpaceTags) {
@@ -83,7 +89,7 @@ export default Component.extend(I18n, {
         .sort()
         .map(label => SpaceTag.create({ ownerSource: this, label }));
     }
-    return result;
+    return this.set('availableTagsByCategoryCache', result);
   }),
 
   tagCategories: computed(function tagCategories() {
@@ -150,6 +156,17 @@ export default Component.extend(I18n, {
       !_.isEmpty(this.availableTagsByCategory[category])
     );
     this.set('selectedCategory', nonEmptyCategory || this.tagCategories[0]);
+  },
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.cacheFor('availableTagsByCategory')?.forEach(obj => obj.destroy());
+    } finally {
+      this._super(...arguments);
+    }
   },
 
   repositionPopover() {

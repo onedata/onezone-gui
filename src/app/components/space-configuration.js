@@ -147,6 +147,11 @@ export default Component.extend(validations, I18n, {
    */
   isAskingUserForUnsavedChanges: false,
 
+  /**
+   * @type {ComputedProperty<Array<Tag>>}
+   */
+  spaceTagsCache: undefined,
+
   //#endregion
 
   isMarketplaceEnabled: reads('spaceManager.marketplaceConfig.enabled'),
@@ -213,12 +218,14 @@ export default Component.extend(validations, I18n, {
    * @type {ComputedProperty<Array<Tag>>}
    */
   spaceTags: computed('space.tags', function spaceTags() {
-    return get(this.space ?? {}, 'tags')?.map(label => {
+    this.spaceTagsCache?.forEach(obj => obj.destroy());
+    const result =  get(this.space ?? {}, 'tags')?.map(label => {
       return SpaceTag.create({
         ownerSource: this,
         label,
       });
     });
+    return this.set('spaceTagsCache', result);
   }),
 
   /**
@@ -389,6 +396,7 @@ export default Component.extend(validations, I18n, {
       this.unregisterRouteChangeHandler();
       this.unregisterPageUnloadHandler();
       this.cacheFor('contactEmailRootField')?.destroy();
+      this.cacheFor('spaceTags')?.forEach(obj => obj.destroy());
     } finally {
       this._super(...arguments);
     }
