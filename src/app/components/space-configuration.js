@@ -35,6 +35,11 @@ import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fi
 import globals from 'onedata-gui-common/utils/globals';
 import preventPageUnload from 'onedata-gui-common/utils/prevent-page-unload';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import {
+  destroyableComputed,
+  initDestroyableCache,
+  destroyDestroyableComputedValues,
+} from 'onedata-gui-common/utils/destroyable-computed';
 
 /**
  * @typedef {'view'|'edit'} SpaceConfigiration.DescriptionEditorMode
@@ -217,15 +222,13 @@ export default Component.extend(validations, I18n, {
    * Space tags ready to use in component.
    * @type {ComputedProperty<Array<Tag>>}
    */
-  spaceTags: computed('space.tags', function spaceTags() {
-    this.spaceTagsCache?.forEach(obj => obj.destroy());
-    const result =  get(this.space ?? {}, 'tags')?.map(label => {
+  spaceTags: destroyableComputed('space.tags', function spaceTags() {
+    return get(this.space ?? {}, 'tags')?.map(label => {
       return SpaceTag.create({
         ownerSource: this,
         label,
       });
     });
-    return this.set('spaceTagsCache', result);
   }),
 
   /**
@@ -375,6 +378,7 @@ export default Component.extend(validations, I18n, {
    * @override
    */
   init() {
+    initDestroyableCache(this);
     this._super(...arguments);
     this.spaceObserver();
 
@@ -395,8 +399,18 @@ export default Component.extend(validations, I18n, {
     try {
       this.unregisterRouteChangeHandler();
       this.unregisterPageUnloadHandler();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
       this.cacheFor('contactEmailRootField')?.destroy();
-      this.cacheFor('spaceTags')?.forEach(obj => obj.destroy());
+      destroyDestroyableComputedValues(this);
     } finally {
       this._super(...arguments);
     }

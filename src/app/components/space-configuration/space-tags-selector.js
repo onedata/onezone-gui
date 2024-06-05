@@ -3,7 +3,7 @@
  * switch.
  *
  * @author Jakub Liput
- * @copyright (C) 2023 ACK CYFRONET AGH
+ * @copyright (C) 2023-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -69,18 +69,16 @@ export default Component.extend(I18n, {
    * @type {Object}
    */
   popoverApi: undefined,
-
-  /**
-   * @type {Object<string, Array<SpaceTag>>}
-   */
-  availableTagsByCategoryCache: undefined,
-
   /**
    * Maps: categoryName -> Array of available tags objects for tags input.
    * @returns {Object<string, Array<SpaceTag>>}
    */
   availableTagsByCategory: computed('usedTagLabels', function availableTagsByCategory() {
-    this.availableTagsByCategoryCache?.forEach(obj => obj.destroy());
+    if (this.availableTagsByCategoryCache) {
+      Object.values(this.availableTagsByCategoryCache)?.forEach(categoryTags =>
+        categoryTags.forEach(tag => tag.destroy)
+      );
+    }
     const availableSpaceTags = this.spaceManager.getAvailableSpaceTags();
     const result = [];
     for (const categoryName in availableSpaceTags) {
@@ -163,7 +161,11 @@ export default Component.extend(I18n, {
    */
   willDestroy() {
     try {
-      this.cacheFor('availableTagsByCategory')?.forEach(obj => obj.destroy());
+      if (this.availableTagsByCategoryCache) {
+        Object.values(this.availableTagsByCategoryCache).forEach(categoryTags =>
+          categoryTags.forEach(tag => tag.destroy())
+        );
+      }
     } finally {
       this._super(...arguments);
     }

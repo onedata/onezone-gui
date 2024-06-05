@@ -139,18 +139,6 @@ export default Component.extend(I18n, {
     ]));
   },
 
-  /**
-   * @override
-   */
-  willDestroyElement() {
-    try {
-      this.cacheFor('rootField')?.destroy();
-      destroyDestroyableComputedValues(this);
-    } finally {
-      this._super(...arguments);
-    }
-  },
-
   createEmailInputField() {
     return TextField.create({
       name: this.emailFieldName,
@@ -169,6 +157,18 @@ export default Component.extend(I18n, {
         name: this.emailFieldName,
         customValidators: this.emailFieldValidators,
       });
+  },
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.cacheFor('rootField')?.destroy();
+      destroyDestroyableComputedValues(this);
+    } finally {
+      this._super(...arguments);
+    }
   },
 
   actions: {
