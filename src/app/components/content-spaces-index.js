@@ -58,6 +58,8 @@ export default Component.extend(
      */
     spaceMarketplaceTileDisplayModel: undefined,
 
+    destroyCache: undefined,
+
     /**
      * @type {Ember.ComputedProperty<string>}
      */
@@ -162,10 +164,12 @@ export default Component.extend(
      * @type {Ember.ComputedProperty<AspectAction>}
      */
     openApiSamplesModalAction: computed('space', function openApiSamplesModalAction() {
-      return this.apiSamplesActions.createShowApiSamplesAction({
-        record: this.space,
-        apiSubject: 'space',
-      });
+      this.destroyCache.openApiSamplesModalAction?.destroy();
+      return this.destroyCache.openApiSamplesModalAction =
+        this.apiSamplesActions.createShowApiSamplesAction({
+          record: this.space,
+          apiSubject: 'space',
+        });
     }),
 
     isDetailsTileShown: computed(
@@ -196,6 +200,7 @@ export default Component.extend(
     isMarketplaceTileShown: reads('spaceMarketplaceTileDisplayModel.isTileShown'),
 
     init() {
+      this.set('destroyCache', {});
       this._super(...arguments);
       this.set(
         'spaceMarketplaceTileDisplayModel',
@@ -205,6 +210,18 @@ export default Component.extend(
           ownerSource: this,
         })
       );
+    },
+
+    /**
+     * @override
+     */
+    willDestroy() {
+      try {
+        this.spaceMarketplaceTileDisplayModel?.destroy();
+        this.destroyCache.openApiSamplesModalAction?.destroy();
+      } finally {
+        this._super(...arguments);
+      }
     },
 
     /**

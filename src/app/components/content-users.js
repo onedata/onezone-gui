@@ -102,6 +102,12 @@ export default Component.extend(...mixins, {
   isChangingPassword: false,
 
   /**
+   * Values are references to objects that should be destroyed on parent destroy.
+   * @type {Object}
+   */
+  destroyCache: undefined,
+
+  /**
    * @type {ComputedProperty<boolean>}
    */
   showPasswordSection: reads('user.basicAuthEnabled'),
@@ -121,8 +127,9 @@ export default Component.extend(...mixins, {
    * @type {ComputedProperty<Utils.Action>}
    */
   deleteAccountAction: computed(function deleteAccountAction() {
+    this.destroyCache.deleteAccountAction?.destroy();
     const component = this;
-    return Action.extend({
+    const action = Action.extend({
       ownerSource: component,
       component,
       i18nPrefix: tag `${'component.i18nPrefix'}.deleteAccountAction`,
@@ -134,6 +141,7 @@ export default Component.extend(...mixins, {
         set(component, 'deleteAccountOpened', true);
       },
     }).create();
+    return this.set('destroyCache.deleteAccountAction', action);
   }),
 
   /**
@@ -258,6 +266,22 @@ export default Component.extend(...mixins, {
    */
   _animateHide(element) {
     element.addClass('fadeOut').removeClass('short-delay fadeIn');
+  },
+
+  init() {
+    this._super(...arguments);
+    this.set('destroyCache', {});
+  },
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.destroyCache.deleteAccountAction?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
   },
 
   actions: {
