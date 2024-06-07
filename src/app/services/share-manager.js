@@ -109,14 +109,20 @@ export const VirtualShareList = EmberObject.extend({
     }
   },
 
-  reload() {
-    return allFulfilled(this.get('shareLists').invoke('reload'));
+  async reload() {
+    await allFulfilled(this.shareLists.invoke('reload'));
+    return this;
   },
 });
 
 export default Service.extend(UserProxyMixin, {
   store: service(),
   currentUser: service(),
+
+  /**
+   * @type {VirtualShareList}
+   */
+  virtualShareList: undefined,
 
   getRecord(gri) {
     return this.get('store').findRecord('share', gri);
@@ -133,11 +139,14 @@ export default Service.extend(UserProxyMixin, {
     );
   },
 
-  getAllShares() {
-    const virtualShareList = VirtualShareList.create({
-      userProxy: this.get('userProxy'),
-    });
-    return virtualShareList.asyncInit();
+  getVirtualAllSharesList() {
+    if (!this.virtualShareList) {
+      const virtualShareList = VirtualShareList.create({
+        userProxy: this.get('userProxy'),
+      });
+      this.set('virtualShareList', virtualShareList);
+    }
+    return this.virtualShareList;
   },
 
   /**

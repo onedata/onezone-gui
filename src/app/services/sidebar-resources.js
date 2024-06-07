@@ -51,7 +51,7 @@ export default SidebarResources.extend({
       case 'spaces':
         return this.get('spaceManager').getSpaces();
       case 'shares':
-        return this.get('shareManager').getAllShares();
+        return this.get('shareManager').getVirtualAllSharesList().reload();
       case 'groups':
         return this.get('groupManager').getGroups();
       case 'harvesters':
