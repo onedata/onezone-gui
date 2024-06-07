@@ -68,7 +68,7 @@ export default Component.extend(
     /**
      * @type {Ember.ComputedProperty<boolean>}
      */
-    isSupported: gt('space.providerList.list.length', 0),
+    isSupported: gt('providersProxy.content.length', 0),
 
     /**
      * @type {Ember.ComputedProperty<PromiseArray<models/Provider>>}
@@ -99,7 +99,7 @@ export default Component.extend(
     /**
      * @type {ComputedProperty<Models.Provider>}
      */
-    dataProviderProxy: promise.object(computed('space.providerList.list.[]',
+    dataProviderProxy: promise.object(computed('space.providerList.list.content.[]',
       function dataProviderProxy() {
         return this.get('space.providerList')
           .then(providerList => get(providerList, 'list'))

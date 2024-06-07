@@ -45,7 +45,7 @@ export const VirtualShareList = EmberObject.extend({
   store: true,
 
   spacesProxy: promise.array(
-    computed('userProxy.spaceList.list.[]', function spacesProxy() {
+    computed('userProxy.spaceList.list.content.[]', function spacesProxy() {
       return this.get('userProxy')
         .then(user => get(user, 'spaceList'))
         .then(spaceList => get(spaceList, 'list'));
@@ -61,6 +61,7 @@ export const VirtualShareList = EmberObject.extend({
   ),
 
   shareListRelations: computed('shareLists.@each.list', function shareListRelations() {
+    // FIXME: possible problem with updates
     const fulfilledListPromises = (async () => {
       const shareLists = await this.shareLists;
       return await onlyFulfilledValues(

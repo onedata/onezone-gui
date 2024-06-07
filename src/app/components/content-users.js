@@ -155,7 +155,7 @@ export default Component.extend(...mixins, {
   /**
    * @type {ComputedProperty<LinkedAccountList>}
    */
-  linkedAccountsList: reads('linkedAccountsProxy.content.list'),
+  linkedAccountsList: reads('linkedAccountsProxy.content.list.content'),
 
   /**
    * @type {Ember.ComputedProperty<PromiseObject<LinkedAccountList>>}

@@ -9,7 +9,7 @@
   <div class="one-tile-container">
     {{#if (and
       dataProviderProxy.isFulfilled
-      (or dataProviderProxy.content (gt providersProxy.length 0))
+      (or dataProviderProxy.content (gt providersProxy.content.length 0))
     )}}
       {{#one-tile
         class="text-center resource-browse-tile"

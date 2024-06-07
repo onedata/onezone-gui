@@ -275,8 +275,8 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   /**
    * @type {ComputedProperty<Array<Models.Provider>>}
    */
-  providers: computed('space.providerList.list.@each.name', function providers() {
-    const list = this.get('space.providerList.list');
+  providers: computed('space.providerList.list.content.@each.name', function providers() {
+    const list = this.get('space.providerList.list.content');
     if (!list) {
       return [];
     }
