@@ -160,7 +160,7 @@
  *     are fixed in Workspace and properties computed in utils.
  *
  * @author Michał Borzęcki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @copyright (C) 2018-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -192,6 +192,11 @@ import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
 import { getOwner } from '@ember/application';
 import dom from 'onedata-gui-common/utils/dom';
 import globals from 'onedata-gui-common/utils/globals';
+import {
+  destroyDestroyableComputedValues,
+  destroyableComputed,
+  initDestroyableCache,
+} from 'onedata-gui-common/utils/destroyable-computed';
 
 export default Component.extend(I18n, {
   classNames: ['groups-hierarchy-visualiser'],
@@ -372,7 +377,7 @@ export default Component.extend(I18n, {
    * Privileges model for relation privileges editor
    * @type {Ember.ComputedProperty<PrivilegeRecordProxy|null>}
    */
-  privilegesEditorModel: computed(
+  privilegesEditorModel: destroyableComputed(
     'relationPrivilegesToChange',
     function privilegesEditorModel() {
       const {
@@ -530,6 +535,7 @@ export default Component.extend(I18n, {
    * @override
    */
   init() {
+    initDestroyableCache(this);
     this._super(...arguments);
     this.set('createdColumnsSet', new Set());
     if (!this.workspace) {
@@ -538,6 +544,9 @@ export default Component.extend(I18n, {
     this.searchStringObserver();
   },
 
+  /**
+   * @override
+   */
   didInsertElement() {
     this._super(...arguments);
 
@@ -550,10 +559,24 @@ export default Component.extend(I18n, {
     this.resetObserver();
   },
 
+  /**
+   * @override
+   */
   willDestroyElement() {
     try {
       globals.window.removeEventListener('resize', this.windowResizeHandler);
       this.createdColumnsSet.forEach((col) => col.destroy());
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      destroyDestroyableComputedValues(this);
       this.cacheFor('columnManager').destroy();
     } finally {
       this._super(...arguments);

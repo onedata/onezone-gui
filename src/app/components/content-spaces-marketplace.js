@@ -50,7 +50,7 @@ export default Component.extend({
       next(this, () => this.router.transitionTo('index'));
       return;
     }
-    this.set('viewModel', this.createViewModel());
+    this.initViewModel();
   },
 
   /**
@@ -58,11 +58,18 @@ export default Component.extend({
    * @private
    * @returns {ComputedProperty<Utils.SpacesMarketplaceViewModel>}
    */
-  createViewModel() {
-    return SpacesMarketplaceViewModel.create({
+  initViewModel() {
+    if (this.viewModel) {
+      console.warn(
+        'ContentSpacesMarketplace#initViewModel: viewModel is already initialized'
+      );
+      return;
+    }
+    const viewModel = SpacesMarketplaceViewModel.create({
       ownerSource: this,
       selectedSpaceId: this.navigationState.aspectOptions.selectedSpace,
     });
+    this.set('viewModel', viewModel);
   },
 
   /**
