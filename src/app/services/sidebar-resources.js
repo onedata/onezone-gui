@@ -77,22 +77,15 @@ export default SidebarResources.extend({
    * @override
    */
   getButtonsFor(type, context) {
-    switch (type) {
-      case 'clusters':
-        return this.get('clusterActions.buttons');
-      case 'tokens':
-        return this.get('tokenActions').createGlobalActions(context);
-      case 'spaces':
-        return this.get('spaceActions.buttons');
-      case 'groups':
-        return this.get('groupActions.buttons');
-      case 'harvesters':
-        return this.get('harvesterActions.buttons');
-      case 'atm-inventories':
-        return this.get('workflowActions').createGlobalActions(context);
-      default:
-        return [];
-    }
+    const actionsSource = {
+      'clusters': this.clusterActions,
+      'tokens': this.tokenActions,
+      'spaces': this.spaceActions,
+      'groups': this.groupActions,
+      'harvesters': this.harvesterActions,
+      'atm-inventories': this.workflowActions,
+    } [type];
+    return actionsSource?.createGlobalActions(context) ?? [];
   },
 
   /**

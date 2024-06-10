@@ -2,15 +2,13 @@
  * A service which provides spaces manipulation functions ready to use for GUI
  *
  * @author Jakub Liput, Michał Borzęcki
- * @copyright (C) 2018-2020 ACK CYFRONET AGH
+ * @copyright (C) 2018-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Service, { inject as service } from '@ember/service';
 import { computed, get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/i18n';
-import { collect } from '@ember/object/computed';
-import { conditional } from 'ember-awesome-macros';
 import RemoveSpaceAction from 'onezone-gui/utils/space-actions/remove-space-action';
 import AddHarvesterToSpaceAction from 'onezone-gui/utils/space-actions/add-harvester-to-space-action';
 import RemoveHarvesterFromSpaceAction from 'onezone-gui/utils/space-actions/remove-harvester-from-space-action';
@@ -28,25 +26,15 @@ export default Service.extend(I18n, {
 
   i18nPrefix: 'services.spaceActions',
 
-  /**
-   * @type {Ember.Computed<Array<SidebarButtonDefinition>>}
-   */
-  buttons: conditional(
-    'spaceManager.marketplaceConfig.enabled',
-    collect('btnCreate', 'btnMarketplace'),
-    collect('btnCreate')
-  ),
-
   // TODO: the button should have optional link option to define a subroute
   // to go from sidebar route
-  btnCreate: computed('router', function getBtnCreate() {
-    const router = this.get('router');
+  btnCreate: computed(function getBtnCreate() {
     return {
       icon: 'add-filled',
       title: this.t('btnCreate.title'),
       tip: this.t('btnCreate.hint'),
       class: 'create-space-btn',
-      action: () => router.transitionTo('onedata.sidebar.content', 'spaces', 'new'),
+      action: () => this.router.transitionTo('onedata.sidebar.content', 'spaces', 'new'),
     };
   }),
 
@@ -63,6 +51,35 @@ export default Service.extend(I18n, {
       ),
     };
   }),
+
+  /**
+   * @returns {Array<SidebarButtonDefinition>}
+   */
+  createGlobalActions() {
+    const addButton = {
+      icon: 'add-filled',
+      title: this.t('btnCreate.title'),
+      tip: this.t('btnCreate.hint'),
+      class: 'create-space-btn',
+      action: () => this.router.transitionTo('onedata.sidebar.content', 'spaces', 'new'),
+    };
+    const buttons = [addButton];
+    if (this.spaceManager.marketplaceConfig.enabled) {
+      const marketplaceButton = {
+        icon: 'cart',
+        title: this.t('btnMarketplace.title'),
+        sidebarTitle: this.t('btnMarketplace.title'),
+        class: 'marketplace-btn',
+        action: () => this.router.transitionTo(
+          'onedata.sidebar.content',
+          'spaces',
+          'join'
+        ),
+      };
+      buttons.push(marketplaceButton);
+    }
+    return buttons;
+  },
 
   createRemoveSpaceAction(context) {
     return RemoveSpaceAction.create({ ownerSource: this, context });
