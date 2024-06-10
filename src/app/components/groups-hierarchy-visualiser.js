@@ -348,7 +348,7 @@ export default Component.extend(I18n, {
    * Column manager instance
    * @type {Ember.ComputedProperty<Utils/GroupsHierarchyVisualiser/ColumnManager>}
    */
-  columnManager: computed('workspace', function columnManager() {
+  columnManager: destroyableComputed('workspace', function columnManager() {
     return ColumnManager.create({
       workspace: this.get('workspace'),
     });
@@ -577,7 +577,6 @@ export default Component.extend(I18n, {
   willDestroy() {
     try {
       destroyDestroyableComputedValues(this);
-      this.cacheFor('columnManager').destroy();
     } finally {
       this._super(...arguments);
     }
