@@ -4,6 +4,10 @@
 
 ### Latest changes
 
+* VFS-11707 Added detection of elements-blocking browser extensions with warning message
+* VFS-12016 Changed fetching records to start with no auth hint
+* VFS-11764 Changed documentation links to use topics
+* VFS-11681 Updated builder docker image and using "npx ember"
 * VFS-9157 Added support for generating file-related URLs on embedded space automation view
 * VFS-11969 Added providers offline info on data tile on space overview
 * VFS-12006 Fixed missing attributes in file/group data spec editor during lambda creation
