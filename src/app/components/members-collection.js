@@ -23,7 +23,7 @@ import { inject as service } from '@ember/service';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
 import { getOwner } from '@ember/application';
-import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
+import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { reject } from 'rsvp';
 import { A } from '@ember/array';
 import _ from 'lodash';
@@ -490,13 +490,16 @@ export default Component.extend(I18n, {
    * @returns {PromiseArray<DS.ManyArray<GraphSingleModel>>}
    */
   getMembers(listName) {
-    const record = this.get('record');
-    return PromiseArray.create({
-      promise: get(record, 'hasViewPrivilege') !== false ?
-        get(record, listName).then(sgl =>
-          sgl ? get(sgl, 'list') : A()
-        ) : reject({ id: 'forbidden' }),
-    });
+    const record = this.record;
+    let promise;
+    if (get(record, 'hasViewPrivilege') !== false) {
+      promise = get(record, listName).then(sgl =>
+        sgl ? get(sgl, 'list') : A()
+      );
+    } else {
+      promise = reject({ id: 'forbidden' });
+    }
+    return promiseArray(promise);
   },
 
   /**
