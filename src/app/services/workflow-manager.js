@@ -560,7 +560,7 @@ const AllKnownAtmLambdasProxyArray = ArrayProxy.extend({
     async function atmLambdasProxy() {
       const atmLambdasLists = await this.get('atmLambdasListsProxy');
       const lambdasArray = [];
-      atmLambdasLists.forEach(list => lambdasArray.push(...list.content.toArray()));
+      atmLambdasLists.forEach(list => lambdasArray.push(...list.toArray()));
       return lambdasArray.uniq();
     }
   )),
