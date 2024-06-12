@@ -13,7 +13,8 @@ import {
   observer,
 } from '@ember/object';
 import { union, collect } from '@ember/object/computed';
-import { A } from '@ember/array';
+import { A, isArray } from '@ember/array';
+import ArrayProxy from '@ember/array/proxy';
 import { inject as service } from '@ember/service';
 import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
@@ -21,9 +22,7 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
 import { getOwner } from '@ember/application';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
-import { isArray } from '@ember/array';
 import { debounce, scheduleOnce } from '@ember/runloop';
-import { resolve } from 'rsvp';
 import Action from 'onedata-gui-common/utils/action';
 import {
   and,
@@ -555,10 +554,10 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   /**
    * Fetches list of record owners
    * @virtual
-   * @returns {Promise<Array<User>>}
+   * @returns {Promise<ArrayProxy<User>>}
    */
-  fetchOwners() {
-    return resolve([]);
+  async fetchOwners() {
+    return ArrayProxy.create({ content: [] });
   },
 
   /**
@@ -832,12 +831,13 @@ const RemoveUserAction = Action.extend({
    * @type {ComputedProperty<boolean>}
    */
   isCurrentUserOwner: computed(
-    'owners.@each.entityId',
+    'owners.content.@each.entityId',
     'currentUser.entityId',
     function isCurrentUserOwner() {
-      const currentUserEntityId = this.get('currentUser.entityId');
-      return this.owners
-        ?.some((owner) => get(owner, 'entityId') === currentUserEntityId) ?? false;
+      const currentUserEntityId = this.currentUser.entityId;
+      return this.owners?.toArray().some((owner) =>
+        get(owner, 'entityId') === currentUserEntityId
+      ) ?? false;
     }
   ),
 

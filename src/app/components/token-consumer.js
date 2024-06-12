@@ -568,7 +568,7 @@ export default Component.extend(I18n, {
       });
       debounce(this, 'examineToken', config.environment === 'test' ? 1 : 500);
     },
-    confirm() {
+    async confirm() {
       const {
         recordManager,
         tokenActions,
@@ -594,12 +594,8 @@ export default Component.extend(I18n, {
         token,
       });
 
-      try {
-        return action.execute();
-      } finally {
-        action.destroyAfterAllExecutions();
-      }
-
+      await action.execute();
+      action.destroy();
     },
 
     cancel() {
