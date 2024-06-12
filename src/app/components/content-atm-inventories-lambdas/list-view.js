@@ -3,7 +3,7 @@
  * a full page carousel.
  *
  * @author Michał Borzęcki
- * @copyright (C) 2021 ACK CYFRONET AGH
+ * @copyright (C) 2021-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -17,6 +17,11 @@ import { resolve } from 'rsvp';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
+import {
+  destroyDestroyableComputedValues,
+  destroyableComputed,
+  initDestroyableCache,
+} from 'onedata-gui-common/utils/destroyable-computed';
 
 export default Component.extend(I18n, {
   classNames: ['content-atm-inventories-lambdas-list-view'],
@@ -116,7 +121,7 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<PromiseArray<Models.AtmLambda>>}
    */
-  allAtmLambdasProxy: computed('mode', function allAtmLambdasProxy() {
+  allAtmLambdasProxy: destroyableComputed('mode', function allAtmLambdasProxy() {
     const {
       mode,
       workflowManager,
@@ -171,7 +176,7 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Utils.Action>}
    */
-  uploadAtmLambdaAction: computed(
+  uploadAtmLambdaAction: destroyableComputed(
     'atmInventory',
     function uploadAtmLambdaAction() {
       const action = this.workflowActions.createUploadAtmRecordAction({
@@ -210,14 +215,17 @@ export default Component.extend(I18n, {
   globalActions: collect('uploadAtmLambdaAction', 'addNewAtmLambdaAction'),
 
   init() {
+    initDestroyableCache(this);
     this._super(...arguments);
     this.registerViewActions();
   },
 
-  willDestroyElement() {
+  /**
+   * @override
+   */
+  willDestroy() {
     try {
-      const uploadAtmLambdaAction = this.cacheFor('uploadAtmLambdaAction');
-      uploadAtmLambdaAction?.destroy();
+      destroyDestroyableComputedValues(this);
     } finally {
       this._super(...arguments);
     }
