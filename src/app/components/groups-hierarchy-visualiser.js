@@ -846,19 +846,24 @@ export default Component.extend(I18n, {
         'tokenActions'
       );
       this.set('isGroupConsumingToken', true);
-      return tokenActions.createConsumeInviteTokenAction({
-          joiningRecord: groupConsumingToken,
-          targetModelName: 'group',
-          token,
-          dontRedirect: true,
-        }).execute()
-        .then(() => safeExec(this, 'reloadModel'))
-        .finally(() =>
-          safeExec(this, 'setProperties', {
-            isGroupConsumingToken: false,
-            groupConsumingToken: null,
-          })
-        );
+      const action = tokenActions.createConsumeInviteTokenAction({
+        joiningRecord: groupConsumingToken,
+        targetModelName: 'group',
+        token,
+        dontRedirect: true,
+      });
+      try {
+        return action.execute()
+          .then(() => safeExec(this, 'reloadModel'))
+          .finally(() =>
+            safeExec(this, 'setProperties', {
+              isGroupConsumingToken: false,
+              groupConsumingToken: null,
+            })
+          );
+      } finally {
+        action.destroyAfterAllExecutions();
+      }
     },
     async leaveGroup(group) {
       const action = this.userActions.createLeaveAction({

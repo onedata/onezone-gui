@@ -588,11 +588,18 @@ export default Component.extend(I18n, {
       const joiningRecord = joiningRecordSelectorModelName ?
         get(selectedJoiningRecordOption, 'value') : recordManager.getCurrentUserRecord();
 
-      return tokenActions.createConsumeInviteTokenAction({
+      const action = tokenActions.createConsumeInviteTokenAction({
         joiningRecord,
         targetModelName: inviteTargetModelName,
         token,
-      }).execute();
+      });
+
+      try {
+        return action.execute();
+      } finally {
+        action.destroyAfterAllExecutions();
+      }
+
     },
 
     cancel() {

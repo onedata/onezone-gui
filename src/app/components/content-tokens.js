@@ -86,21 +86,19 @@ export default Component.extend(I18n, GlobalActions, {
   },
 
   actions: {
-    saveToken(tokenDiff) {
-      const {
-        tokenActions,
-        token,
-      } = this.getProperties('tokenActions', 'token');
-
-      const modifyTokenAction = tokenActions
-        .createModifyTokenAction({ token, tokenDiff });
-
-      return modifyTokenAction.execute()
-        .then(result => {
-          if (get(result, 'status') === 'done') {
-            safeExec(this, () => this.set('mode', 'view'));
-          }
-        });
+    async saveToken(tokenDiff) {
+      const modifyTokenAction = this.tokenActions.createModifyTokenAction({
+        token: this.token,
+        tokenDiff,
+      });
+      try {
+        const result = await modifyTokenAction.execute();
+        if (get(result, 'status') === 'done') {
+          safeExec(this, () => this.set('mode', 'view'));
+        }
+      } finally {
+        modifyTokenAction.destroy();
+      }
     },
   },
 });

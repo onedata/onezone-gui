@@ -2,7 +2,7 @@
  * A component for creating new tokens
  *
  * @author Michał Borzęcki
- * @copyright (C) 2019-2020 ACK CYFRONET AGH
+ * @copyright (C) 2019-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -69,6 +69,17 @@ export default Component.extend(I18n, {
     this.loadTokenTemplateFromUrl();
   },
 
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.tryDestroyUnsavedTemplate();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
   loadTokenTemplateFromUrl() {
     const stringifiedTokenTemplate =
       atob(this.get('navigationState.aspectOptions.tokenTemplate') || '');
@@ -84,6 +95,7 @@ export default Component.extend(I18n, {
 
   selectTemplate(templateName, template) {
     if (templateName && template) {
+      this.tryDestroyUnsavedTemplate();
       this.setProperties({
         lastSelectedTemplateName: templateName,
         // Create a real (but unsaved) record to provide token-related computed properties
@@ -101,21 +113,33 @@ export default Component.extend(I18n, {
     }
   },
 
+  tryDestroyUnsavedTemplate() {
+    if (this.lastSelectedTemplate?.isNew) {
+      this.lastSelectedTemplate.destroy();
+    }
+  },
+
   actions: {
     templateSelected(templateName, template) {
       this.selectTemplate(templateName, template);
     },
     backToTemplates() {
+      this.tryDestroyUnsavedTemplate();
       this.get('navigationState').changeRouteAspectOptions({
         activeSlide: 'templates',
         tokenTemplate: null,
       });
     },
-    submit(rawToken) {
+    async submit(rawToken) {
       const createTokenAction = this.get('tokenActions')
         .createCreateTokenAction({ rawToken });
 
-      return createTokenAction.execute().finally(() => createTokenAction.destroy?.());
+      try {
+        await createTokenAction.execute();
+      } finally {
+        createTokenAction.destroy?.();
+        this.tryDestroyUnsavedTemplate();
+      }
     },
   },
 });
