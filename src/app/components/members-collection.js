@@ -3,7 +3,7 @@
  * Yields list when there are no items to present.
  *
  * @author Michał Borzęcki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @copyright (C) 2018-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -213,6 +213,13 @@ export default Component.extend(I18n, {
   afterPrivilegesSaveTimer: undefined,
 
   /**
+   * Stores all created PrivilegeRecordProxy objects to destroy them at the component
+   * destroy.
+   * @type {Array<PrivilegeRecordProxy>}
+   */
+  privilegesRecordProxyCache: undefined,
+
+  /**
    * @type {SafeString | string}
    */
   effListHeader: computed('listHeader', 'members.length', function effListHeader() {
@@ -410,6 +417,7 @@ export default Component.extend(I18n, {
               isReadOnly: false,
             }
           );
+          this.privilegesRecordProxyCache.push(privilegesProxy);
           set(proxy, 'privilegesProxy', privilegesProxy);
         }
         const effectivePrivilegesGri = this.getPrivilegesGriForMember(
@@ -423,6 +431,7 @@ export default Component.extend(I18n, {
             isReadOnly: true,
           }
         );
+        this.privilegesRecordProxyCache.push(effectivePrivilegesProxy);
         set(proxy, 'effectivePrivilegesProxy', effectivePrivilegesProxy);
         return proxy;
       });
@@ -481,6 +490,7 @@ export default Component.extend(I18n, {
             isReadOnly: true,
           }
         );
+        this.privilegesRecordProxyCache.push(effectivePrivilegesProxy);
         set(proxy, 'effectivePrivilegesProxy', effectivePrivilegesProxy);
         return proxy;
       });
@@ -492,6 +502,18 @@ export default Component.extend(I18n, {
     this._super(...arguments);
     this.membersObserver();
     this.groupsObserver();
+    this.set('privilegesRecordProxyCache', []);
+  },
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.privilegesRecordProxyCache.forEach(obj => obj?.destroy());
+    } finally {
+      this._super(...arguments);
+    }
   },
 
   /**

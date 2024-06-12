@@ -61,7 +61,6 @@ export const VirtualShareList = EmberObject.extend({
   ),
 
   shareListRelations: computed('shareLists.@each.list', function shareListRelations() {
-    // FIXME: possible problem with updates
     const fulfilledListPromises = (async () => {
       const shareLists = await this.shareLists;
       return await onlyFulfilledValues(
