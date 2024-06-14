@@ -837,7 +837,7 @@ export default Component.extend(I18n, {
           })
         );
     },
-    joinUsingToken(token) {
+    async joinUsingToken(token) {
       const {
         groupConsumingToken,
         tokenActions,
@@ -853,16 +853,14 @@ export default Component.extend(I18n, {
         dontRedirect: true,
       });
       try {
-        return action.execute()
-          .then(() => safeExec(this, 'reloadModel'))
-          .finally(() =>
-            safeExec(this, 'setProperties', {
-              isGroupConsumingToken: false,
-              groupConsumingToken: null,
-            })
-          );
+        await action.execute();
+        safeExec(this, 'reloadModel');
       } finally {
-        action.destroyAfterAllExecutions();
+        safeExec(this, 'setProperties', {
+          isGroupConsumingToken: false,
+          groupConsumingToken: null,
+        });
+        action.destroy?.();
       }
     },
     async leaveGroup(group) {
