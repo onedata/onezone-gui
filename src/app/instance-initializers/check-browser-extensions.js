@@ -17,6 +17,5 @@ export default {
       await blockingAddonDetector.runCheck();
       blockingAddonDetector.destroy();
     })();
-
   },
 };

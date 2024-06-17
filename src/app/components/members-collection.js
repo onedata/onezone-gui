@@ -24,12 +24,12 @@ import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
 import { getOwner } from '@ember/application';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
-import { reject } from 'rsvp';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
+import { reject, all as allFulfilled } from 'rsvp';
 import { A } from '@ember/array';
 import _ from 'lodash';
 import ItemProxy from 'onezone-gui/utils/members-collection/item-proxy';
 import { scheduleOnce } from '@ember/runloop';
-import { promise } from 'ember-awesome-macros';
 import { htmlSafe } from '@ember/template';
 import { formatNumber } from 'onedata-gui-common/helpers/format-number';
 import { later, cancel } from '@ember/runloop';
@@ -246,7 +246,7 @@ export default Component.extend(I18n, {
     'record',
     'subjectType',
     function directMembersProxy() {
-      return this.getMembers(this.get('subjectType') + 'List');
+      return this.getMembers(this.subjectType + 'List');
     }
   ),
 
@@ -255,9 +255,8 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<PromiseArray<DS.ManyArray<GraphSingleModel>>>}
    */
   directGroupsProxy: computed(
-    'record.hasViewPrivilege',
+    'record',
     'subjectType',
-    'directMembersProxy',
     function directGroupsProxy() {
       if (this.subjectType === 'group') {
         return this.directMembersProxy;
@@ -271,7 +270,7 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<PromiseArray<DS.ManyArray<GraphSingleModel>>>}
    */
   effectiveMembersProxy: computed(
-    'record.hasViewPrivilege',
+    'record',
     'subjectType',
     function effectiveMembersProxy() {
       return this.getMembers(
@@ -282,13 +281,20 @@ export default Component.extend(I18n, {
 
   /**
    * Promise proxy used to load all members
-   * @type {Ember.ComputedProperty<PromiseArray>}
+   * @type {Ember.ComputedProperty<PromiseObject>}
    */
-  allMembersLoadingProxy: promise.array(promise.all(
+  allMembersLoadingProxy: computed(
     'directMembersProxy',
     'effectiveMembersProxy',
     'directGroupsProxy',
-  )),
+    function allMembersLoadingProxy() {
+      return promiseObject(allFulfilled([
+        this.directMembersProxy,
+        this.effectiveMembersProxy,
+        this.directGroupsProxy,
+      ]));
+    }
+  ),
 
   /**
    * One of `directMembersProxy`, `effectiveMembersProxy` depending on
@@ -297,7 +303,7 @@ export default Component.extend(I18n, {
    */
   membersProxy: computed(
     'onlyDirect',
-    'directMemebersProxy',
+    'directMembersProxy',
     'effectiveMembersProxy',
     function membersProxy() {
       return this.onlyDirect ? this.directMembersProxy : this.effectiveMembersProxy;
