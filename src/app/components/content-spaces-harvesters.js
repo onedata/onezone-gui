@@ -34,6 +34,12 @@ export default Component.extend(I18n, GlobalActions, {
   space: undefined,
 
   /**
+   * Values are computed objects that should be destroyed on recompute or parent destroy.
+   * @type {Object}
+   */
+  destroyCache: undefined,
+
+  /**
    * @type {ComputedProperty<PromiseArray<Models.Harvester>>}
    */
   spaceHarvestersProxy: promise.array(computed('space', function spaceHarvestersProxy() {
@@ -50,25 +56,27 @@ export default Component.extend(I18n, GlobalActions, {
    * @type {ComputedProperty<Array<HarvesterListItem>>}
    */
   harvesterItems: computed('spaceHarvestersProxy.[]', function harvesterItems() {
+    this.destroyCache.harvesterItems?.forEach(obj => obj.destroy());
     const harvesters = this.get('spaceHarvestersProxy.content') || [];
     const space = this.get('space');
-    return harvesters.map(harvester => HarvesterListItem.create({
+    const items = harvesters.map(harvester => HarvesterListItem.create({
       ownerSource: this,
       parentSpace: space,
       record: harvester,
     }));
+    this.destroyCache.harvesterItems = items;
+    return items;
   }),
 
   /**
    * @type {ComputedProperty<Utils.Action>}
    */
   addHarvesterAction: computed('space', function addHarvesterAction() {
-    const {
-      space,
-      spaceActions,
-    } = this.getProperties('space', 'spaceActions');
-
-    return spaceActions.createAddHarvesterToSpaceAction({ space });
+    this.destroyCache.addHarvesterAction?.destroy();
+    const action = this.spaceActions.createAddHarvesterToSpaceAction({
+      space: this.space,
+    });
+    return this.destroyCache.addHarvesterAction = action;
   }),
 
   /**
@@ -77,15 +85,12 @@ export default Component.extend(I18n, GlobalActions, {
   inviteHarvesterUsingTokenAction: computed(
     'space',
     function inviteHarvesterUsingTokenAction() {
-      const {
-        space,
-        tokenActions,
-      } = this.getProperties('space', 'tokenActions');
-
-      return tokenActions.createGenerateInviteTokenAction({
+      this.destroyCache.inviteHarvesterUsingTokenAction?.destroy();
+      const action = this.tokenActions.createGenerateInviteTokenAction({
         inviteType: 'harvesterJoinSpace',
-        targetRecord: space,
+        targetRecord: this.space,
       });
+      return this.destroyCache.inviteHarvesterUsingTokenAction = action;
     }
   ),
 
@@ -93,6 +98,24 @@ export default Component.extend(I18n, GlobalActions, {
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
   globalActions: collect('addHarvesterAction', 'inviteHarvesterUsingTokenAction'),
+
+  init() {
+    this._super(...arguments);
+    this.set('destroyCache', {});
+  },
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.destroyCache.addHarvesterAction?.destroy();
+      this.destroyCache.inviteHarvesterUsingTokenAction?.destroy();
+      this.destroyCache.harvesterItems?.forEach(obj => obj.destroy());
+    } finally {
+      this._super(...arguments);
+    }
+  },
 });
 
 const HarvesterListItem = ResourceListItem.extend(OwnerInjector, {
@@ -104,6 +127,13 @@ const HarvesterListItem = ResourceListItem.extend(OwnerInjector, {
    * @virtual
    */
   parentSpace: undefined,
+
+  destroyCache: undefined,
+
+  init() {
+    this.set('destroyCache', {});
+    this._super(...arguments);
+  },
 
   /**
    * @override
@@ -126,14 +156,23 @@ const HarvesterListItem = ResourceListItem.extend(OwnerInjector, {
    * @override
    */
   actions: computed('parentSpace', 'record', function actions() {
-    const {
-      spaceActions,
-      parentSpace,
-      record,
-    } = this.getProperties('spaceActions', 'parentSpace', 'record');
-    return [spaceActions.createRemoveHarvesterFromSpaceAction({
-      space: parentSpace,
-      harvester: record,
-    })];
+    this.destroyCache.removeHarvesterFromSpaceAction?.destroy?.();
+    const action = this.spaceActions.createRemoveHarvesterFromSpaceAction({
+      space: this.parentSpace,
+      harvester: this.record,
+    });
+    this.destroyCache.removeHarvesterFromSpaceAction = action;
+    return [action];
   }),
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      Object.values(this.destroyCache).forEach(obj => obj.destroy());
+    } finally {
+      this._super(...arguments);
+    }
+  },
 });

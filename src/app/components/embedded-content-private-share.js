@@ -101,10 +101,8 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
     showSharesIndex() {
       return this.get('router').transitionTo('onedata.sidebar.index', 'shares');
     },
-    reloadShareList() {
-      return this.get('shareManager')
-        .getAllShares()
-        .then(allShares => allShares.reload());
+    async reloadShareList() {
+      await this.shareManager.virtualShareList().reload();
     },
   },
 });

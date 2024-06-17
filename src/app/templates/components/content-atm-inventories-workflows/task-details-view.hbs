@@ -31,14 +31,14 @@
     }}
       {{submitBtnText}}
     {{/one-button}}
-    {{#bs-button
+    {{#one-button
       type="default"
       class="btn-cancel clickable"
       disabled=isSubmittingData
       onClick=(action "cancel")
     }}
       {{tt this "buttons.cancel"}}
-    {{/bs-button}}
+    {{/one-button}}
   </div>
 </div>
 {{yield}}

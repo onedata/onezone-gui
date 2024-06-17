@@ -76,6 +76,7 @@ describe('Integration | Component | content-atm-inventories-workflows/creator-vi
             status: 'done',
             result: createdRecord,
           }),
+          destroy: () => {},
         });
         await renderComponent();
 

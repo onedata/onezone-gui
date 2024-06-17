@@ -10,7 +10,7 @@ import { get, set, getProperties } from '@ember/object';
 describe(
   'Integration | Utility | workflow-actions/create-atm-workflow-schema-revision-action',
   function () {
-    setupRenderingTest();
+    const { afterEach } = setupRenderingTest();
 
     beforeEach(function () {
       const workflowSchemaId = 'w1';
@@ -35,6 +35,10 @@ describe(
         revision3,
         atmWorkflowSchema,
       });
+    });
+
+    afterEach(function () {
+      this.action?.destroy();
     });
 
     it('has correct className and icon', function () {

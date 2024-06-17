@@ -13,6 +13,11 @@ import { reads } from '@ember/object/computed';
 
 export default GroupBoxLine.extend({
   /**
+   * @type {Utils.MembershipRelation | null}
+   */
+  relationCache: null,
+
+  /**
    * @override
    */
   isVisible: computed(
@@ -60,10 +65,22 @@ export default GroupBoxLine.extend({
    * @override
    */
   relation: computed('groupBox.{group,column.relatedGroup}', function relation() {
+    this.relationCache?.destroy();
     const groupBox = this.get('groupBox');
-    return MembershipRelation.create({
+    return this.relationCache = MembershipRelation.create({
       parent: get(groupBox, 'column.relatedGroup'),
       child: get(groupBox, 'group'),
     });
   }),
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.cacheFor('relation')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
 });

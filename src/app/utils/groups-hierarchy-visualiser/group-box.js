@@ -174,4 +174,16 @@ export default EmberObject.extend({
    * @type {Ember.ComputedProperty<boolean>}
    */
   isRightLineManuallyHovered: and('rightLine.hovered', 'rightLine.actionsEnabled'),
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.cacheFor('leftLine')?.destroy();
+      this.cacheFor('rightLine')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
 });

@@ -3,7 +3,7 @@
   <span class="detail-label filename-label">{{tt this "filename"}}:</span>
   {{#truncated-string class="detail-value filename"}}{{filename}}{{/truncated-string}}
 </div>
-{{#bs-button
+{{#one-button
   class="upload-btn"
   type="default"
   size="sm"
@@ -11,5 +11,5 @@
   onClick=(action "reupload")
 }}
   {{tt this "uploadButton"}}
-{{/bs-button}}
+{{/one-button}}
 {{yield}}

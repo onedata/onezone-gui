@@ -54,9 +54,9 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
   /**
    * @override
    */
-  fetchOwners() {
-    return this.get('record').getRelation('ownerList')
-      .then(ownerList => get(ownerList, 'list'));
+  async fetchOwners() {
+    const ownerList = await this.record.getRelation('ownerList');
+    return await get(ownerList, 'list');
   },
 
   /**

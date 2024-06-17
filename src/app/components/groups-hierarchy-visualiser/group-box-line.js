@@ -71,6 +71,16 @@ export default Component.extend(I18n, {
   removeRelation: notImplementedThrow,
 
   /**
+   * @type {(() => void) | null}
+   */
+  mouseEnterHandler: null,
+
+  /**
+   * @type {(() => void) | null}
+   */
+  mouseLeaveHandler: null,
+
+  /**
    * @type {Ember.ComputedProperty<boolean>}
    */
   hovered: reads('line.hovered'),
@@ -132,12 +142,42 @@ export default Component.extend(I18n, {
    */
   relationActions: collect('modifyPrivilegesAction', 'removeRelationAction'),
 
-  mouseEnter() {
-    this.changeHover(true);
+  /**
+   * @override
+   */
+  didInsertElement() {
+    this._super(...arguments);
+
+    if (!this.element) {
+      return;
+    }
+
+    this.setProperties({
+      mouseEnterHandler: () => {
+        this.changeHover(true);
+      },
+      mouseLeaveHandler: () => {
+        this.changeHover(false);
+      },
+    });
+    this.element.addEventListener('mouseenter', this.mouseEnterHandler);
+    this.element.addEventListener('mouseleave', this.mouseLeaveHandler);
   },
 
-  mouseLeave() {
-    this.changeHover(false);
+  /**
+   * @override
+   */
+  willDestroyElement() {
+    try {
+      if (this.mouseEnterHandler) {
+        this.element?.removeEventListener('mouseenter', this.mouseEnterHandler);
+      }
+      if (this.mouseLeaveHandler) {
+        this.element?.removeEventListener('mouseleave', this.mouseLeaveHandler);
+      }
+    } finally {
+      this._super(...arguments);
+    }
   },
 
   /**

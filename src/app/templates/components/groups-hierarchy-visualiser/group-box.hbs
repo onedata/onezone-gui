@@ -43,11 +43,8 @@
   isExpanded=childrenRelationActive}}
 
 {{#if groupBox.group.directMembership}}
-  {{#one-icon icon="user" class="direct-membership-icon" mouseEnter=(action (mut directMembershipTooltip))}}
-    {{!-- optimization: rendering tooltip on hover --}}
-    {{#render-later triggerRender=directMembershipTooltip}}
-      {{one-tooltip title=(tt this "youAreDirectMember")}}
-    {{/render-later}}
+  {{#one-icon icon="user" class="direct-membership-icon"}}
+    {{one-tooltip title=(tt this "youAreDirectMember")}}
   {{/one-icon}}
 {{/if}}
 {{#if groupBox.group.isEffectiveMember}}

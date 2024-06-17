@@ -13,7 +13,6 @@ import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 import sortRevisionNumbers from 'onedata-gui-common/utils/revisions/sort-revision-numbers';
-import { getBy } from 'ember-awesome-macros';
 
 /**
  * @type {String}
@@ -64,7 +63,13 @@ export default Model.extend(GraphSingleModelMixin, {
   /**
    * @type {ComputedProperty<AtmLambdaRevision>}
    */
-  latestRevision: getBy('revisionRegistry', 'latestRevisionNumber'),
+  latestRevision: computed(
+    'revisionRegistry',
+    'latestRevisionNumber',
+    function latestRevision() {
+      return this.revisionRegistry?.[this.latestRevisionNumber];
+    }
+  ),
 
   /**
    * ID taken from `originalAtmLambda` relation.

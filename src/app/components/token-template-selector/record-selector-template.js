@@ -12,7 +12,7 @@ import { get, computed, observer, defineProperty } from '@ember/object';
 import { tag } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import { inject as service } from '@ember/service';
-import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
+import { destroyablePromiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve } from 'rsvp';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import $ from 'jquery';
@@ -112,6 +112,17 @@ export default Component.extend(I18n, {
   },
 
   /**
+   * @override
+   */
+  willDestroyElement() {
+    try {
+      this.recordsProxy?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
+  /**
    * @virtual
    * @returns {Promise<Array<GraphSingleModel>>}
    */
@@ -148,7 +159,8 @@ export default Component.extend(I18n, {
 
   loadRecordsIfNeeded() {
     if (!this.get('recordsProxy') || this.get('recordsProxy.isRejected')) {
-      this.set('recordsProxy', promiseArray(this.fetchRecords()));
+      this.recordsProxy?.destroy();
+      this.set('recordsProxy', destroyablePromiseArray(this.fetchRecords()));
     }
   },
 

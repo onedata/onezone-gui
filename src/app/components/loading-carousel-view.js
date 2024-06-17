@@ -9,8 +9,6 @@
 
 import Component from '@ember/component';
 import { computed, getProperties, get } from '@ember/object';
-import { or, getBy, raw } from 'ember-awesome-macros';
-
 /**
  * @typedef {Object} LoadingCarouselViewHeaderTexts
  * @property {string} loading
@@ -77,7 +75,9 @@ export default Component.extend({
   /**
    * @type {ComputedProperty<string>}
    */
-  headerText: or(getBy('headerTexts', 'state'), raw('')),
+  headerText: computed('headerTexts', 'state', function headerText() {
+    return this.headerTexts?.[this.state] ?? '';
+  }),
 
   actions: {
     backSlide() {

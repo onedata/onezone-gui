@@ -2,13 +2,12 @@
  * A service which provides groups manipulation functions ready to use for gui
  *
  * @author Michał Borzęcki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @copyright (C) 2018-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Service, { inject } from '@ember/service';
-import { collect } from '@ember/object/computed';
-import { computed, get } from '@ember/object';
+import { get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import { next } from '@ember/runloop';
 
@@ -23,23 +22,24 @@ export default Service.extend(I18n, {
   i18nPrefix: 'services.groupActions',
 
   /**
-   * @type {Ember.Computed<Array<SidebarButtonDefinition>>}
+   * @returns {Array<SidebarButtonDefinition>}
    */
-  buttons: collect('btnCreate'),
+  createGlobalActions() {
+    return [this.createCreateButton()];
+  },
 
   /**
    * @type {Ember.Computed<SidebarButtonDefinition>}
    */
-  btnCreate: computed('router', function getBtnCreate() {
-    const router = this.get('router');
+  createCreateButton() {
     return {
       icon: 'add-filled',
       title: this.t('btnCreate.title'),
       tip: this.t('btnCreate.hint'),
       class: 'create-group-btn',
-      action: () => router.transitionTo('onedata.sidebar.content', 'groups', 'new'),
+      action: () => this.router.transitionTo('onedata.sidebar.content', 'groups', 'new'),
     };
-  }),
+  },
 
   /**
    * Creates new group

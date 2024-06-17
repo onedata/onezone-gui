@@ -54,6 +54,11 @@ export default Component.extend(I18n, {
   atmInventory: reads('item'),
 
   /**
+   * @type {ComputedProperty<Record<string, Utils.Action>>}
+   */
+  actionsCache: computed(() => ({})),
+
+  /**
    * @type {Ember.ComputedProperty<Action>}
    */
   renameAction: computed('isRenaming', function renameAction() {
@@ -70,36 +75,41 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<Action>}
    */
   leaveAction: computed('atmInventory', function leaveAction() {
+    this.actionsCache.leaveAction?.destroyAfterAllExecutions();
     const action = this.userActions.createLeaveAction({
       recordToLeave: this.atmInventory,
     });
     set(action, 'className', `${action.className} leave-atm-inventory-action-trigger`);
-    return action;
+    return this.actionsCache.leaveAction = action;
   }),
 
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
   removeAction: computed('atmInventory', function removeAction() {
+    this.actionsCache.removeAction?.destroyAfterAllExecutions();
     const {
       atmInventory,
       workflowActions,
     } = this.getProperties('atmInventory', 'workflowActions');
-    return workflowActions.createRemoveAtmInventoryAction({
-      atmInventory,
-    });
+    return this.actionsCache.removeAction =
+      workflowActions.createRemoveAtmInventoryAction({
+        atmInventory,
+      });
   }),
 
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
   copyIdAction: computed('atmInventory', function copyIdAction() {
+    this.actionsCache.copyIdAction?.destroyAfterAllExecutions();
     const {
       atmInventory,
       clipboardActions,
     } = this.getProperties('atmInventory', 'clipboardActions');
 
-    return clipboardActions.createCopyRecordIdAction({ record: atmInventory });
+    return this.actionsCache.copyIdAction =
+      clipboardActions.createCopyRecordIdAction({ record: atmInventory });
   }),
 
   /**
@@ -111,6 +121,18 @@ export default Component.extend(I18n, {
     'removeAction',
     'copyIdAction'
   ),
+
+  willDestroyElement() {
+    try {
+      [
+        'leaveAction',
+        'removeAction',
+        'copyIdAction',
+      ].forEach((action) => this.cacheFor(action)?.destroyAfterAllExecutions());
+    } finally {
+      this._super(...arguments);
+    }
+  },
 
   toggleRename(value) {
     this.set('isRenaming', value);
@@ -154,7 +176,7 @@ export default Component.extend(I18n, {
         } else {
           safeExec(this, () => this.toggleRename(false));
         }
-      });
+      }).finally(() => action.destroy());
     },
   },
 });

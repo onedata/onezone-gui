@@ -20,7 +20,7 @@
       header=(tt this "noWorkflowsHeader")
       text=(tt this "noWorkflowsText")
     }}
-      {{#bs-button
+      {{#one-button
         type="primary"
         size="lg"
         class=(concat-classes
@@ -37,7 +37,7 @@
         {{#if addNewAtmWorkflowSchemaAction.tip}}
           {{one-tooltip title=addNewAtmWorkflowSchemaAction.tip}}
         {{/if}}
-      {{/bs-button}}
+      {{/one-button}}
     {{/content-info}}
   {{/if}}
 {{/promise-proxy-container}}

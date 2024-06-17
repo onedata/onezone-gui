@@ -11,9 +11,10 @@
  */
 
 import Component from '@ember/component';
+import { computed, get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import { inject as service } from '@ember/service';
-import { array, raw, notEmpty, or } from 'ember-awesome-macros';
+import { notEmpty, or } from 'ember-awesome-macros';
 import { reads } from '@ember/object/computed';
 import { resolve } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
@@ -68,28 +69,34 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Array<Models.Token>>}
    */
-  accessTokensToRemove: array.filterBy(
-    'tokensToRemove',
-    raw('typeName'),
-    raw('access')
+  accessTokensToRemove: computed(
+    'tokensToRemove.@each.typeName',
+    function accessTokensToRemove() {
+      return this.tokensToRemove
+        ?.filter((token) => get(token, 'typeName') === 'access') ?? [];
+    }
   ),
 
   /**
    * @type {Ember.ComputedProperty<Array<Models.Token>>}
    */
-  identityTokensToRemove: array.filterBy(
-    'tokensToRemove',
-    raw('typeName'),
-    raw('identity')
+  identityTokensToRemove: computed(
+    'tokensToRemove.@each.typeName',
+    function identityTokensToRemove() {
+      return this.tokensToRemove
+        ?.filter((token) => get(token, 'typeName') === 'identity') ?? [];
+    }
   ),
 
   /**
    * @type {Ember.ComputedProperty<Array<Models.Token>>}
    */
-  inviteTokensToRemove: array.filterBy(
-    'tokensToRemove',
-    raw('typeName'),
-    raw('invite')
+  inviteTokensToRemove: computed(
+    'tokensToRemove.@each.typeName',
+    function inviteTokensToRemove() {
+      return this.tokensToRemove
+        ?.filter((token) => get(token, 'typeName') === 'invite') ?? [];
+    }
   ),
 
   /**

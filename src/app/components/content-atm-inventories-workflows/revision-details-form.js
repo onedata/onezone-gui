@@ -15,7 +15,7 @@ import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-fiel
 import TextareaField from 'onedata-gui-common/utils/form-component/textarea-field';
 import { reads } from '@ember/object/computed';
 import { computed, observer, get } from '@ember/object';
-import { tag, getBy } from 'ember-awesome-macros';
+import { tag } from 'ember-awesome-macros';
 import { scheduleOnce } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
@@ -73,7 +73,13 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<AtmWorkflowSchemaRevision>}
    */
-  revision: getBy('atmWorkflowSchema.revisionRegistry', 'revisionNumber'),
+  revision: computed(
+    'atmWorkflowSchema.revisionRegistry',
+    'revisionNumber',
+    function revision() {
+      return this.atmWorkflowSchema?.revisionRegistry?.[this.revisionNumber];
+    }
+  ),
 
   /**
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsRootGroup>}
@@ -131,6 +137,17 @@ export default Component.extend(I18n, {
   init() {
     this._super(...arguments);
     this.formValuesUpdater();
+  },
+
+  /**
+   * @override
+   */
+  willDestroyElement() {
+    try {
+      this.cacheFor('fields')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
   },
 
   updateFormValues() {

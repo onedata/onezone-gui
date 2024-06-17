@@ -12,7 +12,7 @@ import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import { not, promise, conditional, raw, isEmpty, array, and, notEmpty } from 'ember-awesome-macros';
+import { not, promise, conditional, raw, isEmpty, and, notEmpty } from 'ember-awesome-macros';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -49,10 +49,11 @@ export default Component.extend(I18n, {
 
   allSpaces: reads('allSpacesProxy.content'),
 
-  nonAdvertisedSpaces: array.filterBy(
-    'allSpaces',
-    raw('advertisedInMarketplace'),
-    raw(false)
+  nonAdvertisedSpaces: computed(
+    'allSpaces.@each.advertisedInMarketplace',
+    function nonAdvertisedSpaces() {
+      return this.allSpaces?.filter((spc) => !spc.advertisedInMarketplace) ?? [];
+    }
   ),
 
   noSpaces: isEmpty('allSpaces'),

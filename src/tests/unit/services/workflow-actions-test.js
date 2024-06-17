@@ -22,26 +22,30 @@ import RemoveAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-ac
 import { get } from '@ember/object';
 
 describe('Unit | Service | workflow-actions', function () {
-  setupTest();
+  const { afterEach } = setupTest();
+
+  afterEach(function () {
+    this.action?.destroy();
+  });
 
   it('creates OpenCreateAtmInventoryViewAction instance', function () {
     const service = this.owner.lookup('service:workflow-actions');
 
-    const action = service.createOpenCreateAtmInventoryViewAction();
+    this.action = service.createOpenCreateAtmInventoryViewAction();
 
-    expect(action).to.be.instanceOf(OpenCreateAtmInventoryViewAction);
+    expect(this.action).to.be.instanceOf(OpenCreateAtmInventoryViewAction);
   });
 
   it('creates CreateAtmInventoryAction instance', function () {
     const service = this.owner.lookup('service:workflow-actions');
 
     const rawAtmInventory = { name: 'someName' };
-    const action = service.createCreateAtmInventoryAction({
+    this.action = service.createCreateAtmInventoryAction({
       rawAtmInventory,
     });
 
-    expect(action).to.be.instanceOf(CreateAtmInventoryAction);
-    expect(get(action, 'rawAtmInventory')).to.equal(rawAtmInventory);
+    expect(this.action).to.be.instanceOf(CreateAtmInventoryAction);
+    expect(get(this.action, 'rawAtmInventory')).to.equal(rawAtmInventory);
   });
 
   it('creates ModifyAtmInventoryAction instance', function () {
@@ -49,14 +53,14 @@ describe('Unit | Service | workflow-actions', function () {
 
     const atmInventory = {};
     const atmInventoryDiff = {};
-    const action = service.createModifyAtmInventoryAction({
+    this.action = service.createModifyAtmInventoryAction({
       atmInventory,
       atmInventoryDiff,
     });
 
-    expect(action).to.be.instanceOf(ModifyAtmInventoryAction);
-    expect(get(action, 'atmInventory')).to.equal(atmInventory);
-    expect(get(action, 'atmInventoryDiff'))
+    expect(this.action).to.be.instanceOf(ModifyAtmInventoryAction);
+    expect(get(this.action, 'atmInventory')).to.equal(atmInventory);
+    expect(get(this.action, 'atmInventoryDiff'))
       .to.equal(atmInventoryDiff);
   });
 
@@ -64,12 +68,12 @@ describe('Unit | Service | workflow-actions', function () {
     const service = this.owner.lookup('service:workflow-actions');
 
     const atmInventory = {};
-    const action = service.createRemoveAtmInventoryAction({
+    this.action = service.createRemoveAtmInventoryAction({
       atmInventory,
     });
 
-    expect(action).to.be.instanceOf(RemoveAtmInventoryAction);
-    expect(get(action, 'atmInventory')).to.equal(atmInventory);
+    expect(this.action).to.be.instanceOf(RemoveAtmInventoryAction);
+    expect(get(this.action, 'atmInventory')).to.equal(atmInventory);
   });
 
   it('creates DuplicateAtmRecordRevisionAction instance', function () {
@@ -77,32 +81,32 @@ describe('Unit | Service | workflow-actions', function () {
 
     const atmWorkflowSchema = {};
     const atmInventory = {};
-    const action = service.createDuplicateAtmRecordRevisionAction({
+    this.action = service.createDuplicateAtmRecordRevisionAction({
       atmModelName: 'atmWorkflowSchema',
       atmRecord: atmWorkflowSchema,
       revisionNumber: 3,
       atmInventory,
     });
 
-    expect(action).to.be.instanceOf(DuplicateAtmRecordRevisionAction);
-    expect(action.atmModelName).to.equal('atmWorkflowSchema');
-    expect(action.atmRecord).to.equal(atmWorkflowSchema);
-    expect(action.atmInventory).to.equal(atmInventory);
-    expect(action.revisionNumber).to.equal(3);
+    expect(this.action).to.be.instanceOf(DuplicateAtmRecordRevisionAction);
+    expect(this.action.atmModelName).to.equal('atmWorkflowSchema');
+    expect(this.action.atmRecord).to.equal(atmWorkflowSchema);
+    expect(this.action.atmInventory).to.equal(atmInventory);
+    expect(this.action.revisionNumber).to.equal(3);
   });
 
   it('creates UploadAtmRecordAction instance', function () {
     const service = this.owner.lookup('service:workflow-actions');
 
     const atmInventory = {};
-    const action = service.createUploadAtmRecordAction({
+    this.action = service.createUploadAtmRecordAction({
       atmModelName: 'atmWorkflowSchema',
       atmInventory,
     });
 
-    expect(action).to.be.instanceOf(UploadAtmRecordAction);
-    expect(action.atmModelName).to.equal('atmWorkflowSchema');
-    expect(action.atmInventory).to.equal(atmInventory);
+    expect(this.action).to.be.instanceOf(UploadAtmRecordAction);
+    expect(this.action.atmModelName).to.equal('atmWorkflowSchema');
+    expect(this.action.atmInventory).to.equal(atmInventory);
   });
 
   it('creates CreateAtmLambdaAction instance', function () {
@@ -110,28 +114,28 @@ describe('Unit | Service | workflow-actions', function () {
 
     const atmInventory = {};
     const initialRevision = {};
-    const action = service.createCreateAtmLambdaAction({
+    this.action = service.createCreateAtmLambdaAction({
       initialRevision,
       atmInventory,
     });
 
-    expect(action).to.be.instanceOf(CreateAtmLambdaAction);
-    expect(get(action, 'initialRevision')).to.equal(initialRevision);
-    expect(get(action, 'atmInventory')).to.equal(atmInventory);
+    expect(this.action).to.be.instanceOf(CreateAtmLambdaAction);
+    expect(get(this.action, 'initialRevision')).to.equal(initialRevision);
+    expect(get(this.action, 'atmInventory')).to.equal(atmInventory);
   });
 
   it('creates DumpAtmLambdaRevisionAction instance', function () {
     const service = this.owner.lookup('service:workflow-actions');
 
     const atmLambda = {};
-    const action = service.createDumpAtmLambdaRevisionAction({
+    this.action = service.createDumpAtmLambdaRevisionAction({
       atmLambda,
       revisionNumber: 3,
     });
 
-    expect(action).to.be.instanceOf(DumpAtmLambdaRevisionAction);
-    expect(get(action, 'atmLambda')).to.equal(atmLambda);
-    expect(get(action, 'revisionNumber')).to.equal(3);
+    expect(this.action).to.be.instanceOf(DumpAtmLambdaRevisionAction);
+    expect(get(this.action, 'atmLambda')).to.equal(atmLambda);
+    expect(get(this.action, 'revisionNumber')).to.equal(3);
   });
 
   it('creates CreateAtmLambdaRevisionAction instance', function () {
@@ -139,14 +143,14 @@ describe('Unit | Service | workflow-actions', function () {
 
     const atmLambda = {};
     const revisionContent = {};
-    const action = service.createCreateAtmLambdaRevisionAction({
+    this.action = service.createCreateAtmLambdaRevisionAction({
       atmLambda,
       revisionContent,
     });
 
-    expect(action).to.be.instanceOf(CreateAtmLambdaRevisionAction);
-    expect(get(action, 'atmLambda')).to.equal(atmLambda);
-    expect(get(action, 'revisionContent')).to.equal(revisionContent);
+    expect(this.action).to.be.instanceOf(CreateAtmLambdaRevisionAction);
+    expect(get(this.action, 'atmLambda')).to.equal(atmLambda);
+    expect(get(this.action, 'revisionContent')).to.equal(revisionContent);
   });
 
   it('creates ModifyAtmLambdaRevisionAction instance', function () {
@@ -155,16 +159,16 @@ describe('Unit | Service | workflow-actions', function () {
     const atmLambda = {};
     const revisionNumber = 2;
     const revisionDiff = {};
-    const action = service.createModifyAtmLambdaRevisionAction({
+    this.action = service.createModifyAtmLambdaRevisionAction({
       atmLambda,
       revisionNumber,
       revisionDiff,
     });
 
-    expect(action).to.be.instanceOf(ModifyAtmLambdaRevisionAction);
-    expect(get(action, 'atmLambda')).to.equal(atmLambda);
-    expect(get(action, 'revisionNumber')).to.equal(revisionNumber);
-    expect(get(action, 'revisionDiff')).to.equal(revisionDiff);
+    expect(this.action).to.be.instanceOf(ModifyAtmLambdaRevisionAction);
+    expect(get(this.action, 'atmLambda')).to.equal(atmLambda);
+    expect(get(this.action, 'revisionNumber')).to.equal(revisionNumber);
+    expect(get(this.action, 'revisionDiff')).to.equal(revisionDiff);
   });
 
   it('creates UnlinkAtmLambdaAction instance', function () {
@@ -172,14 +176,14 @@ describe('Unit | Service | workflow-actions', function () {
 
     const atmLambda = {};
     const atmInventory = {};
-    const action = service.createUnlinkAtmLambdaAction({
+    this.action = service.createUnlinkAtmLambdaAction({
       atmLambda,
       atmInventory,
     });
 
-    expect(action).to.be.instanceOf(UnlinkAtmLambdaAction);
-    expect(get(action, 'atmLambda')).to.equal(atmLambda);
-    expect(get(action, 'atmInventory')).to.equal(atmInventory);
+    expect(this.action).to.be.instanceOf(UnlinkAtmLambdaAction);
+    expect(get(this.action, 'atmLambda')).to.equal(atmLambda);
+    expect(get(this.action, 'atmInventory')).to.equal(atmInventory);
   });
 
   it('creates ModifyAtmWorkflowSchemaAction instance', function () {
@@ -187,14 +191,14 @@ describe('Unit | Service | workflow-actions', function () {
 
     const atmWorkflowSchema = {};
     const atmWorkflowSchemaDiff = {};
-    const action = service.createModifyAtmWorkflowSchemaAction({
+    this.action = service.createModifyAtmWorkflowSchemaAction({
       atmWorkflowSchema,
       atmWorkflowSchemaDiff,
     });
 
-    expect(action).to.be.instanceOf(ModifyAtmWorkflowSchemaAction);
-    expect(get(action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
-    expect(get(action, 'atmWorkflowSchemaDiff'))
+    expect(this.action).to.be.instanceOf(ModifyAtmWorkflowSchemaAction);
+    expect(get(this.action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
+    expect(get(this.action, 'atmWorkflowSchemaDiff'))
       .to.equal(atmWorkflowSchemaDiff);
   });
 
@@ -202,12 +206,12 @@ describe('Unit | Service | workflow-actions', function () {
     const service = this.owner.lookup('service:workflow-actions');
 
     const atmWorkflowSchema = {};
-    const action = service.createRemoveAtmWorkflowSchemaAction({
+    this.action = service.createRemoveAtmWorkflowSchemaAction({
       atmWorkflowSchema,
     });
 
-    expect(action).to.be.instanceOf(RemoveAtmWorkflowSchemaAction);
-    expect(get(action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
+    expect(this.action).to.be.instanceOf(RemoveAtmWorkflowSchemaAction);
+    expect(get(this.action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
   });
 
   it('creates CreateAtmWorkflowSchemaAction instance', function () {
@@ -215,28 +219,28 @@ describe('Unit | Service | workflow-actions', function () {
 
     const atmInventory = {};
     const rawAtmWorkflowSchema = {};
-    const action = service.createCreateAtmWorkflowSchemaAction({
+    this.action = service.createCreateAtmWorkflowSchemaAction({
       rawAtmWorkflowSchema,
       atmInventory,
     });
 
-    expect(action).to.be.instanceOf(CreateAtmWorkflowSchemaAction);
-    expect(get(action, 'rawAtmWorkflowSchema')).to.equal(rawAtmWorkflowSchema);
-    expect(get(action, 'atmInventory')).to.equal(atmInventory);
+    expect(this.action).to.be.instanceOf(CreateAtmWorkflowSchemaAction);
+    expect(get(this.action, 'rawAtmWorkflowSchema')).to.equal(rawAtmWorkflowSchema);
+    expect(get(this.action, 'atmInventory')).to.equal(atmInventory);
   });
 
   it('creates DumpAtmWorkflowSchemaRevisionAction instance', function () {
     const service = this.owner.lookup('service:workflow-actions');
 
     const atmWorkflowSchema = {};
-    const action = service.createDumpAtmWorkflowSchemaRevisionAction({
+    this.action = service.createDumpAtmWorkflowSchemaRevisionAction({
       atmWorkflowSchema,
       revisionNumber: 3,
     });
 
-    expect(action).to.be.instanceOf(DumpAtmWorkflowSchemaRevisionAction);
-    expect(get(action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
-    expect(get(action, 'revisionNumber')).to.equal(3);
+    expect(this.action).to.be.instanceOf(DumpAtmWorkflowSchemaRevisionAction);
+    expect(get(this.action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
+    expect(get(this.action, 'revisionNumber')).to.equal(3);
   });
 
   it('creates ModifyAtmWorkflowSchemaRevisionAction instance', function () {
@@ -244,43 +248,43 @@ describe('Unit | Service | workflow-actions', function () {
 
     const atmWorkflowSchema = {};
     const revisionDiff = {};
-    const action = service.createModifyAtmWorkflowSchemaRevisionAction({
+    this.action = service.createModifyAtmWorkflowSchemaRevisionAction({
       atmWorkflowSchema,
       revisionNumber: 3,
       revisionDiff,
     });
 
-    expect(action).to.be.instanceOf(ModifyAtmWorkflowSchemaRevisionAction);
-    expect(get(action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
-    expect(get(action, 'revisionNumber')).to.equal(3);
-    expect(get(action, 'revisionDiff')).to.equal(revisionDiff);
+    expect(this.action).to.be.instanceOf(ModifyAtmWorkflowSchemaRevisionAction);
+    expect(get(this.action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
+    expect(get(this.action, 'revisionNumber')).to.equal(3);
+    expect(get(this.action, 'revisionDiff')).to.equal(revisionDiff);
   });
 
   it('creates CreateAtmWorkflowSchemaRevisionAction instance', function () {
     const service = this.owner.lookup('service:workflow-actions');
 
     const atmWorkflowSchema = {};
-    const action = service.createCreateAtmWorkflowSchemaRevisionAction({
+    this.action = service.createCreateAtmWorkflowSchemaRevisionAction({
       atmWorkflowSchema,
       originRevisionNumber: 3,
     });
 
-    expect(action).to.be.instanceOf(CreateAtmWorkflowSchemaRevisionAction);
-    expect(get(action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
-    expect(get(action, 'originRevisionNumber')).to.equal(3);
+    expect(this.action).to.be.instanceOf(CreateAtmWorkflowSchemaRevisionAction);
+    expect(get(this.action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
+    expect(get(this.action, 'originRevisionNumber')).to.equal(3);
   });
 
   it('creates RemoveAtmWorkflowSchemaRevisionAction instance', function () {
     const service = this.owner.lookup('service:workflow-actions');
 
     const atmWorkflowSchema = {};
-    const action = service.createRemoveAtmWorkflowSchemaRevisionAction({
+    this.action = service.createRemoveAtmWorkflowSchemaRevisionAction({
       atmWorkflowSchema,
       revisionNumber: 3,
     });
 
-    expect(action).to.be.instanceOf(RemoveAtmWorkflowSchemaRevisionAction);
-    expect(get(action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
-    expect(get(action, 'revisionNumber')).to.equal(3);
+    expect(this.action).to.be.instanceOf(RemoveAtmWorkflowSchemaRevisionAction);
+    expect(get(this.action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
+    expect(get(this.action, 'revisionNumber')).to.equal(3);
   });
 });

@@ -267,8 +267,10 @@ export default Component.extend(GlobalActions, I18n, {
 
   willDestroyElement() {
     try {
+      this.cancelTaskDetailsProvider();
       this.unregisterRouteChangeHandler();
       this.unregisterPageUnloadHandler();
+      this.actionsFactory.destroy();
     } finally {
       this._super(...arguments);
     }

@@ -320,7 +320,7 @@ export default Component.extend(I18n, {
   directPrivilegesObserver: observer(
     'directPrivileges',
     function directPrivilegesObserver() {
-      if (!this.recordDirectProxy.isModified) {
+      if (this.recordDirectProxy && !this.recordDirectProxy.isModified) {
         this.recordDirectProxy.resetModifications();
       }
     }

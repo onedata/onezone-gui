@@ -19,14 +19,9 @@ import EmberObject, {
   get,
 } from '@ember/object';
 import {
-  conditional,
   equal,
-  sum,
-  array,
   raw,
-  writable,
   or,
-  neq,
 } from 'ember-awesome-macros';
 import _ from 'lodash';
 import moment from 'moment';
@@ -115,15 +110,20 @@ export default EmberObject.extend({
    * @virtual optional
    * @type {Ember.ComputedProperty<number>|number}
    */
-  objectSize: writable(conditional(
-    neq('overriddenComputedFields.objectSize', raw(undefined)),
-    'overriddenComputedFields.objectSize',
-    sum(array.mapBy(
-      array.rejectBy('children', raw('isCancelled')),
-      raw('objectSize')
-    ))
-  ), {
-    set(value) {
+  objectSize: computed('children.@each.{isCancelled,objectSize}', {
+    get() {
+      if (this.overriddenComputedFields.objectSize !== undefined) {
+        return this.overriddenComputedFields.objectSize;
+      }
+
+      const nonCancelledChildren =
+        this.children?.filter((child) => !child.isCancelled) ?? [];
+      return nonCancelledChildren.reduce(
+        (acc, child) => acc + (child.objectSize ?? 0),
+        0
+      );
+    },
+    set(key, value) {
       return this.overriddenComputedFields.objectSize = value;
     },
   }),
@@ -134,15 +134,20 @@ export default EmberObject.extend({
    * @virtual optional
    * @type {Ember.ComputedProperty<number>|number}
    */
-  bytesUploaded: writable(conditional(
-    neq('overriddenComputedFields.bytesUploaded', raw(undefined)),
-    'overriddenComputedFields.bytesUploaded',
-    sum(array.mapBy(
-      array.rejectBy('children', raw('isCancelled')),
-      raw('bytesUploaded')
-    ))
-  ), {
-    set(value) {
+  bytesUploaded: computed('children.@each.{isCancelled,bytesUploaded}', {
+    get() {
+      if (this.overriddenComputedFields.bytesUploaded !== undefined) {
+        return this.overriddenComputedFields.bytesUploaded;
+      }
+
+      const nonCancelledChildren =
+        this.children?.filter((child) => !child.isCancelled) ?? [];
+      return nonCancelledChildren.reduce(
+        (acc, child) => acc + (child.bytesUploaded ?? 0),
+        0
+      );
+    },
+    set(key, value) {
       return this.overriddenComputedFields.bytesUploaded = value;
     },
   }),
@@ -152,20 +157,20 @@ export default EmberObject.extend({
    * @virtual optional
    * @type {Ember.ComputedProperty<Array<unknown>>}
    */
-  errors: writable(conditional(
-    neq('overriddenComputedFields.errors', raw(undefined)),
-    'overriddenComputedFields.errors',
-    conditional(
-      equal('objectType', raw('file')),
-      raw([]),
-      array.reduce(
-        array.mapBy('children', raw('errors')),
-        (arr, cur) => arr.concat(cur),
-        []
-      )
-    )
-  ), {
-    set(value) {
+  errors: computed('objectType', 'children.@each.errors', {
+    get() {
+      if (this.overriddenComputedFields.errors !== undefined) {
+        return this.overriddenComputedFields.errors;
+      } else if (this.objectType === 'file') {
+        return [];
+      } else {
+        return this.children?.reduce(
+          (acc, child) => acc.concat(child.errors ?? []),
+          []
+        ) ?? [];
+      }
+    },
+    set(key, value) {
       return this.overriddenComputedFields.errors = value;
     },
   }),
@@ -176,16 +181,17 @@ export default EmberObject.extend({
    * @virtual optional
    * @type {Ember.ComputedProperty<boolean>}
    */
-  isCancelled: writable(conditional(
-    neq('overriddenComputedFields.isCancelled', raw(undefined)),
-    'overriddenComputedFields.isCancelled',
-    conditional(
-      equal('objectType', raw('file')),
-      raw(false),
-      array.isEvery('children', raw('isCancelled'))
-    )
-  ), {
-    set(value) {
+  isCancelled: computed('objectType', 'children.@each.isCancelled', {
+    get() {
+      if (this.overriddenComputedFields.isCancelled !== undefined) {
+        return this.overriddenComputedFields.isCancelled;
+      } else if (this.objectType === 'file') {
+        return false;
+      } else {
+        return this.children?.every((child) => child.isCancelled) ?? false;
+      }
+    },
+    set(key, value) {
       return this.overriddenComputedFields.isCancelled = value;
     },
   }),
@@ -196,16 +202,17 @@ export default EmberObject.extend({
    * @virtual optional
    * @type {Ember.ComputedProperty<boolean>}
    */
-  isUploading: writable(conditional(
-    neq('overriddenComputedFields.isUploading', raw(undefined)),
-    'overriddenComputedFields.isUploading',
-    conditional(
-      equal('objectType', raw('file')),
-      raw(true),
-      array.isAny('children', raw('isUploading'))
-    )
-  ), {
-    set(value) {
+  isUploading: computed('objectType', 'children.@each.isUploading', {
+    get() {
+      if (this.overriddenComputedFields.isUploading !== undefined) {
+        return this.overriddenComputedFields.isUploading;
+      } else if (this.objectType === 'file') {
+        return true;
+      } else {
+        return this.children?.some((child) => child.isUploading) ?? false;
+      }
+    },
+    set(key, value) {
       return this.overriddenComputedFields.isUploading = value;
     },
   }),
@@ -239,10 +246,20 @@ export default EmberObject.extend({
    * a file, then numberOfFiles is 1.
    * @type {Ember.ComputedProperty<number>}
    */
-  numberOfFiles: conditional(
-    equal('objectType', raw('file')),
-    conditional('isCancelled', raw(0), raw(1)),
-    sum(array.mapBy('children', raw('numberOfFiles')))
+  numberOfFiles: computed(
+    'objectType',
+    'children.@each.numberOfFiles',
+    'isCancelled',
+    function numberOfFiles() {
+      if (this.objectType === 'file') {
+        return this.isCancelled ? 0 : 1;
+      }
+
+      return this.children?.reduce(
+        (acc, child) => acc + (child.numberOfFiles ?? 0),
+        0
+      ) ?? 0;
+    }
   ),
 
   /**
@@ -250,10 +267,20 @@ export default EmberObject.extend({
    * a file, then numberOfFiles is 1 if it is uploaded, or 0 otherwise.
    * @type {Ember.ComputedProperty<number>}
    */
-  numberOfUploadedFiles: conditional(
-    equal('objectType', raw('file')),
-    conditional(equal('state', raw('uploaded')), raw(1), raw(0)),
-    sum(array.mapBy('children', raw('numberOfUploadedFiles')))
+  numberOfUploadedFiles: computed(
+    'objectType',
+    'state',
+    'children.@each.numberOfUploadedFiles',
+    function numberOfUploadedFiles() {
+      if (this.objectType === 'file') {
+        return this.state === 'uploaded' ? 1 : 0;
+      }
+
+      return this.children?.reduce(
+        (acc, child) => acc + (child.numberOfUploadedFiles ?? 0),
+        0
+      ) ?? 0;
+    }
   ),
 
   /**

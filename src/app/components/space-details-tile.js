@@ -2,7 +2,7 @@
  * Shows space properties set in space configuration or prompt to configure space.
  *
  * @author Jakub Liput
- * @copyright (C) 2023 ACK CYFRONET AGH
+ * @copyright (C) 2023-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -13,6 +13,11 @@ import { reads } from '@ember/object/computed';
 import { conditional, raw, isEmpty, and, not } from 'ember-awesome-macros';
 import computedT from 'onedata-gui-common/utils/computed-t';
 import { SpaceTag } from './space-configuration/space-tags-selector';
+import {
+  destroyableComputed,
+  initDestroyableCache,
+  destroyDestroyableComputedValues,
+} from 'onedata-gui-common/utils/destroyable-computed';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -87,7 +92,7 @@ export default Component.extend(I18n, {
 
   noTags: isEmpty('tags'),
 
-  inputTags: computed('tags.[]', function inputTags() {
+  inputTags: destroyableComputed('tags.[]', function inputTags() {
     return this.tags?.map(label => {
       return SpaceTag.create({
         ownerSource: this,
@@ -146,6 +151,22 @@ export default Component.extend(I18n, {
       }
     },
   ),
+
+  init() {
+    initDestroyableCache(this);
+    this._super(...arguments);
+  },
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      destroyDestroyableComputedValues(this);
+    } finally {
+      this._super(...arguments);
+    }
+  },
 
   actions: {
     evaluateMoreTagsText(moreTagsCount) {

@@ -86,7 +86,8 @@ export default Component.extend(I18n, {
         atmInventory,
         rawAtmWorkflowSchema: newAtmWorkflowSchemaData,
       });
-      const result = await action.execute();
+      const result = await action.execute?.();
+      action.destroy();
       trySet(this, 'isSubmitting', false);
 
       const {

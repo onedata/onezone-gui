@@ -35,6 +35,11 @@ import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fi
 import globals from 'onedata-gui-common/utils/globals';
 import preventPageUnload from 'onedata-gui-common/utils/prevent-page-unload';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import {
+  destroyableComputed,
+  initDestroyableCache,
+  destroyDestroyableComputedValues,
+} from 'onedata-gui-common/utils/destroyable-computed';
 
 /**
  * @typedef {'view'|'edit'} SpaceConfigiration.DescriptionEditorMode
@@ -147,6 +152,11 @@ export default Component.extend(validations, I18n, {
    */
   isAskingUserForUnsavedChanges: false,
 
+  /**
+   * @type {ComputedProperty<Array<Tag>>}
+   */
+  spaceTagsCache: undefined,
+
   //#endregion
 
   isMarketplaceEnabled: reads('spaceManager.marketplaceConfig.enabled'),
@@ -212,7 +222,7 @@ export default Component.extend(validations, I18n, {
    * Space tags ready to use in component.
    * @type {ComputedProperty<Array<Tag>>}
    */
-  spaceTags: computed('space.tags', function spaceTags() {
+  spaceTags: destroyableComputed('space.tags', function spaceTags() {
     return get(this.space ?? {}, 'tags')?.map(label => {
       return SpaceTag.create({
         ownerSource: this,
@@ -368,6 +378,7 @@ export default Component.extend(validations, I18n, {
    * @override
    */
   init() {
+    initDestroyableCache(this);
     this._super(...arguments);
     this.spaceObserver();
 
@@ -388,6 +399,18 @@ export default Component.extend(validations, I18n, {
     try {
       this.unregisterRouteChangeHandler();
       this.unregisterPageUnloadHandler();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.cacheFor('contactEmailRootField')?.destroy();
+      destroyDestroyableComputedValues(this);
     } finally {
       this._super(...arguments);
     }

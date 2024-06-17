@@ -23,7 +23,7 @@ describe('Integration | Component | content-atm-inventories-workflows/editor-vie
     before(function () {
       // Instatiate Action classes to make its `prototype.execute` available for
       // mocking.
-      ModifyAtmWorkflowSchemaRevisionAction.create();
+      ModifyAtmWorkflowSchemaRevisionAction.create().destroy();
     });
 
     afterEach(function () {

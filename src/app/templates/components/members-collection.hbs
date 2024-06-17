@@ -5,7 +5,7 @@
     selectionChanged=recordsSelected
     isListCollapsed=isListCollapsed
     listCollapsed=(action "listCollapsed")
-    resetSelectionTrigger=members
+    resetSelectionTrigger=membersProxy
     as |list|
   }}
     {{#list.header
@@ -47,7 +47,7 @@
                   {{tt this "save"}}
                 {{/one-button}}
                 <span class="space"></span>
-                {{#bs-button
+                {{#one-button
                   size="sm"
                   type="warning"
                   class="discard-btn"
@@ -55,7 +55,7 @@
                   onClick=(action "discardChanges" memberProxy)
                 }}
                   {{tt this "discard"}}
-                {{/bs-button}}
+                {{/one-button}}
                 <span class="space"></span><span class="space"></span>
               </span>
             {{/if}}
@@ -85,13 +85,13 @@
         {{#listItem.content}}
           {{#render-later triggerRender=listItem.isActive}}
             <div class="hidden-sm hidden-md hidden-lg text-center row content-row">
-              {{#bs-button size="sm" type="primary"
+              {{#one-button size="sm" type="primary"
                 disabled=(or memberProxy.privilegesProxy.saving (not memberProxy.privilegesProxy.isModified))
                 onClick=(action "savePrivileges" memberProxy)
               }}
                 {{tt this "save"}}
-              {{/bs-button}}
-              {{#bs-button
+              {{/one-button}}
+              {{#one-button
                 size="sm"
                 type="warning"
                 class="discard-btn"
@@ -100,7 +100,7 @@
               }}
                 {{tt this "discard"
               }}
-              {{/bs-button}}
+              {{/one-button}}
             </div>
             {{#if memberProxy.isOwner}}
               <div class="alert alert-warning privileges-of-owner-warning">

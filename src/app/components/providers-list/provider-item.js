@@ -63,7 +63,7 @@ export default Component.extend({
       return this.get('selectedSpace') && this.get('provider.spaceList.isFulfilled');
     }),
 
-  _spacesCount: reads('provider.spaceList.content.list.length'),
+  _spacesCount: reads('provider.spaceList.content.list.content.length'),
 
   _spaceSupportSize: computed(
     'selectedSpace.supportSizes',

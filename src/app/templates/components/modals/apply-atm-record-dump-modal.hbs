@@ -52,14 +52,14 @@
   {{/modal.body}}
 
   {{#modal.footer class="btn-toolbar"}}
-    {{#bs-button
+    {{#one-button
       type="default"
       class="cancel-btn"
       onClick=modal.close
       disabled=isSubmitting
     }}
       {{tt this "buttons.cancel"}}
-    {{/bs-button}}
+    {{/one-button}}
     {{#one-button
       type="primary"
       buttonType="submit"

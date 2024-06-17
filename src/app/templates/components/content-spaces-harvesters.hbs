@@ -17,14 +17,14 @@
       text=(tt this "empty.description")
     }}
       <div class="action-buttons">
-        {{#bs-button
+        {{#one-button
           type="primary"
           class=(concat-classes "btn-content-info" addHarvesterAction.className)
           onClick=addHarvesterAction.executeCallback
         }}
           {{addHarvesterAction.title}}
-        {{/bs-button}}
-        {{#bs-button
+        {{/one-button}}
+        {{#one-button
           type="primary"
           class=(concat-classes
             "btn-content-info"
@@ -33,7 +33,7 @@
           onClick=inviteHarvesterUsingTokenAction.executeCallback
         }}
           {{inviteHarvesterUsingTokenAction.title}}
-        {{/bs-button}}
+        {{/one-button}}
       </div>
     {{/content-info}}
   {{else}}

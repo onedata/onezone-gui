@@ -10,7 +10,11 @@ import { get } from '@ember/object';
 describe(
   'Integration | Utility | workflow-actions/modify-atm-lambda-revision-action',
   function () {
-    setupRenderingTest();
+    const { afterEach } = setupRenderingTest();
+
+    afterEach(function () {
+      this.action?.destroy();
+    });
 
     it('executes modifying lambda revision (success scenario)', async function () {
       const updateStub = sinon
@@ -30,7 +34,7 @@ describe(
           },
         },
       };
-      const action = ModifyAtmLambdaRevisionAction.create({
+      this.action = ModifyAtmLambdaRevisionAction.create({
         ownerSource: this.owner,
         context: {
           atmLambda,
@@ -43,7 +47,7 @@ describe(
         'success'
       );
 
-      const actionResult = await action.execute();
+      const actionResult = await this.action.execute();
 
       expect(updateStub).to.be.calledOnce
         .and.to.be.calledWith(atmLambda.entityId, 2, revisionDiff);
@@ -73,7 +77,7 @@ describe(
           },
         },
       };
-      const action = ModifyAtmLambdaRevisionAction.create({
+      this.action = ModifyAtmLambdaRevisionAction.create({
         ownerSource: this.owner,
         context: {
           atmLambda,
@@ -86,7 +90,7 @@ describe(
         'backendError'
       );
 
-      const actionResult = await action.execute();
+      const actionResult = await this.action.execute();
       expect(failureNotifySpy).to.be.calledWith(
         sinon.match.has('string', 'modifying lambda revision'),
         error

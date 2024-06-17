@@ -6,8 +6,9 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
+import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { not, and, equal, raw, conditional, array } from 'ember-awesome-macros';
+import { not, and, equal, raw, conditional } from 'ember-awesome-macros';
 import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields-group';
 
 export const CaveatsSectionGroup = FormFieldsGroup.extend({
@@ -30,7 +31,12 @@ export const CaveatsSectionGroup = FormFieldsGroup.extend({
   /**
    * @type {ComputedProperty<boolean>}
    */
-  hasVisibleCaveats: array.isAny('fields', raw('isVisible'), raw(true)),
+  hasVisibleCaveats: computed(
+    'fields.@each.isVisible',
+    function hasVisibleCaveats() {
+      return this.fields.any((field) => field.isVisible);
+    }
+  ),
 
   /**
    * @type {ComputedProperty<boolean>}

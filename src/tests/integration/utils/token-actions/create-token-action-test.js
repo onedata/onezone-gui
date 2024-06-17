@@ -9,7 +9,7 @@ import { reject, Promise } from 'rsvp';
 import { next } from '@ember/runloop';
 
 describe('Integration | Utility | token-actions/create-token-action', function () {
-  setupRenderingTest();
+  const { afterEach } = setupRenderingTest();
 
   beforeEach(function () {
     this.set('context', {
@@ -17,8 +17,12 @@ describe('Integration | Utility | token-actions/create-token-action', function (
     });
   });
 
+  afterEach(function () {
+    this.action?.destroy();
+  });
+
   it('executes creating token (success scenario)', function () {
-    const action = CreateTokenAction.create({
+    this.action = CreateTokenAction.create({
       ownerSource: this.owner,
       context: this.get('context'),
     });
@@ -39,7 +43,7 @@ describe('Integration | Utility | token-actions/create-token-action', function (
       'success'
     );
 
-    return action.execute()
+    return this.action.execute()
       .then(actionResult => {
         expect(createTokenStub).to.be.calledOnce;
         expect(createTokenStub).to.be.calledWith(rawToken);
@@ -58,7 +62,7 @@ describe('Integration | Utility | token-actions/create-token-action', function (
   });
 
   it('executes creating token (failure scenario)', function () {
-    const action = CreateTokenAction.create({
+    this.action = CreateTokenAction.create({
       ownerSource: this.owner,
       context: this.get('context'),
     });
@@ -71,7 +75,7 @@ describe('Integration | Utility | token-actions/create-token-action', function (
       'backendError'
     );
 
-    return action.execute()
+    return this.action.execute()
       .then(actionResult => {
         expect(failureNotifySpy).to.be.calledWith(
           sinon.match.has('string', 'creating token'),

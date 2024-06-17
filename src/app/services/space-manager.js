@@ -639,6 +639,7 @@ export default Service.extend({
    * @param {Object} [options]
    * @param {string} [options.rejectionReason] If rejecting the request, an optional text
    *   with rejection reason can be sent to the requesting user.
+   * @returns {Promise}
    */
   async resolveMarketplaceSpaceAccess(spaceId, requestId, grantAccess, options = {}) {
     const requestGri = gri({

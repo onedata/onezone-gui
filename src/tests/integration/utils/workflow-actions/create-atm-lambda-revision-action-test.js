@@ -11,7 +11,7 @@ import { settled } from '@ember/test-helpers';
 describe(
   'Integration | Utility | workflow-actions/create-atm-lambda-revision-action',
   function () {
-    setupRenderingTest();
+    const { afterEach } = setupRenderingTest();
 
     beforeEach(function () {
       const workflowManager = lookupService(this, 'workflow-manager');
@@ -32,6 +32,10 @@ describe(
       });
     });
 
+    afterEach(function () {
+      this.action?.destroy();
+    });
+
     it('executes creating lambda revision (success scenario)', async function () {
       const {
         createAtmLambdaRevisionStub,
@@ -47,7 +51,7 @@ describe(
       createAtmLambdaRevisionStub
         .withArgs(atmLambda.entityId, 3, revisionContent)
         .resolves();
-      const action = CreateAtmLambdaRevisionAction.create({
+      this.action = CreateAtmLambdaRevisionAction.create({
         ownerSource: this.owner,
         context: {
           atmLambda,
@@ -55,7 +59,7 @@ describe(
         },
       });
 
-      const actionResult = await action.execute();
+      const actionResult = await this.action.execute();
       expect(get(actionResult, 'status')).to.equal('done');
       expect(get(actionResult, 'result')).to.equal(3);
       expect(successNotifySpy).to.be.calledWith(
@@ -75,7 +79,7 @@ describe(
         'atmLambda',
         'revisionContent'
       );
-      const action = CreateAtmLambdaRevisionAction.create({
+      this.action = CreateAtmLambdaRevisionAction.create({
         ownerSource: this.owner,
         context: {
           atmLambda,
@@ -87,7 +91,7 @@ describe(
         new Promise((resolve, reject) => rejectCreate = reject)
       );
 
-      const actionResultPromise = action.execute();
+      const actionResultPromise = this.action.execute();
       rejectCreate('someError');
       await settled();
       const actionResult = await actionResultPromise;

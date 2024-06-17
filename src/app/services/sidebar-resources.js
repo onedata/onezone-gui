@@ -2,14 +2,14 @@
  * An abstraction layer for getting data for sidebar of various tabs
  *
  * @author Jakub Liput, Michał Borzęcki
- * @copyright (C) 2017-2020 ACK CYFRONET AGH
+ * @copyright (C) 2017-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import { inject as service } from '@ember/service';
-import { A } from '@ember/array';
 import { resolve, reject } from 'rsvp';
 import SidebarResources from 'onedata-gui-common/services/sidebar-resources';
+import ArrayProxy from '@ember/array/proxy';
 
 export default SidebarResources.extend({
   providerManager: service(),
@@ -51,7 +51,7 @@ export default SidebarResources.extend({
       case 'spaces':
         return this.get('spaceManager').getSpaces();
       case 'shares':
-        return this.get('shareManager').getAllShares();
+        return this.get('shareManager').getVirtualAllSharesList().reload();
       case 'groups':
         return this.get('groupManager').getGroups();
       case 'harvesters':
@@ -60,11 +60,13 @@ export default SidebarResources.extend({
         return this.get('recordManager').getUserRecordList('atmInventory');
       case 'uploads':
         return resolve({
-          list: this.get('uploadManager.sidebarOneproviders'),
+          list: ArrayProxy.create({
+            content: this.get('uploadManager.sidebarOneproviders'),
+          }),
         });
       case 'users':
         return this.get('currentUser').getCurrentUserRecord().then(user => {
-          return resolve({ list: A([user]) });
+          return resolve({ list: ArrayProxy.create({ content: [user] }) });
         });
       default:
         return reject('No such collection: ' + type);
@@ -75,22 +77,15 @@ export default SidebarResources.extend({
    * @override
    */
   getButtonsFor(type, context) {
-    switch (type) {
-      case 'clusters':
-        return this.get('clusterActions.buttons');
-      case 'tokens':
-        return this.get('tokenActions').createGlobalActions(context);
-      case 'spaces':
-        return this.get('spaceActions.buttons');
-      case 'groups':
-        return this.get('groupActions.buttons');
-      case 'harvesters':
-        return this.get('harvesterActions.buttons');
-      case 'atm-inventories':
-        return this.get('workflowActions').createGlobalActions(context);
-      default:
-        return [];
-    }
+    const actionsSource = {
+      'clusters': this.clusterActions,
+      'tokens': this.tokenActions,
+      'spaces': this.spaceActions,
+      'groups': this.groupActions,
+      'harvesters': this.harvesterActions,
+      'atm-inventories': this.workflowActions,
+    } [type];
+    return actionsSource?.createGlobalActions(context) ?? [];
   },
 
   /**

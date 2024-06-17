@@ -52,15 +52,22 @@ export default Component.extend(I18n, UserProxyMixin, {
   itemActions: collect('copyIdAction', 'copyDomainAction'),
 
   /**
+   * @type {ComputedProperty<Record<string, Utils.Action>>}
+   */
+  actionsCache: computed(() => ({})),
+
+  /**
    * @type {Ember.ComputedProperty<Action>}
    */
   copyIdAction: computed('provider', function copyIdAction() {
+    this.actionsCache.copyIdAction?.destroyAfterAllExecutions();
     const {
       provider,
       clipboardActions,
     } = this.getProperties('provider', 'clipboardActions');
 
-    return clipboardActions.createCopyRecordIdAction({ record: provider });
+    return this.actionsCache.copyIdAction =
+      clipboardActions.createCopyRecordIdAction({ record: provider });
   }),
 
   /**
@@ -162,4 +169,15 @@ export default Component.extend(I18n, UserProxyMixin, {
    * @type {Ember.ComputedProperty<string>}
    */
   _totalSupportSizeHumanReadable: computedPipe('_totalSupportSize', bytesToString),
+
+  /**
+   * @override
+   */
+  willDestroyElement() {
+    try {
+      this.cacheFor('copyIdAction')?.destroyAfterAllExecutions();
+    } finally {
+      this._super(...arguments);
+    }
+  },
 });

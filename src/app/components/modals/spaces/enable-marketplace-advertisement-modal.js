@@ -163,6 +163,17 @@ export default Component.extend(I18n, {
     ]));
   },
 
+  /**
+   * @override
+   */
+  willDestroyElement() {
+    try {
+      this.cacheFor('rootField')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
   async enableMarketplaceAdvertisement() {
     setProperties(this.space, {
       advertisedInMarketplace: true,

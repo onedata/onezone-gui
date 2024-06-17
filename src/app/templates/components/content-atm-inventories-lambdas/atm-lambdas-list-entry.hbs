@@ -34,7 +34,7 @@
       </td>
       {{#if (eq mode "selection")}}
         <td class="revisions-table-data-cell buttons">
-          {{#bs-button
+          {{#one-button
             type="default"
             size="sm"
             class="clickable add-to-workflow-action-trigger"
@@ -42,7 +42,7 @@
           }}
             {{one-icon icon="plus"}}
             <span class="text">{{tt this "columns.buttons.addToWorkflow"}}</span>
-          {{/bs-button}}
+          {{/one-button}}
         </td>
       {{/if}}
     {{/if}}

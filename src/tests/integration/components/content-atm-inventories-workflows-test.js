@@ -13,7 +13,7 @@ import { Promise, resolve } from 'rsvp';
 import { selectChoose } from 'ember-power-select/test-support/helpers';
 import globals from 'onedata-gui-common/utils/globals';
 
-describe('Integration | Component | content-atm-inventories-workflows', function () {
+describe('Integration | Component | content-atm-inventories-workflows (main)', function () {
   setupRenderingTest();
 
   beforeEach(function () {
@@ -457,6 +457,7 @@ describe('Integration | Component | content-atm-inventories-workflows', function
             result: createdRecord,
           });
         },
+        destroy: () => {},
       });
       await renderComponent();
       await fillIn('.name-field .form-control', 'someName');

@@ -8,12 +8,11 @@
  */
 
 import Component from '@ember/component';
-import { observer, get } from '@ember/object';
+import { observer, get, computed } from '@ember/object';
 import {
   conditional,
   and,
   not,
-  array,
   raw,
   equal,
 } from 'ember-awesome-macros';
@@ -125,7 +124,14 @@ export default Component.extend({
    */
   filteredUploadObjects: conditional(
     'oneprovider',
-    array.filterBy('uploadObjects', raw('oneprovider'), 'oneprovider'),
+    computed(
+      'uploadObjects.@each.oneprovider',
+      'oneprovider',
+      function filteredUploadObjects() {
+        return this.uploadObjects
+          ?.filter((obj) => obj.oneprovider === this.oneprovider) ?? [];
+      }
+    ),
     'uploadObjects'
   ),
 

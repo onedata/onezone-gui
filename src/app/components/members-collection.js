@@ -3,7 +3,7 @@
  * Yields list when there are no items to present.
  *
  * @author Michał Borzęcki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @copyright (C) 2018-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -23,13 +23,13 @@ import { inject as service } from '@ember/service';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
 import { getOwner } from '@ember/application';
-import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
-import { reject } from 'rsvp';
+import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
+import { reject, all as allFulfilled } from 'rsvp';
 import { A } from '@ember/array';
 import _ from 'lodash';
 import ItemProxy from 'onezone-gui/utils/members-collection/item-proxy';
 import { scheduleOnce } from '@ember/runloop';
-import { promise } from 'ember-awesome-macros';
 import { htmlSafe } from '@ember/template';
 import { formatNumber } from 'onedata-gui-common/helpers/format-number';
 import { later, cancel } from '@ember/runloop';
@@ -190,8 +190,8 @@ export default Component.extend(I18n, {
    * @virtual
    * @type {Function}
    * @param {Models.User|Models.Group} member
-   * @param {ArrayProxy<Models.User|Models.Group>} directMembers
-   * @param {ArrayProxy<Models.User|Models.Group>} effectiveMembers
+   * @param {ArrayProxy<Models.User|Models.Group>} directMembersProxy
+   * @param {ArrayProxy<Models.User|Models.Group>} effectiveMembersProxy
    * @returns {Array<Action>}
    */
   effectiveItemActionsGenerator: fallbackActionsGenerator,
@@ -211,6 +211,13 @@ export default Component.extend(I18n, {
    * @type {any}
    */
   afterPrivilegesSaveTimer: undefined,
+
+  /**
+   * Stores all created PrivilegeRecordProxy objects to destroy them at the component
+   * destroy.
+   * @type {Array<PrivilegeRecordProxy>}
+   */
+  privilegesRecordProxyCache: undefined,
 
   /**
    * @type {SafeString | string}
@@ -235,11 +242,11 @@ export default Component.extend(I18n, {
    * Direct members
    * @type {Ember.ComputedProperty<PromiseArray<DS.ManyArray<GraphSingleModel>>>}
    */
-  directMembers: computed(
+  directMembersProxy: computed(
     'record',
     'subjectType',
-    function directMembers() {
-      return this.getMembers(this.get('subjectType') + 'List');
+    function directMembersProxy() {
+      return this.getMembers(this.subjectType + 'List');
     }
   ),
 
@@ -247,12 +254,12 @@ export default Component.extend(I18n, {
    * Direct groups
    * @type {Ember.ComputedProperty<PromiseArray<DS.ManyArray<GraphSingleModel>>>}
    */
-  directGroups: computed(
+  directGroupsProxy: computed(
     'record',
     'subjectType',
-    function directGroups() {
+    function directGroupsProxy() {
       if (this.subjectType === 'group') {
-        return this.directMembers;
+        return this.directMembersProxy;
       }
       return this.getMembers('groupList');
     }
@@ -262,40 +269,52 @@ export default Component.extend(I18n, {
    * Effective members
    * @type {Ember.ComputedProperty<PromiseArray<DS.ManyArray<GraphSingleModel>>>}
    */
-  effectiveMembers: computed(
+  effectiveMembersProxy: computed(
     'record',
     'subjectType',
-    function effectiveMembers() {
+    function effectiveMembersProxy() {
       return this.getMembers(
-        'eff' + _.upperFirst(this.get('subjectType')) + 'List'
+        'eff' + _.upperFirst(this.subjectType) + 'List'
       );
     }
   ),
 
   /**
    * Promise proxy used to load all members
-   * @type {Ember.ComputedProperty<PromiseArray>}
+   * @type {Ember.ComputedProperty<PromiseObject>}
    */
-  allMembersLoadingProxy: promise.array(promise.all(
-    'directMembers',
-    'effectiveMembers',
-    'directGroups',
-  )),
+  allMembersLoadingProxy: computed(
+    'directMembersProxy',
+    'effectiveMembersProxy',
+    'directGroupsProxy',
+    function allMembersLoadingProxy() {
+      return promiseObject(allFulfilled([
+        this.directMembersProxy,
+        this.effectiveMembersProxy,
+        this.directGroupsProxy,
+      ]));
+    }
+  ),
 
   /**
-   * One of `directMembers`, `effectiveMembers` depending on
+   * One of `directMembersProxy`, `effectiveMembersProxy` depending on
    *`onlyDirect` flag
    * @type {Ember.ComputedProperty<PromiseArray<DS.ManyArray<GraphSingleModel>>>}
    */
-  members: computed(
+  membersProxy: computed(
     'onlyDirect',
-    'record',
-    'subjectType',
-    function members() {
-      return this.get('onlyDirect') ?
-        this.get('directMembers') : this.get('effectiveMembers');
+    'directMembersProxy',
+    'effectiveMembersProxy',
+    function membersProxy() {
+      return this.onlyDirect ? this.directMembersProxy : this.effectiveMembersProxy;
     }
   ),
+
+  effectiveMembers: reads('effectiveMemebersProxy.content'),
+
+  directMembers: reads('directMembersProxy.content'),
+
+  members: reads('membersProxy.content'),
 
   membersObserver: observer(
     'members.@each.{entityId,name,username}',
@@ -305,9 +324,11 @@ export default Component.extend(I18n, {
       const {
         owners,
         directMembers,
-        effectiveMembers,
+        directMembersProxy,
+        effectiveMembersProxy,
         subjectType,
         members,
+        membersProxy,
         membersProxyList,
         groupedPrivilegesFlags,
         currentUser,
@@ -320,9 +341,11 @@ export default Component.extend(I18n, {
       } = this.getProperties(
         'owners',
         'directMembers',
-        'effectiveMembers',
+        'directMembersProxy',
+        'effectiveMembersProxy',
         'subjectType',
         'members',
+        'membersProxy',
         'membersProxyList',
         'groupedPrivilegesFlags',
         'currentUser',
@@ -334,15 +357,15 @@ export default Component.extend(I18n, {
         'griGroupAspects',
       );
       if (isListCollapsed === undefined && collapseForNumber &&
-        get(members, 'length') > collapseForNumber) {
+        members?.length > collapseForNumber) {
         this.set('isListCollapsed', true);
       }
       // Create ordered list of members. Records should be sorted by name except
       // current user record and owners - they should be always at the top.
       const currentUserMember =
-        members.findBy('entityId', get(currentUser, 'userId'));
+        members?.findBy('entityId', get(currentUser, 'userId'));
       const membersSortKeys = new Map();
-      members.forEach(member => {
+      members?.forEach(member => {
         const {
           entityId,
           name,
@@ -350,7 +373,7 @@ export default Component.extend(I18n, {
         } = getProperties(member, 'entityId', 'name', 'username');
         let key = member === currentUserMember ? '0\n' : '1\n';
         key += (owners || []).includes(member) ? '0\n' : '1\n';
-        key += this.directMembers.includes(member) ? '0\n' : '1\n';
+        key += this.directMembers?.includes(member) ? '0\n' : '1\n';
         key += `${name}\n`;
         if (subjectType === 'user') {
           key += `${username || '\n'}\n`;
@@ -371,24 +394,24 @@ export default Component.extend(I18n, {
             id: get(member, 'id'),
             member,
             owners,
-            directMembers,
-            isDirect: directMembers.includes(member),
+            directMembers: directMembersProxy,
+            isDirect: directMembers?.includes(member),
             privilegesProxy: {},
             effectivePrivilegesProxy: {},
             isYou: member === currentUserMember,
             directMemberActions: itemActionsGenerator(
               member,
-              directMembers,
-              effectiveMembers
+              directMembersProxy,
+              effectiveMembersProxy
             ),
             effectiveMemberActions: effectiveItemActionsGenerator(
               member,
-              directMembers,
-              effectiveMembers
+              directMembersProxy,
+              effectiveMembersProxy
             ),
           });
         }
-        if (directMembers.includes(member)) {
+        if (directMembers?.includes(member)) {
           const directPrivilegesGri = this.getPrivilegesGriForMember(
             member, true, griAspect
           );
@@ -400,6 +423,7 @@ export default Component.extend(I18n, {
               isReadOnly: false,
             }
           );
+          this.privilegesRecordProxyCache.push(privilegesProxy);
           set(proxy, 'privilegesProxy', privilegesProxy);
         }
         const effectivePrivilegesGri = this.getPrivilegesGriForMember(
@@ -413,6 +437,7 @@ export default Component.extend(I18n, {
             isReadOnly: true,
           }
         );
+        this.privilegesRecordProxyCache.push(effectivePrivilegesProxy);
         set(proxy, 'effectivePrivilegesProxy', effectivePrivilegesProxy);
         return proxy;
       });
@@ -420,7 +445,7 @@ export default Component.extend(I18n, {
       if (griAspect === griGroupAspects) {
         this.set('directGroupsProxyList', newMembersProxyList);
       }
-      if (get(members, 'isFulfilled')) {
+      if (get(membersProxy, 'isFulfilled')) {
         scheduleOnce('afterRender', this, 'membersLoaded');
       }
     }
@@ -449,7 +474,7 @@ export default Component.extend(I18n, {
 
       // Create list of group proxies reusing already generated ones as much
       // as possible.
-      const newMembersProxyList = directGroups.map(member => {
+      const newMembersProxyList = (directGroups ?? []).map(member => {
         let proxy = directGroupsProxyList.findBy('member', member);
         // If proxy has not been generated for that member, create new empty proxy.
         if (!proxy || !proxy.isDirect) {
@@ -471,6 +496,7 @@ export default Component.extend(I18n, {
             isReadOnly: true,
           }
         );
+        this.privilegesRecordProxyCache.push(effectivePrivilegesProxy);
         set(proxy, 'effectivePrivilegesProxy', effectivePrivilegesProxy);
         return proxy;
       });
@@ -482,6 +508,18 @@ export default Component.extend(I18n, {
     this._super(...arguments);
     this.membersObserver();
     this.groupsObserver();
+    this.set('privilegesRecordProxyCache', []);
+  },
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.privilegesRecordProxyCache.forEach(obj => obj?.destroy());
+    } finally {
+      this._super(...arguments);
+    }
   },
 
   /**
@@ -490,13 +528,16 @@ export default Component.extend(I18n, {
    * @returns {PromiseArray<DS.ManyArray<GraphSingleModel>>}
    */
   getMembers(listName) {
-    const record = this.get('record');
-    return PromiseArray.create({
-      promise: get(record, 'hasViewPrivilege') !== false ?
-        get(record, listName).then(sgl =>
-          sgl ? get(sgl, 'list') : A()
-        ) : reject({ id: 'forbidden' }),
-    });
+    const record = this.record;
+    let promise;
+    if (get(record, 'hasViewPrivilege') !== false) {
+      promise = get(record, listName).then(sgl =>
+        sgl ? get(sgl, 'list') : A()
+      );
+    } else {
+      promise = reject({ id: 'forbidden' });
+    }
+    return promiseArray(promise);
   },
 
   /**

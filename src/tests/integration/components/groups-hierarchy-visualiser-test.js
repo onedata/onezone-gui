@@ -115,13 +115,13 @@ GroupStub.relationshipNames = {
   belongsTo: ['childList', 'parentList'],
 };
 
-describe('Integration | Component | groups-hierarchy-visualiser', function () {
+describe('Integration | Component | groups-hierarchy-visualiser (main)', function () {
   setupRenderingTest();
 
   before(function () {
     // Instatiate Action class to make its `prototype.execute` available for
     // mocking.
-    LeaveAction.create();
+    LeaveAction.create().destroy();
   });
 
   beforeEach(function beforeEach() {

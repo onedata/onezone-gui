@@ -30,6 +30,11 @@ export const NameField = TextField.extend({
   defaultValue: '',
 
   /**
+   * @type {Utils.TokenEditorUtils.TokenNameConflictDetector | null}
+   */
+  tokenNameConflictDetectorCache: null,
+
+  /**
    * @override
    */
   customValidators: Object.freeze([
@@ -57,8 +62,20 @@ export const NameField = TextField.extend({
   tokenNameConflictDetector: computed(
     'context.editorMode',
     function tokenNameConflictDetector() {
-      return this.context?.editorMode !== 'view' ?
+      this.tokenNameConflictDetectorCache?.destroy();
+      return this.tokenNameConflictDetectorCache = this.context?.editorMode !== 'view' ?
         TokenNameConflictDetector.create({ ownerSource: this }) : null;
     }
   ),
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.tokenNameConflictDetectorCache?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
 });

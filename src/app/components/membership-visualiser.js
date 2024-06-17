@@ -83,6 +83,11 @@ import { groupedFlags as clusterFlags } from 'onedata-gui-websocket-client/utils
 import { groupedFlags as atmInventoryFlags } from 'onedata-gui-websocket-client/utils/atm-inventory-privileges-flags';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import MembershipPath from 'onezone-gui/utils/membership-visualiser/membership-path';
+import {
+  destroyDestroyableComputedValues,
+  destroyableComputed,
+  initDestroyableCache,
+} from 'onedata-gui-common/utils/destroyable-computed';
 
 export default Component.extend(I18n, {
   classNames: ['membership-visualiser'],
@@ -316,7 +321,7 @@ export default Component.extend(I18n, {
    * Privileges model for relation privileges editor
    * @type {Ember.ComputedProperty<PrivilegeModelProxy|null>}
    */
-  privilegesEditorModel: computed(
+  privilegesEditorModel: destroyableComputed(
     'groupedPrivilegesFlags',
     'relationPrivilegesToChange',
     function privilegesEditorModel() {
@@ -438,8 +443,20 @@ export default Component.extend(I18n, {
   ),
 
   init() {
+    initDestroyableCache(this);
     this._super(...arguments);
     this.recordObserver();
+  },
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      destroyDestroyableComputedValues(this);
+    } finally {
+      this._super(...arguments);
+    }
   },
 
   /**
@@ -695,9 +712,10 @@ export default Component.extend(I18n, {
     },
     scheduleRelationRemoval(relationToRemove) {
       if (this.currentUser.userId === relationToRemove.child?.entityId) {
-        this.userActions.createLeaveAction({
+        const action = this.userActions.createLeaveAction({
           recordToLeave: relationToRemove.parent,
-        }).execute();
+        });
+        action.execute().finally(() => action.destroy());
       } else {
         this.set('relationToRemove', relationToRemove);
       }

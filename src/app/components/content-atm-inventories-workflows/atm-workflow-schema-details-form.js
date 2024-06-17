@@ -153,6 +153,17 @@ export default Component.extend(I18n, {
     this.modeObserver();
   },
 
+  /**
+   * @override
+   */
+  willDestroyElement() {
+    try {
+      this.cacheFor('fields')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
   updateFormValues() {
     const atmWorkflowSchema = this.get('atmWorkflowSchema') || {};
     const { name = '', summary = '' } =

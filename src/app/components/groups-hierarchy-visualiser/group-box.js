@@ -167,6 +167,11 @@ export default Component.extend(I18n, {
   removeRelation: notImplementedThrow,
 
   /**
+   * @type {Utils.Action | null}
+   */
+  generateInviteTokenActionCache: null,
+
+  /**
    * If true, tooltip for direct membership icon is rendered
    * @type {boolean}
    */
@@ -229,31 +234,46 @@ export default Component.extend(I18n, {
   }),
 
   /**
-   * @type {Ember.ComputedProperty<Action>}
+   * @type {Ember.ComputedProperty<Utils.Action>}
    */
-  addChildGroupAction: computed('groupBox.group', function addChildGroupAction() {
-    return {
-      nestedActions: [{
-          action: () => this.get('createRelativeGroup')('child'),
-          title: this.t('createNewGroup'),
-          class: 'create-new-action',
-          icon: 'add-filled',
-        }, {
-          action: () => this.get('addYourGroup')('child'),
-          title: this.t('addYourGroup'),
-          class: 'add-your-group-action',
-          icon: 'group-invite',
-        },
-        this.get('tokenActions').createGenerateInviteTokenAction({
+  generateInviteTokenAction: computed(
+    'groupBox.group',
+    function generateInviteTokenAction() {
+      this.generateInviteTokenActionCache?.destroy();
+      return this.generateInviteTokenActionCache =
+        this.tokenActions.createGenerateInviteTokenAction({
           inviteType: 'groupJoinGroup',
           targetRecord: this.get('groupBox.group'),
-        }),
-      ],
-      title: this.t('addChildGroup'),
-      class: 'add-child-group-action',
-      icon: 'add-filled',
-    };
-  }),
+        });
+    }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  addChildGroupAction: computed(
+    'generateInviteTokenAction',
+    function addChildGroupAction() {
+      return {
+        nestedActions: [{
+            action: () => this.get('createRelativeGroup')('child'),
+            title: this.t('createNewGroup'),
+            class: 'create-new-action',
+            icon: 'add-filled',
+          }, {
+            action: () => this.get('addYourGroup')('child'),
+            title: this.t('addYourGroup'),
+            class: 'add-your-group-action',
+            icon: 'group-invite',
+          },
+          this.generateInviteTokenAction,
+        ],
+        title: this.t('addChildGroup'),
+        class: 'add-child-group-action',
+        icon: 'add-filled',
+      };
+    }
+  ),
 
   /**
    * @type {Ember.ComputedProperty<Action>}
@@ -385,6 +405,14 @@ export default Component.extend(I18n, {
       css + `width: ${width}px; margin-bottom: ${marginBottom}px;`
     );
   }),
+
+  willDestroyElement() {
+    try {
+      this.cacheFor('generateInviteTokenAction')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
 
   actions: {
     toggleActions(opened) {

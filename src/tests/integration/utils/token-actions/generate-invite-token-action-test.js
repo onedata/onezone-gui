@@ -15,7 +15,7 @@ import {
 import TestComponent from 'onedata-gui-common/components/test-component';
 
 describe('Integration | Utility | token-actions/generate-invite-token-action', function () {
-  setupRenderingTest();
+  const { afterEach } = setupRenderingTest();
 
   beforeEach(function () {
     sinon.stub(lookupService(this, 'token-manager'), 'createTemporaryInviteToken')
@@ -31,6 +31,10 @@ describe('Integration | Utility | token-actions/generate-invite-token-action', f
         },
       },
     });
+  });
+
+  afterEach(function () {
+    this.action?.destroy();
   });
 
   const userTitle = 'Invite user using token';
@@ -78,12 +82,12 @@ describe('Integration | Utility | token-actions/generate-invite-token-action', f
       `has correct title for ${inviteType} invite type`,
       function () {
         this.set('context.inviteType', inviteType);
-        const action = GenerateInviteTokenAction.create({
+        this.action = GenerateInviteTokenAction.create({
           ownerSource: this.owner,
           context: this.get('context'),
         });
 
-        expect(String(get(action, 'title'))).to.equal(title);
+        expect(String(get(this.action, 'title'))).to.equal(title);
       }
     );
   });
@@ -91,14 +95,14 @@ describe('Integration | Utility | token-actions/generate-invite-token-action', f
   it(
     'has correct classNames, icon and is enabled',
     function () {
-      const action = GenerateInviteTokenAction.create({
+      this.action = GenerateInviteTokenAction.create({
         ownerSource: this.owner,
         context: this.get('context'),
       });
 
-      expect(get(action, 'className')).to.equal('generate-invite-token-action');
-      expect(get(action, 'icon')).to.equal('join-plug');
-      expect(get(action, 'disabled')).to.be.false;
+      expect(get(this.action, 'className')).to.equal('generate-invite-token-action');
+      expect(get(this.action, 'icon')).to.equal('join-plug');
+      expect(get(this.action, 'disabled')).to.be.false;
     }
   );
 
@@ -110,24 +114,24 @@ describe('Integration | Utility | token-actions/generate-invite-token-action', f
       `is disabled when ${fieldName} is not specified`,
       function () {
         this.set(`context.${fieldName}`, undefined);
-        const action = GenerateInviteTokenAction.create({
+        this.action = GenerateInviteTokenAction.create({
           ownerSource: this.owner,
           context: this.get('context'),
         });
 
-        expect(get(action, 'disabled')).to.be.true;
+        expect(get(this.action, 'disabled')).to.be.true;
       }
     );
   });
 
   it('shows modal on execute', async function () {
-    const action = GenerateInviteTokenAction.create({
+    this.action = GenerateInviteTokenAction.create({
       ownerSource: this.owner,
       context: this.get('context'),
     });
 
     await render(hbs `{{global-modal-mounter}}`);
-    action.execute();
+    this.action.execute();
     await settled();
 
     expect(getModal()).to.have.class('generate-invite-token-modal');
@@ -135,13 +139,13 @@ describe('Integration | Utility | token-actions/generate-invite-token-action', f
 
   it('passess inviteType and tokenTarget to the modal', async function () {
     this.owner.register('component:invite-token-generator', TestComponent);
-    const action = GenerateInviteTokenAction.create({
+    this.action = GenerateInviteTokenAction.create({
       ownerSource: this.owner,
       context: this.get('context'),
     });
 
     await render(hbs `{{global-modal-mounter}}`);
-    action.execute();
+    this.action.execute();
     await settled();
 
     const testComponent =
@@ -151,14 +155,14 @@ describe('Integration | Utility | token-actions/generate-invite-token-action', f
   });
 
   it('resolves returned promise when modal has been closed', async function () {
-    const action = GenerateInviteTokenAction.create({
+    this.action = GenerateInviteTokenAction.create({
       ownerSource: this.owner,
       context: this.get('context'),
     });
     let promiseIsResolved = false;
 
     await render(hbs `{{global-modal-mounter}}`);
-    action.execute().then(() => promiseIsResolved = true);
+    this.action.execute().then(() => promiseIsResolved = true);
 
     await settled();
     expect(promiseIsResolved).to.be.false;
