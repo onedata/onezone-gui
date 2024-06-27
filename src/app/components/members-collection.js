@@ -541,7 +541,8 @@ export default Component.extend(I18n, {
       cancel(this.afterPrivilegesSaveTimer);
       return this.get('privilegeActions')
         .handleSave(get(memberProxy, 'privilegesProxy').save(true))
-        .then(() => memberProxy)
+        .catch(() => get(memberProxy, 'privilegesProxy').resetModifications())
+        .finally(() => memberProxy)
         .then(() => this.record.reload())
         .then(() => safeExec(this, () => this.set(
           'afterPrivilegesSaveTimer',
