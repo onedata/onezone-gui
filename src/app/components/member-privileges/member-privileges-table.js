@@ -99,6 +99,12 @@ export default Component.extend(I18n, {
   isBulkEdit: false,
 
   /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  isPrivilegesToggleDisabled: false,
+
+  /**
    * @type {boolean}
    */
   arePrivilegesUpToDate: true,

@@ -33,6 +33,7 @@
             arePrivilegesUpToDate=arePrivilegesUpToDate
             hasUnsavedPrivileges=recordDirectProxy.isModified
             effPrivilegesAffectorInfos=effPrivilegesAffectorInfos
+            isPrivilegesToggleDisabled=isPrivilegesToggleDisabled
           }}
           {{#if (get groupsOpenState groupPrivileges.name)}}
             {{#each groupPrivileges.subtree as |privilege|}}
@@ -71,6 +72,7 @@
                 highlightMemberships=(action "highlightMemberships")
                 targetRecord=targetRecord
                 effPrivilegesAffectorInfos=effPrivilegesAffectorInfos
+                isPrivilegesToggleDisabled=isPrivilegesToggleDisabled
               }}
             {{/each}}
           {{/if}}

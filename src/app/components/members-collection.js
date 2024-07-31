@@ -44,6 +44,7 @@ export default Component.extend(I18n, {
   privilegeManager: service(),
   currentUser: service(),
   recordManager: service(),
+  store: service(),
 
   /**
    * @override
@@ -281,6 +282,130 @@ export default Component.extend(I18n, {
     'effectiveMembers',
     'directGroups',
   )),
+
+  effOzPrivileges: reads('currentUser.user.effOzPrivileges'),
+
+  /**
+   * @type {Ember.ComputedProperty<string>}
+   */
+  recordTypeForTranslation: computed('recordType', function recordTypeForTranslation() {
+    if (this.recordType === 'atm_inventory') {
+      return 'atmInventory';
+    } else {
+      return this.recordType;
+    }
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  isCurrentUserHaveSomeAdminPrivileges: computed(
+    'effOzPrivileges',
+    'recordType',
+    function isCurrentUserHaveSomeAdminPrivileges() {
+      let pluralRecordType = '';
+      if (this.recordType === 'atm_inventory') {
+        pluralRecordType = `${this.recordType.slice(0, -1)}ies`;
+      } else {
+        pluralRecordType = `${this.recordType}s`;
+      }
+
+      const setPrivileges = `oz_${pluralRecordType}_set_privileges`;
+      const viewPrivileges = `oz_${pluralRecordType}_view_privileges`;
+      const viewMembers = `oz_${pluralRecordType}_view`;
+
+      return this.effOzPrivileges.includes(setPrivileges) ||
+        this.effOzPrivileges.includes(viewPrivileges) ||
+        this.effOzPrivileges.includes(viewMembers);
+    }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  isCurrentUserHaveAdminSetPrivileges: computed(
+    'effOzPrivileges',
+    'recordType',
+    function isCurrentUserHaveAdminSetPrivileges() {
+      const recordType = this.recordType;
+      let pluralRecordType = '';
+      if (recordType === 'atm_inventory') {
+        pluralRecordType = `${recordType.slice(0, -1)}ies`;
+      } else {
+        pluralRecordType = `${recordType}s`;
+      }
+      const setPrivileges = `oz_${pluralRecordType}_set_privileges`;
+      return this.effOzPrivileges.includes(setPrivileges);
+    }
+  ),
+
+  effPrivilegesOfCurrentUser: computed(
+    'currentUser.user',
+    'griAspect',
+    function effPrivilegesOfCurrentUser() {
+      const currentUser = this.currentUser.user;
+      const effectivePrivilegesGri = this.getPrivilegesGriForMember(
+        currentUser, false, this.griAspect
+      );
+      return this.get('store').findRecord('privilege', effectivePrivilegesGri);
+    }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<SafeString>}
+   */
+  adminPrivForWarningTranslation: computed(function adminPrivForWarningTranslation() {
+    const recordType = this.recordType;
+    let pluralRecordType = '';
+    let privileges = [];
+
+    if (recordType === 'atm_inventory') {
+      pluralRecordType = `${recordType.slice(0, -1)}ies`;
+    } else {
+      pluralRecordType = `${recordType}s`;
+    }
+
+    const setPrivileges = `oz_${pluralRecordType}_set_privileges`;
+    const viewPrivileges = `oz_${pluralRecordType}_view_privileges`;
+    const viewMembers = `oz_${pluralRecordType}_view`;
+
+    if (this.effOzPrivileges.includes(viewMembers)) {
+      privileges.push(this.tt("adminPrivilegesWarningPrivileges.viewMembers"));
+    }
+    if (this.effOzPrivileges.includes(viewPrivileges)) {
+      privileges.push(this.tt("adminPrivilegesWarningPrivileges.viewPrivileges"));
+    }
+    if (this.effOzPrivileges.includes(setPrivileges)) {
+      privileges.push(this.tt("adminPrivilegesWarningPrivileges.setPrivileges"));
+    }
+
+    return htmlSafe(privileges.join(', '));
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  isCurrentUserHaveSetPrivileges: computed(
+    'effPrivilegesOfCurrentUser.content.privileges',
+    'recordType',
+    function isCurrentUserHaveSetPrivileges() {
+      const privileges = this.effPrivilegesOfCurrentUser.content.privileges;
+      const recordType = this.recordType;
+      return privileges.includes(`${recordType}_set_privileges`);
+    }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  isPrivilegesToggleDisabled: computed(
+    'isCurrentUserHaveAdminSetPrivileges',
+    'isCurrentUserHaveSetPrivileges',
+    function isPrivilegesToggleDisabled() {
+      return !this.isCurrentUserHaveAdminSetPrivileges &&
+        !this.isCurrentUserHaveSetPrivileges;
+    }
+  ),
 
   /**
    * One of `directMembers`, `effectiveMembers` depending on

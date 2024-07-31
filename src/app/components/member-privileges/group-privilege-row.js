@@ -93,6 +93,12 @@ export default Component.extend(I18n, {
   arePrivilegesUpToDate: true,
 
   /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  isPrivilegesToggleDisabled: false,
+
+  /**
    * @type {number}
    */
   newGrantedEffPrivCountCache: undefined,

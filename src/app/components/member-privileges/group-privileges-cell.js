@@ -9,10 +9,16 @@
 
 import { computed } from '@ember/object';
 import Component from '@ember/component';
+import I18n from 'onedata-gui-common/mixins/i18n';
 
-export default Component.extend({
+export default Component.extend(I18n, {
   tagName: 'td',
   classNames: ['group-privileges-cell', 'toggle-column', 'group'],
+
+  /**
+   * @override
+   */
+  i18nPrefix: 'components.memberPrivileges.groupPrivilegesCell',
 
   /**
    * @virtual
@@ -61,6 +67,12 @@ export default Component.extend({
    * @type {boolean}
    */
   arePrivilegesUpToDate: true,
+
+  /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  isPrivilegesToggleDisabled: false,
 
   /**
    * Input changed action.

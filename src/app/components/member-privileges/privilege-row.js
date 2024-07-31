@@ -141,6 +141,12 @@ export default Component.extend(DisabledPaths, I18n, {
   highlightMemberships: notImplementedIgnore,
 
   /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  isPrivilegesToggleDisabled: false,
+
+  /**
    * @type {boolean}
    */
   isModifiedPriv: false,
