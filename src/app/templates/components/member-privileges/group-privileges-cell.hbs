@@ -9,7 +9,7 @@
       showLockForReadOnly=false
       isReadOnly=(or isPrivilegesToggleDisabled (not editionEnabled))
       update=(action "inputChanged")
-      lockHint=(tt this "insufficientPrivileges")
+      lockHint=(if isPrivilegesToggleDisabled insufficientPrivilegesTip)
     }}
   {{/form.group}}
 {{else}}

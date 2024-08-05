@@ -34,6 +34,7 @@
             hasUnsavedPrivileges=recordDirectProxy.isModified
             effPrivilegesAffectorInfos=effPrivilegesAffectorInfos
             isPrivilegesToggleDisabled=isPrivilegesToggleDisabled
+            targetRecordType=targetRecord.entityType
           }}
           {{#if (get groupsOpenState groupPrivileges.name)}}
             {{#each groupPrivileges.subtree as |privilege|}}

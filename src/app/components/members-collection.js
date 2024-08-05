@@ -34,6 +34,8 @@ import { htmlSafe } from '@ember/template';
 import { formatNumber } from 'onedata-gui-common/helpers/format-number';
 import { later, cancel } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import joinStrings from 'onedata-gui-common/utils/i18n/join-strings';
+import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 
 const fallbackActionsGenerator = () => [];
 
@@ -299,10 +301,10 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<boolean>}
    */
-  isCurrentUserHaveSomeAdminPrivileges: computed(
+  hasCurrentUserSomeAdminPrivileges: computed(
     'effOzPrivileges',
     'recordType',
-    function isCurrentUserHaveSomeAdminPrivileges() {
+    function hasCurrentUserSomeAdminPrivileges() {
       let pluralRecordType = '';
       if (this.recordType === 'atm_inventory') {
         pluralRecordType = `${this.recordType.slice(0, -1)}ies`;
@@ -323,10 +325,10 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<boolean>}
    */
-  isCurrentUserHaveAdminSetPrivileges: computed(
+  hasCurrentUserAdminSetPrivileges: computed(
     'effOzPrivileges',
     'recordType',
-    function isCurrentUserHaveAdminSetPrivileges() {
+    function hasCurrentUserAdminSetPrivileges() {
       const recordType = this.recordType;
       let pluralRecordType = '';
       if (recordType === 'atm_inventory') {
@@ -339,15 +341,19 @@ export default Component.extend(I18n, {
     }
   ),
 
-  effPrivilegesOfCurrentUser: computed(
+  effPrivilegesOfCurrentUserProxy: computed(
     'currentUser.user',
     'griAspect',
-    function effPrivilegesOfCurrentUser() {
+    function effPrivilegesOfCurrentUserProxy() {
       const currentUser = this.currentUser.user;
       const effectivePrivilegesGri = this.getPrivilegesGriForMember(
-        currentUser, false, this.griAspect
+        currentUser,
+        false,
+        this.griAspect,
       );
-      return this.get('store').findRecord('privilege', effectivePrivilegesGri);
+      return PromiseObject.create({
+        promise: this.store.findRecord('privilege', effectivePrivilegesGri),
+      });
     }
   ),
 
@@ -357,7 +363,7 @@ export default Component.extend(I18n, {
   adminPrivForWarningTranslation: computed(function adminPrivForWarningTranslation() {
     const recordType = this.recordType;
     let pluralRecordType = '';
-    let privileges = [];
+    const privileges = [];
 
     if (recordType === 'atm_inventory') {
       pluralRecordType = `${recordType.slice(0, -1)}ies`;
@@ -370,28 +376,30 @@ export default Component.extend(I18n, {
     const viewMembers = `oz_${pluralRecordType}_view`;
 
     if (this.effOzPrivileges.includes(viewMembers)) {
-      privileges.push(this.tt("adminPrivilegesWarningPrivileges.viewMembers"));
+      privileges.push(this.tt('adminPrivilegesWarningPrivileges.viewMembers'));
     }
     if (this.effOzPrivileges.includes(viewPrivileges)) {
-      privileges.push(this.tt("adminPrivilegesWarningPrivileges.viewPrivileges"));
+      privileges.push(this.tt('adminPrivilegesWarningPrivileges.viewPrivileges'));
     }
     if (this.effOzPrivileges.includes(setPrivileges)) {
-      privileges.push(this.tt("adminPrivilegesWarningPrivileges.setPrivileges"));
+      privileges.push(this.tt('adminPrivilegesWarningPrivileges.setPrivileges'));
     }
 
-    return htmlSafe(privileges.join(', '));
+    return htmlSafe(joinStrings(this.i18n, privileges, 'and'));
   }),
 
   /**
    * @type {Ember.ComputedProperty<boolean>}
    */
-  isCurrentUserHaveSetPrivileges: computed(
-    'effPrivilegesOfCurrentUser.content.privileges',
+  hasCurrentUserSetPrivileges: computed(
+    'effPrivilegesOfCurrentUserProxy.content.privileges',
     'recordType',
-    function isCurrentUserHaveSetPrivileges() {
-      const privileges = this.effPrivilegesOfCurrentUser.content.privileges;
-      const recordType = this.recordType;
-      return privileges.includes(`${recordType}_set_privileges`);
+    function hasCurrentUserSetPrivileges() {
+      const privileges = this.get('effPrivilegesOfCurrentUserProxy.content.privileges');
+      if (!privileges) {
+        return false;
+      }
+      return privileges.includes(`${this.recordType}_set_privileges`);
     }
   ),
 
@@ -399,11 +407,11 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<boolean>}
    */
   isPrivilegesToggleDisabled: computed(
-    'isCurrentUserHaveAdminSetPrivileges',
-    'isCurrentUserHaveSetPrivileges',
+    'hasCurrentUserAdminSetPrivileges',
+    'hasCurrentUserSetPrivileges',
     function isPrivilegesToggleDisabled() {
-      return !this.isCurrentUserHaveAdminSetPrivileges &&
-        !this.isCurrentUserHaveSetPrivileges;
+      return !this.hasCurrentUserAdminSetPrivileges &&
+        !this.hasCurrentUserSetPrivileges;
     }
   ),
 

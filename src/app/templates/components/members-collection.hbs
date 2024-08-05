@@ -104,11 +104,11 @@
             </div>
             {{#if (or
               memberProxy.isOwner
-              (and memberProxy.isYou isCurrentUserHaveSomeAdminPrivileges)
+              (and memberProxy.isYou hasCurrentUserSomeAdminPrivileges)
             )}}
               <div class="alert alert-warning privileges-warning">
                 {{#if memberProxy.isOwner}}
-                  <p class="owner-warning">
+                  <p class="privileges-of-owner-warning">
                     {{#if memberProxy.isYou}}
                       {{tt this "youAreOwnerWarning"
                         model=(tt this
@@ -127,12 +127,12 @@
                 {{/if}}
                 {{#if (and
                   memberProxy.isOwner
-                  (and memberProxy.isYou isCurrentUserHaveSomeAdminPrivileges)
+                  (and memberProxy.isYou hasCurrentUserSomeAdminPrivileges)
                 )}}
                   <hr class="content-separator">
                 {{/if}}
-                {{#if (and memberProxy.isYou isCurrentUserHaveSomeAdminPrivileges)}}
-                  <p class="admin-priv-warning">
+                {{#if (and memberProxy.isYou hasCurrentUserSomeAdminPrivileges)}}
+                  <p class="admin-privileges-warning">
                     {{tt this "adminPrivilegesWarning"
                       pluralEntityType=(tt this
                         (concat
@@ -147,7 +147,7 @@
               </div>
             {{/if}}
             <div class="member-content">
-              {{#promise-proxy-container proxy=effPrivilegesOfCurrentUser}}
+              {{#promise-proxy-container proxy=effPrivilegesOfCurrentUserProxy}}
                 {{member-privileges/member-privileges-table
                   privilegesGroups=groupedPrivilegesFlags
                   privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath

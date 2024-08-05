@@ -87,6 +87,12 @@ export default Component.extend(I18n, {
   effPrivilegesAffectorInfos: undefined,
 
   /**
+   * @virtual
+   * @type {string}
+   */
+  targetRecordType: '',
+
+  /**
    * @virtual optional
    * @type {boolean}
    */
