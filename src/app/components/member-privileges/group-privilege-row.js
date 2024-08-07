@@ -87,10 +87,22 @@ export default Component.extend(I18n, {
   effPrivilegesAffectorInfos: undefined,
 
   /**
+   * @virtual
+   * @type {string}
+   */
+  targetRecordType: '',
+
+  /**
    * @virtual optional
    * @type {boolean}
    */
   arePrivilegesUpToDate: true,
+
+  /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  isPrivilegesToggleDisabled: false,
 
   /**
    * @type {number}

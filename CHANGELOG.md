@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12094 Blocked changing privileges when the user does not have privileges
 * VFS-12054 Fixed infinite effective privileges loading after changing members permissions failure
 * VFS-11707 Added detection of elements-blocking browser extensions with warning message
 * VFS-12016 Changed fetching records to start with no auth hint
