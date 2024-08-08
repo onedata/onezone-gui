@@ -349,7 +349,7 @@ export default Component.extend(I18n, {
       const effectivePrivilegesGri = this.getPrivilegesGriForMember(
         currentUser,
         false,
-        this.griAspect,
+        'user',
       );
       return PromiseObject.create({
         promise: this.store.findRecord('privilege', effectivePrivilegesGri),
