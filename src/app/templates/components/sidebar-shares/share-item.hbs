@@ -12,6 +12,14 @@
     {{/if}}
   {{/truncated-string}}
 </div>
+  {{#if isOpenData}}
+    <StatusToolbar as |toolbar|>
+      <toolbar.icon
+        @icon="globe-cursor"
+        @hint={{openDataTip}}
+      />
+    </StatusToolbar>
+  {{/if}}
 {{#unless inSidenav}}
   {{actions-toolbar
     isMinimized=true
