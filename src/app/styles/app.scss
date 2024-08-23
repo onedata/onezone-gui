@@ -56,3 +56,20 @@
 @import './components/space-details-tile';
 @import './components/space-marketplace-tile';
 @import './components/member-privileges';
+
+// FIXME: development
+
+.frontpage-iframe-container {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+}
+
+// FIXME: scrollowalność strony customowej
+.onezone-custom-frontpage-iframe {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}

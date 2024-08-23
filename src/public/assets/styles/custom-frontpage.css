@@ -1,0 +1,12 @@
+.hidden {
+  display: none !important;
+}
+
+#login-buttons-container {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  /* FIXME: delete? */
+  /* margin-top: 0; */
+}
+

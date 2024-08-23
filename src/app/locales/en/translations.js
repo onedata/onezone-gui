@@ -162,6 +162,7 @@ import modifyAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/modi
 import createAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/create-atm-workflow-schema-revision-action';
 import removeAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/remove-atm-workflow-schema-revision-action';
 import goToFile from './utils/url-action-handlers/go-to-file';
+import onezoneLoginViewModel from './utils/onezone-login-view-model';
 
 const translations = {
   tabs: {
@@ -301,6 +302,7 @@ const translations = {
   },
   utils: {
     atmWorkflow,
+    onezoneLoginViewModel,
     apiSamplesActions: {
       showApiSamplesAction,
     },

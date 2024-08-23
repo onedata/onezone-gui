@@ -103,6 +103,9 @@ export default LoginFormContainer.extend(
         .getAvailableAuthorizers(this.get('testMode'));
     }),
 
+    // FIXME: model
+    // supportedAuthorizersProxy: reads('loginViewModel.supportedAuthorizersProxy'),
+
     /**
      * If true, there are some auth providers to show.
      * @type {Ember.ComputedProperty<boolean>}
@@ -145,6 +148,7 @@ export default LoginFormContainer.extend(
       }
     }),
 
+    // FIXME: use view model
     /**
      * @type {computed.boolean}
      */
@@ -152,7 +156,9 @@ export default LoginFormContainer.extend(
       'browserDomain',
       'onezoneDomain',
       function showDomainMismatchWarning() {
-        return this.browserDomain !== this.onezoneDomain;
+        // FIXME: debug code
+        return true;
+        // return this.browserDomain !== this.onezoneDomain;
       }
     ),
 
@@ -179,6 +185,7 @@ export default LoginFormContainer.extend(
       this.cachedZoneDomainUpdater();
     },
 
+    // FIXME: duplikacja z modelem
     /**
      * @override
      */

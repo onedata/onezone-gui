@@ -21,12 +21,14 @@ export default LoginBox.extend({
    */
   isLoaded: true,
 
+  // FIXME: debug code
   /**
    * @override
    * Set in init when the special cookie is set
    */
-  sessionHasExpired: false,
+  sessionHasExpired: true,
 
+  // FIXME: use view model
   init() {
     this._super(...arguments);
     const cookies = this.get('cookies');
