@@ -110,7 +110,7 @@ h2 {
   max-height: var(--login-icon-size);
   border-radius: 10px;
   border: 0;
-  padding: 22px 20px;
+  padding: 0 20px;
 }
 
 .login-form-container input.has-error {

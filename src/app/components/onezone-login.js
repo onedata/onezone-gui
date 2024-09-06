@@ -133,7 +133,6 @@ export default Component.extend({
         privacyPolicyUrl: viewModel.privacyPolicyUrl,
         termsOfUseUrl: viewModel.termsOfUseUrl,
         version: viewModel.version,
-        // FIXME: prawdziwe obliczanie
         sessionHasExpired: viewModel.sessionHasExpired,
         isDomainMismatch: viewModel.isDomainMismatch,
       },

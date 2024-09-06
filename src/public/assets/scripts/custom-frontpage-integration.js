@@ -298,12 +298,12 @@ class FrontpageApi {
     <form id="login-form" class="login-form">
       <div id="login-form-inputs" class="login-form-inputs">
         <input id="username-input" class="username-input">
-        <input id="password-input" class="password-input">
+        <input id="password-input" type="password" class="password-input">
       </div>
       <div id="login-form-error-container" class="login-form-error-container"></div>
       <div id="login-form-buttons" class="login-form-buttons">
-        <button id="login-form-back-btn" class="login-form-button back-btn"></button>
-        <button id="login-form-sign-in-btn" class="login-form-button sign-in-btn"></button>
+        <button id="login-form-back-btn" type="button" class="login-form-button back-btn"></button>
+        <button id="login-form-sign-in-btn" type="submit" class="login-form-button sign-in-btn"></button>
       </div>
     </form>
 `;
@@ -315,8 +315,6 @@ class FrontpageApi {
     <div class="button-spinner"></div>
     <span>${this.model.i18n.signInButton}</span>
 `;
-    this.formSignInButton.type = 'submit';
-    this.passwordInput.type = 'password';
     this.loginForm.addEventListener('submit', (event) => {
       if (this.state === State.FormError) {
         this.setState(State.Form);
@@ -472,7 +470,9 @@ class FrontpageApi {
       this.formBackButton.disabled = false;
     }
     this.uninstallClearFormErrorListener();
-    this.usernameInput.focus();
+    if (![this.usernameInput, this.passwordInput].includes(document.activeElement)) {
+      this.usernameInput.focus();
+    }
   }
 
   handleButtonAuthorizingState(metadata) {
