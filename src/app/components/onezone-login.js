@@ -137,10 +137,16 @@ export default Component.extend({
         isDomainMismatch: viewModel.isDomainMismatch,
       },
       api: {
-        // FIXME: type
+        /**
+         * @param {FrontpageApi} frontpageApi
+         */
         registerFrontpageApi(frontpageApi) {
           self.iframeRegisterFrontpageApi(frontpageApi);
         },
+
+        /**
+         * @param {string} authorizerName
+         */
         authenticate(authorizerName) {
           if (authorizerName === 'basicAuth') {
             self.iframeSetFormState();
@@ -148,9 +154,18 @@ export default Component.extend({
             self.iframeAuthenticate(authorizerName);
           }
         },
+
+        /**
+         * @param {string} username
+         * @param {string} password
+         */
         usernameAuthenticate(username, password) {
           self.iframeUsernameAuthenticate(username, password);
         },
+
+        /**
+         * @returns {{ message: string, state: string }}
+         */
         getAuthenticationError() {
           return self.iframeGetAuthenticationError();
         },

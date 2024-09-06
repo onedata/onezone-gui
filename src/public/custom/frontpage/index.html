@@ -22,12 +22,27 @@
   <div id="footer" class="footer"></div>
 
   <!-- uncomment for development mode -->
-  <!--
+
   <script>
     window.frontpageDevelopment = true;
+    window.mock = {
+      loginMessage: 'Ea veniam adipisicing qui deserunt cillum fugiat qui dolore laboris. Duis aute dolore minim amet irure cillum ut veniam sunt minim. Reprehenderit laboris eu exercitation ipsum eiusmod quis amet enim aliquip fugiat incididunt. Minim qui eu ullamco id ut. Commodo adipisicing mollit velit cillum esse aliquip culpa.',
+      isAuthenticationError: false,
+      privacyPolicyUrl: 'https://example.com/privacy-policy',
+      termsOfUseUrl: 'https://example.com/terms-of-use',
+      version: '21.02.5',
+      sessionHasExpired: false,
+      isDomainMismatch: false,
+      // Uncomment below to show authentication error on init
+      // authenticationError: {
+      //   message: 'Example of error.',
+      //   refId: '123456',
+      //   isContactInfo: true,
+      // },
+    };
   </script>
   <script src="../../assets/scripts/custom-frontpage-integration.js"></script>
-  <link rel="stylesheet" href="../../assets/styles/custom-frontpage-integration.css">
-  -->
+  <link rel="stylesheet" href="../../assets/styles/custom-frontpage.css">
+
 </body>
 </html>

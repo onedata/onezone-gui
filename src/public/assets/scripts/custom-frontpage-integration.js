@@ -589,6 +589,7 @@ function createModelMock() {
   /** @type {FrontpageApi} */
   let localFrontpageApi;
   const imagesOrigin = 'https://dev-onezone.default.svc.cluster.local';
+  const windowMock = window.mock ?? {};
   return {
     data: {
       availableAuthorizers: [{
@@ -610,18 +611,43 @@ function createModelMock() {
           displayName: 'Google',
         },
       ],
-      loginMessage: 'Ea veniam adipisicing qui deserunt cillum fugiat qui dolore laboris. Duis aute dolore minim amet irure cillum ut veniam sunt minim. Reprehenderit laboris eu exercitation ipsum eiusmod quis amet enim aliquip fugiat incididunt. Minim qui eu ullamco id ut. Commodo adipisicing mollit velit cillum esse aliquip culpa.',
+      loginMessage: windowMock.loginMessage ?? 'Test message.',
+      isAuthenticationError: Boolean(windowMock?.authenticationError) ?? false,
+      privacyPolicyUrl: windowMock?.privacyPolicyUrl ?? 'https://example.com',
+      termsOfUseUrl: windowMock?.termsOfUseUrl ?? 'https://example.com',
+      version: windowMock?.version ?? '21.02.5',
+      sessionHasExpired: windowMock.sessionHasExpired ?? false,
+      isDomainMismatch: windowMock.isDomainMismatch ?? false,
     },
     api: {
       registerFrontpageApi(frontpageApi) {
         localFrontpageApi = frontpageApi;
       },
-      authenticate(authenticatorName) {
+      async authenticate(authenticatorName) {
         if (authenticatorName === 'basicAuth') {
           localFrontpageApi.setState(State.Form);
+        } else {
+          localFrontpageApi.setState(State.ButtonAuthorizing, {
+            authorizerName: authenticatorName
+          });
+          await new Promise(resolve => {
+            setTimeout(resolve, 2000);
+          });
+          localFrontpageApi.setState(State.Buttons);
         }
       },
-      usernameAuthenticate() {},
+      async usernameAuthenticate() {
+        localFrontpageApi.setState(State.FormAuthorizing);
+        await new Promise(resolve => {
+          setTimeout(resolve, 2000);
+        });
+        localFrontpageApi.setState(State.FormError, {
+          message: 'Invalid username and/or password.'
+        });
+      },
+      getAuthenticationError() {
+        return windowMock.authenticationError ?? null;
+      }
     },
     i18n: {
       signIn: 'Sign in',
@@ -631,6 +657,14 @@ function createModelMock() {
       password: 'Password',
       back: 'Back',
       signInButton: 'Sign in',
+      unknownError: 'Unknown error',
+      authenticationError: 'Authentication error',
+      authenticationErrorContactInfo: 'If the problem persists, please contact the site administrators and quote the below request state identifier:',
+      privacyPolicyLabel: 'Privacy policy',
+      termsOfUseLabel: 'Terms of use',
+      versionLabel: 'version',
+      sessionExpiredText: 'Your session has expired.',
+      domainMismatchText: `You have entered this page using a different domain (127.0.0.1) than the actual Onezone server domain (demo.onedata.org). Some of the content will be unavailable or malfunctioning, e.g. the file upload action. Use the server domain to ensure full functionality.`,
     }
   };
 }
