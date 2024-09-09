@@ -1,1 +1,6 @@
-<OnezoneLogin />
+{{!-- Pass login error info and other data from controller (see also the route) --}}
+<OnezoneLogin
+  @authenticationErrorReason={{authenticationErrorReason}}
+  @authenticationErrorState={{authenticationErrorState}}
+/>
+{{!-- FIXME: redundancja z templates/login ? --}}

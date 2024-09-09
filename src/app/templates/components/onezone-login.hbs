@@ -9,9 +9,6 @@
   {{else}}
     <LoginLayout @loginViewModel={{loginViewModel}}>
       <LoginBox
-        @authenticationSuccess="authenticationSuccess"
-        @authenticationErrorReason={{authenticationErrorReason}}
-        @authenticationErrorState={{authenticationErrorState}}
         @loginViewModel={{loginViewModel}}
       />
     </LoginLayout>

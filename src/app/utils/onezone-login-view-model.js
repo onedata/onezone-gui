@@ -1,32 +1,28 @@
 // FIXME: jsdoc
 
 import LoginViewModel from 'onedata-gui-common/utils/login-view-model';
-import { computed, get } from '@ember/object';
-import { reads } from '@ember/object/computed';
+import { computed } from '@ember/object';
+import { reads, equal } from '@ember/object/computed';
 import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { inject as service } from '@ember/service';
 import DOMPurify from 'dompurify';
-import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
-import AuthenticationErrorMessage from 'onedata-gui-common/mixins/authentication-error-message';
-import { underscore } from '@ember/string';
 import { sessionExpiredCookie } from 'onedata-gui-common/components/websocket-reconnection-modal';
 import globals from 'onedata-gui-common/utils/globals';
 import { htmlSafe } from '@ember/template';
-import sleep from 'onedata-gui-common/utils/sleep';
 
-const mixins = [
-  OwnerInjector,
-  AuthenticationErrorMessage,
-];
+/**
+ * @typedef {'badBasicCredentials'|'basicAuthNotSupported'|'basicAuthDisabled'|'userBlocked'} BasicAuthErrorId
+ */
 
-const fatalBasicAuthErrors = Object.freeze([
-  'basicAuthNotSupported',
-  'basicAuthDisabled',
-  'userBlocked',
-]);
+/**
+ * @typedef {Object} BasicAuthErrorInfo
+ * @property {boolean} isFatal
+ * @property {SafeString} message
+ * @property {BasicAuthErrorId} reason
+ */
 
-export default LoginViewModel.extend(...mixins, {
+export default LoginViewModel.extend({
   i18n: service(),
   onezoneServer: service(),
   guiMessageManager: service(),
@@ -36,6 +32,7 @@ export default LoginViewModel.extend(...mixins, {
   guiUtils: service(),
   cookies: service(),
   onedataConnection: service(),
+  router: service(),
 
   /**
    * @override
@@ -66,9 +63,6 @@ export default LoginViewModel.extend(...mixins, {
    */
   onAuthEndpointError: undefined,
 
-  // FIXME:
-  testMode: false,
-
   //#region state
 
   activeAuthorizer: null,
@@ -77,31 +71,50 @@ export default LoginViewModel.extend(...mixins, {
 
   /**
    * Array of all suported authorizers
-   * @type {PromiseArray<AuthorizerInfo>}
+   * @type {ComputedProperty<PromiseArray<AuthorizerInfo>>}
    */
   availableAuthorizersProxy: computed('testMode', function availableAuthorizersProxy() {
-    return promiseObject(this.authorizerManager.getAvailableAuthorizers(this.testMode));
+    return this.authorizerManager.getAvailableAuthorizers(this.testMode);
   }),
 
+  /**
+   * @type {ComputedProperty<PromiseObject<string>>}
+   */
   signInNotificationProxy: computed(function signInNotificationProxy() {
-    return this.guiMessageManager
-      .getMessage('signin_notification')
-      .then(message => {
-        const sanitizedMessage =
-          DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] }).toString();
-        return sanitizedMessage?.replaceAll('\n', '<br>') || undefined;
-      });
+    const promise = (async () => {
+      const message = await this.guiMessageManager.getMessage('signin_notification');
+      const sanitizedMessage =
+        DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] }).toString();
+      return sanitizedMessage?.replaceAll('\n', '<br>') || undefined;
+    })();
+    return promiseObject(promise);
   }),
 
+  /**
+   * Note: using this computed property will CLEAR the cookie!
+   * @type {ComputedProperty<boolean>}
+   */
   sessionHasExpired: computed(function sessionHasExpired() {
     return this.consumeSessionExpiredCookie();
   }),
 
+  /**
+   * @type {ComputedProperty<string>}
+   */
   browserDomain: computed(function browserDomain() {
     return globals.location.hostname;
   }),
 
+  /**
+   * @type {boolean}
+   */
+  testMode: equal('router.currentRouteName', 'test.login'),
+
   // FIXME: raczej nie zwracać tutaj HTML, tylko opakować w HTML na dalszym etapie
+  // FIXME: sprawdzić na custom frontpage, czy poprawnie obsługuje unknown
+  /**
+   * @type {ComputedProperty<string>}
+   */
   onezoneDomain: computed('onedataConnection.zoneDomain', function onezoneDomain() {
     return this.onedataConnection.zoneDomain ?? htmlSafe(`<em>${this.t('unknown')}</em>`);
   }),
@@ -119,14 +132,17 @@ export default LoginViewModel.extend(...mixins, {
   termsOfUseUrl: reads('guiMessageManager.termsOfUseUrl'),
 
   /**
-   * @type {ComputedProperty<object>}
+   * @type {ComputedProperty<SoftwareVersionDetails>}
    */
   softwareVersionDetails: reads('guiUtils.softwareVersionDetails'),
 
+  /**
+   * @type {ComputedProperty<string>}
+   */
   version: reads('softwareVersionDetails.serviceVersion'),
 
   /**
-   * Notifies about authentication error using auth provider.
+   * Notifies about error when initializing authentication using auth provider.
    * @param {object} error
    * @returns {undefined}
    */
@@ -148,29 +164,26 @@ export default LoginViewModel.extend(...mixins, {
       authorizer.type == authorizerName
     );
     this.set('activeAuthorizer', authorizer);
-    const loginEndpointPromise = this.testMode ?
-      this.onezoneServer.getTestLoginEndpoint(authorizerName) :
-      this.onezoneServer.getLoginEndpoint(authorizerName);
     try {
+      const loginEndpointPromise = this.testMode ?
+        this.onezoneServer.getTestLoginEndpoint(authorizerName) :
+        this.onezoneServer.getLoginEndpoint(authorizerName);
       const data = await loginEndpointPromise;
+      // FIXME: co to jest i dlaczego to jest osobna funkcja? może by przenieść do modelu
       handleLoginEndpoint(data, () => {
         this.notifyAuthEndpointError({
           // FIXME: impl, test
           message: this.t('authEndpointConfError'),
         });
-        // FIXME: impl
+        // FIXME: impl, dlaczego tutaj jest success a wyżej error?
         this.onAuthenticationSuccess?.();
       });
     } catch (error) {
       // FIXME: impl
-      this.notifyAuthEndpointError?.(error);
+      this.notifyAuthEndpointError(error);
       throw error;
     } finally {
-      this.setProperties({
-        activeAuthorizer: null,
-        // FIXME: impl
-        selectedAuthorizer: null,
-      });
+      this.set('activeAuthorizer', null);
     }
   },
 
@@ -191,33 +204,17 @@ export default LoginViewModel.extend(...mixins, {
   },
 
   /**
-   * @param {Object} error
-   * @returns {{ isFatal: boolean, message: SafeString, reason: string }}
+   * @private
+   * @returns {string}
    */
-  parseFormError(error) {
-    let reason;
-    let isFatal = false;
-    const errorId = error && get(error, 'details.authError.id');
-    if (fatalBasicAuthErrors.includes(errorId)) {
-      reason = underscore(errorId);
-      isFatal = true;
-    } else if (errorId === 'badBasicCredentials') {
-      reason = underscore(errorId);
-    } else {
-      reason = 'unknown';
-      isFatal = true;
-    }
-    return {
-      isFatal,
-      message: this.errorReasonToText(reason),
-      reason,
-    };
-  },
-
   readSessionExpiredCookie() {
     return this.cookies.read(sessionExpiredCookie);
   },
 
+  /**
+   * @private
+   * @returns {string}
+   */
   consumeSessionExpiredCookie() {
     try {
       return this.readSessionExpiredCookie();
