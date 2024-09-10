@@ -1,4 +1,11 @@
-// FIXME: jsdoc
+/**
+ * Main authentication screen component for Onezone. Renders iframe with custom frontpage
+ * template if it is provided or the original Onedata login components.
+ *
+ * @author Jakub Liput
+ * @copyright (C) 2024 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
 
 import Component from '@ember/component';
 import { computed } from '@ember/object';
@@ -8,8 +15,8 @@ import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 import { inject as service } from '@ember/service';
 import OnezoneLoginViewModel from 'onezone-gui/utils/onezone-login-view-model';
+import sleep from 'onedata-gui-common/utils/sleep';
 
-// FIXME: ujednolicić: authorization / authentication
 /**
  * Changes must be synchronized with custom-page-integration.js script.
  */
@@ -17,8 +24,8 @@ const FrontpageState = Object.freeze({
   Init: 'Init',
   Buttons: 'Buttons',
   Form: 'Form',
-  ButtonAuthorizing: 'ButtonAuthorizing',
-  FormAuthorizing: 'FormAuthorizing',
+  ButtonAuthenticating: 'ButtonAuthenticating',
+  FormAuthenticating: 'FormAuthenticating',
   Error: 'Error',
   FormError: 'FormError',
 });
@@ -84,7 +91,7 @@ export default Component.extend({
     return `${this.elementId}-custom-frontpage-iframe`;
   }),
 
-  availableAuthorizersProxy: reads('loginViewModel.availableAuthorizersProxy'),
+  availableAuthenticatorsProxy: reads('loginViewModel.availableAuthenticatorsProxy'),
 
   signInNotificationProxy: reads('loginViewModel.signInNotificationProxy'),
 
@@ -127,7 +134,7 @@ export default Component.extend({
     const onezoneDomain = viewModel.onezoneDomain;
     return {
       data: {
-        availableAuthorizers: await this.availableAuthorizersProxy,
+        availableAuthenticators: await this.availableAuthenticatorsProxy,
         loginMessage: await this.signInNotificationProxy,
         isAuthenticationError: Boolean(this.authenticationErrorReason),
         privacyPolicyUrl: viewModel.privacyPolicyUrl,
@@ -145,13 +152,13 @@ export default Component.extend({
         },
 
         /**
-         * @param {string} authorizerName
+         * @param {string} authenticatorName
          */
-        authenticate(authorizerName) {
-          if (authorizerName === 'basicAuth') {
+        authenticate(authenticatorName) {
+          if (authenticatorName === 'basicAuth') {
             self.iframeSetFormState();
           } else {
-            self.iframeAuthenticate(authorizerName);
+            self.iframeAuthenticate(authenticatorName);
           }
         },
 
@@ -191,14 +198,16 @@ export default Component.extend({
     };
   },
 
-  async iframeAuthenticate(authorizerName) {
-    this.frontpageApi.setState(FrontpageState.ButtonAuthorizing, { authorizerName });
+  async iframeAuthenticate(authenticatorName) {
+    this.frontpageApi.setState(FrontpageState.ButtonAuthenticating, {
+      authenticatorName,
+    });
     // FIXME: obsługiwać tutaj asychroniczne zmiany stanu (loader dla bloczku itd.)
     try {
       // FIXME: debug code
-      // await sleep(5000);
+      await sleep(5000);
       // throw new Error('test');
-      await this.loginViewModel.authenticate(authorizerName);
+      await this.loginViewModel.authenticate(authenticatorName);
     } catch (error) {
       // Currently, the loginViewModel.authenticate method handles endpoint error itself
       // using a modal, so we just go back to buttons view state.
@@ -215,7 +224,7 @@ export default Component.extend({
   },
 
   async iframeUsernameAuthenticate(username, password) {
-    this.frontpageApi.setState(FrontpageState.FormAuthorizing);
+    this.frontpageApi.setState(FrontpageState.FormAuthenticating);
     try {
       await this.loginViewModel.usernameAuthenticate(username, password);
     } catch (error) {

@@ -15,7 +15,7 @@ class Xd {
 }
 
 /**
- * @typedef {Object} Authorizer
+ * @typedef {Object} Authenticator
  * @property {'basicAuth'|string} id
  * @property {string} iconPath
  * @property {string} iconBackgroundColor
@@ -27,16 +27,16 @@ class Xd {
  * @property {Object} api
  * @property {(username: string, password: string) => void} api.usernameAuthenticate
  * @property {(frontpageApi: FrontpageApi) => void} api.registerFrontpageApi
- * @property {(authorizerName: string) => void} api.authenticate
+ * @property {(authenticatorName: string) => void} api.authenticate
  * @property {Object} data
- * @property {Array<Authorizer>} data.availableAuthorizers
+ * @property {Array<Authenticator>} data.availableAuthenticators
  * @property {string} data.loginMessage
  * @property {boolean} data.isAuthenticationError
  * @property {Object} i18n
  */
 
 /**
- * @typedef {'Init'|'Buttons'|'Form'|'ButtonAuthorizing'|'FormAuthorizing'|'Error'|'FormError','Final'} FrontpageStateValue
+ * @typedef {'Init'|'Buttons'|'Form'|'ButtonAuthenticating'|'FormAuthenticating'|'Error'|'FormError','Final'} FrontpageStateValue
  */
 
 /**
@@ -46,8 +46,8 @@ const FrontpageState = Object.freeze({
   Init: 'Init',
   Buttons: 'Buttons',
   Form: 'Form',
-  ButtonAuthorizing: 'ButtonAuthorizing',
-  FormAuthorizing: 'FormAuthorizing',
+  ButtonAuthenticating: 'ButtonAuthenticating',
+  FormAuthenticating: 'FormAuthenticating',
   Error: 'Error',
   FormError: 'FormError',
   Final: 'Final',
@@ -60,10 +60,10 @@ const State = FrontpageState;
  */
 const StateTransitions = Object.freeze({
   [State.Init]: [State.Form, State.Buttons, State.Error],
-  [State.Buttons]: [State.Form, State.ButtonAuthorizing],
-  [State.Form]: [State.FormAuthorizing, State.Buttons],
-  [State.ButtonAuthorizing]: [State.Buttons, State.Final],
-  [State.FormAuthorizing]: [State.Error, State.FormError, State.Form, State.Final],
+  [State.Buttons]: [State.Form, State.ButtonAuthenticating],
+  [State.Form]: [State.FormAuthenticating, State.Buttons],
+  [State.ButtonAuthenticating]: [State.Buttons, State.Final],
+  [State.FormAuthenticating]: [State.Error, State.FormError, State.Form, State.Final],
   [State.FormError]: [State.Form, State.Buttons],
   [State.Error]: [State.Init],
 });
@@ -89,8 +89,8 @@ class FrontpageApi {
   }
 
   get isOnlyBasicAuth() {
-    const authorizers = this.model?.data?.availableAuthorizers;
-    return authorizers?.length === 1 && authorizers[0].id === 'basicAuth';
+    const authenticators = this.model?.data?.availableAuthenticators;
+    return authenticators?.length === 1 && authenticators[0].id === 'basicAuth';
   }
 
   get isAuthenticationError() {
@@ -230,17 +230,17 @@ class FrontpageApi {
    */
   initLoginButtons() {
     const elements = [];
-    for (const authorizer of this.model?.data?.availableAuthorizers) {
+    for (const authenticator of this.model?.data?.availableAuthenticators) {
       const loginIconBox = document.createElement('a');
-      loginIconBox.style.backgroundColor = authorizer.iconBackgroundColor ?? '#ffffff';
-      loginIconBox.classList.add('login-icon-box', 'auth-icon', authorizer.id);
+      loginIconBox.style.backgroundColor = authenticator.iconBackgroundColor ?? '#ffffff';
+      loginIconBox.classList.add('login-icon-box', 'auth-icon', authenticator.id);
       loginIconBox.addEventListener('click', () => {
         if (this.state === State.Buttons) {
-          this.model.api.authenticate(authorizer.id);
+          this.model.api.authenticate(authenticator.id);
         }
       });
       const authIconImage = document.createElement('div')
-      authIconImage.style.backgroundImage = `url(${authorizer.iconPath})`;
+      authIconImage.style.backgroundImage = `url(${authenticator.iconPath})`;
       authIconImage.classList.add('auth-icon-image');
       const loginIconSpinner = document.createElement('div');
       loginIconSpinner.classList.add('login-icon-spinner', 'hidden');
@@ -475,11 +475,11 @@ class FrontpageApi {
     }
   }
 
-  handleButtonAuthorizingState(metadata) {
-    this.setAuthIconSpinner(metadata.authorizerName, true);
+  handleButtonAuthenticatingState(metadata) {
+    this.setAuthIconSpinner(metadata.authenticatorName, true);
   }
 
-  handleFormAuthorizingState() {
+  handleFormAuthenticatingState() {
     this.usernameInput.disabled = true;
     this.passwordInput.disabled = true;
     this.formSignInButton.disabled = true;
@@ -566,8 +566,9 @@ class FrontpageApi {
     );
   }
 
-  setAuthIconSpinner(authorizerId, isLoading) {
-    const button = this.buttonsContainer.querySelector(`.login-icon-box.${authorizerId}`);
+  setAuthIconSpinner(authenticatorName, isLoading) {
+    const button =
+      this.buttonsContainer.querySelector(`.login-icon-box.${authenticatorName}`);
     if (!button) {
       return;
     }
@@ -578,7 +579,7 @@ class FrontpageApi {
   }
 
   setAllAuthIconsSpinners(isLoading) {
-    for (const { id } of this.model.data.availableAuthorizers) {
+    for (const { id } of this.model.data.availableAuthenticators) {
       this.setAuthIconSpinner(id, isLoading);
     }
   }
@@ -592,7 +593,7 @@ function createModelMock() {
   const windowMock = window.mock ?? {};
   return {
     data: {
-      availableAuthorizers: [{
+      availableAuthenticators: [{
           id: 'basicAuth',
           iconPath: `${imagesOrigin}/ozw/onezone/assets/images/auth-providers/basicauth.svg`,
           iconBackgroundColor: '#4BD187',
@@ -627,8 +628,8 @@ function createModelMock() {
         if (authenticatorName === 'basicAuth') {
           localFrontpageApi.setState(State.Form);
         } else {
-          localFrontpageApi.setState(State.ButtonAuthorizing, {
-            authorizerName: authenticatorName
+          localFrontpageApi.setState(State.ButtonAuthenticating, {
+            authenticatorName
           });
           await new Promise(resolve => {
             setTimeout(resolve, 2000);
@@ -637,7 +638,7 @@ function createModelMock() {
         }
       },
       async usernameAuthenticate() {
-        localFrontpageApi.setState(State.FormAuthorizing);
+        localFrontpageApi.setState(State.FormAuthenticating);
         await new Promise(resolve => {
           setTimeout(resolve, 2000);
         });

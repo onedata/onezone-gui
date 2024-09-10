@@ -94,7 +94,7 @@ export default LoginFormContainer.extend(...mixins, {
    * Array of all suported authorizers
    * @type {PromiseArray<AuthorizerInfo>|null}
    */
-  supportedAuthorizersProxy: reads('loginViewModel.availableAuthorizersProxy'),
+  supportedAuthorizersProxy: reads('loginViewModel.availableAuthenticatorsProxy'),
 
   /**
    * Array of all supported authorizers.

@@ -1,6 +1,10 @@
 /**
  * A dropdown component which presents authorizers.
  *
+ * Note: most of the authentication code (components, utils) use wrong naming, where
+ * authentication is called "authorization". New code (September 2024+) use
+ * "authentication" naming, so there can be some naming incostinstencies.
+ *
  * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

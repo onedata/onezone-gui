@@ -65,17 +65,20 @@ export default LoginViewModel.extend({
 
   //#region state
 
-  activeAuthorizer: null,
+  activeAuthenticator: null,
 
   //#endregion
 
   /**
-   * Array of all suported authorizers
-   * @type {ComputedProperty<PromiseArray<AuthorizerInfo>>}
+   * Array of all supported authenticators
+   * @type {ComputedProperty<PromiseArray<Authenticator>>}
    */
-  availableAuthorizersProxy: computed('testMode', function availableAuthorizersProxy() {
-    return this.authorizerManager.getAvailableAuthorizers(this.testMode);
-  }),
+  availableAuthenticatorsProxy: computed(
+    'testMode',
+    function availableAuthenticatorsProxy() {
+      return this.authorizerManager.getAvailableAuthorizers(this.testMode);
+    }
+  ),
 
   /**
    * @type {ComputedProperty<PromiseObject<string>>}
@@ -155,19 +158,20 @@ export default LoginViewModel.extend({
 
   /**
    * Performs authentication using given auth provider name.
-   * @param {string} authorizerName
+   * @param {string} authenticatorName
    * @returns {Promise}
    */
-  async authenticate(authorizerName) {
-    const availableAuthorizers = await this.availableAuthorizersProxy;
-    const authorizer = availableAuthorizers.find(authorizer =>
-      authorizer.type == authorizerName
+  async authenticate(authenticatorName) {
+    const availableAuthenticators = await this.availableAuthenticatorsProxy;
+    debugger;
+    const authenticator = availableAuthenticators.find(authenticator =>
+      authenticator.type == authenticatorName
     );
-    this.set('activeAuthorizer', authorizer);
+    this.set('activeAuthenticator', authenticator);
     try {
       const loginEndpointPromise = this.testMode ?
-        this.onezoneServer.getTestLoginEndpoint(authorizerName) :
-        this.onezoneServer.getLoginEndpoint(authorizerName);
+        this.onezoneServer.getTestLoginEndpoint(authenticatorName) :
+        this.onezoneServer.getLoginEndpoint(authenticatorName);
       const data = await loginEndpointPromise;
       // FIXME: co to jest i dlaczego to jest osobna funkcja? może by przenieść do modelu
       handleLoginEndpoint(data, () => {
@@ -183,7 +187,7 @@ export default LoginViewModel.extend({
       this.notifyAuthEndpointError(error);
       throw error;
     } finally {
-      this.set('activeAuthorizer', null);
+      this.set('activeAuthenticator', null);
     }
   },
 

@@ -26,7 +26,6 @@ export default LoginBox.extend({
    */
   sessionHasExpired: false,
 
-  // FIXME: use view model
   init() {
     this._super(...arguments);
     this.set(
