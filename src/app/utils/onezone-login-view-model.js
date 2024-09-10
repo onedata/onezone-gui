@@ -163,7 +163,6 @@ export default LoginViewModel.extend({
    */
   async authenticate(authenticatorName) {
     const availableAuthenticators = await this.availableAuthenticatorsProxy;
-    debugger;
     const authenticator = availableAuthenticators.find(authenticator =>
       authenticator.type == authenticatorName
     );

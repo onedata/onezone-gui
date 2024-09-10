@@ -34,6 +34,7 @@ export default Component.extend({
   classNames: ['onezone-login'],
   classNameBindings: ['isCustomFrontpageShown:frontpage-iframe-container'],
 
+  i18n: service(),
   authorizerManager: service(),
   guiMessageManager: service(),
   router: service(),
@@ -50,7 +51,6 @@ export default Component.extend({
    */
   authenticationErrorState: undefined,
 
-  // FIXME: odporność na różne ścieżki - powinienem dostawać tą scieżkę z backendu
   frontpagePath: 'custom/frontpage/index.html',
 
   //#region state
@@ -132,6 +132,7 @@ export default Component.extend({
     const viewModel = this.loginViewModel;
     const browserDomain = viewModel.browserDomain;
     const onezoneDomain = viewModel.onezoneDomain;
+    const t = this.i18n.t.bind(this.i18n);
     return {
       data: {
         availableAuthenticators: await this.availableAuthenticatorsProxy,
@@ -177,23 +178,26 @@ export default Component.extend({
           return self.iframeGetAuthenticationError();
         },
       },
-      // FIXME: prawdziwe i18n
       i18n: {
-        signIn: 'Sign in',
-        withIdentityProvider: 'with your identity provider',
-        usingUsername: 'using your username & password',
-        username: 'Username',
-        password: 'Password',
-        back: 'Back',
-        signInButton: 'Sign in',
-        unknownError: 'Unknown error',
-        authenticationError: 'Authentication error',
-        authenticationErrorContactInfo: 'If the problem persists, please contact the site administrators and quote the below request state identifier:',
-        privacyPolicyLabel: 'Privacy policy',
-        termsOfUseLabel: 'Terms of use',
-        versionLabel: 'version',
-        sessionExpiredText: 'Your session has expired.',
-        domainMismatchText: `You have entered this page using a different domain (${browserDomain}) than the actual Onezone server domain (${onezoneDomain}). Some of the content will be unavailable or malfunctioning, e.g. the file upload action. Use the server domain to ensure full functionality.`,
+        signIn: t('components.loginBox.signIn'),
+        withIdentityProvider: t('components.loginBox.loginFormContainer.dropdownSubtitle'),
+        usingUsername: t('components.loginBox.loginFormContainer.formSubtitle'),
+        username: t('components.basicauthLoginForm.username'),
+        password: t('components.basicauthLoginForm.password'),
+        back: t('components.basicauthLoginForm.back'),
+        signInButton: t('components.loginBox.signIn'),
+        unknownError: t('mixins.authenticationErrorMessage.codes.unknown'),
+        authenticationError: t('components.loginBox.errorTitle'),
+        authenticationErrorContactInfo: t('mixins.authenticationErrorMessage.contactInfo'),
+        privacyPolicyLabel: t('components.loginLayout.privacyPolicy'),
+        termsOfUseLabel: t('components.loginLayout.termsOfUse'),
+        versionLabel: t('components.loginLayout.version'),
+        sessionExpiredText: t('components.loginBox.loginFormContainer.sessionExpired'),
+        domainMismatchText: t(
+          'components.loginBox.loginFormContainer.domainMismatchWarning', {
+            browserDomain,
+            onezoneDomain,
+          }),
       },
     };
   },
@@ -235,8 +239,7 @@ export default Component.extend({
         });
       } else {
         this.frontpageApi.setState(FrontpageState.FormError, {
-          // FIXME: i18n
-          message: 'Invalid username and/or password.',
+          message: this.i18n.t('components.basicauthLoginForm.invalidCredentials'),
         });
       }
     }
@@ -257,13 +260,11 @@ export default Component.extend({
     }
   },
 
-  // FIXME: być może nie tutaj będzie najlepiej mieć await
   async injectFrontpageIntegrationScript(iframe) {
     iframe.contentWindow.customFrontpageModel = await this.getCustomFrontpageModel();
     const iframeDocument = iframe.contentWindow.document;
     // append integration script
     const script = iframeDocument.createElement('script');
-    // FIXME: odporność na różne ścieżki customowe
     script.src = '../../assets/scripts/custom-frontpage-integration.js';
     const style = iframeDocument.createElement('link');
     style.rel = 'stylesheet';

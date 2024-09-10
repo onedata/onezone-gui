@@ -11,7 +11,7 @@ export default {
   noSignInMethods: 'There are no sign-in methods configured.',
   signInTestMode: 'This is the test sign-in page — based on test.auth.config — used for sign-in simulation and diagnostics.',
   goBackToMainPage: 'Go back to the main page.',
-  sessionExpired: 'Your session has expired',
+  sessionExpired: 'Your session has expired.',
   domainMismatchWarning: 'You have entered this page using a different domain ({{browserDomain}}) than the actual Onezone server domain ({{onezoneDomain}}). Some of the content will be unavailable or malfunctioning, e.g. the file upload action. Use the server domain to ensure full functionality.',
   unknown: 'unknown',
 };
