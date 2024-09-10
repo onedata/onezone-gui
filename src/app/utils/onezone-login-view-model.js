@@ -16,7 +16,6 @@ import { inject as service } from '@ember/service';
 import DOMPurify from 'dompurify';
 import { sessionExpiredCookie } from 'onedata-gui-common/components/websocket-reconnection-modal';
 import globals from 'onedata-gui-common/utils/globals';
-import { htmlSafe } from '@ember/template';
 
 /**
  * @typedef {'badBasicCredentials'|'basicAuthNotSupported'|'basicAuthDisabled'|'userBlocked'} BasicAuthErrorId
@@ -175,17 +174,14 @@ export default LoginViewModel.extend({
         this.onezoneServer.getTestLoginEndpoint(authenticatorName) :
         this.onezoneServer.getLoginEndpoint(authenticatorName);
       const data = await loginEndpointPromise;
-      // FIXME: co to jest i dlaczego to jest osobna funkcja? może by przenieść do modelu
       handleLoginEndpoint(data, () => {
-        this.notifyAuthEndpointError({
-          // FIXME: impl, test
+        const error = {
           message: this.t('authEndpointConfError'),
-        });
-        // FIXME: impl, dlaczego tutaj jest success a wyżej error?
-        this.onAuthenticationSuccess?.();
+        };
+        this.notifyAuthEndpointError(error);
+        throw error;
       });
     } catch (error) {
-      // FIXME: impl
       this.notifyAuthEndpointError(error);
       throw error;
     } finally {
