@@ -15,6 +15,7 @@ import { computed } from '@ember/object';
 import LoginFormContainer from 'onedata-gui-common/components/login-box/login-form-container';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import $ from 'jquery';
+import { htmlSafe } from '@ember/template';
 
 const ANIMATION_TIMEOUT = 333;
 
@@ -56,6 +57,10 @@ export default LoginFormContainer.extend(...mixins, {
   //#endregion
 
   signInNotificationProxy: reads('loginViewModel.signInNotificationProxy'),
+
+  onezoneDomainText: computed('onezoneDomain', function onezoneDomainText() {
+    return this.onezoneDomain ?? htmlSafe(`<em>${this.t('unknown')}</em>`);
+  }),
 
   /**
    * If true, component is waiting for data to load.

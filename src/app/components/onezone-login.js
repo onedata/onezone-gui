@@ -15,7 +15,7 @@ import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 import { inject as service } from '@ember/service';
 import OnezoneLoginViewModel from 'onezone-gui/utils/onezone-login-view-model';
-import sleep from 'onedata-gui-common/utils/sleep';
+import { htmlSafe } from '@ember/template';
 
 /**
  * Changes must be synchronized with custom-page-integration.js script.
@@ -129,10 +129,12 @@ export default Component.extend({
 
   async getCustomFrontpageModel() {
     const self = this;
+    const t = this.i18n.t.bind(this.i18n);
     const viewModel = this.loginViewModel;
     const browserDomain = viewModel.browserDomain;
     const onezoneDomain = viewModel.onezoneDomain;
-    const t = this.i18n.t.bind(this.i18n);
+    const onezoneDomainText = onezoneDomain ??
+      htmlSafe(`<em>${t('components.loginBox.loginFormContainer.unknown')}</em>`);
     return {
       data: {
         availableAuthenticators: await this.availableAuthenticatorsProxy,
@@ -196,7 +198,7 @@ export default Component.extend({
         domainMismatchText: t(
           'components.loginBox.loginFormContainer.domainMismatchWarning', {
             browserDomain,
-            onezoneDomain,
+            onezoneDomain: onezoneDomainText,
           }),
       },
     };
@@ -206,10 +208,9 @@ export default Component.extend({
     this.frontpageApi.setState(FrontpageState.ButtonAuthenticating, {
       authenticatorName,
     });
-    // FIXME: obsługiwać tutaj asychroniczne zmiany stanu (loader dla bloczku itd.)
     try {
       // FIXME: debug code
-      await sleep(5000);
+      // await sleep(5000);
       // throw new Error('test');
       await this.loginViewModel.authenticate(authenticatorName);
     } catch (error) {

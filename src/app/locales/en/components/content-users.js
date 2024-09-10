@@ -29,9 +29,7 @@ export default {
   userDataPersistence: 'user data persistence',
   addAccount: 'Add account...',
   addAccountDropdownPlaceholder: 'Find your identity provider...',
-  // FIXME: pewnie do usunięcia
   authEndpointError: 'Getting authentication endpoint failed',
   authentication: 'authentication',
-  // FIXME: pewnie do usunięcia
   authEndpointConfError: 'Authorization configuration is invalid, please contact system administrator',
 };

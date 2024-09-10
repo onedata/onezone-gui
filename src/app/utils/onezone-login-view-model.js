@@ -1,4 +1,11 @@
-// FIXME: jsdoc
+/**
+ * View Model to use in components displaying login screen elements, specifically
+ * in Onezone.
+ *
+ * @author Jakub Liput
+ * @copyright (C) 2024 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
 
 import LoginViewModel from 'onedata-gui-common/utils/login-view-model';
 import { computed } from '@ember/object';
@@ -113,14 +120,10 @@ export default LoginViewModel.extend({
    */
   testMode: equal('router.currentRouteName', 'test.login'),
 
-  // FIXME: raczej nie zwracać tutaj HTML, tylko opakować w HTML na dalszym etapie
-  // FIXME: sprawdzić na custom frontpage, czy poprawnie obsługuje unknown
   /**
    * @type {ComputedProperty<string>}
    */
-  onezoneDomain: computed('onedataConnection.zoneDomain', function onezoneDomain() {
-    return this.onedataConnection.zoneDomain ?? htmlSafe(`<em>${this.t('unknown')}</em>`);
-  }),
+  onezoneDomain: reads('onedataConnection.zoneDomain'),
 
   isDomainMismatch: computed(
     'browserDomain',
