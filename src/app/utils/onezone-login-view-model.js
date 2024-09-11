@@ -33,7 +33,6 @@ export default LoginViewModel.extend({
   onezoneServer: service(),
   guiMessageManager: service(),
   authorizerManager: service(),
-  session: service(),
   globalNotify: service(),
   guiUtils: service(),
   cookies: service(),
@@ -97,14 +96,6 @@ export default LoginViewModel.extend({
       return sanitizedMessage?.replaceAll('\n', '<br>') || undefined;
     })();
     return promiseObject(promise);
-  }),
-
-  /**
-   * Note: using this computed property will CLEAR the cookie!
-   * @type {ComputedProperty<boolean>}
-   */
-  sessionHasExpired: computed(function sessionHasExpired() {
-    return this.consumeSessionExpiredCookie();
   }),
 
   /**
@@ -187,22 +178,6 @@ export default LoginViewModel.extend({
     } finally {
       this.set('activeAuthenticator', null);
     }
-  },
-
-  async usernameAuthenticate(username, password) {
-    // FIXME: debug code
-    // await sleep(5000);
-    // throw {
-    //   details: {
-    //     authError: {
-    //       id: 'badBasicCredentials',
-    //     },
-    //   },
-    // };
-    await this.session.authenticate('authenticator:application', {
-      username,
-      password,
-    });
   },
 
   /**

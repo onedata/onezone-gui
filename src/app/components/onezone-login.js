@@ -35,9 +35,6 @@ export default Component.extend({
   classNameBindings: ['isCustomFrontpageShown:frontpage-iframe-container'],
 
   i18n: service(),
-  authorizerManager: service(),
-  guiMessageManager: service(),
-  router: service(),
 
   /**
    * @virtual
@@ -61,8 +58,6 @@ export default Component.extend({
   loginViewModel: undefined,
 
   //#endregion
-
-  testMode: equal('router.currentRouteName', 'test.login'),
 
   isCustomFrontpageShown: bool('isCustomFrontpageAvailable'),
 

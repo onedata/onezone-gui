@@ -135,5 +135,9 @@ module.exports = function (defaults) {
     });
   }
 
+  app.import('onezone-gui/scripts/custom-frontpage-integration.js', {
+    outputFile: 'assets/scripts/custom-frontpage-integration.js',
+  });
+
   return app.toTree();
 };

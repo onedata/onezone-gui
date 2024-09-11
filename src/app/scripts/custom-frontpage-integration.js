@@ -19,14 +19,10 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-// FIXME: translacja z ecmascript? - test poniżej
-class Xd {
-  #aa = 1;
-
-  fun() {
-    return this.#aa;
-  }
-}
+// This script is invoked in the context of index.html of custom frontpage, so allow
+// to use browser globals (they cannot be imported anyway).
+/* eslint no-restricted-globals: ["off"] */
+/* eslint promise/no-native: ["off"] */
 
 /**
  * @typedef {Object} Authenticator
@@ -188,10 +184,6 @@ class FrontpageApi {
     return document.getElementById('login-form-sign-in-btn');
   }
 
-  get formContainer() {
-    return document.getElementById('login-form-container');
-  }
-
   /**
    * @type {HTMLDivElement}
    */
@@ -244,7 +236,8 @@ class FrontpageApi {
    */
   initLoginButtons() {
     const elements = [];
-    for (const authenticator of this.model?.data?.availableAuthenticators) {
+    const authenticators = this.model?.data?.availableAuthenticators ?? [];
+    for (const authenticator of authenticators) {
       const loginIconBox = document.createElement('a');
       loginIconBox.style.backgroundColor = authenticator.iconBackgroundColor ?? '#ffffff';
       loginIconBox.classList.add('login-icon-box', 'auth-icon', authenticator.id);
@@ -403,7 +396,7 @@ class FrontpageApi {
     <button id="error-back-btn" class="back-btn"></button>
 `;
     this.errorBackButton.innerHTML = '&lt; ' + this.model.i18n.back;
-    this.errorBackButton.addEventListener('click', (event) => {
+    this.errorBackButton.addEventListener('click', () => {
       this.isAuthenticationErrorDismissed = true;
       this.setState(State.Init);
     });
@@ -506,7 +499,6 @@ class FrontpageApi {
   }
 
   handleErrorState(metadata) {
-    // FIXME: sprawdzić wsparcie opt. chain
     this.initErrorContainer(
       metadata?.message,
       metadata?.refId,
@@ -601,7 +593,6 @@ class FrontpageApi {
   }
 }
 
-// FIXME: uzupełnić mock
 function createModelMock() {
   /** @type {FrontpageApi} */
   let localFrontpageApi;
