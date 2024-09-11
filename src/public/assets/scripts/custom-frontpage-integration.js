@@ -1,9 +1,23 @@
-// FIXME: debug code
-console.log('custom-frontpage-integration!');
-
-// FIXME: doc
-
-// FIXME: ten plik nie jest kopiowany podczas przebudowywania (watcher)
+/**
+ * This script is added to the user-provided template of custom frontpage (login screen)
+ * for Onezone GUI.
+ *
+ * The custom frontpage is created by the user and put onto the Onezone server by admin.
+ * Onezone GUI renders an iframe that displays `index.html` with user-created custom frontpage
+ * and injects this script (integration script) and basic stylesheet into the custom frontpage.
+ *
+ * The script has some data and API injected from Onezone GUI main window, which allows to
+ * push the data and invoke commands in the application (see `FrontpageApi.model` getter).
+ *
+ * The custom template contains special HTML elements which are populated and managed by this script.
+ * Views are managed using a state machine - see implementaion of:
+ * - `FrontpageState` enum
+ * - `FrontpageApi.setState`
+ *
+ * @author Jakub Liput
+ * @copyright (C) 2024 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
 
 // FIXME: translacja z ecmascript? - test poniżej
 class Xd {
@@ -239,7 +253,7 @@ class FrontpageApi {
           this.model.api.authenticate(authenticator.id);
         }
       });
-      const authIconImage = document.createElement('div')
+      const authIconImage = document.createElement('div');
       authIconImage.style.backgroundImage = `url(${authenticator.iconPath})`;
       authIconImage.classList.add('auth-icon-image');
       const loginIconSpinner = document.createElement('div');
@@ -347,7 +361,7 @@ class FrontpageApi {
     const termsOfUseUrl = this.model.data.termsOfUseUrl;
     const version = this.model.data.version;
     this.footer.classList.add('login-footer');
-    let innerHtml = ''
+    let innerHtml = '';
     if (privacyPolicyUrl) {
       innerHtml += `
     <a href="${privacyPolicyUrl}" target="_top" class="footer-link">${privacyPolicyLabel}</a>
@@ -413,16 +427,18 @@ class FrontpageApi {
 
   setState(state, metadata) {
     if (!Object.values(State).includes(state)) {
-      // FIXME: do not throw in production
-      throw new Error(`invalid state ${state}`);
+      console.error(`Custom frontpage: invalid state ${state}`);
+      return;
     }
     if (
       !StateTransitions[this.state]?.includes(state) &&
       // check first time setting Init state (from undefined)
       !(!this.state && state === State.Init)
     ) {
-      // FIXME: do not throw in production
-      throw new Error(`invalid state transition ${this.state} -> ${state}`);
+      console.error(
+        `Custom frontpage: invalid state transition ${this.state} -> ${state}`
+      );
+      return;
     }
     const methodName = `handle${state}State`;
     this[methodName](metadata);
@@ -629,7 +645,7 @@ function createModelMock() {
           localFrontpageApi.setState(State.Form);
         } else {
           localFrontpageApi.setState(State.ButtonAuthenticating, {
-            authenticatorName
+            authenticatorName,
           });
           await new Promise(resolve => {
             setTimeout(resolve, 2000);
@@ -643,12 +659,12 @@ function createModelMock() {
           setTimeout(resolve, 2000);
         });
         localFrontpageApi.setState(State.FormError, {
-          message: 'Invalid username and/or password.'
+          message: 'Invalid username and/or password.',
         });
       },
       getAuthenticationError() {
         return windowMock.authenticationError ?? null;
-      }
+      },
     },
     i18n: {
       signIn: 'Sign in',
@@ -665,8 +681,8 @@ function createModelMock() {
       termsOfUseLabel: 'Terms of use',
       versionLabel: 'version',
       sessionExpiredText: 'Your session has expired.',
-      domainMismatchText: `You have entered this page using a different domain (127.0.0.1) than the actual Onezone server domain (demo.onedata.org). Some of the content will be unavailable or malfunctioning, e.g. the file upload action. Use the server domain to ensure full functionality.`,
-    }
+      domainMismatchText: 'You have entered this page using a different domain (127.0.0.1) than the actual Onezone server domain (demo.onedata.org). Some of the content will be unavailable or malfunctioning, e.g. the file upload action. Use the server domain to ensure full functionality.',
+    },
   };
 }
 
@@ -677,6 +693,4 @@ function createModelMock() {
   const frontpageApi = new FrontpageApi();
   frontpageApi.mountFrontpage();
   frontpageApi.setState(State.Init);
-  // FIXME: debug
-  window.frontpageApi = frontpageApi;
 })();

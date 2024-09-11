@@ -70,9 +70,6 @@ export default Component.extend({
     'frontpagePath',
     function isCustomFrontpageAvailableProxy() {
       return promiseObject((async () => {
-        // FIXME: debug code
-        // return false;
-
         /** @type {Response} */
         let response;
         try {
@@ -209,9 +206,6 @@ export default Component.extend({
       authenticatorName,
     });
     try {
-      // FIXME: debug code
-      // await sleep(5000);
-      // throw new Error('test');
       await this.loginViewModel.authenticate(authenticatorName);
     } catch (error) {
       // Currently, the loginViewModel.authenticate method handles endpoint error itself
