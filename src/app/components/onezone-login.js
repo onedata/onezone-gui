@@ -16,6 +16,7 @@ import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 import { inject as service } from '@ember/service';
 import OnezoneLoginViewModel from 'onezone-gui/utils/onezone-login-view-model';
 import { htmlSafe } from '@ember/template';
+import { v4 as uuid } from 'ember-uuid';
 
 /**
  * Changes must be synchronized with custom-page-integration.js script.
@@ -253,9 +254,12 @@ export default Component.extend({
   async injectFrontpageIntegrationScript(iframe) {
     iframe.contentWindow.customFrontpageModel = await this.getCustomFrontpageModel();
     const iframeDocument = iframe.contentWindow.document;
-    // append integration script
+    // Append integration script.
     const script = iframeDocument.createElement('script');
-    script.src = '../../assets/scripts/custom-frontpage-integration.js';
+    // Always fetch fresh copy of script, because integration script is currently built
+    // without fingerprint.
+    const random = uuid();
+    script.src = `../../assets/scripts/custom-frontpage-integration.js?nocache=${random}`;
     const style = iframeDocument.createElement('link');
     style.rel = 'stylesheet';
     style.type = 'text/css';
