@@ -16,6 +16,7 @@ import { inject as service } from '@ember/service';
 import DOMPurify from 'dompurify';
 import { sessionExpiredCookie } from 'onedata-gui-common/components/websocket-reconnection-modal';
 import globals from 'onedata-gui-common/utils/globals';
+import { htmlSafe } from '@ember/template';
 
 /**
  * @typedef {'badBasicCredentials'|'basicAuthNotSupported'|'basicAuthDisabled'|'userBlocked'} BasicAuthErrorId
@@ -86,14 +87,17 @@ export default LoginViewModel.extend({
   ),
 
   /**
-   * @type {ComputedProperty<PromiseObject<string>>}
+   * @type {ComputedProperty<PromiseObject<SafeString>>}
    */
   signInNotificationProxy: computed(function signInNotificationProxy() {
     const promise = (async () => {
       const message = await this.guiMessageManager.getMessage('signin_notification');
+      if (!message) {
+        return undefined;
+      }
       const sanitizedMessage =
         DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] }).toString();
-      return sanitizedMessage?.replaceAll('\n', '<br>') || undefined;
+      return htmlSafe(sanitizedMessage.replaceAll('\n', '<br>'));
     })();
     return promiseObject(promise);
   }),

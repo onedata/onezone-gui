@@ -9,7 +9,7 @@
 
 import Component from '@ember/component';
 import { computed } from '@ember/object';
-import { bool, equal, reads } from '@ember/object/computed';
+import { bool, reads } from '@ember/object/computed';
 import globals from 'onedata-gui-common/utils/globals';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';

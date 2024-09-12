@@ -7,7 +7,6 @@ import { lookupService } from '../../helpers/stub-service';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { defer } from 'rsvp';
 import globals from 'onedata-gui-common/utils/globals';
-import sleep from 'onedata-gui-common/utils/sleep';
 
 function getStyle(element, styleName) {
   return globals.window.getComputedStyle(element)[styleName];
@@ -87,7 +86,6 @@ describe('Integration | Component | onezone-login', function () {
     await getAuthorizersLock.promise;
     await getMessageLock.promise;
     await settled();
-    await sleep(1000);
     expect(find('.login-notification-admin-message').innerHTML)
       .to.match(/^\s*hello\s*<br>\s*world\s*$/);
   });
