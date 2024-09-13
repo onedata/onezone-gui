@@ -49,6 +49,7 @@ export default Component.extend({
    */
   authenticationErrorState: undefined,
 
+  // FIXME: wymuszać odświeżenie poprzez parametry
   frontpagePath: 'custom/frontpage/index.html',
 
   //#region state
