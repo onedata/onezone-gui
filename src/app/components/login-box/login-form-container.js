@@ -58,6 +58,8 @@ export default LoginFormContainer.extend(...mixins, {
 
   signInNotificationProxy: reads('loginViewModel.signInNotificationProxy'),
 
+  signInNotification: reads('signInNotificationProxy.content'),
+
   onezoneDomainText: computed('onezoneDomain', function onezoneDomainText() {
     return this.onezoneDomain ?? htmlSafe(`<em>${this.t('unknown')}</em>`);
   }),

@@ -16,7 +16,6 @@ import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 import { inject as service } from '@ember/service';
 import OnezoneLoginViewModel from 'onezone-gui/utils/onezone-login-view-model';
 import { htmlSafe } from '@ember/template';
-import { v4 as uuid } from 'ember-uuid';
 
 /**
  * Changes must be synchronized with custom-page-integration.js script.
@@ -49,8 +48,10 @@ export default Component.extend({
    */
   authenticationErrorState: undefined,
 
-  // FIXME: wymuszać odświeżenie poprzez parametry
-  frontpagePath: 'custom/frontpage/index.html',
+  /**
+   * @type {string}
+   */
+  frontpagePath: undefined,
 
   //#region state
 
@@ -91,11 +92,14 @@ export default Component.extend({
 
   init() {
     this._super(...arguments);
-    this.set('loginViewModel', OnezoneLoginViewModel.create({
-      ownerSource: this,
-      authenticationErrorReason: this.authenticationErrorReason,
-      authenticationErrorState: this.authenticationErrorState,
-    }));
+    this.setProperties({
+      frontpagePath: noCacheUrl('custom/frontpage/index.html'),
+      loginViewModel: OnezoneLoginViewModel.create({
+        ownerSource: this,
+        authenticationErrorReason: this.authenticationErrorReason,
+        authenticationErrorState: this.authenticationErrorState,
+      }),
+    });
   },
 
   /**
@@ -259,14 +263,18 @@ export default Component.extend({
     const script = iframeDocument.createElement('script');
     // Always fetch fresh copy of script, because integration script is currently built
     // without fingerprint.
-    const random = uuid();
-    script.src = `../../assets/scripts/custom-frontpage-integration.js?nocache=${random}`;
+    script.src = noCacheUrl('../../assets/scripts/custom-frontpage-integration.js');
     const style = iframeDocument.createElement('link');
     style.rel = 'stylesheet';
     style.type = 'text/css';
-    style.href = '../../assets/styles/custom-frontpage.css';
+    style.href = noCacheUrl('../../assets/styles/custom-frontpage.css');
 
     iframeDocument.body.appendChild(script);
     iframeDocument.head.appendChild(style);
   },
 });
+
+function noCacheUrl(url) {
+  const timestamp = new Date().getTime();
+  return `${url}?timestamp=${timestamp}`;
+}
