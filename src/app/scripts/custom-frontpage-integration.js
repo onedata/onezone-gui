@@ -42,6 +42,7 @@
  * @property {Array<Authenticator>} data.availableAuthenticators
  * @property {string} data.loginMessage
  * @property {boolean} data.isAuthenticationError
+ * @property {boolean} data.isTestMode
  * @property {Object} i18n
  */
 
@@ -246,6 +247,10 @@ class FrontpageApi {
           this.model.api.authenticate(authenticator.id);
         }
       });
+      this.applyMicrotip(
+        loginIconBox,
+        `${this.model.i18n.signInUsing} ${authenticator.displayName}`
+      );
       const authIconImage = document.createElement('div');
       authIconImage.style.backgroundImage = `url(${authenticator.iconPath})`;
       authIconImage.classList.add('auth-icon-image');
@@ -270,6 +275,14 @@ class FrontpageApi {
     const container = this.messageContainer;
     const loginMessage = this.model.data.loginMessage || '';
     let innerHtml = '';
+    if (this.model.data.isTestMode) {
+      const testModeText = this.model.i18n.signInTestMode;
+      innerHtml += `
+      <div class="login-notification test-mode-notification login-notification-warning" >
+        ${testModeText}
+      </div>
+`;
+    }
     if (this.model.data.sessionHasExpired) {
       const sessionExpiredText = this.model.i18n.sessionExpiredText;
       innerHtml += `
@@ -371,6 +384,12 @@ class FrontpageApi {
     <span class="footer-version">${versionLabel} ${version}</span>
 `;
     this.footer.innerHTML = innerHtml;
+    const build = this.model.data.versionBuild;
+    if (build) {
+      const buildString = `${this.model.i18n.versionBuild}: ${build}`;
+      const footerVersion = this.footer.querySelector('.footer-version');
+      this.applyMicrotip(footerVersion, buildString);
+    }
   }
 
   /**
@@ -591,96 +610,21 @@ class FrontpageApi {
       this.setAuthIconSpinner(id, isLoading);
     }
   }
-}
 
-function createModelMock() {
-  /** @type {FrontpageApi} */
-  let localFrontpageApi;
-  const imagesOrigin = 'https://dev-onezone.default.svc.cluster.local';
-  const windowMock = window.mock ?? {};
-  return {
-    data: {
-      availableAuthenticators: [{
-          id: 'basicAuth',
-          iconPath: `${imagesOrigin}/ozw/onezone/assets/images/auth-providers/basicauth.svg`,
-          iconBackgroundColor: '#4BD187',
-          displayName: 'username & password',
-        },
-        {
-          id: 'egi',
-          iconPath: `${imagesOrigin}/ozw/onezone/assets/images/auth-providers/egi.svg`,
-          iconBackgroundColor: '#FFFFFF',
-          displayName: 'EGI',
-        },
-        {
-          id: 'google',
-          iconPath: `${imagesOrigin}/ozw/onezone/assets/images/auth-providers/google.svg`,
-          iconBackgroundColor: '#FFFFFF',
-          displayName: 'Google',
-        },
-      ],
-      loginMessage: windowMock.loginMessage ?? 'Test message.',
-      isAuthenticationError: Boolean(windowMock?.authenticationError) ?? false,
-      privacyPolicyUrl: windowMock?.privacyPolicyUrl ?? 'https://example.com',
-      termsOfUseUrl: windowMock?.termsOfUseUrl ?? 'https://example.com',
-      version: windowMock?.version ?? '21.02.5',
-      sessionHasExpired: windowMock.sessionHasExpired ?? false,
-      isDomainMismatch: windowMock.isDomainMismatch ?? false,
-    },
-    api: {
-      registerFrontpageApi(frontpageApi) {
-        localFrontpageApi = frontpageApi;
-      },
-      async authenticate(authenticatorName) {
-        if (authenticatorName === 'basicAuth') {
-          localFrontpageApi.setState(State.Form);
-        } else {
-          localFrontpageApi.setState(State.ButtonAuthenticating, {
-            authenticatorName,
-          });
-          await new Promise(resolve => {
-            setTimeout(resolve, 2000);
-          });
-          localFrontpageApi.setState(State.Buttons);
-        }
-      },
-      async usernameAuthenticate() {
-        localFrontpageApi.setState(State.FormAuthenticating);
-        await new Promise(resolve => {
-          setTimeout(resolve, 2000);
-        });
-        localFrontpageApi.setState(State.FormError, {
-          message: 'Invalid username and/or password.',
-        });
-      },
-      getAuthenticationError() {
-        return windowMock.authenticationError ?? null;
-      },
-    },
-    i18n: {
-      signIn: 'Sign in',
-      withIdentityProvider: 'with your identity provider',
-      usingUsername: 'using your username & password',
-      username: 'Username',
-      password: 'Password',
-      back: 'Back',
-      signInButton: 'Sign in',
-      unknownError: 'Unknown error',
-      authenticationError: 'Authentication error',
-      authenticationErrorContactInfo: 'If the problem persists, please contact the site administrators and quote the below request state identifier:',
-      privacyPolicyLabel: 'Privacy policy',
-      termsOfUseLabel: 'Terms of use',
-      versionLabel: 'version',
-      sessionExpiredText: 'Your session has expired.',
-      domainMismatchText: 'You have entered this page using a different domain (127.0.0.1) than the actual Onezone server domain (demo.onedata.org). Some of the content will be unavailable or malfunctioning, e.g. the file upload action. Use the server domain to ensure full functionality.',
-    },
-  };
+  /**
+   *
+   * @param {HTMLElement} element
+   * @param {string} text
+   * @param {'top'|'top-left'|'top-right'|'bottom'|'bottom-left'|'bottom-right'|'left'|'right'} position
+   */
+  applyMicrotip(element, text, position = 'top') {
+    element.role = 'tooltip';
+    element.ariaLabel = text;
+    element.setAttribute('data-microtip-position', position);
+  }
 }
 
 (function main() {
-  if (window.frontpageDevelopment) {
-    window.customFrontpageModel = createModelMock();
-  }
   const frontpageApi = new FrontpageApi();
   frontpageApi.mountFrontpage();
   frontpageApi.setState(State.Init);

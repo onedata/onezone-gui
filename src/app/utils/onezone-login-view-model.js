@@ -14,9 +14,9 @@ import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { inject as service } from '@ember/service';
 import DOMPurify from 'dompurify';
-import { sessionExpiredCookie } from 'onedata-gui-common/components/websocket-reconnection-modal';
 import globals from 'onedata-gui-common/utils/globals';
 import { htmlSafe } from '@ember/template';
+import { sessionExpiredCookie } from 'onedata-gui-common/components/websocket-reconnection-modal';
 
 /**
  * @typedef {'badBasicCredentials'|'basicAuthNotSupported'|'basicAuthDisabled'|'userBlocked'} BasicAuthErrorId
@@ -74,6 +74,11 @@ export default LoginViewModel.extend({
   activeAuthenticator: null,
 
   //#endregion
+
+  /**
+   * @type {boolean}
+   */
+  sessionHasExpired: undefined,
 
   /**
    * Array of all supported authenticators
@@ -140,6 +145,11 @@ export default LoginViewModel.extend({
    * @type {ComputedProperty<string>}
    */
   version: reads('softwareVersionDetails.serviceVersion'),
+
+  init() {
+    this._super(...arguments);
+    this.set('sessionHasExpired', this.consumeSessionExpiredCookie());
+  },
 
   /**
    * Notifies about error when initializing authentication using auth provider.

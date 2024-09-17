@@ -141,8 +141,10 @@ export default Component.extend({
         privacyPolicyUrl: viewModel.privacyPolicyUrl,
         termsOfUseUrl: viewModel.termsOfUseUrl,
         version: viewModel.version,
+        versionBuild: viewModel.softwareVersionDetails.serviceBuildVersion,
         sessionHasExpired: viewModel.sessionHasExpired,
         isDomainMismatch: viewModel.isDomainMismatch,
+        isTestMode: viewModel.testMode,
       },
       api: {
         /**
@@ -180,6 +182,7 @@ export default Component.extend({
       },
       i18n: {
         signIn: t('components.loginBox.signIn'),
+        signInUsing: t('components.loginBox.authIconBoxList.signInUsing'),
         withIdentityProvider: t('components.loginBox.loginFormContainer.dropdownSubtitle'),
         usingUsername: t('components.loginBox.loginFormContainer.formSubtitle'),
         username: t('components.basicauthLoginForm.username'),
@@ -192,12 +195,15 @@ export default Component.extend({
         privacyPolicyLabel: t('components.loginLayout.privacyPolicy'),
         termsOfUseLabel: t('components.loginLayout.termsOfUse'),
         versionLabel: t('components.loginLayout.version'),
+        versionBuild: t('components.loginLayout.versionBuild'),
         sessionExpiredText: t('components.loginBox.loginFormContainer.sessionExpired'),
         domainMismatchText: t(
           'components.loginBox.loginFormContainer.domainMismatchWarning', {
             browserDomain,
             onezoneDomain: onezoneDomainText,
-          }),
+          }
+        ),
+        signInTestMode: t('components.loginBox.loginFormContainer.signInTestMode'),
       },
     };
   },
@@ -269,8 +275,8 @@ export default Component.extend({
     style.type = 'text/css';
     style.href = noCacheUrl('../../assets/styles/custom-frontpage.css');
 
-    iframeDocument.body.appendChild(script);
-    iframeDocument.head.appendChild(style);
+    iframeDocument.body.prepend(script);
+    iframeDocument.head.prepend(style);
   },
 });
 
