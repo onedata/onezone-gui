@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12282 Fixed clicking on provider info icon
 * VFS-12197 Added information about OpenData status of shares in sidebar
 * VFS-12221 Fixed groups privileges table on the members page
 * VFS-12094 Blocked changing privileges when the user does not have privileges
