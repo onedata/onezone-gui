@@ -33,16 +33,31 @@
  */
 
 /**
+ * @typedef {Object} FrontpageModelApi
+ * @property {(username: string, password: string) => void} usernameAuthenticate
+ * @property {(frontpageApi: FrontpageApi) => void} registerFrontpageApi
+ * @property {(authenticatorName: string) => void} authenticate
+ * @property {() => {message: string, refId: string, isContactInfo: boolean}} getAuthenticationError
+ */
+
+/**
+ * @typedef {Object} FrontpageModelData
+ * @property {Array<Authenticator>} availableAuthenticators
+ * @property {string} loginMessage
+ * @property {boolean} isAuthenticationError
+ * @property {string} [privacyPolicyUrl]
+ * @property {string} [termsOfUseUrl]
+ * @property {string} version
+ * @property {string} versionBuild
+ * @property {boolean} sessionHasExpired
+ * @property {boolean} isDomainMismatch
+ */
+
+/**
  * @typedef {Object} FrontpageModel
- * @property {Object} api
- * @property {(username: string, password: string) => void} api.usernameAuthenticate
- * @property {(frontpageApi: FrontpageApi) => void} api.registerFrontpageApi
- * @property {(authenticatorName: string) => void} api.authenticate
- * @property {Object} data
- * @property {Array<Authenticator>} data.availableAuthenticators
- * @property {string} data.loginMessage
- * @property {boolean} data.isAuthenticationError
- * @property {boolean} data.isTestMode
+ *
+ * @property {FrontpageModelApi} api
+ * @property {FrontpageModelData} data
  * @property {Object} i18n
  */
 
@@ -612,7 +627,9 @@ class FrontpageApi {
   }
 
   /**
-   *
+   * Custom front page uses Microtip library (https://github.com/ghosh/microtip) which
+   * adds support for displaying CSS-based tooltips. This method adds a tooltip shown
+   * when element is hovered.
    * @param {HTMLElement} element
    * @param {string} text
    * @param {'top'|'top-left'|'top-right'|'bottom'|'bottom-left'|'bottom-right'|'left'|'right'} position

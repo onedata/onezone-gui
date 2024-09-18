@@ -1,8 +1,8 @@
 /**
  * Provides functions, which fetch data about authorizers.
  *
- * Note: this file shoul have "authenticator" naming instead of "authorizer".
- * It is keep in some files and may be refactored some day.
+ * Note: this file should have "authenticator" naming instead of "authorizer".
+ * It is being kept in some files and may be refactored some day.
  *
  * @author Michał Borzęcki
  * @copyright (C) 2018-2024 ACK CYFRONET AGH

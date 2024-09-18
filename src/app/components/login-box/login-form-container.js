@@ -10,7 +10,6 @@
 
 import { notEmpty, gt, reads } from '@ember/object/computed';
 import { not, or } from 'ember-awesome-macros';
-import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import LoginFormContainer from 'onedata-gui-common/components/login-box/login-form-container';
 import I18n from 'onedata-gui-common/mixins/i18n';
@@ -25,13 +24,6 @@ const mixins = [
 
 export default LoginFormContainer.extend(...mixins, {
   classNames: ['login-form-container'],
-
-  i18n: service(),
-  globalNotify: service(),
-  authorizerManager: service(),
-  onezoneServer: service(),
-  onedataConnection: service(),
-  router: service(),
 
   /**
    * @override
@@ -48,10 +40,19 @@ export default LoginFormContainer.extend(...mixins, {
    */
   selectedAuthorizer: null,
 
+  /**
+   * @type {boolean}
+   */
   isUsernameLoginActive: undefined,
 
+  /**
+   * @type {string}
+   */
   browserDomain: undefined,
 
+  /**
+   * @type {string}
+   */
   onezoneDomain: undefined,
 
   //#endregion

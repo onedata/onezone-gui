@@ -174,7 +174,7 @@ export default Component.extend({
         },
 
         /**
-         * @returns {{ message: string, state: string }}
+         * @returns {{message: string, refId: string, isContactInfo: boolean}}
          */
         getAuthenticationError() {
           return self.iframeGetAuthenticationError();
@@ -248,7 +248,7 @@ export default Component.extend({
   },
 
   /**
-   * @returns {{message: string, state: string}}
+   * @returns {{message: string, refId: string, isContactInfo: boolean}}
    */
   iframeGetAuthenticationError() {
     if (this.authenticationErrorReason) {
@@ -273,7 +273,8 @@ export default Component.extend({
     const style = iframeDocument.createElement('link');
     style.rel = 'stylesheet';
     style.type = 'text/css';
-    style.href = noCacheUrl('../../assets/styles/custom-frontpage.css');
+    // Can be safely cached by browser - it is fingerprinted in production.
+    style.href = '../../assets/styles/custom-frontpage.css';
 
     iframeDocument.body.prepend(script);
     iframeDocument.head.prepend(style);

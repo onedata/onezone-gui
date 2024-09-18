@@ -6,7 +6,6 @@ export default {
   signInWith: 'Sign in with',
   findProviderPlaceholder: 'Find your identity provider...',
   fetchProvidersFailedUnknown: 'unknown reason',
-  authEndpointError: 'Getting authentication endpoint failed',
   authEndpointConfError: 'Authorization configuration is invalid, please contact system administrator',
   noSignInMethods: 'There are no sign-in methods configured.',
   signInTestMode: 'This is the test sign-in page — based on test.auth.config — used for sign-in simulation and diagnostics.',
