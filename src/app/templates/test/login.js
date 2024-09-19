@@ -1,1 +1,1 @@
-export { default } from 'onezone-gui/templates/onezone-login';
+export { default } from 'onezone-gui/templates/login';

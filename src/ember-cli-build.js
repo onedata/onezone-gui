@@ -16,6 +16,9 @@ const breakpoints = require('./lib/onedata-gui-common/config/breakpoints');
 const copyDynamicLibraries = require('./lib/onedata-gui-common/addon/utils/copy-dynamic-libraries');
 const dynamicLibraries = require('./lib/onedata-gui-common/config/dynamic-libraries');
 const sass = require('sass-embedded');
+const BabelTranspiler = require('broccoli-babel-transpiler');
+const Funnel = require('broccoli-funnel');
+const mergeTrees = require('broccoli-merge-trees');
 
 const environment = EmberApp.env();
 
@@ -135,5 +138,28 @@ module.exports = function (defaults) {
     });
   }
 
-  return app.toTree();
+  // Create separate script files with transpilation, that will be copied to assets.
+  // Note, that currently these modules are integrated anyway into the main application,
+  // which could be fixed someday.
+  const scriptsFunnel = new Funnel('app/scripts', {
+    files: [
+      'custom-frontpage-integration.js',
+    ],
+    destDir: 'assets/scripts',
+  });
+  const transpiledScripts = new BabelTranspiler(scriptsFunnel, {
+    presets: [
+      [
+        require.resolve('@babel/preset-env'),
+        {
+          targets: require('./config/targets'),
+        },
+      ],
+    ],
+  });
+
+  const appTree = app.toTree();
+  return mergeTrees([appTree, transpiledScripts], {
+    overwrite: true,
+  });
 };

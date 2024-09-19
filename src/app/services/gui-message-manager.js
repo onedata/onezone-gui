@@ -12,6 +12,7 @@ import DOMPurify from 'dompurify';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import { Promise } from 'rsvp';
 import hasEmptyHtmlContent from 'onedata-gui-common/utils/has-empty-html-content';
+import globals from 'onedata-gui-common/utils/globals';
 
 const cookiesAcceptedCookieName = 'cookies-accepted';
 
@@ -34,8 +35,8 @@ export default Service.extend(
     privacyPolicyUrl: computed(
       'privacyPolicy',
       function privacyPolicyUrl() {
-        if (this.get('privacyPolicy')) {
-          return this.get('router').urlFor('public.privacy-policy');
+        if (this.privacyPolicy) {
+          return globals.location.pathname + this.router.urlFor('public.privacy-policy');
         }
         return null;
       }
@@ -47,8 +48,8 @@ export default Service.extend(
     termsOfUseUrl: computed(
       'termsOfUse',
       function termsOfUseUrl() {
-        if (this.get('termsOfUse')) {
-          return this.get('router').urlFor('public.terms-of-use');
+        if (this.termsOfUse) {
+          return globals.location.pathname + this.router.urlFor('public.terms-of-use');
         }
         return null;
       }

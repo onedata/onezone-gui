@@ -6,6 +6,6 @@ export default {
   header,
   loginFormContainer,
   authIconBoxList,
-  unknownZoneName: 'unknown',
   getZoneNameError: 'Failed to get zone name and version',
+  authenticationSucceeded: 'Authentication succeeded!',
 };
