@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12328 Added support for test custom login page
 * VFS-12080 Added support for custom login page
 * VFS-12282 Fixed clicking on provider info icon
 * VFS-12197 Added information about OpenData status of shares in sidebar

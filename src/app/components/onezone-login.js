@@ -48,11 +48,6 @@ export default Component.extend({
    */
   authenticationErrorState: undefined,
 
-  /**
-   * @type {string}
-   */
-  frontpagePath: undefined,
-
   //#region state
 
   /**
@@ -90,10 +85,17 @@ export default Component.extend({
 
   signInNotificationProxy: reads('loginViewModel.signInNotificationProxy'),
 
+  /**
+   * @type {ComputerProperty<string>}
+   */
+  frontpagePath: computed('loginViewModel.testMode', function frontpagePath() {
+    const frontpageDir = this.loginViewModel.testMode ? 'frontpage-test' : 'frontpage';
+    return noCacheUrl(`custom/${frontpageDir}/index.html`);
+  }),
+
   init() {
     this._super(...arguments);
     this.setProperties({
-      frontpagePath: noCacheUrl('custom/frontpage/index.html'),
       loginViewModel: OnezoneLoginViewModel.create({
         ownerSource: this,
         authenticationErrorReason: this.authenticationErrorReason,
