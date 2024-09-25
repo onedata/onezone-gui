@@ -1,1 +1,0 @@
-../lib/onedata-gui-common/tests/check-sync-observers-test.js
