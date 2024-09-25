@@ -25,6 +25,8 @@
     newGrantedEffPrivCount=0
     arePrivilegesUpToDate=true
     isUnknownEffPrivStatus=false
+    isPrivilegesToggleDisabled=isPrivilegesToggleDisabled
+    targetRecordType=targetRecordType
   }}
 {{else}}
   <td class="toggle-column direct group na">{{tt this "na"}}</td>
@@ -43,6 +45,8 @@
       newGrantedEffPrivCount=newGrantedEffPrivCount
       arePrivilegesUpToDate=arePrivilegesUpToDate
       isUnknownEffPrivStatus=isUnknownEffPrivStatus.content
+      isPrivilegesToggleDisabled=isPrivilegesToggleDisabled
+      targetRecordType=targetRecordType
     }}
   {{/promise-proxy-container}}
 {{/if}}

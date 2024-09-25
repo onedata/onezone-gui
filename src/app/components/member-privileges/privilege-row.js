@@ -15,6 +15,7 @@ import I18n from 'onedata-gui-common/mixins/i18n';
 import { promise } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 
 /**
  * @typedef {Object} PrivilegeInfo
@@ -141,6 +142,12 @@ export default Component.extend(DisabledPaths, I18n, {
   highlightMemberships: notImplementedIgnore,
 
   /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  isPrivilegesToggleDisabled: false,
+
+  /**
    * @type {boolean}
    */
   isModifiedPriv: false,
@@ -163,6 +170,23 @@ export default Component.extend(DisabledPaths, I18n, {
   inputClass: computed('privilegesGroupName', function inputClass() {
     return `field-${this.privilegesGroupName} form-control`;
   }),
+
+  insufficientPrivilegesTip: computed(
+    'targetRecord.entityType',
+    function insufficientPrivilegesTip() {
+      let modelName;
+      if (this.targetRecord.entityType === 'atm_inventory') {
+        modelName = 'atmInventory';
+      } else {
+        modelName = this.targetRecord.entityType;
+      }
+      return insufficientPrivilegesMessage({
+        i18n: this.i18n,
+        modelName,
+        privilegeFlag: `${this.targetRecord.entityType}_set_privileges`,
+      });
+    }
+  ),
 
   /**
    * @type {ComputedProperty<boolean>}

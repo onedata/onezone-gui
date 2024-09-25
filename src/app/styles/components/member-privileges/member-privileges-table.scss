@@ -103,6 +103,7 @@
 
     .priv-group:hover {
       background-color: darken($main-content-hover-background, 3%);
+      cursor: pointer;
     }
   }
 }

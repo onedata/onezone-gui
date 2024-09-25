@@ -9,8 +9,10 @@
 
 import { computed } from '@ember/object';
 import Component from '@ember/component';
+import I18n from 'onedata-gui-common/mixins/i18n';
+import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 
-export default Component.extend({
+export default Component.extend(I18n, {
   tagName: 'td',
   classNames: ['group-privileges-cell', 'toggle-column', 'group'],
 
@@ -57,10 +59,22 @@ export default Component.extend({
   isUnknownEffPrivStatus: false,
 
   /**
+   * @virtual
+   * @type {string}
+   */
+  targetRecordType: '',
+
+  /**
    * @virtual optional
    * @type {boolean}
    */
   arePrivilegesUpToDate: true,
+
+  /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  isPrivilegesToggleDisabled: false,
 
   /**
    * Input changed action.
@@ -68,6 +82,23 @@ export default Component.extend({
    * @type {Function}
    */
   inputChanged: () => {},
+
+  insufficientPrivilegesTip: computed(
+    'targetRecordType',
+    function insufficientPrivilegesTip() {
+      let modelName;
+      if (this.targetRecordType === 'atm_inventory') {
+        modelName = 'atmInventory';
+      } else {
+        modelName = this.targetRecordType;
+      }
+      return insufficientPrivilegesMessage({
+        i18n: this.i18n,
+        modelName,
+        privilegeFlag: `${this.targetRecordType}_set_privileges`,
+      });
+    }
+  ),
 
   /**
    * Input classes.

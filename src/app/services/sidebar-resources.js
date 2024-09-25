@@ -92,12 +92,15 @@ export default SidebarResources.extend({
    * @override
    */
   getItemsSortingFor(resourceType) {
-    if (resourceType === 'tokens') {
-      return ['isActive:desc', 'isObsolete', 'name'];
-    } else if (resourceType === 'uploads') {
-      return ['isAllOneproviders:desc', 'name'];
-    } else {
-      return this._super(...arguments);
+    switch (resourceType) {
+      case 'tokens':
+        return ['isActive:desc', 'isObsolete', 'name'];
+      case 'uploads':
+        return ['isAllOneproviders:desc', 'name'];
+      case 'shares':
+        return ['hasHandle:desc', 'name'];
+      default:
+        return this._super(...arguments);
     }
   },
 });

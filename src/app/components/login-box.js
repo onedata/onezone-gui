@@ -3,13 +3,12 @@
  *
  * @author Michał Borzęcki
  * @author Jakub Liput
- * @copyright (C) 2017-2019 ACK CYFRONET AGH
+ * @copyright (C) 2017-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import { inject as service } from '@ember/service';
 import LoginBox from 'onedata-gui-common/components/login-box';
-import { sessionExpiredCookie } from 'onedata-gui-common/components/websocket-reconnection-modal';
 
 export default LoginBox.extend({
   i18n: service(),
@@ -29,14 +28,9 @@ export default LoginBox.extend({
 
   init() {
     this._super(...arguments);
-    const cookies = this.get('cookies');
     this.set(
       'headerModel.zoneName',
       this.get('onedataConnection.zoneName')
     );
-    if (cookies.read(sessionExpiredCookie)) {
-      this.set('sessionHasExpired', true);
-      cookies.clear(sessionExpiredCookie, { path: '/' });
-    }
   },
 });

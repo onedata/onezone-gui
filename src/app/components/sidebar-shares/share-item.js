@@ -8,7 +8,7 @@
 
 import Component from '@ember/component';
 import { conditional, eq, raw } from 'ember-awesome-macros';
-import { reads, collect } from '@ember/object/computed';
+import { reads, collect, bool } from '@ember/object/computed';
 import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/i18n';
@@ -36,6 +36,14 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<Share>}
    */
   share: reads('item'),
+
+  isOpenData: bool('item.hasHandle'),
+
+  openDataTip: computed(function openDataTip() {
+    return this.t('openDataTip', {
+      fileType: this.t('fileType.' + this.get('share.fileType')),
+    });
+  }),
 
   icon: conditional(
     eq('item.fileType', raw('file')),

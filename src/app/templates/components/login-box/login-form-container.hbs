@@ -1,42 +1,47 @@
 {{#if supportedAuthorizers.length}}
   <div class="basicauth-login-form-container animated fast {{if (or isLoading _hasAuthorizersForSelect) "hide" "always-visible"}}">
-    <h2>{{t "components.loginBox.loginFormContainer.formSubtitle"}}
+    <h2>{{tt this "formSubtitle"}}
       <span class="subtitle-tip">
-        {{one-icon icon="sign-question-rounded"}}
-        {{one-tooltip title=(if _hasAuthorizersForSelect
-          (t "components.loginBox.loginFormContainer.formSubtitleTip")
-          (t "components.loginBox.loginFormContainer.noProvidersFormSubtitleTip"))}}
+        <OneIcon @icon="sign-question-rounded" />
+        <OneTooltip
+          @title={{if
+            _hasAuthorizersForSelect
+            (tt this "formSubtitleTip")
+            (tt this "noProvidersFormSubtitleTip")
+          }}
+        />
       </span>
     </h2>
-    {{basicauth-login-form
-      authenticationSuccess=authenticationSuccess
-      authenticationFailure=authenticationFailure
-      authenticationStarted=authenticationStarted
-      backButtonAction=(if _hasAuthorizersForSelect (action "backAction") undefined)
-    }}
+    <BasicauthLoginForm
+      @loginViewModel={{loginViewModel}}
+      @authenticationSuccess={{authenticationSuccess}}
+      @authenticationFailure={{authenticationFailure}}
+      @authenticationStarted={{authenticationStarted}}
+      @backButtonAction={{if _hasAuthorizersForSelect (action "backAction") undefined}}
+    />
   </div>
   {{#if _hasAuthorizersForSelect}}
     <div class="authorizers-select-container animated fast">
-      <h2>{{t "components.loginBox.loginFormContainer.dropdownSubtitle"}}</h2>
-      {{login-box/auth-icon-box-list
-        supportedAuthorizers=_authorizersForButtons
-        isLoading=isLoading
-        authenticate=(action "authenticate")
-        usernameLoginClick=(action "usernameLoginToggle")
-        showMoreButton=_showMoreProvidersButton
-        showMoreClick=(action "showMoreClick")
-      }}
-      {{#authorizers-dropdown
+      <h2>{{tt this "dropdownSubtitle"}}</h2>
+      <LoginBox::AuthIconBoxList
+        @supportedAuthorizers={{_authorizersForButtons}}
+        @isLoading={{isLoading}}
+        @authenticate={{action "authenticate"}}
+        @usernameLoginClick={{action "usernameLoginToggle"}}
+        @showMoreButton={{_showMoreProvidersButton}}
+        @showMoreClick={{action "showMoreClick"}}
+      />
+      <AuthorizersDropdown
         class="animated fast hide"
-        authorizers=_authorizersForSelect
-        onSelect=(action "authorizerSelected")
-        selectedAuthorizer=selectedAuthorizer
-        activeAuthorizer=_activeAuthorizer
-        placeholder=(t "components.loginBox.loginFormContainer.findProviderPlaceholder")
-        disabled=_activeAuthorizer
-      }}
-        <div class="dropdown-label">{{t "components.loginBox.loginFormContainer.signInWith"}}</div>
-      {{/authorizers-dropdown}}
+        @authorizers={{_authorizersForSelect}}
+        @onSelect={{action "authorizerSelected"}}
+        @selectedAuthorizer={{selectedAuthorizer}}
+        @activeAuthorizer={{_activeAuthorizer}}
+        @placeholder={{tt this "findProviderPlaceholder"}}
+        @disabled={{_activeAuthorizer}}
+      >
+        <div class="dropdown-label">{{tt this "signInWith"}}</div>
+      </AuthorizersDropdown>
     </div>
   {{/if}}
 {{else if (not isLoading)}}
@@ -46,26 +51,26 @@
 {{#if sessionHasExpired}}
   <div class="login-notification login-notification-session-expired login-notification-warning">
     <div class="inline-icon-container session-expired-icon-container">
-      {{one-icon icon="time-outline" class="session-expired-icon"}}
+      <OneIcon @icon="time-outline" class="session-expired-icon" />
     </div>
-    {{tt this "sessionExpired"}}.
+    {{tt this "sessionExpired"}}
   </div>
 {{/if}}
 {{#if showDomainMismatchWarning}}
   <div class="login-notification login-notification-warning">
     <div class="inline-icon-container session-expired-icon-container">
-      {{one-icon icon="sign-warning-rounded" class="warning-icon"}}
+      <OneIcon @icon="sign-warning-rounded" class="warning-icon" />
     </div>
     {{tt this "domainMismatchWarning"
       browserDomain=browserDomain
-      onezoneDomain=onezoneDomain
+      onezoneDomain=onezoneDomainText
     }}
   </div>
 {{/if}}
 {{#if testMode}}
   <div class="login-notification test-mode-notification login-notification-warning">
     <span>{{tt this "signInTestMode"}}</span><br>
-    {{#link-to "login"}}{{tt this "goBackToMainPage"}}{{/link-to}}
+    <LinkTo @route="login">{{tt this "goBackToMainPage"}}</LinkTo>
   </div>
 {{else if (and signInNotification (not isLoading))}}
   <div class="login-notification login-notification-admin-message">
