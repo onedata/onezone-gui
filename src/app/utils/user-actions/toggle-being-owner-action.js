@@ -78,7 +78,7 @@ export default Action.extend({
    * @type {ComputedProperty<boolean>}
    */
   isCurrentUserOwner: computed(
-    'owners.content.@each.entityId',
+    'owners.@each.entityId',
     'currentUser.entityId',
     function isCurrentUserOwner() {
       const currentUserEntityId = this.currentUser.entityId;

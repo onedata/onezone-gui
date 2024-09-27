@@ -12,12 +12,10 @@ import {
   get,
   observer,
 } from '@ember/object';
-import { union, collect } from '@ember/object/computed';
+import { union, collect, reads } from '@ember/object/computed';
 import { A, isArray } from '@ember/array';
-import ArrayProxy from '@ember/array/proxy';
 import { inject as service } from '@ember/service';
 import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
-import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
 import { getOwner } from '@ember/application';
@@ -28,7 +26,6 @@ import {
   and,
   or,
   not,
-  array,
   raw,
   equal,
   conditional,
@@ -43,8 +40,16 @@ import {
   destroyableComputed,
   initDestroyableCache,
 } from 'onedata-gui-common/utils/destroyable-computed';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
+import { all as allFulfilled } from 'rsvp';
 
-export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
+/**
+ * @typedef {Models.UserList|Models.GroupList} MembersOwnersList
+ */
+
+export default Mixin.create({
+  // required property: ownersListProxy: PromiseObject<MembersOwnersList>
+
   privilegeManager: service(),
   privilegeActions: service(),
   tokenActions: service(),
@@ -267,6 +272,11 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   }),
 
   /**
+   * @type {ComputedProperty<RecordArray>}
+   */
+  owners: reads('ownersListProxy.content.list.content'),
+
+  /**
    * @type {Ember.ComputedProperty<Function>}
    * @param {Models.User} member
    * @param {ArrayProxy<Models.User>} directMembers
@@ -278,33 +288,20 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
     'record',
     'modelSupportsOwners',
     function userActionsGenerator() {
-      const {
-        userActions,
-        modelSupportsOwners,
-        owners,
-        record,
-        i18nPrefix,
-      } = this.getProperties(
-        'userActions',
-        'modelSupportsOwners',
-        'owners',
-        'record',
-        'i18nPrefix',
-      );
       return (user, directUsers, effectiveUsers) => {
         const actions = [];
-        if (modelSupportsOwners) {
-          actions.push(userActions.createToggleBeingOwnerAction({
-            recordBeingOwned: record,
+        if (this.modelSupportsOwners) {
+          actions.push(this.userActions.createToggleBeingOwnerAction({
+            recordBeingOwned: this.record,
             ownerRecord: user,
-            owners,
+            owners: this.owners,
           }));
         }
         actions.push(RemoveUserAction.create({
           ownerSource: this,
-          i18nPrefix,
+          i18nPrefix: this.i18nPrefix,
           user,
-          owners,
+          owners: this.owners,
           effectiveUsers,
           execute: () => this.set('memberToRemove', user),
         }));
@@ -478,6 +475,14 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
    */
   headerActions: collect('removeSelectedAction'),
 
+  requiredDataProxy: computed('ownersListProxy', function requiredDataProxy() {
+    const proxies = [];
+    if (this.ownersListProxy) {
+      proxies.push(this.ownersListProxy);
+    }
+    return promiseObject(allFulfilled(proxies));
+  }),
+
   recordObserver: observer('record', function recordObserver() {
     // reset state after record change
     scheduleOnce('afterRender', this, 'reset');
@@ -549,15 +554,6 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
     } finally {
       this._super(...arguments);
     }
-  },
-
-  /**
-   * Fetches list of record owners
-   * @virtual
-   * @returns {Promise<ArrayProxy<User>>}
-   */
-  async fetchOwners() {
-    return ArrayProxy.create({ content: [] });
   },
 
   /**
@@ -780,12 +776,6 @@ const RemoveUserAction = Action.extend({
 
   /**
    * @virtual
-   * @type {Array<Models.User>}
-   */
-  owners: undefined,
-
-  /**
-   * @virtual
    * @type {ArrayProxy<Models.User>}
    */
   effectiveUsers: undefined,
@@ -808,7 +798,9 @@ const RemoveUserAction = Action.extend({
   /**
    * @type {ComputedProperty<boolean>}
    */
-  isOwner: array.includes('owners', 'user'),
+  isOwner: computed('owners.[]', 'user', function isOwner() {
+    return this.owners?.includes(this.user);
+  }),
 
   /**
    * @type {ComputedProperty<boolean>}
@@ -831,7 +823,7 @@ const RemoveUserAction = Action.extend({
    * @type {ComputedProperty<boolean>}
    */
   isCurrentUserOwner: computed(
-    'owners.content.@each.entityId',
+    'owners.@each.entityId',
     'currentUser.entityId',
     function isCurrentUserOwner() {
       const currentUserEntityId = this.currentUser.entityId;

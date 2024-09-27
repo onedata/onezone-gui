@@ -16,6 +16,7 @@ import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import MembersAspectBase from 'onezone-gui/mixins/members-aspect-base';
 import layout from 'onezone-gui/templates/components/-members-aspect-base';
 import { Promise } from 'rsvp';
+import { computedRelationProxy } from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 
 export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
   layout,
@@ -52,12 +53,9 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
   record: reads('space'),
 
   /**
-   * @override
+   * @implements {Mixins.MembersAspectBase}
    */
-  async fetchOwners() {
-    const ownerList = await this.record.getRelation('ownerList');
-    return await get(ownerList, 'list');
-  },
+  ownersListProxy: computedRelationProxy('record', 'ownerList'),
 
   /**
    * @override
