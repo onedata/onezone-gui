@@ -177,10 +177,11 @@ export default LoginFormContainer.extend(...mixins, {
    * Powerselect item matcher used by its search engine.
    * @param {AuthorizerInfo} authorizer
    * @param {string} term Query string.
-   * @returns {boolean} True, if authorizer matches given term.
+   * @returns {number} Positive number if term matches authorizer or `-1` if there is no
+   *   match.
    */
   _authorizersSelectMatcher(authorizer, term) {
-    return authorizer.name.toLowerCase().indexOf(term.toLowerCase());
+    return authorizer.displayName.toLowerCase().indexOf(term.toLowerCase());
   },
 
   /**
