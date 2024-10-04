@@ -7,9 +7,9 @@
       threeState=true
       allowThreeStateToggle=true
       showLockForReadOnly=false
-      isReadOnly=false
+      isReadOnly=(or isPrivilegesToggleDisabled (not editionEnabled))
       update=(action "inputChanged")
-      isReadOnly=(not editionEnabled)
+      lockHint=(if isPrivilegesToggleDisabled insufficientPrivilegesTip)
     }}
   {{/form.group}}
 {{else}}

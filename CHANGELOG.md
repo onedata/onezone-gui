@@ -4,6 +4,12 @@
 
 ### Latest changes
 
+* VFS-12080 Added support for custom login page
+* VFS-12282 Fixed clicking on provider info icon
+* VFS-12197 Added information about OpenData status of shares in sidebar
+* VFS-12221 Fixed groups privileges table on the members page
+* VFS-12094 Blocked changing privileges when the user does not have privileges
+* VFS-12054 Fixed infinite effective privileges loading after changing members permissions failure
 * VFS-11707 Added detection of elements-blocking browser extensions with warning message
 * VFS-12016 Changed fetching records to start with no auth hint
 * VFS-11764 Changed documentation links to use topics

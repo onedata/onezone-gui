@@ -102,30 +102,68 @@
               }}
               {{/one-button}}
             </div>
-            {{#if memberProxy.isOwner}}
-              <div class="alert alert-warning privileges-of-owner-warning">
-                {{tt this "ownerPrivilegesWarning"
-                  model=(tt this
-                    (concat "ownerPrivilegesWarningModels." record.constructor.modelName)
-                  )
-                }}
+            {{#if (or
+              memberProxy.isOwner
+              (and memberProxy.isYou hasCurrentUserSomeAdminPrivileges)
+            )}}
+              <div class="alert alert-warning privileges-warning">
+                {{#if memberProxy.isOwner}}
+                  <p class="privileges-of-owner-warning">
+                    {{#if memberProxy.isYou}}
+                      {{tt this "youAreOwnerWarning"
+                        model=(tt this
+                          (concat "ownerPrivilegesWarningModels." recordType)
+                        )
+                      }}
+                    {{else}}
+                      {{tt this "userAreOwnerWarning"
+                        model=(tt this
+                          (concat "ownerPrivilegesWarningModels." recordType)
+                        )
+                      }}
+                    {{/if}}
+                    {{tt this "ownerPrivilegesWarning"}}
+                  </p>
+                {{/if}}
+                {{#if (and
+                  memberProxy.isOwner
+                  (and memberProxy.isYou hasCurrentUserSomeAdminPrivileges)
+                )}}
+                  <hr class="content-separator">
+                {{/if}}
+                {{#if (and memberProxy.isYou hasCurrentUserSomeAdminPrivileges)}}
+                  <p class="admin-privileges-warning">
+                    {{tt this "adminPrivilegesWarning"
+                      pluralEntityType=(tt this
+                        (concat
+                          "adminPrivilegesWarningPluralModels."
+                          recordTypeForTranslation
+                        )
+                      )
+                      privileges=adminPrivForWarningTranslation
+                    }}
+                  </p>
+                {{/if}}
               </div>
             {{/if}}
             <div class="member-content">
-              {{member-privileges/member-privileges-table
-                privilegesGroups=groupedPrivilegesFlags
-                privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
-                privilegesTranslationsPath=privilegesTranslationsPath
-                recordDirectProxy=(if memberProxy.isDirect memberProxy.privilegesProxy null)
-                recordEffectiveProxy=memberProxy.effectivePrivilegesProxy
-                modelTypeTranslation=modelTypeTranslation
-                areEffPrivilegesRecalculated=record.areEffPrivilegesRecalculated
-                arePrivilegesJustSaved=arePrivilegesJustSaved
-                contextRecord=memberProxy.member
-                targetRecord=record
-                directGroupMembers=directGroupsProxyList
-                highlightMemberships=(action "highlightMemberships")
-              }}
+              {{#promise-proxy-container proxy=effPrivilegesOfCurrentUserProxy}}
+                {{member-privileges/member-privileges-table
+                  privilegesGroups=groupedPrivilegesFlags
+                  privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
+                  privilegesTranslationsPath=privilegesTranslationsPath
+                  recordDirectProxy=(if memberProxy.isDirect memberProxy.privilegesProxy null)
+                  recordEffectiveProxy=memberProxy.effectivePrivilegesProxy
+                  modelTypeTranslation=modelTypeTranslation
+                  areEffPrivilegesRecalculated=record.areEffPrivilegesRecalculated
+                  arePrivilegesJustSaved=arePrivilegesJustSaved
+                  contextRecord=memberProxy.member
+                  targetRecord=record
+                  directGroupMembers=directGroupsProxyList
+                  highlightMemberships=(action "highlightMemberships")
+                  isPrivilegesToggleDisabled=isPrivilegesToggleDisabled
+                }}
+              {{/promise-proxy-container}}
               <div class="memberships-container">
                 <div class="header-memberships-container">
                   <div class="header-memberships">

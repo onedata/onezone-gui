@@ -34,6 +34,8 @@ import { htmlSafe } from '@ember/template';
 import { formatNumber } from 'onedata-gui-common/helpers/format-number';
 import { later, cancel } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import joinStrings from 'onedata-gui-common/utils/i18n/join-strings';
+import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 
 const fallbackActionsGenerator = () => [];
 
@@ -44,6 +46,7 @@ export default Component.extend(I18n, {
   privilegeManager: service(),
   currentUser: service(),
   recordManager: service(),
+  store: service(),
 
   /**
    * @override
@@ -293,6 +296,136 @@ export default Component.extend(I18n, {
         this.effectiveMembersProxy,
         this.directGroupsProxy,
       ]));
+    }
+  ),
+
+  effOzPrivileges: reads('currentUser.user.effOzPrivileges'),
+
+  /**
+   * @type {Ember.ComputedProperty<string>}
+   */
+  recordTypeForTranslation: computed('recordType', function recordTypeForTranslation() {
+    if (this.recordType === 'atm_inventory') {
+      return 'atmInventory';
+    } else {
+      return this.recordType;
+    }
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  hasCurrentUserSomeAdminPrivileges: computed(
+    'effOzPrivileges',
+    'recordType',
+    function hasCurrentUserSomeAdminPrivileges() {
+      let pluralRecordType = '';
+      if (this.recordType === 'atm_inventory') {
+        pluralRecordType = `${this.recordType.slice(0, -1)}ies`;
+      } else {
+        pluralRecordType = `${this.recordType}s`;
+      }
+
+      const setPrivileges = `oz_${pluralRecordType}_set_privileges`;
+      const viewPrivileges = `oz_${pluralRecordType}_view_privileges`;
+      const viewMembers = `oz_${pluralRecordType}_view`;
+
+      return this.effOzPrivileges.includes(setPrivileges) ||
+        this.effOzPrivileges.includes(viewPrivileges) ||
+        this.effOzPrivileges.includes(viewMembers);
+    }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  hasCurrentUserAdminSetPrivileges: computed(
+    'effOzPrivileges',
+    'recordType',
+    function hasCurrentUserAdminSetPrivileges() {
+      const recordType = this.recordType;
+      let pluralRecordType = '';
+      if (recordType === 'atm_inventory') {
+        pluralRecordType = `${recordType.slice(0, -1)}ies`;
+      } else {
+        pluralRecordType = `${recordType}s`;
+      }
+      const setPrivileges = `oz_${pluralRecordType}_set_privileges`;
+      return this.effOzPrivileges.includes(setPrivileges);
+    }
+  ),
+
+  effPrivilegesOfCurrentUserProxy: computed(
+    'currentUser.user',
+    'griAspect',
+    function effPrivilegesOfCurrentUserProxy() {
+      const currentUser = this.currentUser.user;
+      const effectivePrivilegesGri = this.getPrivilegesGriForMember(
+        currentUser,
+        false,
+        'user',
+      );
+      return PromiseObject.create({
+        promise: this.store.findRecord('privilege', effectivePrivilegesGri),
+      });
+    }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<SafeString>}
+   */
+  adminPrivForWarningTranslation: computed(function adminPrivForWarningTranslation() {
+    const recordType = this.recordType;
+    let pluralRecordType = '';
+    const privileges = [];
+
+    if (recordType === 'atm_inventory') {
+      pluralRecordType = `${recordType.slice(0, -1)}ies`;
+    } else {
+      pluralRecordType = `${recordType}s`;
+    }
+
+    const setPrivileges = `oz_${pluralRecordType}_set_privileges`;
+    const viewPrivileges = `oz_${pluralRecordType}_view_privileges`;
+    const viewMembers = `oz_${pluralRecordType}_view`;
+
+    if (this.effOzPrivileges.includes(viewMembers)) {
+      privileges.push(this.tt('adminPrivilegesWarningPrivileges.viewMembers'));
+    }
+    if (this.effOzPrivileges.includes(viewPrivileges)) {
+      privileges.push(this.tt('adminPrivilegesWarningPrivileges.viewPrivileges'));
+    }
+    if (this.effOzPrivileges.includes(setPrivileges)) {
+      privileges.push(this.tt('adminPrivilegesWarningPrivileges.setPrivileges'));
+    }
+
+    return htmlSafe(joinStrings(this.i18n, privileges, 'and'));
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  hasCurrentUserSetPrivileges: computed(
+    'effPrivilegesOfCurrentUserProxy.content.privileges',
+    'recordType',
+    function hasCurrentUserSetPrivileges() {
+      const privileges = this.get('effPrivilegesOfCurrentUserProxy.content.privileges');
+      if (!privileges) {
+        return false;
+      }
+      return privileges.includes(`${this.recordType}_set_privileges`);
+    }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  isPrivilegesToggleDisabled: computed(
+    'hasCurrentUserAdminSetPrivileges',
+    'hasCurrentUserSetPrivileges',
+    function isPrivilegesToggleDisabled() {
+      return !this.hasCurrentUserAdminSetPrivileges &&
+        !this.hasCurrentUserSetPrivileges;
     }
   ),
 
@@ -582,7 +715,8 @@ export default Component.extend(I18n, {
       cancel(this.afterPrivilegesSaveTimer);
       return this.get('privilegeActions')
         .handleSave(get(memberProxy, 'privilegesProxy').save(true))
-        .then(() => memberProxy)
+        .catch(() => get(memberProxy, 'privilegesProxy').resetModifications())
+        .finally(() => memberProxy)
         .then(() => this.record.reload())
         .then(() => safeExec(this, () => this.set(
           'afterPrivilegesSaveTimer',
