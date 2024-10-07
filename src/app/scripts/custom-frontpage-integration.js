@@ -89,7 +89,7 @@ const StateTransitions = Object.freeze({
   [State.Buttons]: [State.Form, State.ButtonAuthenticating],
   [State.Form]: [State.FormAuthenticating, State.Buttons],
   [State.ButtonAuthenticating]: [State.Buttons, State.Final],
-  [State.FormAuthenticating]: [State.Error, State.FormError, State.Form, State.Final],
+  [State.FormAuthenticating]: [State.Error, State.FormError, State.Final],
   [State.FormError]: [State.Form, State.Buttons],
   [State.Error]: [State.Init],
 });
@@ -425,7 +425,6 @@ class FrontpageApi {
     this.signInSubheader.innerHTML = subheaderText;
 
     this.errorContainer.classList.toggle('hidden', true);
-    this.errorContainer.innerHTML = '';
     this.errorContainer.innerHTML = `
     <button id="error-back-btn" class="back-btn"></button>
 `;
