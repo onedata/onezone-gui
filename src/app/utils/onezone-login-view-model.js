@@ -76,11 +76,6 @@ export default LoginViewModel.extend({
   //#endregion
 
   /**
-   * @type {boolean}
-   */
-  sessionHasExpired: undefined,
-
-  /**
    * Array of all supported authenticators
    * @type {ComputedProperty<PromiseArray<Authenticator>>}
    */
