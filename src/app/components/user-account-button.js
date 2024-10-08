@@ -20,6 +20,7 @@ export default Component.extend({
 
   /**
    * @virtual
+   * @type {boolean}
    */
   isActive: undefined,
 
@@ -37,6 +38,7 @@ export default Component.extend({
 
   /**
    * @virtual
+   * @type {boolean}
    */
   mobileMode: undefined,
 
