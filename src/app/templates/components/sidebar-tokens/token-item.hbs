@@ -23,23 +23,22 @@
   </div>
 {{/if}}
 
-{{#unless inSidenav}}
-  {{actions-toolbar
-    isMinimized=true
-    dropdownPlacement="auto"
-    actionsArray=actionsArray
-    toolbarToggleClasses="token-menu-trigger"
+{{actions-toolbar
+  isMinimized=true
+  dropdownPlacement="auto"
+  actionsArray=actionsArray
+  toolbarToggleClasses="token-menu-trigger"
+  toolbarClasses="btn-toolbar"
+  popoverClass="token-toolbar-popover"
+}}
+{{#render-later triggerRender=isRemoveTokenModalOpened as |renderLater|}}
+  {{remove-token-modal
+    opened=isRemoveTokenModalOpened
+    proceed=(action "remove")
+    close=(action "closeRemoveTokenModal")
+    processing=isRemovingToken
+    token=token
+    onHidden=renderLater.resetRenderTrigger
   }}
-
-  {{#render-later triggerRender=isRemoveTokenModalOpened as |renderLater|}}
-    {{remove-token-modal
-      opened=isRemoveTokenModalOpened
-      proceed=(action "remove")
-      close=(action "closeRemoveTokenModal")
-      processing=isRemovingToken
-      token=token
-      onHidden=renderLater.resetRenderTrigger
-    }}
-  {{/render-later}}
-{{/unless}}
+{{/render-later}}
 {{yield}}

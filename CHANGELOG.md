@@ -4,6 +4,8 @@
 
 ### Latest changes
 
+* VFS-12083 Allowed to copy token when sidebar is revealed but not opened
+* VFS-12355 Applied minor code fixes; Fixed not working authenticators search field
 * VFS-12080 Added support for custom login page
 * VFS-12282 Fixed clicking on provider info icon
 * VFS-12197 Added information about OpenData status of shares in sidebar

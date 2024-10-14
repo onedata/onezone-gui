@@ -118,12 +118,6 @@ describe('Integration | Component | sidebar-tokens/token-item', function () {
     );
   });
 
-  it('does not render actions menu if inSidenav is true', async function () {
-    await render(hbs `{{sidebar-tokens/token-item item=token inSidenav=true}}`);
-
-    expect(find('.token-menu-trigger')).to.not.exist;
-  });
-
   it('allows to rename token through "Rename" action', async function () {
     const token = this.get('token');
     const saveStub = sinon.stub(token, 'save').resolves();
