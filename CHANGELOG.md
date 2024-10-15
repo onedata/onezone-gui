@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12294 Added pointer cursor and fixed info icon alignment on token consumer page
 * VFS-12083 Allowed to copy token when sidebar is revealed but not opened
 * VFS-12355 Applied minor code fixes; Fixed not working authenticators search field
 * VFS-12080 Added support for custom login page
