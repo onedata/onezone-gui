@@ -8,10 +8,11 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import AbstractNavigationTabsConfiguration from 'onedata-gui-common/services/navigation-tabs-configuration';
+import CommonNavigationTabsConfiguration from 'onedata-gui-common/services/navigation-tabs-configuration';
 import { computed } from '@ember/object';
+import _ from 'lodash';
 
-class OnezoneNavigationTabsConfiguration extends AbstractNavigationTabsConfiguration {
+class OnezoneNavigationTabsConfiguration extends CommonNavigationTabsConfiguration {
   /**
    * @override
    * @returns {Array<OnedataTabModel>}
@@ -19,9 +20,8 @@ class OnezoneNavigationTabsConfiguration extends AbstractNavigationTabsConfigura
   @computed
   get tabModels() {
     const navigationTabsConfiguration = this;
-    return [{
-      id: 'spaces',
-      icon: 'browser-directory',
+    const tabModels = super.tabModels;
+    Object.assign(tabModels.find(tab => tab.id === 'spaces'), {
       isDefault: true,
       /**
        * @param {OnedataSidebarRouteModel<Space>} sidebarModel
@@ -46,40 +46,15 @@ class OnezoneNavigationTabsConfiguration extends AbstractNavigationTabsConfigura
       async defaultResource(sidebarModel) {
         return navigationTabsConfiguration.getLastUsedResource(sidebarModel);
       },
-    }, {
-      id: 'shares',
-      icon: 'browser-share',
-    }, {
-      id: 'providers',
-      icon: 'provider',
-      allowIndex: true,
-    }, {
-      id: 'groups',
-      icon: 'groups',
-      defaultAspect: 'members',
-    }, {
-      id: 'tokens',
-      icon: 'tokens',
-    }, {
-      id: 'harvesters',
-      icon: 'light-bulb',
-      defaultAspect: 'plugin',
-    }, {
-      id: 'atmInventories',
-      icon: 'atm-inventory',
-      defaultAspect: 'workflows',
-    }, {
-      id: 'clusters',
-      icon: 'cluster',
-      defaultAspect: 'overview',
-      allowIndex: false,
-    }, {
+    });
+    tabModels.push({
       id: 'uploads',
       icon: 'browser-upload',
       stickyBottom: true,
       visibilityCondition: 'uploadManager.hasUploads',
       component: 'main-menu/upload-item',
-    }];
+    });
+    return tabModels;
   }
 }
 
