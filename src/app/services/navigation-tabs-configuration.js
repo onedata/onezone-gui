@@ -9,12 +9,16 @@
  */
 
 import AbstractNavigationTabsConfiguration from 'onedata-gui-common/services/navigation-tabs-configuration';
+import { computed } from '@ember/object';
 
 class OnezoneNavigationTabsConfiguration extends AbstractNavigationTabsConfiguration {
   /**
+   * @override
    * @returns {Array<OnedataTabModel>}
    */
-  getTabModels() {
+  @computed
+  get tabModels() {
+    const navigationTabsConfiguration = this;
     return [{
       id: 'spaces',
       icon: 'browser-directory',
@@ -28,13 +32,19 @@ class OnezoneNavigationTabsConfiguration extends AbstractNavigationTabsConfigura
         if (!sidebarModel || !contentModel) {
           return this.defaultAspect;
         }
-
         const supportingProviderIds = Object.keys(contentModel.resource.supportSizes);
         if (!supportingProviderIds.length) {
           return 'index';
         } else {
           return 'data';
         }
+      },
+      /**
+       * @param {OnedataSidebarRouteModel<Space>} sidebarModel
+       * @returns {string}
+       */
+      async defaultResource(sidebarModel) {
+        return navigationTabsConfiguration.getLastUsedResource(sidebarModel);
       },
     }, {
       id: 'shares',
