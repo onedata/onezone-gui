@@ -8,69 +8,9 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Service from '@ember/service';
+import AbstractNavigationTabsConfiguration from 'onedata-gui-common/services/navigation-tabs-configuration';
 
-/**
- * @typedef {OnedataSidebarRouteModel<ResourceT>} Object
- * @property {string} resourceType
- * @property {Array<ResourceT>} collection
- */
-
-/**
- * @typedef {OnedataContentRouteModel<ResourceT>} Object
- * @property {string} resourceId
- * @property {ResourceT} resource
- * @property {Array<ResourceT>} collection
- * @property {Object} queryParams
- */
-
-/**
- * @typedef {(sidebarModel?: OnedataSidebarRouteModel, contentModel?: OnedataContentRouteModel) => string|Promise<string>} DefaultAspectGetter
- */
-
-/**
- * @typedef OnedataTabModel
- * @property {string} id
- * @property {string} icon
- * @property {boolean} [isDefault] If true, then page under that menu item will be a
- *     default choice when URL does not specify selected menu item. Only one menu item can
- *     be default.
- * @property {string|DefaultAspectGetter} [defaultAspect] Aspect name, that should be
- *     rendered, when URL does not specify any
- * @property {boolean} [allowIndex] If true and URL does not specify any resource, then
- *     router will allow showing page not related to any resource - index page for
- *     resource type of that menu item.
- * @property {boolean} [stickyBottom] If true, menu item will stick to the bottom edge of
- *     main-menu column (only in desktop mode) regardless scroll
- * @property {string} [visibilityCondition] String in format `serviceName.propertyName`,
- *     that will point to boolean value. If it will be true, then menu item will be
- *     visible, hidden otherwise. `propertyName` can represent a nested property in
- *     standard format `some.nested.property`.
- * @property {string} [component] Custom component name, that should be used to render
- *     menu item.
- */
-
-export default class NavigationTabsConfiguration extends Service {
-  static defaultAspect = 'index';
-
-  // FIXME: static, generic for common
-  /**
-   *
-   * @param {OnedataTabModel} tabModel
-   */
-  async getDefaultAspect(tabId, sidebarRouteModel, contentRouteModel) {
-    const tabModel = this.getTabModels().find(tab => tab.id === tabId);
-    if (!tabModel.defaultAspect) {
-      return NavigationTabsConfiguration.defaultAspect;
-    }
-    if (typeof tabModel.defaultAspect === 'string') {
-      return tabModel.defaultAspect;
-    }
-    if (typeof tabModel.defaultAspect === 'function') {
-      return await tabModel.defaultAspect(sidebarRouteModel, contentRouteModel);
-    }
-  }
-
+class OnezoneNavigationTabsConfiguration extends AbstractNavigationTabsConfiguration {
   /**
    * @returns {Array<OnedataTabModel>}
    */
@@ -86,7 +26,7 @@ export default class NavigationTabsConfiguration extends Service {
        */
       async defaultAspect(sidebarModel, contentModel) {
         if (!sidebarModel || !contentModel) {
-          return NavigationTabsConfiguration.defaultAspect;
+          return this.defaultAspect;
         }
 
         const supportingProviderIds = Object.keys(contentModel.resource.supportSizes);
@@ -132,3 +72,5 @@ export default class NavigationTabsConfiguration extends Service {
     }];
   }
 }
+
+export default OnezoneNavigationTabsConfiguration;
