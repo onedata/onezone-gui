@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-10341 Upgraded EmberJS to v3.16.10
 * VFS-12083 Allowed to copy token when sidebar is revealed but not opened
 * VFS-12355 Applied minor code fixes; Fixed not working authenticators search field
 * VFS-12080 Added support for custom login page
