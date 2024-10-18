@@ -19,50 +19,6 @@ module.exports = function (environment) {
         Date: false,
       },
     },
-    /**
-     * Objects in collection:
-     * - id: string
-     * - icon: string
-     * - [isDefault]: boolean If true, then page under that menu item will be
-     *     a default choice when URL does not specify selected menu item.
-     *     Only one menu item can be default.
-     * - [defaultAspect]: string Aspect name, that should be rendered, when
-     *     URL does not specify any
-     * - [allowIndex]: boolean If true and URL does not specify any resource,
-     *     then router will allow showing page not related to any resource -
-     *     index page for resource type of that menu item.
-     * - [stickyBottom]: boolean If true, menu item will stick to the bottom
-     *     edge of main-menu column (only in desktop mode) regardless scroll
-     * - [visibilityCondition]: string String in format
-     *     `serviceName.propertyName`, that will point to boolean value. If it
-     *     will be true, then menu item will be visible, hidden otherwise.
-     *     `propertyName` can represent a nested property in standard format
-     *     `some.nested.property`.
-     * - [component]: string Custom component name, that should be used to
-     *     render menu item.
-     */
-    'onedataTabs': [
-      { id: 'spaces', icon: 'browser-directory', isDefault: true },
-      { id: 'shares', icon: 'browser-share' },
-      { id: 'providers', icon: 'provider', allowIndex: true },
-      { id: 'groups', icon: 'groups', defaultAspect: 'members' },
-      { id: 'tokens', icon: 'tokens' },
-      { id: 'harvesters', icon: 'light-bulb', defaultAspect: 'plugin' },
-      { id: 'atmInventories', icon: 'atm-inventory', defaultAspect: 'workflows' },
-      {
-        id: 'clusters',
-        icon: 'cluster',
-        defaultAspect: 'overview',
-        allowIndex: false,
-      },
-      {
-        id: 'uploads',
-        icon: 'browser-upload',
-        stickyBottom: true,
-        visibilityCondition: 'uploadManager.hasUploads',
-        component: 'main-menu/upload-item',
-      },
-    ],
     'layoutConfig': {
       formLabelColumns: 'col-xs-12 col-sm-5',
       formInputColumns: 'col-xs-12 col-sm-7',
