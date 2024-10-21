@@ -59,7 +59,10 @@ export default UrlActionRunner.extend({
     } = this.getProperties('spaceActions', 'recordManager');
 
     return recordManager.getRecordById('space', spaceId)
-      .then(space => spaceActions.createRemoveSpaceAction({ space }).execute());
+      .then(space => {
+        const action = spaceActions.createRemoveSpaceAction({ space });
+        return action.execute().finally(() => action.destroy());
+      });
   },
 
   /**
@@ -90,10 +93,11 @@ export default UrlActionRunner.extend({
         'members'
       );
     } finally {
-      this.spaceActions.createConfirmSpaceJoinRequestAction({
+      const action = this.spaceActions.createConfirmSpaceJoinRequestAction({
         spaceId,
         requestId,
-      }).execute();
+      });
+      action.execute().finally(() => action.destroy());
     }
   },
 
@@ -114,7 +118,11 @@ export default UrlActionRunner.extend({
     } catch {
       // onedata transition could fail, but it should not cause action to cancel
     }
-    await GoToFileUrlActionHandler.create({ ownerSource: this })
-      .handle({ fileId, fileAction });
+    const actionHandler = GoToFileUrlActionHandler.create({ ownerSource: this });
+    try {
+      await actionHandler.handle({ fileId, fileAction });
+    } finally {
+      actionHandler.destroy();
+    }
   },
 });

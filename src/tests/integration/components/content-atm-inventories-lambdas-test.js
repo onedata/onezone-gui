@@ -22,7 +22,7 @@ import { set, setProperties, get } from '@ember/object';
 import { clearStoreAfterEach } from '../../helpers/clear-store';
 import globals from 'onedata-gui-common/utils/globals';
 
-describe('Integration | Component | content-atm-inventories-lambdas', function () {
+describe('Integration | Component | content-atm-inventories-lambdas (main)', function () {
   setupRenderingTest();
 
   clearStoreAfterEach();
@@ -30,9 +30,9 @@ describe('Integration | Component | content-atm-inventories-lambdas', function (
   before(function () {
     // Instatiate Action class to make its `prototype.execute` available for
     // mocking.
-    CreateAtmLambdaAction.create();
-    CreateAtmLambdaRevisionAction.create();
-    ModifyAtmLambdaRevisionAction.create();
+    CreateAtmLambdaAction.create().destroy();
+    CreateAtmLambdaRevisionAction.create().destroy();
+    ModifyAtmLambdaRevisionAction.create().destroy();
   });
 
   beforeEach(async function () {

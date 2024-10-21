@@ -343,7 +343,7 @@ export default Service.extend({
    * @returns {String}
    */
   getModelNameForRecord(record) {
-    return camelize(get(record, 'constructor.modelName'));
+    return camelize(record.constructor.modelName);
   },
 
   /**

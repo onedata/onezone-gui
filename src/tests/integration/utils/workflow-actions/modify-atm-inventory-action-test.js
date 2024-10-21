@@ -10,7 +10,11 @@ import { get } from '@ember/object';
 describe(
   'Integration | Utility | workflow-actions/modify-atm-inventory-action',
   function () {
-    setupRenderingTest();
+    const { afterEach } = setupRenderingTest();
+
+    afterEach(function () {
+      this.action?.destroy();
+    });
 
     it('executes modifying automation inventory (success scenario)', function () {
       const atmInventoryDiff = {
@@ -24,7 +28,7 @@ describe(
           }
         }),
       };
-      const action = ModifyAtmInventoryAction.create({
+      this.action = ModifyAtmInventoryAction.create({
         ownerSource: this.owner,
         context: {
           atmInventory,
@@ -36,7 +40,7 @@ describe(
         'success'
       );
 
-      return action.execute()
+      return this.action.execute()
         .then(actionResult => {
           expect(atmInventory.save).to.be.calledOnce;
           expect(atmInventory.name).to.equal('inventory2');
@@ -63,7 +67,7 @@ describe(
           atmInventory.name = 'inventory1';
         },
       };
-      const action = ModifyAtmInventoryAction.create({
+      this.action = ModifyAtmInventoryAction.create({
         ownerSource: this.owner,
         context: {
           atmInventory,
@@ -75,7 +79,7 @@ describe(
         'backendError'
       );
 
-      return action.execute()
+      return this.action.execute()
         .then(actionResult => {
           expect(atmInventory.name).to.equal('inventory1');
           expect(failureNotifySpy).to.be.calledWith(

@@ -8,7 +8,7 @@
  */
 
 import Component from '@ember/component';
-import { observer, get, computed } from '@ember/object';
+import { observer, get, computed, trySet } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/i18n';
@@ -75,6 +75,11 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   clickable: false,
+
+  /**
+   * @type {(() => void) | null}
+   */
+  mouseEnterHandler: null,
 
   /**
    * @type {Ember.ComputedProperty<boolean>}
@@ -208,6 +213,9 @@ export default Component.extend(I18n, {
     this.clickHandlerObserver();
   },
 
+  /**
+   * @override
+   */
   doubleClick() {
     if (this.get('relationIsRejected')) {
       this.get('globalNotify').backendError(
@@ -217,7 +225,32 @@ export default Component.extend(I18n, {
     }
   },
 
-  mouseEnter() {
-    this.set('renderTooltip', true);
+  /**
+   * @override
+   */
+  didInsertElement() {
+    this._super(...arguments);
+
+    if (!this.element) {
+      return;
+    }
+
+    this.set('mouseEnterHandler', () => {
+      trySet(this, 'renderTooltip', true);
+    });
+    this.element.addEventListener('mouseenter', this.mouseEnterHandler);
+  },
+
+  /**
+   * @override
+   */
+  willDestroyElement() {
+    try {
+      if (this.mouseEnterHandler) {
+        this.element?.removeEventListener('mouseenter', this.mouseEnterHandler);
+      }
+    } finally {
+      this._super(...arguments);
+    }
   },
 });

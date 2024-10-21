@@ -66,6 +66,11 @@ export default Component.extend(I18n, {
   onRegisterViewActions: notImplementedIgnore,
 
   /**
+   * @type {Utils.Action | null}
+   */
+  uploadAtmWorkflowSchemaActionCache: null,
+
+  /**
    * @type {ComputedProperty<Boolean>}
    */
   hasManageWorkflowSchemasPrivilege: bool('atmInventory.privileges.manageWorkflowSchemas'),
@@ -121,12 +126,14 @@ export default Component.extend(I18n, {
     'atmInventory',
     'onOpenAtmWorkflowSchemaRevision',
     function uploadAtmWorkflowSchemaAction() {
-      const action = this.workflowActions.createUploadAtmRecordAction({
-        atmModelName: 'atmWorkflowSchema',
-        atmInventory: this.atmInventory,
-      });
+      this.uploadAtmWorkflowSchemaActionCache?.destroy();
+      this.uploadAtmWorkflowSchemaActionCache =
+        this.workflowActions.createUploadAtmRecordAction({
+          atmModelName: 'atmWorkflowSchema',
+          atmInventory: this.atmInventory,
+        });
       // After successful workflow schema upload, open it
-      action.addExecuteHook(actionResult => {
+      this.uploadAtmWorkflowSchemaActionCache.addExecuteHook(actionResult => {
         const {
           status,
           result,
@@ -142,7 +149,7 @@ export default Component.extend(I18n, {
         }
       });
 
-      return action;
+      return this.uploadAtmWorkflowSchemaActionCache;
     }
   ),
 

@@ -160,7 +160,7 @@
  *     are fixed in Workspace and properties computed in utils.
  *
  * @author Michał Borzęcki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @copyright (C) 2018-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -192,6 +192,11 @@ import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
 import { getOwner } from '@ember/application';
 import dom from 'onedata-gui-common/utils/dom';
 import globals from 'onedata-gui-common/utils/globals';
+import {
+  destroyDestroyableComputedValues,
+  destroyableComputed,
+  initDestroyableCache,
+} from 'onedata-gui-common/utils/destroyable-computed';
 
 export default Component.extend(I18n, {
   classNames: ['groups-hierarchy-visualiser'],
@@ -335,10 +340,15 @@ export default Component.extend(I18n, {
   workspace: undefined,
 
   /**
+   * @type {Set<Utils.GroupsHierarchyVisualiser.Column>}
+   */
+  createdColumnsSet: undefined,
+
+  /**
    * Column manager instance
    * @type {Ember.ComputedProperty<Utils/GroupsHierarchyVisualiser/ColumnManager>}
    */
-  columnManager: computed('workspace', function columnManager() {
+  columnManager: destroyableComputed('workspace', function columnManager() {
     return ColumnManager.create({
       workspace: this.get('workspace'),
     });
@@ -367,7 +377,7 @@ export default Component.extend(I18n, {
    * Privileges model for relation privileges editor
    * @type {Ember.ComputedProperty<PrivilegeRecordProxy|null>}
    */
-  privilegesEditorModel: computed(
+  privilegesEditorModel: destroyableComputed(
     'relationPrivilegesToChange',
     function privilegesEditorModel() {
       const {
@@ -525,13 +535,18 @@ export default Component.extend(I18n, {
    * @override
    */
   init() {
+    initDestroyableCache(this);
     this._super(...arguments);
+    this.set('createdColumnsSet', new Set());
     if (!this.workspace) {
       this.set('workspace', Workspace.create());
     }
     this.searchStringObserver();
   },
 
+  /**
+   * @override
+   */
   didInsertElement() {
     this._super(...arguments);
 
@@ -544,9 +559,24 @@ export default Component.extend(I18n, {
     this.resetObserver();
   },
 
+  /**
+   * @override
+   */
   willDestroyElement() {
     try {
       globals.window.removeEventListener('resize', this.windowResizeHandler);
+      this.createdColumnsSet.forEach((col) => col.destroy());
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      destroyDestroyableComputedValues(this);
     } finally {
       this._super(...arguments);
     }
@@ -634,6 +664,7 @@ export default Component.extend(I18n, {
       relationType: relationType,
       relatedGroup,
     });
+    this.createdColumnsSet.add(column);
     column.set('model', this.createColumnModel(column));
     return column;
   },
@@ -806,7 +837,7 @@ export default Component.extend(I18n, {
           })
         );
     },
-    joinUsingToken(token) {
+    async joinUsingToken(token) {
       const {
         groupConsumingToken,
         tokenActions,
@@ -815,25 +846,29 @@ export default Component.extend(I18n, {
         'tokenActions'
       );
       this.set('isGroupConsumingToken', true);
-      return tokenActions.createConsumeInviteTokenAction({
-          joiningRecord: groupConsumingToken,
-          targetModelName: 'group',
-          token,
-          dontRedirect: true,
-        }).execute()
-        .then(() => safeExec(this, 'reloadModel'))
-        .finally(() =>
-          safeExec(this, 'setProperties', {
-            isGroupConsumingToken: false,
-            groupConsumingToken: null,
-          })
-        );
+      const action = tokenActions.createConsumeInviteTokenAction({
+        joiningRecord: groupConsumingToken,
+        targetModelName: 'group',
+        token,
+        dontRedirect: true,
+      });
+      try {
+        await action.execute();
+        safeExec(this, 'reloadModel');
+      } finally {
+        safeExec(this, 'setProperties', {
+          isGroupConsumingToken: false,
+          groupConsumingToken: null,
+        });
+        action.destroy?.();
+      }
     },
     async leaveGroup(group) {
       const action = this.userActions.createLeaveAction({
         recordToLeave: group,
       });
       const result = await action.execute();
+      action.destroy();
       if (result.status === 'done') {
         safeExec(this, 'reloadModel');
       }

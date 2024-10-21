@@ -8,7 +8,7 @@
 
 import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { raw, array, isEmpty, conditional } from 'ember-awesome-macros';
+import { isEmpty, conditional } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
 import computedT from 'onedata-gui-common/utils/computed-t';
 import Action from 'onedata-gui-common/utils/action';
@@ -66,7 +66,9 @@ export default Action.extend({
   /**
    * @type {Ember.ComputedProperty<Array<Models.Token>>}
    */
-  tokensToRemove: array.filterBy('allTokens', raw('isObsolete')),
+  tokensToRemove: computed('allTokens.@each.isObsolete', function tokensToRemove() {
+    return this.allTokens?.filter((token) => token.isObsolete) ?? [];
+  }),
 
   /**
    * @type {Ember.ComputedProperty<Array<Models.Token>>}

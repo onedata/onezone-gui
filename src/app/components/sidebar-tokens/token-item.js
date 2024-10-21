@@ -86,6 +86,11 @@ export default Component.extend(I18n, {
   }),
 
   /**
+   * @type {ComputedProperty<Record<string, Utils.Action>>}
+   */
+  actionsCache: computed(() => ({})),
+
+  /**
    * @type {Ember.ComputedProperty<Action>}
    */
   renameAction: computed('isRenaming', function renameAction() {
@@ -129,18 +134,31 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<Action>}
    */
   copyIdAction: computed('token', function copyIdAction() {
+    this.actionsCache.copyIdAction?.destroyAfterAllExecutions();
     const {
       token,
       clipboardActions,
     } = this.getProperties('token', 'clipboardActions');
 
-    return clipboardActions.createCopyRecordIdAction({ record: token });
+    return this.actionsCache.copyIdAction =
+      clipboardActions.createCopyRecordIdAction({ record: token });
   }),
 
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
   actionsArray: collect('renameAction', 'removeAction', 'copyTokenAction', 'copyIdAction'),
+
+  /**
+   * @override
+   */
+  willDestroyElement() {
+    try {
+      this.cacheFor('copyIdAction')?.destroyAfterAllExecutions();
+    } finally {
+      this._super(...arguments);
+    }
+  },
 
   /**
    * If actual token disappeared from the sidebar, redirects to token main page

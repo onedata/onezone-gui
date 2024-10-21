@@ -50,16 +50,36 @@ export default Component.extend({
       next(this, () => this.router.transitionTo('index'));
       return;
     }
-    this.set('viewModel', this.createViewModel());
+    this.initViewModel();
   },
 
   /**
+   * This method should be used only one-time to not produce dangling objects.
+   * @private
    * @returns {ComputedProperty<Utils.SpacesMarketplaceViewModel>}
    */
-  createViewModel() {
-    return SpacesMarketplaceViewModel.create({
+  initViewModel() {
+    if (this.viewModel) {
+      console.warn(
+        'ContentSpacesMarketplace#initViewModel: viewModel is already initialized'
+      );
+      return;
+    }
+    const viewModel = SpacesMarketplaceViewModel.create({
       ownerSource: this,
       selectedSpaceId: this.navigationState.aspectOptions.selectedSpace,
     });
+    this.set('viewModel', viewModel);
+  },
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.viewModel?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
   },
 });

@@ -18,7 +18,7 @@ import {
 describe(
   'Integration | Utility | workflow-actions/remove-atm-workflow-schema-action',
   function () {
-    setupRenderingTest();
+    const { afterEach } = setupRenderingTest();
 
     beforeEach(function () {
       const context = {
@@ -34,6 +34,10 @@ describe(
         }),
         atmWorkflowSchema: context.atmWorkflowSchema,
       });
+    });
+
+    afterEach(function () {
+      this.action?.destroy();
     });
 
     it('has correct className, icon and title', function () {

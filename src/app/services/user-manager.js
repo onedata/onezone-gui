@@ -9,7 +9,7 @@
 import Service, { inject as service } from '@ember/service';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { entityType as userEntityType } from 'onezone-gui/models/user';
-import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
+import { destroyablePromiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promise } from 'ember-awesome-macros';
 import { computed, get } from '@ember/object';
 import { all as allFulfilled } from 'rsvp';
@@ -84,7 +84,7 @@ export default Service.extend({
     const knownUsersProxy = AllKnownUsersProxyArray.create({
       recordManager: this.get('recordManager'),
     });
-    return promiseArray(
+    return destroyablePromiseArray(
       get(knownUsersProxy, 'allRecordsProxy').then(() => knownUsersProxy)
     );
   },

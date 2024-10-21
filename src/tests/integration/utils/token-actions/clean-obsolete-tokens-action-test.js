@@ -15,7 +15,7 @@ import {
 } from '../../../helpers/modal';
 
 describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', function () {
-  setupRenderingTest();
+  const { afterEach } = setupRenderingTest();
 
   beforeEach(function () {
     const tokens = [{
@@ -52,8 +52,12 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
     });
   });
 
+  afterEach(function () {
+    this.action?.destroy();
+  });
+
   it('has correct className, icon and title', function () {
-    const action = CleanObsoleteTokensAction.create({
+    this.action = CleanObsoleteTokensAction.create({
       ownerSource: this.owner,
       context: this.get('context'),
     });
@@ -62,72 +66,72 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
       className,
       icon,
       title,
-    } = getProperties(action, 'className', 'icon', 'title');
+    } = getProperties(this.action, 'className', 'icon', 'title');
     expect(className).to.equal('clean-obsolete-tokens-trigger');
     expect(icon).to.equal('clean-filled');
     expect(String(title)).to.equal('Clean up obsolete tokens');
   });
 
   it('has correct tip when there is something to clean', function () {
-    const action = CleanObsoleteTokensAction.create({
+    this.action = CleanObsoleteTokensAction.create({
       ownerSource: this.owner,
       context: this.get('context'),
     });
 
-    expect(String(get(action, 'tip'))).to.equal('Clean up obsolete tokens');
+    expect(String(get(this.action, 'tip'))).to.equal('Clean up obsolete tokens');
   });
 
   it('has correct tip when there is nothing to clean', function () {
-    const action = CleanObsoleteTokensAction.create({
+    this.action = CleanObsoleteTokensAction.create({
       ownerSource: this.owner,
     });
 
-    expect(String(get(action, 'tip')))
+    expect(String(get(this.action, 'tip')))
       .to.equal('Clean up obsolete tokens (nothing to clean)');
   });
 
   it('is disabled when there are no tokens to remove', function () {
     const tokens = this.get('tokens').setEach('isObsolete', false);
-    const action = CleanObsoleteTokensAction.create({
+    this.action = CleanObsoleteTokensAction.create({
       ownerSource: this.owner,
       context: {
         collection: tokens,
       },
     });
 
-    expect(get(action, 'disabled')).to.be.true;
+    expect(get(this.action, 'disabled')).to.be.true;
   });
 
   it('is enabled when there are tokens to remove', function () {
-    const action = CleanObsoleteTokensAction.create({
+    this.action = CleanObsoleteTokensAction.create({
       ownerSource: this.owner,
       context: this.get('context'),
     });
 
-    expect(get(action, 'disabled')).to.be.false;
+    expect(get(this.action, 'disabled')).to.be.false;
   });
 
   it('shows modal on execute', async function () {
-    const action = CleanObsoleteTokensAction.create({
+    this.action = CleanObsoleteTokensAction.create({
       ownerSource: this.owner,
       context: this.get('context'),
     });
 
     await render(hbs `{{global-modal-mounter}}`);
-    action.execute();
+    this.action.execute();
     await settled();
 
     expect(getModal()).to.have.class('clean-obsolete-tokens-modal');
   });
 
   it('passes only obsolete tokens to modal', async function () {
-    const action = CleanObsoleteTokensAction.create({
+    this.action = CleanObsoleteTokensAction.create({
       ownerSource: this.owner,
       context: this.get('context'),
     });
 
     await render(hbs `{{global-modal-mounter}}`);
-    action.execute();
+    this.action.execute();
     await settled();
 
     const accessTokens = getAccessTokenItems();
@@ -144,7 +148,7 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
 
   it('passes information about visible tokens to modal', async function () {
     const tokens = this.get('tokens');
-    const action = CleanObsoleteTokensAction.create({
+    this.action = CleanObsoleteTokensAction.create({
       ownerSource: this.owner,
       context: {
         collection: tokens,
@@ -153,7 +157,7 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
     });
 
     await render(hbs `{{global-modal-mounter}}`);
-    action.execute();
+    this.action.execute();
     await settled();
 
     const accessTokens = getAccessTokenItems();
@@ -177,13 +181,13 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
       collection: tokens,
       visibleCollection: undefined,
     };
-    const action = CleanObsoleteTokensAction.create({
+    this.action = CleanObsoleteTokensAction.create({
       ownerSource: this.owner,
       context,
     });
 
     await render(hbs `{{global-modal-mounter}}`);
-    action.execute();
+    this.action.execute();
     await settled();
 
     const accessTokens = getAccessTokenItems();
@@ -204,13 +208,13 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
   it(
     'returns promise with cancelled ActionResult after execute() and modal close using "Cancel"',
     async function () {
-      const action = CleanObsoleteTokensAction.create({
+      this.action = CleanObsoleteTokensAction.create({
         ownerSource: this.owner,
         context: this.get('context'),
       });
 
       await render(hbs `{{global-modal-mounter}}`);
-      const resultPromise = action.execute();
+      const resultPromise = this.action.execute();
       await settled();
 
       await click(getModalFooter().querySelector('.remove-tokens-cancel'));
@@ -221,7 +225,7 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
 
   it('executes removing selected tokens on submit (success scenario)', async function () {
     const tokens = this.get('tokens');
-    const action = CleanObsoleteTokensAction.create({
+    this.action = CleanObsoleteTokensAction.create({
       ownerSource: this.owner,
       context: this.get('context'),
     });
@@ -242,7 +246,7 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
     );
 
     await render(hbs `{{global-modal-mounter}}`);
-    const actionResultPromise = action.execute();
+    const actionResultPromise = this.action.execute();
     await settled();
 
     await click(getModalFooter().querySelector('.remove-tokens-submit'));
@@ -262,7 +266,7 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
   it(
     'executes removing selected tokens on submit (remove failure scenario)',
     async function () {
-      const action = CleanObsoleteTokensAction.create({
+      this.action = CleanObsoleteTokensAction.create({
         ownerSource: this.owner,
         context: this.get('context'),
       });
@@ -283,7 +287,7 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
       );
 
       await render(hbs `{{global-modal-mounter}}`);
-      const actionResultPromise = action.execute();
+      const actionResultPromise = this.action.execute();
       await settled();
 
       await click(getModalFooter().querySelector('.remove-tokens-submit'));
@@ -307,7 +311,7 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
   it(
     'executes removing selected tokens on submit (reload failure scenario)',
     async function () {
-      const action = CleanObsoleteTokensAction.create({
+      this.action = CleanObsoleteTokensAction.create({
         ownerSource: this.owner,
         context: this.get('context'),
       });
@@ -320,7 +324,7 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
       );
 
       await render(hbs `{{global-modal-mounter}}`);
-      const actionResultPromise = action.execute();
+      const actionResultPromise = this.action.execute();
       await settled();
 
       await click(getModalFooter().querySelector('.remove-tokens-submit'));

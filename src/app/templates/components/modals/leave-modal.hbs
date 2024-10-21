@@ -42,14 +42,14 @@
   {{/modal.body}}
 
   {{#modal.footer class="btn-toolbar"}}
-    {{#bs-button
+    {{#one-button
       type="default"
       class="cancel-btn"
       onClick=modal.close
       disabled=isSubmitting
     }}
       {{tt this (if isCurrentUserDirectMember "buttons.cancel" "buttons.close")}}
-    {{/bs-button}}
+    {{/one-button}}
     {{#if isCurrentUserDirectMember}}
       {{#one-button
         type="danger"

@@ -1,56 +1,104 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
+import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render, click, find, findAll } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import { get } from '@ember/object';
 import { selectChoose } from 'ember-power-select/test-support/helpers';
+import { lookupService } from '../../helpers/stub-service';
+import clearStore from '../../helpers/clear-store';
+import { all as allFulfilled } from 'rsvp';
+import gri from 'onedata-gui-websocket-client/utils/gri';
+import { entityType as clusterEntityType } from 'onezone-gui/models/cluster';
 
 describe('Integration | Component | sidebar-tokens', function () {
-  setupRenderingTest();
+  const { beforeEach, afterEach } = setupRenderingTest();
 
-  beforeEach(function () {
+  beforeEach(async function () {
+    const store = lookupService(this, 'store');
+    const clusterId = '48ece7a0376745413e58e14c225e196fchee7a';
+    const onedataConnection = lookupService(this, 'onedataConnection');
+    onedataConnection.set('zoneName', 'cluster1');
+    const cluster1 = store.createRecord('cluster', {
+      id: gri({
+        entityType: clusterEntityType,
+        entityId: clusterId,
+        aspect: 'instance',
+        scope: 'auto',
+      }),
+      type: 'zone',
+    });
+    await cluster1.save();
+    const tokenSpecs = [{
+      name: 'invite token 2',
+      type: {
+        inviteToken: {
+          parameters: {},
+          inviteType: 'userJoinGroup',
+          groupId: 'admins',
+        },
+      },
+      revoked: false,
+    }, {
+      name: 'access token',
+      type: { accessToken: {} },
+      revoked: false,
+    }, {
+      name: 'identity token',
+      type: { identityToken: {} },
+      revoked: false,
+    }, {
+      name: 'invite token 1 cluster cluster1',
+      type: {
+        inviteToken: {
+          parameters: {},
+          inviteType: 'userJoinCluster',
+          clusterId: cluster1.entityId,
+        },
+      },
+      revoked: false,
+    }, {
+      name: 'invite disabled cluster unknown',
+      type: {
+        inviteToken: {
+          parameters: {},
+          inviteType: 'userJoinCluster',
+        },
+      },
+      revoked: true,
+    }, {
+      name: 'access disabled',
+      type: {
+        accessToken: {
+          parameters: {},
+          inviteType: 'userJoinCluster',
+        },
+      },
+      revoked: true,
+    }];
+
+    const tokens = await allFulfilled(tokenSpecs.map(spec =>
+      createTokenRecord(store, spec).save()
+    ));
+
+    const tokenList = await store.createRecord('token-list', {
+      list: tokens,
+    }).save();
+
     this.setProperties({
       model: {
-        collection: {
-          list: [{
-            name: 'invite token 2',
-            typeName: 'invite',
-            isActive: true,
-          }, {
-            name: 'access token',
-            typeName: 'access',
-            isActive: true,
-          }, {
-            name: 'identity token',
-            typeName: 'identity',
-            isActive: true,
-          }, {
-            name: 'invite token 1 cluster cluster1',
-            typeName: 'invite',
-            isActive: true,
-            targetModelName: 'cluster',
-            tokenTarget: {
-              name: 'cluster1',
-            },
-          }, {
-            name: 'invite disabled cluster unknown',
-            typeName: 'invite',
-            isActive: false,
-            targetModelName: 'cluster',
-          }, {
-            name: 'access disabled',
-            typeName: 'access',
-            isActive: false,
-          }],
-        },
+        collection: tokenList,
       },
       tokensOrder: [1, 2, 3, 0, 5, 4],
     });
   });
 
+  afterEach(function () {
+    clearStore();
+  });
+
   it('renders all tokens', async function () {
-    const tokens = this.get('model.collection.list');
+    const tokens = await this.get('model.collection.list');
 
     await render(hbs `{{sidebar-tokens model=model}}`);
 
@@ -59,15 +107,14 @@ describe('Integration | Component | sidebar-tokens', function () {
   });
 
   it('renders tokens in correct order', async function () {
-    const tokens = this.get('model.collection.list');
+    const tokens = await this.get('model.collection.list');
     const tokensOrder = this.get('tokensOrder');
 
     await render(hbs `{{sidebar-tokens model=model}}`);
-
     findAll('.token-item').forEach((element, index) => {
       const originIndex = tokensOrder[index];
       expect(element.querySelector('.token-name'))
-        .to.contain.text(get(tokens[originIndex], 'name'));
+        .to.contain.text(get(tokens.objectAt(originIndex), 'name'));
     });
   });
 
@@ -148,3 +195,7 @@ describe('Integration | Component | sidebar-tokens', function () {
     }
   );
 });
+
+function createTokenRecord(store, data = {}) {
+  return store.createRecord('token', data);
+}

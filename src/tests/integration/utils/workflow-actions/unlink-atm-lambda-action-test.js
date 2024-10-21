@@ -18,7 +18,7 @@ import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 
 describe('Integration | Utility | workflow-actions/unlink-atm-lambda-action',
   function () {
-    setupRenderingTest();
+    const { afterEach } = setupRenderingTest();
 
     beforeEach(function () {
       const atmInventory = {
@@ -74,6 +74,10 @@ describe('Integration | Utility | workflow-actions/unlink-atm-lambda-action',
         atmInventories,
         removeRelationStub,
       }, context));
+    });
+
+    afterEach(function () {
+      this.action?.destroy();
     });
 
     it('has correct className, icon and title', function () {

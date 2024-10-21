@@ -2,7 +2,7 @@
  * Modal for sending request message to marketplace space contact.
  *
  * @author Jakub Liput
- * @copyright (C) 2022 ACK CYFRONET AGH
+ * @copyright (C) 2022-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -19,6 +19,11 @@ import { and, not, collect } from 'ember-awesome-macros';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
 import { inject as service } from '@ember/service';
+import {
+  destroyDestroyableComputedValues,
+  destroyableComputed,
+  initDestroyableCache,
+} from 'onedata-gui-common/utils/destroyable-computed';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -106,20 +111,9 @@ export default Component.extend(I18n, {
     });
   }),
 
-  emailField: computed('predefinedEmails', function emailField() {
-    if (_.isEmpty(this.predefinedEmails)) {
-      return this.emailInputField;
-    } else {
-      return this.emailDropdownField;
-    }
-  }),
-
-  emailInputField: computed(function emailInputField() {
-    return TextField.create({
-      name: this.emailFieldName,
-      defaultValue: '',
-      customValidators: this.emailFieldValidators,
-    });
+  emailField: destroyableComputed('predefinedEmails', function emailField() {
+    return _.isEmpty(this.predefinedEmails) ?
+      this.createEmailInputField() : this.createEmailDropdownField();
   }),
 
   predefinedEmailsOptions: computed(
@@ -132,21 +126,10 @@ export default Component.extend(I18n, {
     }
   ),
 
-  emailDropdownField: computed(function emailInputField() {
-    return CustomValueDropdownField
-      .extend({
-        options: reads('requestSpaceAccessModal.predefinedEmailsOptions'),
-      })
-      .create({
-        requestSpaceAccessModal: this,
-        name: this.emailFieldName,
-        customValidators: this.emailFieldValidators,
-      });
-  }),
-
   isProceedAvailable: and('rootField.isValid', 'isEmailShareConfirmed'),
 
   init() {
+    initDestroyableCache(this);
     this._super(...arguments);
     this.set('emailFieldValidators', Object.freeze([
       validator('format', {
@@ -156,9 +139,42 @@ export default Component.extend(I18n, {
     ]));
   },
 
+  createEmailInputField() {
+    return TextField.create({
+      name: this.emailFieldName,
+      defaultValue: '',
+      customValidators: this.emailFieldValidators,
+    });
+  },
+
+  createEmailDropdownField() {
+    return CustomValueDropdownField
+      .extend({
+        options: reads('requestSpaceAccessModal.predefinedEmailsOptions'),
+      })
+      .create({
+        requestSpaceAccessModal: this,
+        name: this.emailFieldName,
+        customValidators: this.emailFieldValidators,
+      });
+  },
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.cacheFor('rootField')?.destroy();
+      destroyDestroyableComputedValues(this);
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
   actions: {
     /**
      * @param {(data: SpaceAccessRequestMessageData) => void} modalSubmitCallback
+     * @returns {Promise}
      */
     async submit(modalSubmitCallback) {
       if (!this.isProceedAvailable || this.isDisabled) {

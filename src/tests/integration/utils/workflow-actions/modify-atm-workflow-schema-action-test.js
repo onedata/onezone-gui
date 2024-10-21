@@ -10,7 +10,11 @@ import { get } from '@ember/object';
 describe(
   'Integration | Utility | workflow-actions/modify-atm-workflow-schema-action',
   function () {
-    setupRenderingTest();
+    const { afterEach } = setupRenderingTest();
+
+    afterEach(function () {
+      this.action?.destroy();
+    });
 
     it('executes modifying workflow (success scenario)', function () {
       const atmWorkflowSchemaDiff = {
@@ -24,7 +28,7 @@ describe(
           }
         }),
       };
-      const action = ModifyAtmWorkflowSchemaAction.create({
+      this.action = ModifyAtmWorkflowSchemaAction.create({
         ownerSource: this.owner,
         context: {
           atmWorkflowSchema,
@@ -36,7 +40,7 @@ describe(
         'success'
       );
 
-      return action.execute()
+      return this.action.execute()
         .then(actionResult => {
           expect(atmWorkflowSchema.save).to.be.calledOnce;
           expect(atmWorkflowSchema.name).to.equal('workflow2');
@@ -63,7 +67,7 @@ describe(
           atmWorkflowSchema.name = 'workflow1';
         },
       };
-      const action = ModifyAtmWorkflowSchemaAction.create({
+      this.action = ModifyAtmWorkflowSchemaAction.create({
         ownerSource: this.owner,
         context: {
           atmWorkflowSchema,
@@ -75,7 +79,7 @@ describe(
         'backendError'
       );
 
-      return action.execute()
+      return this.action.execute()
         .then(actionResult => {
           expect(atmWorkflowSchema.name).to.equal('workflow1');
           expect(failureNotifySpy).to.be.calledWith(

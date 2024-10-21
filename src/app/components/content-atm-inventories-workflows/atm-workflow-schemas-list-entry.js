@@ -80,6 +80,11 @@ export default Component.extend(I18n, {
   isEditing: false,
 
   /**
+   * @type {ComputedProperty<Record<string, unknown>}
+   */
+  destroyablePropsCache: computed(() => ({})),
+
+  /**
    * @type {ComputedProperty<Array<RevisionsTableColumnSpec>>}
    */
   revisionCustomColumnSpecs: computed(function revisionCustomColumnSpecs() {
@@ -112,25 +117,29 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.Action>}
    */
   removeAction: computed('atmWorkflowSchema', function removeAction() {
+    this.destroyablePropsCache.removeAction?.destroy();
     const {
       workflowActions,
       atmWorkflowSchema,
     } = this.getProperties('workflowActions', 'atmWorkflowSchema');
-    return workflowActions.createRemoveAtmWorkflowSchemaAction({
-      atmWorkflowSchema,
-    });
+    return this.destroyablePropsCache.removeAction =
+      workflowActions.createRemoveAtmWorkflowSchemaAction({
+        atmWorkflowSchema,
+      });
   }),
 
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
   copyIdAction: computed('atmWorkflowSchema', function copyIdAction() {
+    this.destroyablePropsCache.copyIdAction?.destroy();
     const {
       atmWorkflowSchema,
       clipboardActions,
     } = this.getProperties('atmWorkflowSchema', 'clipboardActions');
 
-    return clipboardActions.createCopyRecordIdAction({ record: atmWorkflowSchema });
+    return this.destroyablePropsCache.copyIdAction =
+      clipboardActions.createCopyRecordIdAction({ record: atmWorkflowSchema });
   }),
 
   /**
@@ -150,14 +159,26 @@ export default Component.extend(I18n, {
     'atmWorkflowSchema',
     'onRevisionCreated',
     function revisionActionsFactory() {
-      return RevisionActionsFactory.create({
-        ownerSource: this,
-        atmInventory: this.atmInventory,
-        atmWorkflowSchema: this.atmWorkflowSchema,
-        onRevisionCreated: this.onRevisionCreated,
-      });
+      this.destroyablePropsCache.revisionActionsFactory?.destroy();
+      return this.destroyablePropsCache.revisionActionsFactory =
+        RevisionActionsFactory.create({
+          ownerSource: this,
+          atmInventory: this.atmInventory,
+          atmWorkflowSchema: this.atmWorkflowSchema,
+          onRevisionCreated: this.onRevisionCreated,
+        });
     }
   ),
+
+  willDestroyElement() {
+    try {
+      this.cacheFor('revisionActionsFactory')?.destroy();
+      this.cacheFor('removeAction')?.destroy();
+      this.cacheFor('copyIdAction')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
 
   actions: {
     toggleActionsOpen(state) {
@@ -177,14 +198,18 @@ export default Component.extend(I18n, {
         workflowActions,
       } = this.getProperties('changesToApply', 'atmWorkflowSchema', 'workflowActions');
 
-      return workflowActions.createModifyAtmWorkflowSchemaAction({
+      const action = workflowActions.createModifyAtmWorkflowSchemaAction({
         atmWorkflowSchema,
         atmWorkflowSchemaDiff: changesToApply,
-      }).execute().then(result => {
+      });
+
+      return action.execute().then(result => {
         if (get(result, 'status') === 'done') {
           trySet(this, 'isEditing', false);
         }
         trySet(this, 'isSavingChanges', false);
+      }).finally(() => {
+        action.destroy();
       });
     },
     cancelChanges() {

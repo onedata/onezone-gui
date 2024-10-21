@@ -124,6 +124,11 @@ export default Component.extend(I18n, {
   isCondensed: false,
 
   /**
+   * @type {Set<MembershipRelation>}
+   */
+  createdMembershipRelations: undefined,
+
+  /**
    * @type {Ember.ComputedProperty<string>}
    */
   currentUserId: reads('currentUser.userId'),
@@ -230,15 +235,19 @@ export default Component.extend(I18n, {
           const isChildCurrentUser = Boolean(child) &&
             recordManager.getModelNameForRecord(child) === 'user' &&
             get(child, 'entityId') === currentUserId;
+          const relation = !isPrevBlock || !isThisBlock ?
+            null : MembershipRelation.create({
+              parent: get(block, 'record'),
+              child,
+              isChildCurrentUser,
+            });
+          if (relation) {
+            this.createdMembershipRelations.add(relation);
+          }
           elements.push({
             id: this.getPathRelationId(prevBlock, block),
             type: 'relation',
-            relation: !isPrevBlock || !isThisBlock ?
-              null : MembershipRelation.create({
-                parent: get(block, 'record'),
-                child,
-                isChildCurrentUser,
-              }),
+            relation,
           }, block);
           prevBlock = block;
         });
@@ -349,11 +358,33 @@ export default Component.extend(I18n, {
     }
   ),
 
+  /**
+   * @override
+   */
+  init() {
+    this._super(...arguments);
+    this.set('createdMembershipRelations', new Set());
+  },
+
+  /**
+   * @override
+   */
   didInsertElement() {
     this._super(...arguments);
     this.get('recordsProxy').then(() => {
       next(() => safeExec(this, 'recalculateScrollButtonsVisibility'));
     });
+  },
+
+  /**
+   * @override
+   */
+  willDestroyElement() {
+    try {
+      this.createdMembershipRelations.forEach((relation) => relation.destroy());
+    } finally {
+      this._super(...arguments);
+    }
   },
 
   getScrollContainer() {

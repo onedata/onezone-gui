@@ -7,7 +7,6 @@
  */
 
 import { computed } from '@ember/object';
-import { getBy, array, raw } from 'ember-awesome-macros';
 import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields-group';
 import { TimeCaveatsGroup } from './caveat-sections/time-caveats-group';
 import { GeoCaveatsGroup } from './caveat-sections/geo-caveats-group';
@@ -43,8 +42,10 @@ export const CaveatsGroup = FormFieldsGroup.extend({
   /**
    * @type {ComputedProperty<string | undefined>}
    */
-  firstGroupWithVisibleCaveatName: getBy(
-    array.findBy('fields', raw('hasVisibleCaveats'), raw(true)),
-    raw('name')
+  firstGroupWithVisibleCaveatName: computed(
+    'fields.@each.{hasVisibleCaveats,name}',
+    function firstGroupWithVisibleCaveatName() {
+      return this.fields.find((field) => field.hasVisibleCaveats)?.name;
+    }
   ),
 });

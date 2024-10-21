@@ -12,24 +12,20 @@ import {
   get,
   observer,
 } from '@ember/object';
-import { union, collect } from '@ember/object/computed';
-import { A } from '@ember/array';
+import { union, collect, reads } from '@ember/object/computed';
+import { A, isArray } from '@ember/array';
 import { inject as service } from '@ember/service';
 import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
-import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
 import { getOwner } from '@ember/application';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
-import { isArray } from '@ember/array';
 import { debounce, scheduleOnce } from '@ember/runloop';
-import { resolve } from 'rsvp';
 import Action from 'onedata-gui-common/utils/action';
 import {
   and,
   or,
   not,
-  array,
   raw,
   equal,
   conditional,
@@ -39,8 +35,21 @@ import computedT from 'onedata-gui-common/utils/computed-t';
 import { classify } from '@ember/string';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 import animateCss from 'onedata-gui-common/utils/animate-css';
+import {
+  destroyDestroyableComputedValues,
+  destroyableComputed,
+  initDestroyableCache,
+} from 'onedata-gui-common/utils/destroyable-computed';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
+import { all as allFulfilled } from 'rsvp';
 
-export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
+/**
+ * @typedef {Models.UserList|Models.GroupList} MembersOwnersList
+ */
+
+export default Mixin.create({
+  // required property: ownersListProxy: PromiseObject<MembersOwnersList>
+
   privilegeManager: service(),
   privilegeActions: service(),
   tokenActions: service(),
@@ -149,6 +158,18 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   showMembershipDescription: false,
 
   /**
+   * Objects to destroy on this mixin destroy.
+   * @type Array<PrivilegeRecordProxy>
+   */
+  privilegeRecordProxyCache: undefined,
+
+  /**
+   * Actions to destroy on this mixin destroy.
+   * @type {Array<Action>}
+   */
+  userActionsCache: undefined,
+
+  /**
    * @type {Ember.ComputedProperty<string>}
    */
   privilegesTranslationsPath: computed(
@@ -251,6 +272,11 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   }),
 
   /**
+   * @type {ComputedProperty<RecordArray>}
+   */
+  owners: reads('ownersListProxy.content.list.content'),
+
+  /**
    * @type {Ember.ComputedProperty<Function>}
    * @param {Models.User} member
    * @param {ArrayProxy<Models.User>} directMembers
@@ -262,36 +288,24 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
     'record',
     'modelSupportsOwners',
     function userActionsGenerator() {
-      const {
-        userActions,
-        modelSupportsOwners,
-        owners,
-        record,
-        i18nPrefix,
-      } = this.getProperties(
-        'userActions',
-        'modelSupportsOwners',
-        'owners',
-        'record',
-        'i18nPrefix'
-      );
       return (user, directUsers, effectiveUsers) => {
         const actions = [];
-        if (modelSupportsOwners) {
-          actions.push(userActions.createToggleBeingOwnerAction({
-            recordBeingOwned: record,
+        if (this.modelSupportsOwners) {
+          actions.push(this.userActions.createToggleBeingOwnerAction({
+            recordBeingOwned: this.record,
             ownerRecord: user,
-            owners,
+            owners: this.owners,
           }));
         }
         actions.push(RemoveUserAction.create({
           ownerSource: this,
-          i18nPrefix,
+          i18nPrefix: this.i18nPrefix,
           user,
-          owners,
+          owners: this.owners,
           effectiveUsers,
           execute: () => this.set('memberToRemove', user),
         }));
+        this.userActionsCache.push(...actions);
         return actions;
       };
     }
@@ -344,18 +358,20 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   /**
    * @type {ComputedProperty<Action>}
    */
-  inviteGroupUsingTokenAction: computed('record', function inviteGroupUsingTokenAction() {
-    const {
-      record,
-      recordManager,
-      tokenActions,
-    } = this.getProperties('record', 'recordManager', 'tokenActions');
+  inviteGroupUsingTokenAction: destroyableComputed('record',
+    function inviteGroupUsingTokenAction() {
+      const {
+        record,
+        recordManager,
+        tokenActions,
+      } = this.getProperties('record', 'recordManager', 'tokenActions');
 
-    return tokenActions.createGenerateInviteTokenAction({
-      inviteType: `groupJoin${_.upperFirst(recordManager.getModelNameForRecord(record))}`,
-      targetRecord: record,
-    });
-  }),
+      return tokenActions.createGenerateInviteTokenAction({
+        inviteType: `groupJoin${_.upperFirst(recordManager.getModelNameForRecord(record))}`,
+        targetRecord: record,
+      });
+    }
+  ),
 
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
@@ -391,17 +407,19 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   /**
    * @type {ComputedProperty<Action>}
    */
-  inviteUserUsingTokenAction: computed('record', function inviteUserUsingTokenAction() {
-    const {
-      record,
-      tokenActions,
-    } = this.getProperties('record', 'tokenActions');
+  inviteUserUsingTokenAction: destroyableComputed('record',
+    function inviteUserUsingTokenAction() {
+      const {
+        record,
+        tokenActions,
+      } = this.getProperties('record', 'tokenActions');
 
-    return tokenActions.createGenerateInviteTokenAction({
-      inviteType: `userJoin${classify(get(record, 'constructor.modelName'))}`,
-      targetRecord: record,
-    });
-  }),
+      return tokenActions.createGenerateInviteTokenAction({
+        inviteType: `userJoin${classify(get(record, 'constructor.modelName'))}`,
+        targetRecord: record,
+      });
+    }
+  ),
 
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
@@ -457,6 +475,14 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
    */
   headerActions: collect('removeSelectedAction'),
 
+  requiredDataProxy: computed('ownersListProxy', function requiredDataProxy() {
+    const proxies = [];
+    if (this.ownersListProxy) {
+      proxies.push(this.ownersListProxy);
+    }
+    return promiseObject(allFulfilled(proxies));
+  }),
+
   recordObserver: observer('record', function recordObserver() {
     // reset state after record change
     scheduleOnce('afterRender', this, 'reset');
@@ -510,17 +536,24 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   ),
 
   init() {
+    this.set('privilegeRecordProxyCache', []);
+    this.set('userActionsCache', []);
+    initDestroyableCache(this);
     this._super(...arguments);
     this.selectedMemberObserver();
   },
 
   /**
-   * Fetches list of record owners
-   * @virtual
-   * @returns {Promise<Array<User>>}
+   * @override
    */
-  fetchOwners() {
-    return resolve([]);
+  willDestroy() {
+    try {
+      this.privilegeRecordProxyCache.forEach(obj => obj?.destroy());
+      this.userActionsCache.forEach(obj => obj?.destroy());
+      destroyDestroyableComputedValues(this);
+    } finally {
+      this._super(...arguments);
+    }
   },
 
   /**
@@ -594,16 +627,19 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
    */
   loadBatchPrivilegesEditModel() {
     const selectedMembersProxies = this.get('selectedMembersProxies');
-    this.set(
-      'batchPrivilegesEditModalModel',
+    const batchPrivilegesEditModalModel =
       PrivilegeRecordProxy.create(getOwner(this).ownerInjection(), {
         griArray: _.flatten(selectedMembersProxies
           .map(proxy => get(proxy, 'privilegesProxy.griArray'))
         ),
         sumPrivileges: true,
         groupedPrivilegesFlags: this.get('groupedPrivilegesFlags'),
-      })
+      });
+    this.set(
+      'batchPrivilegesEditModalModel',
+      batchPrivilegesEditModalModel
     );
+    this.privilegeRecordProxyCache.push(batchPrivilegesEditModalModel);
   },
 
   async scheduleExpandSelectedMember() {
@@ -740,12 +776,6 @@ const RemoveUserAction = Action.extend({
 
   /**
    * @virtual
-   * @type {Array<Models.User>}
-   */
-  owners: undefined,
-
-  /**
-   * @virtual
    * @type {ArrayProxy<Models.User>}
    */
   effectiveUsers: undefined,
@@ -768,7 +798,9 @@ const RemoveUserAction = Action.extend({
   /**
    * @type {ComputedProperty<boolean>}
    */
-  isOwner: array.includes('owners', 'user'),
+  isOwner: computed('owners.[]', 'user', function isOwner() {
+    return this.owners?.includes(this.user);
+  }),
 
   /**
    * @type {ComputedProperty<boolean>}
@@ -790,9 +822,15 @@ const RemoveUserAction = Action.extend({
   /**
    * @type {ComputedProperty<boolean>}
    */
-  isCurrentUserOwner: array.includes(
-    array.mapBy('owners', raw('entityId')),
-    'currentUser.entityId'
+  isCurrentUserOwner: computed(
+    'owners.@each.entityId',
+    'currentUser.entityId',
+    function isCurrentUserOwner() {
+      const currentUserEntityId = this.currentUser.entityId;
+      return this.owners?.toArray().some((owner) =>
+        get(owner, 'entityId') === currentUserEntityId
+      ) ?? false;
+    }
   ),
 
   /**

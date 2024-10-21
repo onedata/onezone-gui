@@ -115,6 +115,17 @@ export default Action.extend({
   /**
    * @override
    */
+  willDestroy() {
+    try {
+      this.cacheFor('atmLambdasUsedByAtmInventoryProxy')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
+  /**
+   * @override
+   */
   onExecute() {
     const {
       atmLambda,

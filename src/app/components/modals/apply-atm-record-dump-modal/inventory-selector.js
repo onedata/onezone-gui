@@ -75,6 +75,17 @@ export default Component.extend(I18n, {
     });
   }),
 
+  /**
+   * @override`
+   */
+  willDestroyElement() {
+    try {
+      this.cacheFor('targetAtmInventoryField')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
   notifyChange(atmInventory) {
     const onChange = this.get('onChange');
     onChange && onChange(atmInventory);

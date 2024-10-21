@@ -16,21 +16,21 @@
       header=(tt this "harvesterSpaces")
       text=(tt this "noSpaces")}}
       <div class="action-buttons">
-        {{#bs-button
+        {{#one-button
           class="btn btn-primary btn-content-info btn-add-your-space"
           onClick=(action (mut isAddYourSpaceModalOpened) true)}}
           {{tt this "addYourSpace"}}
-        {{/bs-button}}
+        {{/one-button}}
         &#32;
-        {{#bs-button
+        {{#one-button
           class="btn btn-primary btn-content-info btn-invite-space"
           onClick=(action "inviteSpaceUsingToken")}}
           {{inviteSpaceUsingTokenAction.title}}
-        {{/bs-button}}
+        {{/one-button}}
       </div>
     {{/content-info}}
   {{else}}
-    {{resources-list 
+    {{resources-list
       items=spaceItems
       isResourceWithAdditionalInfo=true
     }}

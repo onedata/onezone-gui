@@ -20,7 +20,7 @@ import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import { entityType as groupEntityType } from 'onezone-gui/models/group';
-import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
+import { destroyablePromiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promise } from 'ember-awesome-macros';
 import AllKnownMembersProxyArrayBase from 'onezone-gui/utils/all-known-members-proxy-array-base';
 
@@ -76,7 +76,7 @@ export default Service.extend({
     const knownGroupsProxy = AllKnownGroupsProxyArray.create({
       recordManager: this.get('recordManager'),
     });
-    return promiseArray(
+    return destroyablePromiseArray(
       get(knownGroupsProxy, 'allRecordsProxy').then(() => knownGroupsProxy)
     );
   },

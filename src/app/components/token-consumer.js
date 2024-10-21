@@ -568,7 +568,7 @@ export default Component.extend(I18n, {
       });
       debounce(this, 'examineToken', config.environment === 'test' ? 1 : 500);
     },
-    confirm() {
+    async confirm() {
       const {
         recordManager,
         tokenActions,
@@ -588,11 +588,14 @@ export default Component.extend(I18n, {
       const joiningRecord = joiningRecordSelectorModelName ?
         get(selectedJoiningRecordOption, 'value') : recordManager.getCurrentUserRecord();
 
-      return tokenActions.createConsumeInviteTokenAction({
+      const action = tokenActions.createConsumeInviteTokenAction({
         joiningRecord,
         targetModelName: inviteTargetModelName,
         token,
-      }).execute();
+      });
+
+      await action.execute();
+      action.destroy();
     },
 
     cancel() {

@@ -24,9 +24,9 @@ describe(
     before(function () {
       // Instatiate Action class to make its `prototype.execute` available for
       // mocking.
-      ModifyAtmInventoryAction.create();
-      RemoveAtmInventoryAction.create();
-      CopyRecordIdAction.create();
+      ModifyAtmInventoryAction.create().destroy();
+      RemoveAtmInventoryAction.create().destroy();
+      CopyRecordIdAction.create().destroy();
     });
 
     beforeEach(function () {

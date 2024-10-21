@@ -201,7 +201,25 @@ export default EmberObject.extend(OwnerInjector, {
     this.initEntries();
   },
 
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.entries?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
+  /**
+   * @private
+   */
   async initEntries() {
+    if (this.entries) {
+      console.warn('SpacesMarketplaceViewModel: entries are already initialized');
+      return;
+    }
     const selectedSpaceInfo = await this.selectedSpaceInfoProxy;
     const initialJumpIndex = selectedSpaceInfo?.index ?? null;
     const entries = ReplacingChunksArray.create({

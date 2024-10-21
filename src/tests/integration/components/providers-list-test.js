@@ -1,67 +1,78 @@
 import { A } from '@ember/array';
 import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
+import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render, click, fillIn, find } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import _ from 'lodash';
-import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
-import { Promise } from 'rsvp';
+import { all as allFulfilled } from 'rsvp';
 import globals from 'onedata-gui-common/utils/globals';
+import { lookupService } from '../../helpers/stub-service';
+import clearStore from '../../helpers/clear-store';
+import gri from 'onedata-gui-websocket-client/utils/gri';
+import { entityType as providerEntityType } from 'onezone-gui/models/provider';
 
 describe('Integration | Component | providers-list', function () {
-  setupRenderingTest();
+  const { beforeEach, afterEach } = setupRenderingTest();
 
-  beforeEach(function () {
-    const spaces = A([{
+  beforeEach(async function () {
+    const store = lookupService(this, 'store');
+
+    const space1 = store.createRecord('space', {
       name: 'space1',
       supportSizes: {
         1: 2097152,
         2: 1048576,
         3: 1048576,
       },
-    }, {
+    });
+    const space2 = store.createRecord('space', {
       name: 'space2',
       supportSizes: {
         1: 1048576,
         2: 2097152,
         3: 1048576,
       },
-    }]);
-    const spaceList = PromiseObject.create({
-      promise: Promise.resolve({
-        list: spaces,
-      }),
     });
+
+    const spaces = await allFulfilled([space1.save(), space2.save()]);
+
+    const spaceList = store.createRecord('space-list', {
+      list: spaces,
+    });
+
+    await spaceList.save();
+
+    const providers = [1, 2, 3].map(number => {
+      return createProviderRecord(store, String(number), {
+        name: `provider${number}`,
+        spaceList,
+      });
+    });
+
+    await allFulfilled(providers.map(provider => provider.save()));
+
     this.setProperties({
       providersData: A([{
-          provider: {
-            entityId: '1',
-            name: 'provider1',
-            spaceList,
-          },
+          provider: providers[0],
           color: 'red',
         },
         {
-          provider: {
-            entityId: '1',
-            name: 'provider2',
-            spaceList,
-          },
+          provider: providers[1],
           color: 'green',
         },
         {
-          provider: {
-            entityId: '1',
-            name: 'provider3',
-            spaceList,
-          },
+          provider: providers[2],
           color: 'yellow',
         },
       ]),
       selectedSpace: spaces[0],
     });
+  });
+
+  afterEach(function afterEach() {
+    clearStore();
   });
 
   it('renders list of providers', async function () {
@@ -150,3 +161,14 @@ describe('Integration | Component | providers-list', function () {
       .to.contain.text('2 MiB');
   });
 });
+
+function createProviderRecord(store, entityId, data = {}) {
+  return store.createRecord('provider', {
+    id: gri({
+      entityType: providerEntityType,
+      entityId,
+      aspect: 'instance',
+    }),
+    ...data,
+  });
+}

@@ -19,9 +19,6 @@ import {
   eq,
   raw,
   not,
-  and,
-  bool,
-  getBy,
 } from 'ember-awesome-macros';
 import getNextFreeRevisionNumber from 'onedata-gui-common/utils/revisions/get-next-free-revision-number';
 
@@ -103,9 +100,14 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Boolean>}
    */
-  isRevisionConflictWarningVisible: and(
-    eq('selectedOperation', raw('merge')),
-    bool(getBy('selectedTargetAtmRecord.revisionRegistry', 'revisionNumber'))
+  isRevisionConflictWarningVisible: computed(
+    'selectedOperation',
+    'selectedTargetAtmRecord.revisionRegistry',
+    'revisionNumber',
+    function isRevisionConflictWarningVisible() {
+      return this.selectedOperation === 'merge' &&
+        Boolean(this.selectedTargetAtmRecord?.revisionRegistry?.[this.revisionNumber]);
+    }
   ),
 
   /**
@@ -220,6 +222,17 @@ export default Component.extend(I18n, {
   init() {
     this._super(...arguments);
     this.fields;
+  },
+
+  /**
+   * @override
+   */
+  willDestroyElement() {
+    try {
+      this.cacheFor('fields')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
   },
 
   /**

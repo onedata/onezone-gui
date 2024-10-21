@@ -16,7 +16,7 @@
     </div>
     <div class="btn-toolbar">
       {{#if (contains dumpAction globalActions)}}
-        {{#bs-button
+        {{#one-button
           type="default"
           onClick=dumpAction.executeCallback
           disabled=dumpAction.disabled
@@ -25,7 +25,7 @@
         }}
           {{one-icon icon=dumpAction.icon}}
           <span class="text">{{dumpAction.title}}</span>
-        {{/bs-button}}
+        {{/one-button}}
       {{/if}}
     </div>
   </h1>

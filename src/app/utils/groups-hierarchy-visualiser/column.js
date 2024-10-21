@@ -102,6 +102,11 @@ export default EmberObject.extend({
   groupBoxes: undefined,
 
   /**
+   * @type {Set<Utils.GroupHierarchyVisualiser.GroupBox>}
+   */
+  createdGroupBoxes: undefined,
+
+  /**
    * Column width
    * @type {Ember.ComputedProperty<number>}
    */
@@ -460,12 +465,26 @@ export default EmberObject.extend({
 
   init() {
     this._super(...arguments);
-    this.set('columnId', getNextColumnId());
+    this.setProperties({
+      createdGroupBoxes: new Set(),
+      columnId: getNextColumnId(),
+    });
     if (!this.groupBoxes) {
       this.set('groupBoxes', A());
     }
     this.modelObserver();
     this.prevColumnObserver();
+  },
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.createdGroupBoxes.forEach((box) => box.destroy());
+    } finally {
+      this._super(...arguments);
+    }
   },
 
   /**
@@ -493,10 +512,12 @@ export default EmberObject.extend({
    * @returns {Utils/GroupHierarchyVisualiser/GroupBox}
    */
   createGroupBox(group) {
-    return GroupBox.create({
+    const newGroupBox = GroupBox.create({
       group,
       column: this,
     });
+    this.createdGroupBoxes.add(newGroupBox);
+    return newGroupBox;
   },
 
   /**

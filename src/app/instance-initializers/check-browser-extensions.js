@@ -10,6 +10,12 @@ import BlockingAddonDetector from 'onedata-gui-common/utils/blocking-addon-detec
 
 export default {
   initialize(applicationInstance) {
-    BlockingAddonDetector.create({ ownerSource: applicationInstance }).runCheck();
+    (async () => {
+      const blockingAddonDetector = BlockingAddonDetector.create({
+        ownerSource: applicationInstance,
+      });
+      await blockingAddonDetector.runCheck();
+      blockingAddonDetector.destroy();
+    })();
   },
 };

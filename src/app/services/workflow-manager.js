@@ -32,7 +32,7 @@ import {
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import { promise } from 'ember-awesome-macros';
 import onlyFulfilledValues from 'onedata-gui-common/utils/only-fulfilled-values';
-import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
+import { destroyablePromiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import ArrayProxy from '@ember/array/proxy';
 import getNextFreeRevisionNumber from 'onedata-gui-common/utils/revisions/get-next-free-revision-number';
 
@@ -504,7 +504,7 @@ export default WorkflowManager.extend({
     const knownAtmLambdasProxy = AllKnownAtmLambdasProxyArray.create({
       recordManager: this.get('recordManager'),
     });
-    return promiseArray(
+    return destroyablePromiseArray(
       get(knownAtmLambdasProxy, 'atmLambdasProxy').then(() => knownAtmLambdasProxy)
     );
   },
@@ -518,7 +518,7 @@ export default WorkflowManager.extend({
       recordManager: this.get('recordManager'),
       atmInventory,
     });
-    return promiseArray(
+    return destroyablePromiseArray(
       get(usedAtmLambdasProxy, 'atmLambdasProxy').then(() => usedAtmLambdasProxy)
     );
   },
@@ -625,7 +625,7 @@ const AtmLambdasUsedByAtmInventoryProxyArray = ArrayProxy.extend({
     async function atmLambdasProxy() {
       const atmLambdasLists = await this.get('atmLambdasListsProxy');
       const lambdasArray = [];
-      atmLambdasLists.forEach(list => lambdasArray.push(...list.toArray()));
+      atmLambdasLists.forEach(list => lambdasArray.push(...list.content.toArray()));
       return lambdasArray.uniq();
     }
   )),

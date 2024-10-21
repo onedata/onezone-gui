@@ -127,7 +127,10 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
     });
   },
 
-  destroy() {
+  /**
+   * @override
+   */
+  willDestroyElement() {
     try {
       this.destroyConnectionChecker();
     } finally {

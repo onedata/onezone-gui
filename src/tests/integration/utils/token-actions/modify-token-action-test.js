@@ -8,7 +8,11 @@ import { lookupService } from '../../../helpers/stub-service';
 import { reject, resolve } from 'rsvp';
 
 describe('Integration | Utility | token-actions/modify-token-action', function () {
-  setupRenderingTest();
+  const { afterEach } = setupRenderingTest();
+
+  afterEach(function () {
+    this.action?.destroy();
+  });
 
   it('executes modifying token (success scenario)', function () {
     const tokenDiff = {
@@ -24,7 +28,7 @@ describe('Integration | Utility | token-actions/modify-token-action', function (
         }
       }),
     };
-    const action = ModifyTokenAction.create({
+    this.action = ModifyTokenAction.create({
       ownerSource: this.owner,
       context: {
         token,
@@ -36,7 +40,7 @@ describe('Integration | Utility | token-actions/modify-token-action', function (
       'success'
     );
 
-    return action.execute()
+    return this.action.execute()
       .then(actionResult => {
         expect(token.save).to.be.calledOnce;
         expect(token.name).to.equal('token2');
@@ -67,7 +71,7 @@ describe('Integration | Utility | token-actions/modify-token-action', function (
         token.revoked = true;
       },
     };
-    const action = ModifyTokenAction.create({
+    this.action = ModifyTokenAction.create({
       ownerSource: this.owner,
       context: {
         token,
@@ -79,7 +83,7 @@ describe('Integration | Utility | token-actions/modify-token-action', function (
       'backendError'
     );
 
-    return action.execute()
+    return this.action.execute()
       .then(actionResult => {
         expect(token.name).to.equal('token1');
         expect(token.revoked).to.equal(true);

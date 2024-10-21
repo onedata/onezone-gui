@@ -14,7 +14,7 @@ const atmWorkflowSchemaId = 'wfkId';
 describe(
   'Integration | Utility | workflow-actions/dump-atm-workflow-schema-revision-action',
   function () {
-    setupRenderingTest();
+    const { afterEach } = setupRenderingTest();
 
     beforeEach(function () {
       const downloadSpy = sinon.spy();
@@ -31,6 +31,10 @@ describe(
         }),
         downloadSpy,
       });
+    });
+
+    afterEach(function () {
+      this.action?.destroy();
     });
 
     it('has correct className, icon and title', function () {

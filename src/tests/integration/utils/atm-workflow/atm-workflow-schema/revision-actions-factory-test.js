@@ -24,15 +24,21 @@ const revisionActionsClasses = [{
 
 describe('Integration | Utility | atm-workflow/atm-workflow-schema/revision-actions-factory',
   function () {
-    setupRenderingTest();
+    const { afterEach } = setupRenderingTest();
+
+    afterEach(function () {
+      this.actions?.forEach((action) => action.destroy());
+      this.actionsFactory?.destroy();
+    });
 
     it('creates actions for specific revision', function () {
       const atmWorkflowSchema = { entityId: 'someId' };
-      const actionsFactory = RevisionActionsFactory.create({
+      this.actionsFactory = RevisionActionsFactory.create({
         ownerSource: this.owner,
         atmWorkflowSchema,
       });
-      const revisionActions = actionsFactory.createActionsForRevisionNumber(3);
+      const revisionActions = this.actionsFactory.createActionsForRevisionNumber(3);
+      this.actions = revisionActions;
       expect(revisionActions).to.have.length(revisionActionsClasses.length);
       revisionActions.forEach((action, idx) => {
         expect(action).to.be.instanceOf(revisionActionsClasses[idx].classDef);
@@ -44,11 +50,12 @@ describe('Integration | Utility | atm-workflow/atm-workflow-schema/revision-acti
 
     it('creates action via createCreateRevisionAction', function () {
       const atmWorkflowSchema = { entityId: 'someId' };
-      const actionsFactory = RevisionActionsFactory.create({
+      this.actionsFactory = RevisionActionsFactory.create({
         ownerSource: this.owner,
         atmWorkflowSchema,
       });
-      const action = actionsFactory.createCreateRevisionAction();
+      const action = this.actionsFactory.createCreateRevisionAction();
+      this.actions = [action];
       expect(action).to.be.instanceOf(CreateAtmWorkflowSchemaRevisionAction);
       expect(get(action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
     });

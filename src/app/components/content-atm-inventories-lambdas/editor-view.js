@@ -12,7 +12,6 @@ import { getProperties, observer, computed } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import { inject as service } from '@ember/service';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
-import { getBy, tag } from 'ember-awesome-macros';
 import { scheduleOnce } from '@ember/runloop';
 
 const viewTypeToFormModeMap = {
@@ -82,11 +81,6 @@ export default Component.extend(I18n, {
   onAtmLambdaRevisionSaved: notImplementedIgnore,
 
   /**
-   * @type {Object<string,string>}
-   */
-  viewTypeToFormModeMap,
-
-  /**
    * @type {String}
    */
   activeViewType: undefined,
@@ -102,25 +96,38 @@ export default Component.extend(I18n, {
   activeRevisionNumber: undefined,
 
   /**
+   * @type {Utils.Action | null}
+   */
+  dumpActionCache: null,
+
+  /**
    * @type {AtmLambdaRevision|undefined}
    */
-  activeRevision: getBy(
-    'atmLambda',
-    tag`revisionRegistry.${'activeRevisionNumber'}`
+  activeRevision: computed(
+    'atmLambda.revisionRegistry',
+    'activeRevisionNumber',
+    function activeRevision() {
+      return this.atmLambda?.revisionRegistry?.[this.activeRevisionNumber];
+    }
   ),
 
   /**
    * @type {ComputedProperty<AtmLambdaRevision|undefined>}
    */
-  atmLambdaRevision: getBy(
-    'atmLambda',
-    tag`revisionRegistry.${'atmLambdaRevisionNumber'}`
+  atmLambdaRevision: computed(
+    'atmLambda.revisionRegistry',
+    'atmLambdaRevisionNumber',
+    function atmLambdaRevision() {
+      return this.atmLambda?.revisionRegistry?.[this.atmLambdaRevisionNumber];
+    }
   ),
 
   /**
    * @type {ComputedProperty<string>}
    */
-  formMode: getBy('viewTypeToFormModeMap', 'viewType'),
+  formMode: computed('viewType', function formMode() {
+    return viewTypeToFormModeMap[this.viewType];
+  }),
 
   /**
    * @type {ComputedProperty<string>}
@@ -143,10 +150,12 @@ export default Component.extend(I18n, {
     'atmLambda',
     'atmLambdaRevisionNumber',
     function dumpAction() {
-      return this.workflowActions.createDumpAtmLambdaRevisionAction({
-        atmLambda: this.atmLambda,
-        revisionNumber: this.atmLambdaRevisionNumber,
-      });
+      this.dumpActionCache?.destroy();
+      return this.dumpActionCache =
+        this.workflowActions.createDumpAtmLambdaRevisionAction({
+          atmLambda: this.atmLambda,
+          revisionNumber: this.atmLambdaRevisionNumber,
+        });
     }
   ),
 
@@ -209,6 +218,7 @@ export default Component.extend(I18n, {
   willDestroyElement() {
     try {
       this.registerViewActions(true);
+      this.cacheFor('dumpAction')?.destroy();
     } finally {
       this._super(...arguments);
     }
@@ -279,6 +289,7 @@ export default Component.extend(I18n, {
           return;
       }
       const actionResult = await action.execute();
+      action.destroy();
 
       const {
         status,

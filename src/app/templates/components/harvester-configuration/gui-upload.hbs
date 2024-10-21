@@ -8,7 +8,7 @@
     <input class="form-control file-name-input input-sm" type="text" readonly="readonly" value={{selectedFile.name}} {{action "browse"}}>
   </div>
   <div class="col-xs-12 col-sm-7 upload-buttons">
-    {{#bs-button onClick=(action "browse") size="sm" class="browse-button"}}{{tt this "browse"}}{{/bs-button}}
+    {{#one-button onClick=(action "browse") size="sm" class="browse-button"}}{{tt this "browse"}}{{/one-button}}
     {{#one-button
       type="primary"
       buttonType="submit"

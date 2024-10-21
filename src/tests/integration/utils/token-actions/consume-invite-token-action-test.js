@@ -10,7 +10,7 @@ import { next } from '@ember/runloop';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 
 describe('Integration | Utility | token-actions/consume-invite-token-action', function () {
-  setupRenderingTest();
+  const { afterEach } = setupRenderingTest();
 
   beforeEach(function () {
     const token = 'abcd';
@@ -28,6 +28,10 @@ describe('Integration | Utility | token-actions/consume-invite-token-action', fu
         token: token + ' !@ ',
       },
     });
+  });
+
+  afterEach(function () {
+    this.action?.destroy();
   });
 
   [{
@@ -118,7 +122,7 @@ describe('Integration | Utility | token-actions/consume-invite-token-action', fu
             aspect: 'instance',
             scope: 'auto',
           }));
-          const action = ConsumeInviteTokenAction.create({
+          this.action = ConsumeInviteTokenAction.create({
             ownerSource: this.owner,
             context,
           });
@@ -135,7 +139,7 @@ describe('Integration | Utility | token-actions/consume-invite-token-action', fu
             'success'
           );
 
-          return action.execute()
+          return this.action.execute()
             .then(actionResult => {
               expect(consumeTokenStub).to.be.calledOnce;
               expect(consumeTokenStub).to.be
@@ -164,7 +168,7 @@ describe('Integration | Utility | token-actions/consume-invite-token-action', fu
     function () {
       this.set('context.targetModelName', 'group');
       this.set('context.joiningRecord.constructor.modelName', 'group');
-      const action = ConsumeInviteTokenAction.create({
+      this.action = ConsumeInviteTokenAction.create({
         ownerSource: this.owner,
         context: Object.assign(this.get('context'), { dontRedirect: true }),
       });
@@ -178,7 +182,7 @@ describe('Integration | Utility | token-actions/consume-invite-token-action', fu
       const transitionToStub = sinon.stub(router, 'transitionTo')
         .resolves();
 
-      return action.execute()
+      return this.action.execute()
         .then(() => new Promise(resolve => next(resolve)))
         .then(() => expect(transitionToStub).to.not.be.called);
     });
@@ -186,7 +190,7 @@ describe('Integration | Utility | token-actions/consume-invite-token-action', fu
   it('executes consuming token (failure scenario)', function () {
     this.set('context.targetModelName', 'group');
     this.set('context.joiningRecord.constructor.modelName', 'group');
-    const action = ConsumeInviteTokenAction.create({
+    this.action = ConsumeInviteTokenAction.create({
       ownerSource: this.owner,
       context: this.get('context'),
     });
@@ -199,7 +203,7 @@ describe('Integration | Utility | token-actions/consume-invite-token-action', fu
       'backendError'
     );
 
-    return action.execute()
+    return this.action.execute()
       .then(actionResult => {
         expect(failureNotifySpy).to.be.calledWith(
           sinon.match.has('string', 'consuming token'),

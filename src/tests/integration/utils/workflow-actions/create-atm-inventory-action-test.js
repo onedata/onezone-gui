@@ -10,7 +10,7 @@ import { next } from '@ember/runloop';
 
 describe('Integration | Utility | workflow-actions/create-atm-inventory-action',
   function () {
-    setupRenderingTest();
+    const { afterEach } = setupRenderingTest();
 
     beforeEach(function () {
       this.set('context', {
@@ -18,8 +18,12 @@ describe('Integration | Utility | workflow-actions/create-atm-inventory-action',
       });
     });
 
+    afterEach(function () {
+      this.action?.destroy();
+    });
+
     it('executes creating automation inventory (success scenario)', function () {
-      const action = CreateAtmInventoryAction.create({
+      this.action = CreateAtmInventoryAction.create({
         ownerSource: this.owner,
         context: this.get('context'),
       });
@@ -40,7 +44,7 @@ describe('Integration | Utility | workflow-actions/create-atm-inventory-action',
         'success'
       );
 
-      return action.execute()
+      return this.action.execute()
         .then(actionResult => {
           expect(createAtmInventoryStub).to.be.calledOnce;
           expect(createAtmInventoryStub).to.be.calledWith(rawAtmInventory);
@@ -59,7 +63,7 @@ describe('Integration | Utility | workflow-actions/create-atm-inventory-action',
     });
 
     it('executes creating automation inventory (failure scenario)', function () {
-      const action = CreateAtmInventoryAction.create({
+      this.action = CreateAtmInventoryAction.create({
         ownerSource: this.owner,
         context: this.get('context'),
       });
@@ -72,7 +76,7 @@ describe('Integration | Utility | workflow-actions/create-atm-inventory-action',
         'backendError'
       );
 
-      return action.execute()
+      return this.action.execute()
         .then(actionResult => {
           expect(failureNotifySpy).to.be.calledWith(
             sinon.match.has('string', 'creating automation inventory'),

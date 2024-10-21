@@ -57,19 +57,37 @@ export default Component.extend(I18n, {
   spaceProxy: computedRelationProxy('share', 'space'),
 
   /**
+   * @type {ComputedProperty<Record<string, Utils.Action>>}
+   */
+  actionsCache: computed(() => ({})),
+
+  /**
    * @type {Ember.ComputedProperty<Action>}
    */
   copyIdAction: computed('share', function copyIdAction() {
+    this.actionsCache.copyIdAction?.destroyAfterAllExecutions();
     const {
       share,
       clipboardActions,
     } = this.getProperties('share', 'clipboardActions');
 
-    return clipboardActions.createCopyRecordIdAction({ record: share });
+    return this.actionsCache.copyIdAction =
+      clipboardActions.createCopyRecordIdAction({ record: share });
   }),
 
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
   itemActions: collect('copyIdAction'),
+
+  /**
+   * @override
+   */
+  willDestroyElement() {
+    try {
+      this.cacheFor('copyIdAction')?.destroyAfterAllExecutions();
+    } finally {
+      this._super(...arguments);
+    }
+  },
 });

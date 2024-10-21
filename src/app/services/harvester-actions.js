@@ -7,8 +7,7 @@
  */
 
 import Service, { inject as service } from '@ember/service';
-import { computed, get } from '@ember/object';
-import { collect } from '@ember/object/computed';
+import { get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import { next } from '@ember/runloop';
 import RemoveSpaceFromHarvesterAction from 'onezone-gui/utils/harvester-actions/remove-space-from-harvester-action';
@@ -27,24 +26,25 @@ export default Service.extend(I18n, {
   i18nPrefix: 'services.harvesterActions',
 
   /**
-   * @type {Ember.ComputedProperty<Array<SidebarButtonDefinition>>}
+   * @returns {Array<SidebarButtonDefinition>}
    */
-  buttons: collect('btnCreate'),
+  createGlobalActions() {
+    return [this.createCreateButton()];
+  },
 
   /**
-   * @type {Ember.ComputedProperty<SidebarButtonDefinition>}
+   * @returns {Array<SidebarButtonDefinition>}
    */
-  btnCreate: computed(function btnCreate() {
-    const router = this.get('router');
+  createCreateButton() {
     return {
       icon: 'add-filled',
       title: this.t('btnCreate.title'),
       tip: this.t('btnCreate.hint'),
       class: 'create-harvester-btn',
-      action: () => router.transitionTo('onedata.sidebar.content', 'harvesters',
-        'new'),
+      action: () =>
+        this.router.transitionTo('onedata.sidebar.content', 'harvesters', 'new'),
     };
-  }),
+  },
 
   createRemoveSpaceFromHarvesterAction(context) {
     return RemoveSpaceFromHarvesterAction.create({ ownerSource: this, context });
