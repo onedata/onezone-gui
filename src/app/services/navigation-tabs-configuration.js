@@ -30,7 +30,6 @@ class OnezoneNavigationTabsConfiguration extends CommonNavigationTabsConfigurati
    */
   @computed
   get tabModels() {
-    const navigationTabsConfiguration = this;
     const tabModels = _.cloneDeep(super.tabModels);
     const spacesTab = tabModels.find(tab => tab.id === 'spaces');
     Object.assign(spacesTab, {
@@ -50,13 +49,6 @@ class OnezoneNavigationTabsConfiguration extends CommonNavigationTabsConfigurati
         } else {
           return 'data';
         }
-      },
-      /**
-       * @param {OnedataSidebarRouteModel<Space>} sidebarModel
-       * @returns {string}
-       */
-      async defaultResource(sidebarModel) {
-        return navigationTabsConfiguration.getLastUsedResource(sidebarModel);
       },
     });
     const uploadsTab = {
