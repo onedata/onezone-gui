@@ -98,12 +98,16 @@
   .subject-description {
     display: flex;
     position: relative;
-    padding-right: 1.4em;
+    align-items: center;
+
+    .text {
+      padding-right: $padding-xs-horizontal;
+    }
 
     .record-info-icon {
-      position: absolute;
-      right: 0.1em;
-      top: 0.1em;
+      cursor: pointer;
+      width: 0.95em;
+      height: 0.95em;
       color: $color-one-light-gray;
       font-size: 130%;
     }
