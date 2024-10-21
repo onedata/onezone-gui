@@ -20,8 +20,9 @@ class OnezoneNavigationTabsConfiguration extends CommonNavigationTabsConfigurati
   @computed
   get tabModels() {
     const navigationTabsConfiguration = this;
-    const tabModels = super.tabModels;
-    Object.assign(tabModels.find(tab => tab.id === 'spaces'), {
+    const tabModels = _.cloneDeep(super.tabModels);
+    const spacesTab = tabModels.find(tab => tab.id === 'spaces');
+    Object.assign(spacesTab, {
       isDefault: true,
       /**
        * @param {OnedataSidebarRouteModel<Space>} sidebarModel
@@ -47,13 +48,14 @@ class OnezoneNavigationTabsConfiguration extends CommonNavigationTabsConfigurati
         return navigationTabsConfiguration.getLastUsedResource(sidebarModel);
       },
     });
-    tabModels.push({
+    const uploadsTab = {
       id: 'uploads',
       icon: 'browser-upload',
       stickyBottom: true,
       visibilityCondition: 'uploadManager.hasUploads',
       component: 'main-menu/upload-item',
-    });
+    };
+    tabModels.push(uploadsTab);
     return tabModels;
   }
 }
