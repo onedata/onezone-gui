@@ -11,8 +11,19 @@
 import CommonNavigationTabsConfiguration from 'onedata-gui-common/services/navigation-tabs-configuration';
 import { computed } from '@ember/object';
 import _ from 'lodash';
+import { inject as service } from '@ember/service';
 
 class OnezoneNavigationTabsConfiguration extends CommonNavigationTabsConfiguration {
+  @service currentUser;
+
+  /**
+   * @override
+   */
+  @computed
+  get userId() {
+    return this.currentUser.userId;
+  }
+
   /**
    * @override
    * @returns {Array<OnedataTabModel>}
