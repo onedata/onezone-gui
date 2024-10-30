@@ -5,6 +5,7 @@ export default {
     supportCountHint: 'Number of supporting providers: {{{count}}}',
     advertisedInMarketplace: 'This space is advertised in the Space Marketplace',
     spacePersistence: 'space persistence',
+    recentlyUsed: 'Recently used',
   },
   secondLevelItems: {
     aspects: {

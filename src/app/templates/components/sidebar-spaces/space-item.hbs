@@ -1,42 +1,48 @@
-{{one-icon class="sidebar-item-icon" icon="space"}}
+<OneIcon class="sidebar-item-icon" @icon="space" />
 {{#if isRenaming}}
-  {{one-inline-editor
-    isEditing=true
-    value=item.name
-    showEmptyInfo=false
-    onSave=(action "rename")
-    editOnClick=false
-    onEdit=(action "toggleRename")
+  <OneInlineEditor
+    @isEditing={{true}}
+    @value={{item.name}}
+    @showEmptyInfo={{false}}
+    @onSave={{action "rename"}}
+    @editOnClick={{false}}
+    @onEdit={{action "toggleRename"}}
     class="one-label name-editor sidebar-item-title"
-    click=(action "editorClick")
-  }}
+    @click={{action "editorClick"}}
+  />
 {{else}}
-  {{#truncated-string class="sidebar-item-title"}}
-    {{name-conflict item=item tagName="span" class="one-label"}}
-  {{/truncated-string}}
-  {{#status-toolbar as |toolbar|}}
+  <TruncatedString class="sidebar-item-title sidebar-spaces-item-title">
+    <NameConflict @item={{item}} @tagName="span" class="one-label" />
+  </TruncatedString>
+  {{#if isRecentlyUsedIconShown}}
+    <OneIcon
+      @icon="time-outline"
+      class="recently-used-icon"
+      style={{recentlyUsedIconStyle}}
+    >
+      <OneTooltip @title={{tt this "recentlyUsed"}} />
+    </OneIcon>
+  {{/if}}
+  <StatusToolbar class="sidebar-spaces-status-toolbar" as |toolbar|>
     {{#if isInMarketplace}}
-      {{toolbar.icon
-        icon="cart-checked"
-        hint=(tt this "advertisedInMarketplace")
-      }}
+      <toolbar.icon @icon="cart-checked" @hint={{tt this "advertisedInMarketplace"}} />
     {{/if}}
-    {{toolbar.icon
-      outerText=_totalSupportSizeHumanReadable
-      hint=(tt this "totalStorageHint" size=_totalSupportSizeHumanReadable)
-    }}
-    {{toolbar.icon
-      icon="provider"
-      outerText=_providersCount
-      hint=(tt this "supportCountHint" count=_providersCount)
-    }}
-  {{/status-toolbar}}
+    <toolbar.icon
+      @outerText={{_totalSupportSizeHumanReadable}}
+      @hint={{tt this "totalStorageHint" size=_totalSupportSizeHumanReadable}}
+    />
+    <toolbar.icon
+      @icon="provider"
+      @outerText={{_providersCount}}
+      @hint={{tt this "supportCountHint" count=_providersCount}}
+    />
+  </StatusToolbar>
 {{/if}}
 
 {{#unless inSidenav}}
-  {{actions-toolbar
-    isMinimized=true
-    dropdownPlacement="auto"
-    actionsArray=itemActions
-  }}
+  <ActionsToolbar
+    @isMinimized={{true}}
+    @dropdownPlacement="auto"
+    @actionsArray={{itemActions}}
+  />
 {{/unless}}

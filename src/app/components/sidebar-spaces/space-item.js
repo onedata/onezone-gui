@@ -2,12 +2,12 @@
  * A first-level item component for spaces sidebar
  *
  * @author Jakub Liput, Michał Borzęcki, Agnieszka Warchoł
- * @copyright (C) 2018-2020 ACK CYFRONET AGH
+ * @copyright (C) 2018-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import { computed, get, set } from '@ember/object';
-import { reads, collect } from '@ember/object/computed';
+import { reads, collect, bool } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import { next } from '@ember/runloop';
 import Component from '@ember/component';
@@ -17,6 +17,7 @@ import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { reject, resolve } from 'rsvp';
+import { htmlSafe } from '@ember/string';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -27,6 +28,7 @@ export default Component.extend(I18n, {
   clipboardActions: service(),
   apiSamplesActions: service(),
   userActions: service(),
+  navigationTabsConfiguration: service(),
 
   /**
    * @override
@@ -34,10 +36,11 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.sidebarSpaces.spaceItem',
 
   /**
-   * Proxy of current user
-   * @type {Ember.ComputedProperty<PromiseObject<models/User>>}
+   * @type {Components.SidebarSpaces}
    */
-  userProxy: reads('sidebar.userProxy'),
+  sidebar: undefined,
+
+  recentlyUsedIcon: 'time-outline',
 
   /**
    * Provider item
@@ -55,6 +58,12 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   isRenaming: false,
+
+  /**
+   * Proxy of current user
+   * @type {Ember.ComputedProperty<PromiseObject<models/User>>}
+   */
+  userProxy: reads('sidebar.userProxy'),
 
   /**
    * Just an one-way alias
@@ -209,6 +218,34 @@ export default Component.extend(I18n, {
   ),
 
   /**
+   * Opacity of "recently used" icon that can be displayed for MRU items.
+   * @type {ComputedProperty<number>} Number in range 0-1 (for opacity CSS rule).
+   */
+  recentlyUsedOpacity: computed(
+    'space.name',
+    'sidebar.{maxMruCount,mruList}',
+    function recentlyUsedOpacity() {
+      const mruIndex = this.sidebar.mruList.indexOf(this.item.entityId);
+      return this.getMruOpacity(this.sidebar.maxMruCount, mruIndex);
+    }
+  ),
+
+  isRecentlyUsedIconShown: bool('recentlyUsedOpacity'),
+
+  /**
+   * @type {ComputedProperty<SafeString>}
+   */
+  recentlyUsedIconStyle: computed(
+    'recentlyUsedOpacity',
+    function recentlyUsedIconStyle() {
+      const opacity = this.recentlyUsedOpacity;
+      if (opacity) {
+        return htmlSafe(`opacity: ${opacity};`);
+      }
+    }
+  ),
+
+  /**
    * @override
    */
   willDestroyElement() {
@@ -222,6 +259,23 @@ export default Component.extend(I18n, {
     } finally {
       this._super(...arguments);
     }
+  },
+
+  /**
+   * Computes opacity of item that is ordered as `mruIndex` in the MRU list.
+   * @private
+   * @param {number} total Total count of items that can be marked as recently used.
+   * @param {number} mruIndex Index of the item in the MRU list (starting with the
+   *   latest).
+   * @returns {number}
+   */
+  getMruOpacity(total, mruIndex) {
+    if (!total || !(mruIndex >= 0)) {
+      return 0;
+    }
+    const maxOpacity = 0.8;
+    const step = maxOpacity / total;
+    return maxOpacity - mruIndex * step;
   },
 
   actions: {
