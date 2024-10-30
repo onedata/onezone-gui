@@ -22,6 +22,7 @@ export default OneSidebar.extend(I18n, UserProxyMixin, {
    * @type {Ember.Service}
    */
   currentUser: service(),
+  navigationTabsConfiguration: service(),
 
   i18nPrefix: 'components.sidebarSpaces',
 
