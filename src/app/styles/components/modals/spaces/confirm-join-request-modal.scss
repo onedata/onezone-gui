@@ -57,14 +57,22 @@
   }
 }
 
-.modal.in.confirm-join-request-modal .modal-dialog .modal-content {
-  overflow: hidden;
-  height: 530px;
-  @media (max-width: 980px) {
-    height: 580px;
+.modal.in.confirm-join-request-modal {
+  &.small-content {
+    .modal-dialog .modal-content {
+      height: auto;
+    }
   }
-  @media (max-width: $screen-xs-max) {
-    // minimum height for "rejection" content
-    height: 420px;
+  .modal-dialog .modal-content {
+    overflow: hidden;
+    height: 530px;
+    @media (max-width: 980px) {
+      height: 580px;
+    }
+    @media (max-width: $screen-xs-max) {
+      // minimum height for "rejection" content
+      height: 420px;
+    }
   }
+
 }

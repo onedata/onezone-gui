@@ -10,7 +10,6 @@
 import UrlActionRunner from 'onedata-gui-common/services/url-action-runner';
 import { inject as service } from '@ember/service';
 import { get } from '@ember/object';
-import { reject } from 'rsvp';
 import GoToFileUrlActionHandler from 'onezone-gui/utils/url-action-handlers/go-to-file';
 
 export default UrlActionRunner.extend({
@@ -40,29 +39,36 @@ export default UrlActionRunner.extend({
    * @returns {Promise}
    */
   async removeSpaceActionRunner(actionParams, transition) {
+    const {
+      spaceActions,
+      recordManager,
+    } = this;
+
     // NOTE: legacy name of parameter - in new code please follow convention:
     // `action_camelCaseKey`
     const spaceId = get(actionParams || {}, 'action_space_id');
     if (!spaceId) {
-      return reject();
+      throw new Error('removeSpaceActionRunner: no spaceId');
     }
 
+    transition.abort();
     try {
-      await transition;
-    } catch {
-      // onedata transition could fail, but it should not cause action to cancel
+      // Force landing on the Overview space view (prevent default aspect redirection)
+      await this.router.transitionTo(
+        'onedata.sidebar.content.aspect',
+        'spaces',
+        spaceId,
+        'index'
+      );
+    } finally {
+      const space = await recordManager.getRecordById('space', spaceId);
+      const action = spaceActions.createRemoveSpaceAction({ space });
+      try {
+        await action.execute();
+      } finally {
+        action.destroy();
+      }
     }
-
-    const {
-      spaceActions,
-      recordManager,
-    } = this.getProperties('spaceActions', 'recordManager');
-
-    return recordManager.getRecordById('space', spaceId)
-      .then(space => {
-        const action = spaceActions.createRemoveSpaceAction({ space });
-        return action.execute().finally(() => action.destroy());
-      });
   },
 
   /**
