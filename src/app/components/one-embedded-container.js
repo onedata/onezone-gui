@@ -84,7 +84,6 @@ export default Component.extend({
   relatedData: undefined,
 
   /**
-   * FIXME: experimental, inject to all containers
    * @type {Models.Oneprovider}
    * @virtual
    */
