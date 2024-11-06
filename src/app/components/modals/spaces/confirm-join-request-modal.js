@@ -287,6 +287,16 @@ export default Component.extend(I18n, {
       });
   }),
 
+  hasSmallContent: bool('dataVerificationInfo.errorId'),
+
+  modalClass: computed('hasSmallContent', function modalClass() {
+    const classes = ['confirm-join-request-modal'];
+    if (this.hasSmallContent) {
+      classes.push('small-content');
+    }
+    return classes.join(' ');
+  }),
+
   /**
    * @override
    */

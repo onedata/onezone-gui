@@ -1,22 +1,22 @@
-{{#oneprovider-view-container
-  contentContainerClass="content-spaces-data-content"
-  space=space
-  oneproviderId=oneproviderId
-  resourceType="data"
-  oneproviderIdChanged=(action "oneproviderIdChanged")
-  hasEmbeddedIframesChanged=(action "hasEmbeddedIframesChanged")
+<OneproviderViewContainer
+  @contentContainerClass="content-spaces-data-content"
+  @space={{space}}
+  @oneproviderId={{oneproviderId}}
+  @resourceType="data"
+  @oneproviderIdChanged={{action "oneproviderIdChanged"}}
+  @hasEmbeddedIframesChanged={{action "hasEmbeddedIframesChanged"}}
   as |container|
-}}
-  {{#container.header class="content-spaces-data-header"}}
+>
+  <container.header @class="content-spaces-data-header">
     <h1>
       <span class="one-label">{{tt this "header"}}</span>
     </h1>
-  {{/container.header}}
-  {{#container.body}}
-    {{embedded-content-file-browser
-      oneprovider=container.selectedProvider
-      baseUrl=container.contentIframeBaseUrl
-      spaceEntityId=space.entityId
-    }}
-  {{/container.body}}
-{{/oneprovider-view-container}}
+  </container.header>
+  <container.body>
+    <EmbeddedContentFileBrowser
+      @oneprovider={{container.selectedProvider}}
+      @baseUrl={{container.contentIframeBaseUrl}}
+      @spaceEntityId={{space.entityId}}
+    />
+  </container.body>
+</OneproviderViewContainer>

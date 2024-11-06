@@ -84,7 +84,7 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
     changeListTab(tab) {
       return this.get('navigationState').changeRouteAspectOptions({
         tab,
-      });
+      }, true);
     },
   },
 });

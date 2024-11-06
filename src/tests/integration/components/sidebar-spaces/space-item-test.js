@@ -25,9 +25,13 @@ describe('Integration | Component | sidebar-spaces/space-item', function () {
 
   it('allows to rename space through "Rename" action', async function () {
     const saveSpy = sinon.spy(resolve);
+    const sidebarMock = {
+      mruList: [],
+    };
     this.set('space.save', saveSpy);
+    this.set('sidebar', sidebarMock);
 
-    await render(hbs `{{sidebar-spaces/space-item item=space}}`);
+    await render(hbs`<SidebarSpaces::SpaceItem @item={{space}} @sidebar={{sidebar}} />`);
 
     await click('.collapsible-toolbar-toggle');
     const renameTrigger =

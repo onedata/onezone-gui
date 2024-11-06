@@ -1,15 +1,25 @@
-{{#promise-proxy-container proxy=viewRequiredDataProxy}}
+<PromiseProxyContainer
+  @proxy={{viewRequiredDataProxy}}
+  @sizeClass="lg"
+>
   {{#if (not hasSupport)}}
-    {{content-spaces-no-support class="cancel-absolute-flex-content-padding"}}
+    <ContentSpacesNoSupport class="cancel-absolute-flex-content-padding" />
   {{else}}
     <div class="row content-header-section">
-      {{#promise-proxy-container proxy=isEmbeddableOneproviderProxy}}
+      <PromiseProxyContainer
+        @proxy={{isEmbeddableOneproviderProxy}}
+        {{!--
+          In practice, this area is loaded simultaneously with the content,
+          so we dont need double spinners.
+        --}}
+        @spinnerBlockClass="hidden"
+      >
         {{#if (or isEmbeddableOneprovider (not selectedProvider))}}
           {{yield (hash
             header=(component "oneprovider-view-container/container-header")
           )}}
         {{/if}}
-      {{/promise-proxy-container}}
+      </PromiseProxyContainer>
       <div class="row row-content-tab-bar">
         {{#if effIsTabBarCollapsed}}
           <div class={{concat-classes
@@ -21,11 +31,11 @@
                 {{tt this "currentOneproviderInfo"}}
               </span>
               <span class="provider-info-container">
-                {{record-info-with-icon
-                  record=selectedProviderItem
-                  recordType="provider"
+                <RecordInfoWithIcon
+                  @record={{selectedProviderItem}}
+                  @recordType="provider"
                   class="provider-info-name"
-                }}
+                />
               </span>{{#if multiOneproviders}}<span class="dot">.</span>{{/if}}
               {{#if multiOneproviders}}
                 <a {{action (mut isTabBarCollapsed) false}}
@@ -34,18 +44,18 @@
                   {{tt this "chooseOneprovider"}}
                 </a>
               {{/if}}
-              {{one-icon
-                icon="sign-question-rounded"
-                class=(concat-classes
+              <OneIcon
+                @icon="sign-question-rounded"
+                class={{concat-classes
                   "collapsed-selector-hint-trigger clickable"
                   collapsedSelectorHintTriggerClass
-                )
-              }}
-              {{#one-switchable-popover-modal
+                }}
+              />
+              <OneSwitchablePopoverModal
                 class="collapsed-selector-hint"
-                triggersConfiguration=hintTriggersConfiguration
+                @triggersConfiguration={{hintTriggersConfiguration}}
                 as |popmodal|
-              }}
+              >
                 <h1>
                   {{tt this
                     (concat "collapsedSelectorHint." collapsedSelectorState ".header")
@@ -58,37 +68,37 @@
                   }}
                 </p>
                 <div class="btn-toolbar text-right visible-xs-block">
-                  {{#one-button type="default" onClick=popmodal.close}}
+                  <OneButton @type="default" @onClick={{popmodal.close}}>
                     {{tt this "collapsedSelectorHint.close"}}
-                  {{/one-button}}
+                  </OneButton>
                 </div>
-              {{/one-switchable-popover-modal}}
+              </OneSwitchablePopoverModal>
             </div>
           </div>
         {{else}}
-          {{#one-tab-bar
-            class=(concat-classes
+          <OneTabBar
+            class={{concat-classes
               "space-providers-tab-bar"
               tabBarClass
               (if mapSelectorEnabled "with-map-selector")
-            )
-            items=tabBarItems
-            selectedItem=selectedProviderItem
-            selectDefaultOnInit=false
-            selectedItemChanged=(action "selectedProviderChanged")
-            tabBarLiComponentName="provider-tab-li"
-            isSorted=false
-          }}
+            }}
+            @items={{tabBarItems}}
+            @selectedItem={{selectedProviderItem}}
+            @selectDefaultOnInit={{false}}
+            @selectedItemChanged={{action "selectedProviderChanged"}}
+            @tabBarLiComponentName="provider-tab-li"
+            @isSorted={{false}}
+          >
             {{#if mapSelectorEnabled}}
-              {{oneproviders-map-selector
-                isExpanded=isMapExpanded
-                oneproviders=providers
-                selectedOneprovider=selectedProvider
-                onToggleExpand=(action "onToggleExpandMap")
-                onOneproviderSelected=(action "selectedProviderChanged")
-              }}
+              <OneprovidersMapSelector
+                @isExpanded={{isMapExpanded}}
+                @oneproviders={{providers}}
+                @selectedOneprovider={{selectedProvider}}
+                @onToggleExpand={{action "onToggleExpandMap"}}
+                @onOneproviderSelected={{action "selectedProviderChanged"}}
+              />
             {{/if}}
-          {{/one-tab-bar}}
+          </OneTabBar>
         {{/if}}
       </div>
     </div>
@@ -104,29 +114,32 @@
         contentContainerClass
       }}>
         {{#if showAllOfflineInfo}}
-          {{content-info
-            header=(tt this "allOneprovidersOffline")
-            imagePath=(root-url "assets/images/data-error-no-providers.svg")
+          <ContentInfo
+            @header={{tt this "allOneprovidersOffline"}}
+            @imagePath={{root-url "assets/images/data-error-no-providers.svg"}}
             class="preserve-header scroll-breakpoint-600"
-          }}
+          />
         {{else if showAllVersionsOld}}
-          {{oneprovider-view-container/info-old-oneprovider
-            requiredVersion=minOneproviderRequiredVersion
-            infoType="allOld"
-          }}
+          <OneproviderViewContainer::InfoOldOneprovider
+            @requiredVersion={{minOneproviderRequiredVersion}}
+            @infoType="allOld"
+          />
         {{else if showAllRequiredVersionsOffline}}
-          {{oneprovider-view-container/info-old-oneprovider
-            requiredVersion=minOneproviderRequiredVersion
-            infoType="allNewOffline"
-          }}
+          <OneproviderViewContainer::InfoOldOneprovider
+            @requiredVersion={{minOneproviderRequiredVersion}}
+            @infoType="allNewOffline"
+          />
         {{else if showSelectedProviderIsOld}}
-          {{oneprovider-view-container/info-old-oneprovider
-            requiredVersion=minOneproviderRequiredVersion
-            infoType="selectedOld"
-            selectedProviderVersion=selectedProvider.version
-          }}
+          <OneproviderViewContainer::InfoOldOneprovider
+            @requiredVersion={{minOneproviderRequiredVersion}}
+            @infoType="selectedOld"
+            @selectedProviderVersion={{selectedProvider.version}}
+          />
         {{else}}
-          {{#promise-proxy-container proxy=oneproviderViewProxy}}
+          <PromiseProxyContainer
+            @proxy={{oneproviderViewProxy}}
+            @sizeClass="lg"
+          >
             {{#if isEmbeddableOneprovider}}
               {{#if selectedProvider.online}}
                 {{yield (hash
@@ -135,22 +148,22 @@
                   selectedProvider=selectedProvider
                 )}}
               {{else}}
-                {{content-info
-                  header=(tt this "oneproviderOffline")
-                  imagePath=(root-url "assets/images/no-connection.svg")
+                <ContentInfo
+                  @header={{tt this "oneproviderOffline"}}
+                  @imagePath={{root-url "assets/images/no-connection.svg"}}
                   class="preserve-header scroll-breakpoint-600"
-                }}
+                />
               {{/if}}
             {{else}}
-              {{content-provider-redirect
-                provider=selectedProvider
-                spaceId=space.entityId
-                resourceType=resourceType
-              }}
+              <ContentProviderRedirect
+                @provider={{selectedProvider}}
+                @spaceId={{space.entityId}}
+                @resourceType={{resourceType}}
+              />
             {{/if}}
-          {{/promise-proxy-container}}
+          </PromiseProxyContainer>
         {{/if}}
       </div>
     {{/if}}
   {{/if}}
-{{/promise-proxy-container}}
+</PromiseProxyContainer>

@@ -51,7 +51,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   areEffPrivilegesRecalculated: attr('boolean'),
 
   /**
-   * Maps: provider name => capacity in bytes provided for this space
+   * Maps: Oneprovider ID -> capacity in bytes provided for this space
    * @type {Object}
    */
   supportSizes: attr('object'),

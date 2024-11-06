@@ -1,10 +1,11 @@
 import { expect } from 'chai';
 import { describe, it, afterEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { lookupService } from '../../helpers/stub-service';
+import { lookupService, registerService } from '../../helpers/stub-service';
 import RemoveSpaceAction from 'onezone-gui/utils/space-actions/remove-space-action';
 import sinon from 'sinon';
 import { get } from '@ember/object';
+import Service from '@ember/service';
 import { settled } from '@ember/test-helpers';
 import { resolve } from 'rsvp';
 
@@ -21,6 +22,10 @@ describe('Integration | Service | url-action-runner', function () {
     const space = {};
     sinon.stub(lookupService(this, 'record-manager'), 'getRecordById')
       .withArgs('space', 'space1').resolves(space);
+    class RouterMock extends Service {
+      transitionTo() {}
+    }
+    registerService(this, 'router', RouterMock);
 
     // Create an empty instance of action to load methods of the class. Without this line
     // RemoveSpaceAction has no property 'prototype.execute'.
@@ -39,6 +44,7 @@ describe('Integration | Service | url-action-runner', function () {
           action_space_id: 'space1',
         },
       },
+      abort() {},
     };
 
     service.runFromTransition(transition);

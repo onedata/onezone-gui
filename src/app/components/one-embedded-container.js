@@ -16,8 +16,12 @@ import { inject as service } from '@ember/service';
 import EmbeddedIframe from 'onedata-gui-common/utils/embedded-iframe';
 import { A } from '@ember/array';
 import { getOwner } from '@ember/application';
-import { array } from 'ember-awesome-macros';
 import globals from 'onedata-gui-common/utils/globals';
+
+import {
+  commonIframeInjectedProperties,
+  commonCallParentActionNames,
+} from 'onedata-gui-common/services/app-proxy';
 
 export default Component.extend({
   classNames: ['one-embedded-container'],
@@ -80,22 +84,16 @@ export default Component.extend({
   relatedData: undefined,
 
   /**
+   * @type {Models.Oneprovider}
+   * @virtual
+   */
+  oneprovider: undefined,
+
+  /**
    * If true, the iframe will be absolutely positioned with 100% width and height
    * @type {boolean}
    */
   fitContainer: false,
-
-  /**
-   * Collection of action names (strings), which will be injected to iframe from this
-   * component.
-   * @type {Array<string>}
-   */
-  commonCallParentActionNames: Object.freeze([
-    'showOneproviderConnectionError',
-    'hideOneproviderConnectionError',
-    'getManageClusterUrl',
-    'callGlobalNotify',
-  ]),
 
   /**
    * Collection of action names (strings), which should be injected to iframe.
@@ -103,15 +101,28 @@ export default Component.extend({
    */
   callParentActionNames: Object.freeze([]),
 
-  allCallParentActionNames: array.concat(
-    'commonCallParentActionNames',
-    'callParentActionNames'
-  ),
-
   /**
    * @type {Utils.EmbeddedIframe}
    */
   embeddedIframe: undefined,
+
+  allCallParentActionNames: computed(
+    'callParentActionNames',
+    function allCallParentActionNames() {
+      return [...commonCallParentActionNames, ...this.callParentActionNames];
+    }
+  ),
+
+  allIframeInjectedProperties: computed(
+    'iframeInjectedProperties',
+    function allIframeInjectedProperties() {
+      return [...commonIframeInjectedProperties, ...this.iframeInjectedProperties];
+    }
+  ),
+
+  oneproviderId: reads('oneprovider.entityId'),
+
+  oneproviderName: reads('oneprovider.name'),
 
   /**
    * Set by iframe onload event.
@@ -138,12 +149,14 @@ export default Component.extend({
     return `${baseUrl}#/${isPublic ? 'public' : 'onedata'}/components/${embeddedComponentName}`;
   }),
 
+  loadingLabel: reads('oneprovider.name'),
+
   iframeIdObserver: observer('iframeId', function iframeIdObserver() {
     const {
       embeddedIframe,
       iframeId,
-    } = this.getProperties('embeddedIframe', 'iframeId');
-    const prevIframeId = embeddedIframe && get(embeddedIframe, 'iframeId');
+    } = this;
+    const prevIframeId = embeddedIframe && embeddedIframe.iframeId;
 
     if (prevIframeId !== iframeId) {
       if (prevIframeId) {
@@ -171,10 +184,9 @@ export default Component.extend({
   didInsertElement() {
     this._super(...arguments);
 
-    this.get('iframeInjectedProperties').forEach(propertyName => {
+    this.allIframeInjectedProperties.forEach(propertyName => {
       const observerFun = function () {
-        this.get('embeddedIframe')
-          .setSharedProperty(propertyName, this.get(propertyName));
+        this.embeddedIframe.setSharedProperty(propertyName, this.get(propertyName));
       };
       this.addObserver(propertyName, this, observerFun);
     });
@@ -200,19 +212,10 @@ export default Component.extend({
       relatedData,
       iframeType,
       src,
-      iframeInjectedProperties,
+      allIframeInjectedProperties,
       allCallParentActionNames,
       element,
-    } = this.getProperties(
-      'embeddedIframeManager',
-      'iframeId',
-      'relatedData',
-      'iframeType',
-      'src',
-      'iframeInjectedProperties',
-      'allCallParentActionNames',
-      'element'
-    );
+    } = this;
 
     const iframeOwnership = {
       ownerReference: this,
@@ -220,7 +223,7 @@ export default Component.extend({
     };
 
     // Try to find existing embedded iframe with specified iframeId
-    const embeddedIframes = get(embeddedIframeManager, 'embeddedIframes');
+    const embeddedIframes = embeddedIframeManager.embeddedIframes;
     let embeddedIframe = embeddedIframes.findBy('iframeId', iframeId);
     if (!embeddedIframe) {
       // If not found, create new one...
@@ -235,8 +238,8 @@ export default Component.extend({
       embeddedIframes.pushObject(embeddedIframe);
     } else {
       // If embedded iframe exists, add this component to its owners list
-      const owners = get(embeddedIframe, 'owners');
-      if (!owners.any(owner => get(owner, 'ownerReference') === this)) {
+      const owners = embeddedIframe.owners;
+      if (!owners.any(owner => owner.ownerReference === this)) {
         owners.unshiftObject(iframeOwnership);
       }
       // and update its src
@@ -258,7 +261,7 @@ export default Component.extend({
     });
 
     // Inject all shared properties into iframe
-    iframeInjectedProperties.forEach(propertyName => {
+    allIframeInjectedProperties.forEach(propertyName => {
       embeddedIframe.setSharedProperty(propertyName, this.get(propertyName));
     });
   },
@@ -272,14 +275,14 @@ export default Component.extend({
     const {
       allCallParentActionNames,
       embeddedIframe,
-    } = this.getProperties('allCallParentActionNames', 'embeddedIframe');
+    } = this;
 
     if (embeddedIframe) {
       allCallParentActionNames.forEach(actionName => {
         set(embeddedIframe, `callParentCallbacks.${actionName}`, undefined);
       });
 
-      const owners = get(embeddedIframe, 'owners');
+      const owners = embeddedIframe.owners;
       owners.removeObject(owners.findBy('ownerReference', this));
     }
   },
@@ -337,7 +340,7 @@ export default Component.extend({
         });
     },
     callGlobalNotify(methodName, ...args) {
-      return this.get('globalNotify')[methodName](...args);
+      return this.globalNotify[methodName](...args);
     },
   },
 });

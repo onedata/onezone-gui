@@ -1,0 +1,16 @@
+.sidebar-spaces {
+  .two-level-sidebar {
+    .sidebar-item-title.sidebar-spaces-item-title {
+      flex-grow: 0;
+    }
+    .item-header .status-toolbar.sidebar-spaces-status-toolbar {
+      margin-left: auto;
+    }
+  }
+  .recently-used-icon {
+    margin: auto 0.4em;
+    font-size: 160%;
+    color: $main-text-color;
+    font-weight: bold;
+  }
+}

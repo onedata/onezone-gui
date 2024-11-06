@@ -11,6 +11,7 @@ import layout from 'onedata-gui-common/templates/components/one-sidebar';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import { inject as service } from '@ember/service';
+import { computed } from '@ember/object';
 
 export default OneSidebar.extend(I18n, UserProxyMixin, {
   layout,
@@ -21,6 +22,7 @@ export default OneSidebar.extend(I18n, UserProxyMixin, {
    * @type {Ember.Service}
    */
   currentUser: service(),
+  navigationTabsConfiguration: service(),
 
   i18nPrefix: 'components.sidebarSpaces',
 
@@ -50,4 +52,29 @@ export default OneSidebar.extend(I18n, UserProxyMixin, {
    * @override
    */
   sidebarType: 'spaces',
+
+  /**
+   * Number of items that can have MRU (most recently used) badge.
+   * @type {ComputedProperty<number>}
+   */
+  maxMruCount: computed('sortedCollection.length', function maxMruCount() {
+    const itemsCount = this.sortedCollection.length;
+    return itemsCount > 1 ? Math.ceil(itemsCount / 5) : 0;
+  }),
+
+  /**
+   * List of MRU (most recently used) items IDs starting with MRU item.
+   * @type {ComputedProperty<number>}
+   */
+  mruList: computed(
+    'sidebarType',
+    'maxMruCount',
+    'navigationTabsConfiguration.recentlyUsedWriteTimestamp',
+    function mruList() {
+      return this.navigationTabsConfiguration.getRecentlyUsedResourceIds(
+        this.sidebarType,
+        this.maxMruCount
+      );
+    }
+  ),
 });

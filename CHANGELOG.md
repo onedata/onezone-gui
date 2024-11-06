@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12370 Changed default views opened using tabs, remembering last used resource (eg. space), improved loading indicators, added "recently used" space indicators
 * VFS-10341 Upgraded EmberJS to v3.16.10
 * VFS-12294 Added pointer cursor and fixed info icon alignment on token consumer page
 * VFS-12083 Allowed to copy token when sidebar is revealed but not opened
