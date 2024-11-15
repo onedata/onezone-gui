@@ -8,8 +8,7 @@
 
 import I18n from 'onedata-gui-common/mixins/i18n';
 import { inject as service } from '@ember/service';
-import { computed } from '@ember/object';
-import { promise } from 'ember-awesome-macros';
+import { reads } from '@ember/object/computed';
 import ContentOneproviderContainerBase from './content-oneprovider-container-base';
 
 export default ContentOneproviderContainerBase.extend(I18n, {
@@ -32,13 +31,10 @@ export default ContentOneproviderContainerBase.extend(I18n, {
    */
   share: undefined,
 
-  spaceProxy: promise.object(computed('share', function space() {
-    const {
-      share,
-      shareManager,
-    } = this.getProperties('share', 'shareManager');
-    return shareManager.getSpaceForShare(share);
-  })),
+  /**
+   * @type {ComputedProperty<PromiseObject<Models.Space>>}
+   */
+  spaceProxy: reads('share.space'),
 
   actions: {
     clipboardSuccess() {

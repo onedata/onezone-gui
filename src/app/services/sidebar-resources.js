@@ -38,9 +38,9 @@ export default SidebarResources.extend({
 
   /**
    * @param {string} type
-   * @returns {GraphListModel}
+   * @returns {Promise<GraphListModel>}
    */
-  getCollectionFor(type) {
+  async getCollectionFor(type) {
     switch (type) {
       case 'providers':
         return this.get('providerManager').getProviders();
@@ -51,7 +51,7 @@ export default SidebarResources.extend({
       case 'spaces':
         return this.get('spaceManager').getSpaces();
       case 'shares':
-        return this.get('shareManager').getVirtualAllSharesList().reload();
+        return (await this.shareManager.getVirtualAllSharesList()).reload();
       case 'groups':
         return this.get('groupManager').getGroups();
       case 'harvesters':

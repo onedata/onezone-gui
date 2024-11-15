@@ -138,11 +138,12 @@ export default Service.extend(UserProxyMixin, {
     );
   },
 
-  getVirtualAllSharesList() {
+  async getVirtualAllSharesList() {
     if (!this.virtualShareList) {
       const virtualShareList = VirtualShareList.create({
-        userProxy: this.get('userProxy'),
+        userProxy: this.userProxy,
       });
+      await virtualShareList.asyncInit();
       this.set('virtualShareList', virtualShareList);
     }
     return this.virtualShareList;
