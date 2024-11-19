@@ -74,6 +74,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   providerList: belongsTo('providerList'),
 
   // members of this space
+  // FIXME: do usunięcia
   shareList: belongsTo('shareList'),
   groupList: belongsTo('groupList'),
   userList: belongsTo('userList'),

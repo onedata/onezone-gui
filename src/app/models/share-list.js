@@ -1,3 +1,4 @@
+// FIXME: plik do usunięcia
 /**
  * @author Jakub Liput
  * @copyright (C) 2020 ACK CYFRONET AGH
