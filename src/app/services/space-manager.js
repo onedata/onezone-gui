@@ -131,18 +131,18 @@ export default Service.extend({
    * @param {string} id
    * @returns {Promise<Provider>} space promise
    */
-  getRecord(id) {
-    return this.get('store').findRecord('space', id);
+  getRecord(id, options) {
+    return this.get('store').findRecord('space', id, options);
   },
 
-  getRecordById(entityId) {
+  getRecordById(entityId, options) {
     const recordGri = gri({
       entityType: spaceEntityType,
       entityId: entityId,
       aspect: 'instance',
       scope: 'auto',
     });
-    return this.getRecord(recordGri);
+    return this.getRecord(recordGri, options);
   },
 
   /**

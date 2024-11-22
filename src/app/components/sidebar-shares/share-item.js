@@ -33,7 +33,7 @@ export default Component.extend(I18n, {
   inSidenav: false,
 
   /**
-   * @type {Ember.ComputedProperty<Share>}
+   * @type {Ember.ComputedProperty<SharesSidebarItem>}
    */
   share: reads('item'),
 
@@ -54,13 +54,14 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<PromiseObject<Space>>}
    */
-  spaceProxy: computedRelationProxy('share', 'space'),
+  spaceProxy: reads('share.spaceProxy'),
 
   /**
    * @type {ComputedProperty<Record<string, Utils.Action>>}
    */
   actionsCache: computed(() => ({})),
 
+  // FIXME: naprawić
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
@@ -69,7 +70,7 @@ export default Component.extend(I18n, {
     const {
       share,
       clipboardActions,
-    } = this.getProperties('share', 'clipboardActions');
+    } = this;
 
     return this.actionsCache.copyIdAction =
       clipboardActions.createCopyRecordIdAction({ record: share });

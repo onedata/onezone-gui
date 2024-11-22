@@ -1,77 +1,101 @@
-/**
- * An abstraction layer for getting data for sidebar of various tabs
- *
- * @author Jakub Liput, Michał Borzęcki
- * @copyright (C) 2017-2024 ACK CYFRONET AGH
- * @license This software is released under the MIT license cited in 'LICENSE.txt'.
- */
-
 import { inject as service } from '@ember/service';
-import { resolve, reject } from 'rsvp';
 import SidebarResources from 'onedata-gui-common/services/sidebar-resources';
-import ArrayProxy from '@ember/array/proxy';
+import { computed } from '@ember/object';
+import ReplacingChunksArray from 'onedata-gui-common/utils/replacing-chunks-array';
+import { tracked } from '@glimmer/tracking';
 
-export default SidebarResources.extend({
-  providerManager: service(),
-  tokenManager: service(),
-  tokenActions: service(),
-  currentUser: service(),
-  spaceManager: service(),
-  shareManager: service(),
-  clusterActions: service(),
-  spaceActions: service(),
-  groupManager: service(),
-  groupActions: service(),
-  clusterManager: service(),
-  harvesterManager: service(),
-  harvesterActions: service(),
-  uploadManager: service(),
-  recordManager: service(),
-  workflowActions: service(),
+export default class OnezoneSidebarResources extends SidebarResources {
+  @service providerManager;
+  @service tokenManager;
+  @service tokenActions;
+  @service currentUser;
+  @service spaceManager;
+  @service shareManager;
+  @service clusterActions;
+  @service spaceActions;
+  @service groupManager;
+  @service groupActions;
+  @service clusterManager;
+  @service harvesterManager;
+  @service harvesterActions;
+  @service uploadManager;
+  @service recordManager;
+  @service workflowActions;
 
   /**
    * @override
    */
-  modelNameToRouteResourceTypeMapping: Object.freeze(new Map([
+  modelNameToRouteResourceTypeMapping = Object.freeze(new Map([
     ['atmInventory', 'atm-inventories'],
-  ])),
+  ]));
 
+  // FIXME: rozszerzyć o możliwość ReplacingChunksArray
   /**
    * @param {string} type
-   * @returns {Promise<GraphListModel>}
+   * @returns {Promise<SidebarCollection>}
    */
   async getCollectionFor(type) {
     switch (type) {
-      case 'providers':
-        return this.get('providerManager').getProviders();
-      case 'clusters':
-        return this.get('clusterManager').getClusters();
-      case 'tokens':
-        return this.get('tokenManager').getTokens();
-      case 'spaces':
-        return this.get('spaceManager').getSpaces();
       case 'shares':
-        return (await this.shareManager.getVirtualAllSharesList()).reload();
+        await this.shares.initialLoad;
+        return new ChunksArraySidebarCollection(
+          this.shares
+        );
+      case 'providers':
+        return new ListModelSidebarCollection(
+          await this.providerManager.getProviders()
+        );
+      case 'clusters':
+        return new ListModelSidebarCollection(
+          await this.clusterManager.getClusters()
+        );
+      case 'tokens':
+        return new ListModelSidebarCollection(
+          await this.tokenManager.getTokens()
+        );
+      case 'spaces':
+        return new ListModelSidebarCollection(
+          await this.spaceManager.getSpaces()
+        );
       case 'groups':
-        return this.get('groupManager').getGroups();
+        return new ListModelSidebarCollection(
+          await this.groupManager.getGroups()
+        );
       case 'harvesters':
-        return this.get('harvesterManager').getHarvesters();
+        return new ListModelSidebarCollection(
+          await this.harvesterManager.getHarvesters()
+        );
       case 'atm-inventories':
-        return this.get('recordManager').getUserRecordList('atmInventory');
-      case 'uploads':
-        return resolve({
-          list: ArrayProxy.create({
-            content: this.get('uploadManager.sidebarOneproviders'),
-          }),
-        });
-      case 'users':
-        return this.get('currentUser').getCurrentUserRecord().then(user => {
-          return resolve({ list: ArrayProxy.create({ content: [user] }) });
-        });
+        return new ListModelSidebarCollection(
+          await this.recordManager.getUserRecordList('atmInventory')
+        );
+      case 'uploads': {
+        // FIXME: można by zrobić reaktywnie za pomocą reads (ale nie było do tej pory)
+        const sidebarOneproviders = this.uploadManager.sidebarOneproviders;
+        return {
+          get array() {
+            return sidebarOneproviders;
+          },
+          get ids() {
+            return sidebarOneproviders.map(record => record.id);
+          },
+        };
+      }
+      case 'users': {
+        const user = await this.currentUser.getCurrentUserRecord();
+        return {
+          get array() {
+            return [user];
+          },
+          get ids() {
+            return [user.id];
+          },
+        };
+      }
       default:
-        return reject('No such collection: ' + type);
+        throw new Error('No such collection: ' + type);
     }
-  },
+  }
 
   /**
    * @override
@@ -86,7 +110,7 @@ export default SidebarResources.extend({
       'atm-inventories': this.workflowActions,
     } [type];
     return actionsSource?.createGlobalActions(context) ?? [];
-  },
+  }
 
   /**
    * @override
@@ -97,10 +121,116 @@ export default SidebarResources.extend({
         return ['isActive:desc', 'isObsolete', 'name'];
       case 'uploads':
         return ['isAllOneproviders:desc', 'name'];
-      case 'shares':
-        return ['hasHandle:desc', 'name'];
       default:
-        return this._super(...arguments);
+        return super.getItemsSortingFor(...arguments);
     }
-  },
-});
+  }
+
+  @computed
+  get shares() {
+    return ReplacingChunksArray.create({
+      fetch: this.getShareList.bind(this),
+      startIndex: 0,
+      endIndex: 50,
+      indexMargin: 10,
+      initialJumpIndex: this.initialJumpIndex,
+    });
+  }
+
+  /**
+   * @private
+   * @param {string} index
+   * @param {number} limit
+   * @param {number} offset
+   * @returns {ShareDataListPage}
+   */
+  async getShareList(index, limit, offset) {
+    // FIXME: wiele spejsów, MergedChunksArray
+    const spaceId = '01789649985817106dc6fe928dff2bfechb70b';
+    const { array, isLast } = await this.shareManager.getSpaceShareList(spaceId, {
+      index,
+      limit,
+      offset,
+    });
+    const shareManager = this.shareManager;
+    const spaceManager = this.spaceManager;
+    return {
+      array: array.map(shareData => new SharesSidebarItem({
+        shareData,
+        shareManager,
+        spaceManager,
+      })),
+      isLast,
+    };
+  }
+}
+
+class SharesSidebarItem {
+  shareManager = undefined;
+  spaceManaer = undefined;
+
+  // FIXME: zrobić jak w providerze gety "proxy"?
+  constructor({ shareData, shareManager, spaceManager }) {
+    Object.assign(this, shareData);
+    this.shareManager = shareManager;
+    this.spaceManager = spaceManager;
+  }
+  // FIXME: użyć zmiennych
+  get id() {
+    return `share.${this.entityId}.instance:public`;
+  }
+  get entityId() {
+    return this.shareId;
+  }
+  @computed
+  get shareProxy() {
+    return this.shareManager.getRecord(this.id, { reload: false });
+  }
+  @computed
+  get spaceProxy() {
+    return this.spaceManager.getRecordById(this.spaceId, {
+      reload: false,
+      backgroundReload: false,
+    });
+  }
+}
+
+/**
+ * @typedef {Object} SidebarCollection
+ * @property {Array<any>} array
+ * @property {Array<string>} ids
+ */
+
+class ChunksArraySidebarCollection {
+  @tracked chunksArray;
+
+  constructor(chunksArray) {
+    this.chunksArray = chunksArray;
+  }
+
+  @computed('chunksArray.content.[]')
+  get array() {
+    return this.chunksArray.toArray();
+  }
+
+  get ids() {
+    return this.array.map(record => record.id);
+  }
+}
+
+class ListModelSidebarCollection {
+  @tracked listModel;
+
+  constructor(listModel) {
+    this.listModel = listModel;
+  }
+
+  @computed('listModel.list.content.[]')
+  get array() {
+    return this.listModel?.list?.content.toArray();
+  }
+
+  get ids() {
+    return this.listModel?.belongsTo?.('list')?.ids?.() ?? [];
+  }
+}

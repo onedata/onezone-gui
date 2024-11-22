@@ -4,14 +4,12 @@
  * It adds support for GRI.
  *
  * @author Michał Borzęcki
- * @copyright (C) 2018-2019 ACK CYFRONET AGH
+ * @copyright (C) 2018-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import OnedataSidebarContentRoute from 'onedata-gui-common/routes/onedata/sidebar/content';
-import isRecord from 'onedata-gui-common/utils/is-record';
 import modelRoutableId from 'onezone-gui/utils/model-routable-id';
-import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { inject as service } from '@ember/service';
 
@@ -41,9 +39,7 @@ export default OnedataSidebarContentRoute.extend({
    * @override
    */
   availableResourceId(resourceId, collection) {
-    const griIds = isRecord(collection) ?
-      collection.hasMany('list').ids() :
-      get(collection, 'list').map(record => get(record, 'id'));
+    const griIds = collection.ids;
     return findGri(griIds, resourceId);
   },
 
@@ -58,12 +54,13 @@ export default OnedataSidebarContentRoute.extend({
 
     const modelName = sidebarResources.getModelNameForRouteResourceType(resourceType);
     const entityType = recordManager.getEntityTypeForModelName(modelName);
+    const scope = recordManager.getScopeForModelName(modelName);
     if (entityType) {
       return gri({
         entityId: resourceId,
         entityType,
         aspect: 'instance',
-        scope: 'auto',
+        scope,
       });
     } else {
       return null;
