@@ -195,12 +195,6 @@ class SharesSidebarItem {
   }
 }
 
-/**
- * @typedef {Object} SidebarCollection
- * @property {Array<any>} array
- * @property {Array<string>} ids
- */
-
 class ChunksArraySidebarCollection {
   @tracked chunksArray;
 
