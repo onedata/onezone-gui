@@ -13,9 +13,8 @@ import { computed } from '@ember/object';
 import InfiniteScroll from 'onedata-gui-common/utils/infinite-scroll';
 import { inject as service } from '@ember/service';
 import { reads } from '@ember/object/computed';
-import { ShareListItem } from 'onedata-gui-common/utils/common-shares';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
-import ArraySlice from 'onedata-gui-common/utils/array-slice';
+import ConflictIdsArray from 'onedata-gui-common/utils/conflict-ids-array';
 
 @layout(template)
 @classNames('sidebar-shares')
@@ -77,7 +76,14 @@ export default class SidebarShares extends OneSidebar {
    * Disable filtering features.
    * @override
    */
-  @reads('sortedCollection') filteredCollection;
+  @computed('sortedCollection')
+  get filteredCollection() {
+    return ConflictIdsArray.create({
+      content: this.sortedCollection,
+      diffProperty: 'entityId',
+      conflictProperty: 'name',
+    });
+  }
 
   /**
    * @override
