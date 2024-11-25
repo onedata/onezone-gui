@@ -1,12 +1,14 @@
+import { FileType } from 'onedata-gui-common/utils/file';
+
 export default {
   shareItem: {
     space: 'Space',
     unknown: 'unknown',
     openDataTip: 'This {{fileType}} is published as Open&nbsp;Data.',
     fileType: {
-      file: 'file',
-      dir: 'directory',
-      symlink: 'symbolic link',
+      [FileType.Regular]: 'file',
+      [FileType.Directory]: 'directory',
+      [FileType.SymbolicLink]: 'symbolic link',
       item: 'item',
     },
   },

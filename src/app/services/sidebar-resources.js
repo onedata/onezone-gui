@@ -230,6 +230,9 @@ class SharesSidebarItem {
   get entityId() {
     return this.shareId;
   }
+  get hasHandle() {
+    return Boolean(this.handleId);
+  }
   @computed
   get shareProxy() {
     return this.shareManager.getRecord(this.id, { reload: false });
