@@ -50,17 +50,16 @@ export default OnedataSidebarContentRoute.extend({
     const {
       recordManager,
       sidebarResources,
-    } = this.getProperties('recordManager', 'sidebarResources');
+    } = this;
 
     const modelName = sidebarResources.getModelNameForRouteResourceType(resourceType);
     const entityType = recordManager.getEntityTypeForModelName(modelName);
-    const scope = recordManager.getScopeForModelName(modelName);
     if (entityType) {
       return gri({
         entityId: resourceId,
         entityType,
         aspect: 'instance',
-        scope,
+        scope: 'auto',
       });
     } else {
       return null;

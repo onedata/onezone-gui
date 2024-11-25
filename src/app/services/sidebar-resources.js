@@ -1,8 +1,16 @@
+// FIXME: jsdoc
+
 import { inject as service } from '@ember/service';
 import SidebarResources from 'onedata-gui-common/services/sidebar-resources';
-import { computed } from '@ember/object';
-import ReplacingChunksArray from 'onedata-gui-common/utils/replacing-chunks-array';
+import { computed, defineProperty } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
+import MergedChunksArray from 'onedata-gui-common/utils/merged-chunks-array';
+import computedLastProxyContent from 'onedata-gui-common/utils/computed-last-proxy-content';
+import { reads } from '@ember/object/computed';
+import gri from 'onedata-gui-websocket-client/utils/gri';
+import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
+import { entityType as shareEntityType } from 'onezone-gui/models/share';
 
 export default class OnezoneSidebarResources extends SidebarResources {
   @service providerManager;
@@ -36,11 +44,11 @@ export default class OnezoneSidebarResources extends SidebarResources {
    */
   async getCollectionFor(type) {
     switch (type) {
-      case 'shares':
-        await this.shares.initialLoad;
-        return new ChunksArraySidebarCollection(
-          this.shares
-        );
+      case 'shares': {
+        await this.fetchersProxy;
+        await this.sharesChunksArray.initialLoad;
+        return new ChunksArraySidebarCollection(this.sharesChunksArray);
+      }
       case 'providers':
         return new ListModelSidebarCollection(
           await this.providerManager.getProviders()
@@ -126,27 +134,63 @@ export default class OnezoneSidebarResources extends SidebarResources {
     }
   }
 
+  @computed('currentUser.user.spaceList.list')
+  get spacesIdsProxy() {
+    return promiseObject((async () => {
+      const user = this.currentUser.user;
+      const spaceList = await user.spaceList;
+      return spaceList.hasMany('list').ids().map(gri => parseGri(gri).entityId);
+    })());
+  }
+
+  /**
+   * @type {PromiseObject<Array<(index, limit, offset) => ShareDataListPage>>}
+   */
+  @computed('spacesIdsProxy')
+  get fetchersProxy() {
+    return promiseObject((async () => {
+      const spacesIds = await this.spacesIdsProxy;
+      return spacesIds.map(spaceId => {
+        return (index, limit, offset) => {
+          return this.getShareList(spaceId, {
+            index,
+            limit,
+            offset,
+          });
+        };
+      });
+    })());
+  }
+
   @computed
-  get shares() {
-    return ReplacingChunksArray.create({
-      fetch: this.getShareList.bind(this),
-      startIndex: 0,
-      endIndex: 50,
-      indexMargin: 10,
-      initialJumpIndex: this.initialJumpIndex,
-    });
+  get sharesChunksArray() {
+    const sidebarResources = this;
+    return MergedChunksArray
+      .extend({
+        fetchers: reads('sidebarResources.fetchersProxy.content'),
+      })
+      .create({
+        sidebarResources,
+        startIndex: 0,
+        endIndex: 50,
+        indexMargin: 10,
+        initialJumpIndex: this.initialJumpIndex,
+      });
+  }
+
+  init() {
+    super.init(...arguments);
+    defineProperty(this, 'fetchers', computedLastProxyContent('fetchersProxy'));
   }
 
   /**
    * @private
-   * @param {string} index
-   * @param {number} limit
-   * @param {number} offset
+   * @param {string} spaceId
+   * @param {InfiniteListQuery} listQuery
    * @returns {ShareDataListPage}
    */
-  async getShareList(index, limit, offset) {
-    // FIXME: wiele spejsów, MergedChunksArray
-    const spaceId = '01789649985817106dc6fe928dff2bfechb70b';
+  async getShareList(spaceId, listQuery) {
+    const { index, limit, offset } = listQuery;
     const { array, isLast } = await this.shareManager.getSpaceShareList(spaceId, {
       index,
       limit,
@@ -175,9 +219,13 @@ class SharesSidebarItem {
     this.shareManager = shareManager;
     this.spaceManager = spaceManager;
   }
-  // FIXME: użyć zmiennych
   get id() {
-    return `share.${this.entityId}.instance:public`;
+    return gri({
+      entityType: shareEntityType,
+      entityId: this.entityId,
+      aspect: 'instance',
+      scope: 'private',
+    });
   }
   get entityId() {
     return this.shareId;

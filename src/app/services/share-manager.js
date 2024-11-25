@@ -22,14 +22,19 @@ export default class ShareManager extends Service {
     return this.store.findRecord('share', gri);
   }
 
-  getShareById(shareId) {
+  /**
+   *
+   * @param {string} shareId
+   * @param {'auto'|'private'|'public'} scope
+   * @returns
+   */
+  getShareById(shareId, scope = 'auto') {
     return this.getRecord(
       gri({
         entityType: shareEntityType,
         entityId: shareId,
         aspect: 'instance',
-        // Onezone supports only public scope of share record
-        scope: 'public',
+        scope,
       })
     );
   }

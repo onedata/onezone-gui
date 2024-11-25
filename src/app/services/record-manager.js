@@ -317,10 +317,6 @@ export default Service.extend({
       .getEntityTypeForModelName(this.emberifyModelName(modelName));
   },
 
-  getScopeForModelName(modelName) {
-    return modelName === shareEntityType ? 'public' : 'auto';
-  },
-
   /**
    * Returns model name for given entity type
    * @param {String} entityType

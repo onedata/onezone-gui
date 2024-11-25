@@ -98,6 +98,7 @@ describe('Integration | Component | sidebar-tokens', function () {
   });
 
   it('renders all tokens', async function () {
+    // FIXME: zmiana API collection
     const tokens = await this.get('model.collection.list');
 
     await render(hbs `{{sidebar-tokens model=model}}`);
@@ -107,6 +108,7 @@ describe('Integration | Component | sidebar-tokens', function () {
   });
 
   it('renders tokens in correct order', async function () {
+    // FIXME: zmiana API collection
     const tokens = await this.get('model.collection.list');
     const tokensOrder = this.get('tokensOrder');
 

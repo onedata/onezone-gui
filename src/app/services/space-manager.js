@@ -21,6 +21,7 @@ import {
 import {
   generateGri as generateSpaceMembershipRequestsInfoGri,
 } from 'onezone-gui/models/space-membership-requests-info';
+import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 
 export const listMarketplaceAspect = 'list_marketplace';
 
@@ -124,6 +125,15 @@ export default Service.extend({
       .then(spaceList => get(spaceList, 'list')
         .then(() => spaceList)
       );
+  },
+
+  async getSpacesGris() {
+    const spaceList = await (await this.currentUser.getCurrentUserRecord()).spaceList;
+    return spaceList.hasMany('list').ids();
+  },
+
+  async getSpacesIds() {
+    return await this.getSpacesGris().map(gri => parseGri(gri).entityId);
   },
 
   /**
