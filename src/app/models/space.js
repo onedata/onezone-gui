@@ -64,7 +64,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
 
   /**
    * Information about space. Available fields:
-   * creatorId, creatorType, creatorName, creationTime, sharesCount
+   * creatorId, creatorType, creatorName, creationTime
    * @type {Object}
    */
   info: attr('object'),
@@ -74,8 +74,6 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   providerList: belongsTo('providerList'),
 
   // members of this space
-  // FIXME: do usunięcia
-  shareList: belongsTo('shareList'),
   groupList: belongsTo('groupList'),
   userList: belongsTo('userList'),
   effGroupList: belongsTo('groupList'),

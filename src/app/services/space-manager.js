@@ -61,6 +61,12 @@ export const listMarketplaceAspect = 'list_marketplace';
  */
 
 /**
+ * @typedef {Object} SpaceSharesCountInfo
+ * @property {number} count
+ * @property {boolean} isMoreAvailable
+ */
+
+/**
  * Fallback time (24h) in seconds used if backend configuration is invalid for:
  * - minBackoffBetweenReminders
  * - minBackoffAfterRejection
@@ -78,6 +84,7 @@ export default Service.extend({
   onedataGraphUtils: service(),
   recordManager: service(),
   onedataConnection: service(),
+  shareManager: service(),
 
   /**
    * It is allowed to be overwritten only in tests.
@@ -513,6 +520,22 @@ export default Service.extend({
     const availableSpaceTags = this.onedataConnection.availableSpaceTags;
     return (availableSpaceTags && typeof availableSpaceTags === 'object') ?
       availableSpaceTags : {};
+  },
+
+  /**
+   * @param {Models.Space|string} spaceRecordOrId
+   * @returns {Promise<{ count: number, isMoreAvailable: boolean }>}
+   */
+  async getSpaceSharesCountInfo(spaceRecordOrId) {
+    const spaceId = (typeof spaceRecordOrId === 'string') ?
+      spaceRecordOrId : spaceRecordOrId.entityId;
+    const sharesIdsData = await this.shareManager.getSpaceShareList(spaceId, {
+      index: null,
+    }, { onlyIds: true });
+    return {
+      count: sharesIdsData.array.length,
+      isMoreAvailable: !sharesIdsData.isLast,
+    };
   },
 
   //#region spaces marketplace

@@ -12,6 +12,12 @@ import { entityType as shareEntityType } from 'onezone-gui/models/share';
 import { entityType as spaceEntityType } from 'onezone-gui/models/space';
 
 const listSpaceSharesAspect = 'list_shares_with_data';
+const listSpaceSharesIdsAspect = 'list_shares';
+
+/**
+ * @typedef {Object} SpaceShareListOptions
+ * @property {boolean} onlyIds
+ */
 
 export default class ShareManager extends Service {
   @service store;
@@ -40,14 +46,17 @@ export default class ShareManager extends Service {
   }
 
   /**
+   * @param {string} spaceId
    * @param {InfiniteListQuery} listQuery
+   * @param {SpaceShareListOptions} options
    * @returns {ShareDataListPage|ShareIdListPage}
    */
-  async getSpaceShareList(spaceId, listQuery) {
+  async getSpaceShareList(spaceId, listQuery, options) {
+    const onlyIds = Boolean(options?.onlyIds);
     const getListGri = gri({
       entityType: spaceEntityType,
       entityId: spaceId,
-      aspect: listSpaceSharesAspect,
+      aspect: onlyIds ? listSpaceSharesIdsAspect : listSpaceSharesAspect,
       scope: 'private',
     });
     const { list: array, isLast } = await this.onedataGraph.request({
@@ -56,8 +65,10 @@ export default class ShareManager extends Service {
       data: listQuery,
       subscribe: false,
     });
-    for (const shareData of array) {
-      shareData.spaceId = spaceId;
+    if (!onlyIds) {
+      for (const shareData of array) {
+        shareData.spaceId = spaceId;
+      }
     }
     return { array, isLast };
   }
