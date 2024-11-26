@@ -12,12 +12,10 @@ import { inject as service } from '@ember/service';
 export const commonShareActions = Object.freeze([
   'getSpaceShareList',
   'reloadCurrentShareRecord',
-  'reloadShareList',
 ]);
 
 export default Mixin.create({
   shareManager: service(),
-  sidebarResources: service(),
 
   actions: {
     updateDirId(dirId) {
@@ -41,10 +39,6 @@ export default Mixin.create({
       }
       const share = await this.shareManager?.getShareById(effShareId);
       await share?.reload();
-    },
-
-    async reloadShareList() {
-      await this.sidebarResources.reloadShareList();
     },
   },
 });

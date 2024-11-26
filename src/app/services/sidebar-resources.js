@@ -208,7 +208,7 @@ export default class OnezoneSidebarResources extends SidebarResources {
   }
 
   async reloadShareList() {
-    await this.sharesChunksArray.scheduleReload();
+    await this.cacheFor('sharesChunksArray')?.scheduleReload();
   }
 }
 
