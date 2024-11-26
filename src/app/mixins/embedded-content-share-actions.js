@@ -2,7 +2,7 @@
  * Common Onezone-side actions for embedded Oneprovider share views
  *
  * @author Jakub Liput
- * @copyright (C) 2020 ACK CYFRONET AGH
+ * @copyright (C) 2020-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -18,7 +18,7 @@ export default Mixin.create({
         dirId,
       });
     },
-    // FIXME: może jedna funkcja wystarczy i options (także dla listy idków)
+    // FIXME: dodać options?
     /**
      * @param {InfiniteListQuery} listQuery
      * @returns {Promise<ShareListItem>}
@@ -26,8 +26,13 @@ export default Mixin.create({
     async getSpaceShareList(spaceId, listQuery) {
       return await this.shareManager.getSpaceShareList(spaceId, listQuery);
     },
-    // async getShareIdList(listQuery) {
-    //   return await this.shareManager.getShareIdList(listQuery);
-    // },
+
+    async reloadCurrentShareRecord() {
+      if (!this.shareId) {
+        return;
+      }
+      const share = await this.shareManager?.getShareById(this.shareId);
+      await share?.reload();
+    },
   },
 });
