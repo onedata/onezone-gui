@@ -9,8 +9,15 @@
 import Mixin from '@ember/object/mixin';
 import { inject as service } from '@ember/service';
 
+export const commonShareActions = Object.freeze([
+  'getSpaceShareList',
+  'reloadCurrentShareRecord',
+  'reloadShareList',
+]);
+
 export default Mixin.create({
   shareManager: service(),
+  sidebarResources: service(),
 
   actions: {
     updateDirId(dirId) {
@@ -27,12 +34,17 @@ export default Mixin.create({
       return await this.shareManager.getSpaceShareList(spaceId, listQuery);
     },
 
-    async reloadCurrentShareRecord() {
-      if (!this.shareId) {
+    async reloadCurrentShareRecord(shareId) {
+      const effShareId = shareId ?? this.shareId;
+      if (!effShareId) {
         return;
       }
-      const share = await this.shareManager?.getShareById(this.shareId);
+      const share = await this.shareManager?.getShareById(effShareId);
       await share?.reload();
+    },
+
+    async reloadShareList() {
+      await this.sidebarResources.reloadShareList();
     },
   },
 });

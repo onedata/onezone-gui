@@ -37,7 +37,6 @@ export default class OnezoneSidebarResources extends SidebarResources {
     ['atmInventory', 'atm-inventories'],
   ]));
 
-  // FIXME: rozszerzyć o możliwość ReplacingChunksArray
   /**
    * @param {string} type
    * @returns {Promise<SidebarCollection>}
@@ -206,6 +205,10 @@ export default class OnezoneSidebarResources extends SidebarResources {
       })),
       isLast,
     };
+  }
+
+  async reloadShareList() {
+    await this.sharesChunksArray.scheduleReload();
   }
 }
 
