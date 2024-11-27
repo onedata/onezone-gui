@@ -82,19 +82,6 @@ export default class SidebarShares extends OneSidebar {
   /**
    * @override
    */
-  init() {
-    super.init(...arguments);
-
-    // FIXME: debug code
-    ((name) => {
-      window[name] = this;
-      console.log(`window.${name}`, window[name]);
-    })('debug_sidebar_shares');
-  }
-
-  /**
-   * @override
-   */
   didInsertElement() {
     super.didInsertElement(...arguments);
 

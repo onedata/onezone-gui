@@ -218,16 +218,60 @@ export default class OnezoneSidebarResources extends SidebarResources {
   }
 }
 
-class SharesSidebarItem {
-  shareManager = undefined;
-  spaceManaer = undefined;
+export class SharesSidebarItem {
+  /** @type {ShareListItem} */
+  shareData = undefined;
 
-  // FIXME: zrobić jak w providerze gety "proxy"?
+  shareManager = undefined;
+  spaceManager = undefined;
+
   constructor({ shareData, shareManager, spaceManager }) {
-    Object.assign(this, shareData);
+    this.shareData = shareData;
     this.shareManager = shareManager;
     this.spaceManager = spaceManager;
   }
+
+  //#region proxied properties
+
+  get index() {
+    return this.shareData.index;
+  }
+
+  get name() {
+    return this.shareData.name;
+  }
+
+  get spaceId() {
+    return this.shareData.spaceId;
+  }
+
+  /** @type {FileType} */
+  get rootFileType() {
+    return this.shareData.rootFileType;
+  }
+
+  get rootFilePrivateId() {
+    return this.shareData.rootFilePrivateId;
+  }
+
+  get rootFilePublicId() {
+    return this.shareData.rootFilePublicId;
+  }
+
+  get handleId() {
+    return this.shareData.handleId;
+  }
+
+  get handlePublicUrl() {
+    return this.shareData.handlePublicUrl;
+  }
+
+  get sharePublicUrl() {
+    return this.shareData.sharePublicUrl;
+  }
+
+  //#endregion
+
   get id() {
     return gri({
       entityType: shareEntityType,
@@ -236,12 +280,15 @@ class SharesSidebarItem {
       scope: 'private',
     });
   }
+
   get entityId() {
-    return this.shareId;
+    return this.shareData.shareId;
   }
+
   get hasHandle() {
     return Boolean(this.handleId);
   }
+
   @computed
   get shareProxy() {
     return this.shareManager.getRecord(this.id, { reload: false });
@@ -255,7 +302,7 @@ class SharesSidebarItem {
   }
 }
 
-class ChunksArraySidebarCollection {
+export class ChunksArraySidebarCollection {
   @tracked chunksArray;
 
   constructor(chunksArray) {
@@ -272,7 +319,7 @@ class ChunksArraySidebarCollection {
   }
 }
 
-class ListModelSidebarCollection {
+export class ListModelSidebarCollection {
   @tracked listModel;
 
   constructor(listModel) {

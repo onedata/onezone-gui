@@ -10,6 +10,7 @@ import clearStore from '../../helpers/clear-store';
 import { all as allFulfilled } from 'rsvp';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { entityType as clusterEntityType } from 'onezone-gui/models/cluster';
+import { ListModelSidebarCollection } from 'onezone-gui/services/sidebar-resources';
 
 describe('Integration | Component | sidebar-tokens', function () {
   const { beforeEach, afterEach } = setupRenderingTest();
@@ -87,7 +88,7 @@ describe('Integration | Component | sidebar-tokens', function () {
 
     this.setProperties({
       model: {
-        collection: tokenList,
+        collection: new ListModelSidebarCollection(tokenList),
       },
       tokensOrder: [1, 2, 3, 0, 5, 4],
     });
@@ -98,8 +99,7 @@ describe('Integration | Component | sidebar-tokens', function () {
   });
 
   it('renders all tokens', async function () {
-    // FIXME: zmiana API collection
-    const tokens = await this.get('model.collection.list');
+    const tokens = await this.get('model.collection.array');
 
     await render(hbs `{{sidebar-tokens model=model}}`);
 
@@ -108,8 +108,7 @@ describe('Integration | Component | sidebar-tokens', function () {
   });
 
   it('renders tokens in correct order', async function () {
-    // FIXME: zmiana API collection
-    const tokens = await this.get('model.collection.list');
+    const tokens = await this.get('model.collection.array');
     const tokensOrder = this.get('tokensOrder');
 
     await render(hbs `{{sidebar-tokens model=model}}`);

@@ -23,13 +23,15 @@ export default Mixin.create({
         dirId,
       });
     },
-    // FIXME: dodać options?
+
     /**
+     * @param {string} spaceId
      * @param {InfiniteListQuery} listQuery
+     * @param {SpaceShareListOptions} options
      * @returns {Promise<ShareListItem>}
      */
-    async getSpaceShareList(spaceId, listQuery) {
-      return await this.shareManager.getSpaceShareList(spaceId, listQuery);
+    async getSpaceShareList(spaceId, listQuery, options) {
+      return await this.shareManager.getSpaceShareList(spaceId, listQuery, options);
     },
 
     async reloadCurrentShareRecord(shareId) {
