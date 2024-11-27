@@ -16,6 +16,7 @@ import { reads } from '@ember/object/computed';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 import ConflictIdsArray from 'onedata-gui-common/utils/conflict-ids-array';
 
+// TODO: VFS-12506 Maybe create common class for sidebars with infinite scroll
 @layout(template)
 @classNames('sidebar-shares')
 export default class SidebarShares extends OneSidebar {
@@ -57,16 +58,9 @@ export default class SidebarShares extends OneSidebar {
     return InfiniteScroll.create({
       entries: this.chunksArray,
       singleRowHeight: this.rowHeight,
-      // FIXME: implement, może auto refresh
-      // onScroll: this.handleTableScroll.bind(this),
     });
   }
 
-  // FIXME: wyciągnąć obsługę infinite scroll do wspólnej klasy dla sidebarów?
-
-  // FIXME: ignorujemy model sidebarowy - pewnie przenieść RCA do sidebara
-  // FIXME: nadpisywanie sortedCollection i filteredCollection powinno być robione już na
-  // etapie klasy sidebara wyżej (generycznie dla kolekcji infinite)
   /**
    * @override
    */
@@ -110,6 +104,8 @@ export default class SidebarShares extends OneSidebar {
       /** @type {HTMLElement} */
       const itemsTable = this.element.querySelector('.one-sidebar-primary-item-list');
       this.infiniteScroll.mount(itemsTable);
+      // TODO: VFS-12506 Try to optimize numer of reloads (not needed on first init)
+      this.chunksArray.scheduleReload();
     })();
   }
 }

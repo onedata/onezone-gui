@@ -50,15 +50,8 @@ export default class OnezoneSidebarResources extends SidebarResources {
   async getCollectionFor(type) {
     switch (type) {
       case 'shares': {
-        const wasLoaded = Boolean(this.cacheFor('sharesChunksArray'));
         await this.fetchersProxy;
-        if (wasLoaded) {
-          // reload in background - do not delay rendering, because it is likely that
-          // there are the same list of shares as previous
-          this.sharesChunksArray.scheduleReload();
-        } else {
-          await this.sharesChunksArray.initialLoad;
-        }
+        await this.sharesChunksArray.initialLoad;
         return new ChunksArraySidebarCollection(this.sharesChunksArray);
       }
       case 'providers':
