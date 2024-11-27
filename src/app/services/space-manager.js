@@ -534,7 +534,7 @@ export default Service.extend({
     }, { onlyIds: true });
     return {
       count: sharesIdsData.array.length,
-      isMoreAvailable: !sharesIdsData.isLast,
+      areMoreAvailable: !sharesIdsData.isLast,
     };
   },
 

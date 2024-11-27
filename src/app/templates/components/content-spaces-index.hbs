@@ -42,7 +42,10 @@
           <td class="property-name">{{tt this "sharesCount"}}</td>
           <td class="property-value shares-count">
             {{!-- do not break line to avoid space --}}
-            {{format-number (or sharesCountInfo.count 0)}}{{if sharesCount.isMoreAvailable "+"}}
+            {{#if sharesCountInfo.areMoreAvailable}}
+              {{tt this "over"}}
+            {{/if}}
+            {{or sharesCountInfo.count 0}}
           </td>
         </tr>
       {{/if}}
