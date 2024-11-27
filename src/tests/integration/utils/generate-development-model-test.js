@@ -33,7 +33,6 @@ describe('Integration | Utility | generate-development-model', function () {
       'provider',
       'providerList',
       'share',
-      'shareList',
       'space',
       'spaceList',
       'token',
