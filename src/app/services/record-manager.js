@@ -13,7 +13,6 @@ import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import RecordManagerConfiguration from 'onezone-gui/utils/record-manager-configuration';
-import { entityType as shareEntityType } from 'onezone-gui/models/share';
 
 /**
  * @typedef {Object} LoadRecordOptions

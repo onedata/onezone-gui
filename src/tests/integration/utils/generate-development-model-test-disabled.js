@@ -6,6 +6,8 @@ import { lookupService } from '../../helpers/stub-service';
 import { setupTest } from 'ember-mocha';
 import { clearStoreAfterEach } from '../../helpers/clear-store';
 
+// TODO: VFS-12506 Fix development model and enable test (change filename)
+
 describe('Integration | Utility | generate-development-model', function () {
   setupTest();
   clearStoreAfterEach();
