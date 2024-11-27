@@ -1,4 +1,10 @@
-// FIXME: jsdoc
+/**
+ * Implements resources for Onezone GUI sidebar.
+ *
+ * @author Jakub Liput
+ * @copyright (C) 2024 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
 
 import { inject as service } from '@ember/service';
 import SidebarResources from 'onedata-gui-common/services/sidebar-resources';
@@ -84,7 +90,7 @@ export default class OnezoneSidebarResources extends SidebarResources {
           await this.recordManager.getUserRecordList('atmInventory')
         );
       case 'uploads': {
-        // FIXME: można by zrobić reaktywnie za pomocą reads (ale nie było do tej pory)
+        // TODO: VFS-12506 Maybe do it reactive with reads (but it was not earlier)
         const sidebarOneproviders = this.uploadManager.sidebarOneproviders;
         return {
           get array() {
