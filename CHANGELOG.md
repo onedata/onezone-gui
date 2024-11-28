@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12470 Changed static shares list to infinite scroll; changed resource resolving in routes
 * VFS-12469 Added support for immediately reloading share when eg. Oneprovider GUI changes its name
 * VFS-12370 Changed default views opened using tabs, remembering last used resource (eg. space), improved loading indicators, added "recently used" space indicators
 * VFS-10341 Upgraded EmberJS to v3.16.10
