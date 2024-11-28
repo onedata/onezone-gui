@@ -16,7 +16,7 @@ import {
   all as allFulfilled,
   hash as hashFulfilled,
 } from 'rsvp';
-import { get, set, setProperties } from '@ember/object';
+import { get, set } from '@ember/object';
 import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import harvesterPrivilegesFlags from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
@@ -218,6 +218,7 @@ export default function generateDevelopmentModel(store) {
                 fileType: 'dir',
                 space,
               };
+              generalData.index = getShareIndex(generalData);
               return store.createRecord(
                   'share',
                   Object.assign({ id: publicGri }, generalData)
@@ -1311,4 +1312,8 @@ async function generateMarketplaceMock(store, listRecords) {
   }
 
   return await allFulfilled(spaceInfoRecords.map(record => record.save()));
+}
+
+function getShareIndex(share) {
+  return `${share.hasHandle ? '1' : '0'}\u0000${share.name.toLowerCase()}\u0000${share.name}`;
 }
