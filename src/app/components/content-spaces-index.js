@@ -22,6 +22,7 @@ import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import _ from 'lodash';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import globals from 'onedata-gui-common/utils/globals';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 
 export default Component.extend(
   I18n,
@@ -198,6 +199,16 @@ export default Component.extend(
     ),
 
     isMarketplaceTileShown: reads('spaceMarketplaceTileDisplayModel.isTileShown'),
+
+    /**
+     * @type {ComputedProperty<PromiseObject<SpaceSharesCountInfo>>}
+     */
+    sharesCountInfoProxy: computed(function sharesCountInfoProxy() {
+      const promise = this.spaceManager.getSpaceSharesCountInfo(this.space);
+      return promiseObject(promise);
+    }),
+
+    sharesCountInfo: reads('sharesCountInfoProxy.content'),
 
     init() {
       this.set('destroyCache', {});

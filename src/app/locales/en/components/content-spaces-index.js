@@ -10,4 +10,5 @@ export default {
   browseFiles: 'Browse files',
   sharesCount: 'Shares',
   providersOfflineText: 'Supporting providers are offline',
+  over: 'over',
 };

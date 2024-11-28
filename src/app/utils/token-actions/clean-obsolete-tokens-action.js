@@ -56,7 +56,7 @@ export default Action.extend({
   /**
    * @type {Ember.ComputedProperty<Array<Models.Token>>}
    */
-  allTokens: reads('context.collection'),
+  allTokens: reads('context.sortedCollection'),
 
   /**
    * @type {Ember.ComputedProperty<Array<Models.Token>>}

@@ -15,7 +15,7 @@ import { inject as service } from '@ember/service';
 import { reads } from '@ember/object/computed';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
-import EmbeddedContentShareActions from 'onezone-gui/mixins/embedded-content-share-actions';
+import EmbeddedContentShareActions, { commonShareActions } from 'onezone-gui/mixins/embedded-content-share-actions';
 import EmbeddedBrowserCommon from 'onezone-gui/mixins/embedded-browser-common';
 import globals from 'onedata-gui-common/utils/globals';
 
@@ -96,7 +96,7 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
     'getDatasetsUrl',
     'showShareList',
     'openRestApiModal',
-    'reloadCurrentShareRecord',
+    ...commonShareActions,
     // TODO: VFS-11156 This method will be needed to implement shared files links
     // 'getFileGoToUrl',
   ]),

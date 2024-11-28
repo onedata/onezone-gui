@@ -46,7 +46,7 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
     this.setProperties({
       tokens,
       context: {
-        collection: tokens,
+        sortedCollection: tokens,
         visibleCollection: tokens,
       },
     });
@@ -151,7 +151,7 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
     this.action = CleanObsoleteTokensAction.create({
       ownerSource: this.owner,
       context: {
-        collection: tokens,
+        sortedCollection: tokens,
         visibleCollection: tokens.slice(0, 2),
       },
     });
@@ -178,7 +178,7 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
   it('marks all tokens as visible when visibility is not specified', async function () {
     const tokens = this.get('tokens');
     const context = {
-      collection: tokens,
+      sortedCollection: tokens,
       visibleCollection: undefined,
     };
     this.action = CleanObsoleteTokensAction.create({

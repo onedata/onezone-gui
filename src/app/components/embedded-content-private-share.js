@@ -13,7 +13,7 @@ import OneproviderEmbeddedContainer from 'onezone-gui/components/oneprovider-emb
 import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
 import { reads } from '@ember/object/computed';
-import EmbeddedContentShareActions from 'onezone-gui/mixins/embedded-content-share-actions';
+import EmbeddedContentShareActions, { commonShareActions } from 'onezone-gui/mixins/embedded-content-share-actions';
 import EmbeddedBrowserCommon from 'onezone-gui/mixins/embedded-browser-common';
 
 const mixins = [
@@ -26,8 +26,8 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
 
   navigationState: service(),
   globalNotify: service(),
-  shareManager: service(),
   router: service(),
+  sidebarResources: service(),
 
   /**
    * @virtual
@@ -92,8 +92,7 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
     'getDataUrl',
     'getDatasetsUrl',
     'showSharesIndex',
-    'reloadShareList',
-    'reloadCurrentShareRecord',
+    ...commonShareActions,
     // TODO: VFS-11156 This method will be needed to implement shared files links
     // 'getFileGoToUrl',
   ]),
@@ -101,9 +100,6 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
   actions: {
     showSharesIndex() {
       return this.get('router').transitionTo('onedata.sidebar.index', 'shares');
-    },
-    async reloadShareList() {
-      await this.shareManager.virtualShareList().reload();
     },
   },
 });

@@ -37,12 +37,18 @@
       {{/one-tile}}
     {{/if}}
     {{#resource-info-tile record=space}}
-      <tr>
-        <td class="property-name">{{tt this "sharesCount"}}</td>
-        <td class="property-value shares-count">
-          {{format-number (or space.info.sharesCount 0)}}
-        </td>
-      </tr>
+      {{#if sharesCountInfo}}
+        <tr>
+          <td class="property-name">{{tt this "sharesCount"}}</td>
+          <td class="property-value shares-count">
+            {{!-- do not break line to avoid space --}}
+            {{#if sharesCountInfo.areMoreAvailable}}
+              {{tt this "over"}}
+            {{/if}}
+            {{or sharesCountInfo.count 0}}
+          </td>
+        </tr>
+      {{/if}}
     {{/resource-info-tile}}
     {{#if space.hasViewPrivilege}}
       {{#if isDetailsTileShown}}

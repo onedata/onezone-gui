@@ -21,6 +21,7 @@ import {
 import {
   generateGri as generateSpaceMembershipRequestsInfoGri,
 } from 'onezone-gui/models/space-membership-requests-info';
+import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 
 export const listMarketplaceAspect = 'list_marketplace';
 
@@ -60,6 +61,12 @@ export const listMarketplaceAspect = 'list_marketplace';
  */
 
 /**
+ * @typedef {Object} SpaceSharesCountInfo
+ * @property {number} count
+ * @property {boolean} isMoreAvailable
+ */
+
+/**
  * Fallback time (24h) in seconds used if backend configuration is invalid for:
  * - minBackoffBetweenReminders
  * - minBackoffAfterRejection
@@ -77,6 +84,7 @@ export default Service.extend({
   onedataGraphUtils: service(),
   recordManager: service(),
   onedataConnection: service(),
+  shareManager: service(),
 
   /**
    * It is allowed to be overwritten only in tests.
@@ -126,23 +134,32 @@ export default Service.extend({
       );
   },
 
+  async getSpacesGris() {
+    const spaceList = await (await this.currentUser.getCurrentUserRecord()).spaceList;
+    return spaceList.hasMany('list').ids();
+  },
+
+  async getSpacesIds() {
+    return await this.getSpacesGris().map(gri => parseGri(gri).entityId);
+  },
+
   /**
    * Returns provider with specified id
    * @param {string} id
    * @returns {Promise<Provider>} space promise
    */
-  getRecord(id) {
-    return this.get('store').findRecord('space', id);
+  getRecord(id, options) {
+    return this.get('store').findRecord('space', id, options);
   },
 
-  getRecordById(entityId) {
+  getRecordById(entityId, options) {
     const recordGri = gri({
       entityType: spaceEntityType,
       entityId: entityId,
       aspect: 'instance',
       scope: 'auto',
     });
-    return this.getRecord(recordGri);
+    return this.getRecord(recordGri, options);
   },
 
   /**
@@ -503,6 +520,22 @@ export default Service.extend({
     const availableSpaceTags = this.onedataConnection.availableSpaceTags;
     return (availableSpaceTags && typeof availableSpaceTags === 'object') ?
       availableSpaceTags : {};
+  },
+
+  /**
+   * @param {Models.Space|string} spaceRecordOrId
+   * @returns {Promise<{ count: number, isMoreAvailable: boolean }>}
+   */
+  async getSpaceSharesCountInfo(spaceRecordOrId) {
+    const spaceId = (typeof spaceRecordOrId === 'string') ?
+      spaceRecordOrId : spaceRecordOrId.entityId;
+    const sharesIdsData = await this.shareManager.getSpaceShareList(spaceId, {
+      index: null,
+    }, { onlyIds: true });
+    return {
+      count: sharesIdsData.array.length,
+      areMoreAvailable: !sharesIdsData.isLast,
+    };
   },
 
   //#region spaces marketplace

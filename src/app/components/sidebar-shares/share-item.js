@@ -2,17 +2,16 @@
  * A first-level item component for shares sidebar
  *
  * @author Jakub Liput
- * @copyright (C) 2020 ACK CYFRONET AGH
+ * @copyright (C) 2020-2024 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Component from '@ember/component';
-import { conditional, eq, raw } from 'ember-awesome-macros';
 import { reads, collect, bool } from '@ember/object/computed';
 import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/i18n';
-import { computedRelationProxy } from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
+import { FileType } from 'onedata-gui-common/utils/file';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -33,7 +32,7 @@ export default Component.extend(I18n, {
   inSidenav: false,
 
   /**
-   * @type {Ember.ComputedProperty<Share>}
+   * @type {Ember.ComputedProperty<SharesSidebarItem>}
    */
   share: reads('item'),
 
@@ -41,20 +40,19 @@ export default Component.extend(I18n, {
 
   openDataTip: computed(function openDataTip() {
     return this.t('openDataTip', {
-      fileType: this.t('fileType.' + this.get('share.fileType')),
+      fileType: this.t('fileType.' + this.get('share.rootFileType')),
     });
   }),
 
-  icon: conditional(
-    eq('item.fileType', raw('file')),
-    raw('browser-file'),
-    raw('browser-directory')
-  ),
+  icon: computed('item.rootFileType', function icon() {
+    return this.item?.rootFileType === FileType.Regular ?
+      'browser-file' : 'browser-directory';
+  }),
 
   /**
    * @type {ComputedProperty<PromiseObject<Space>>}
    */
-  spaceProxy: computedRelationProxy('share', 'space'),
+  spaceProxy: reads('share.spaceProxy'),
 
   /**
    * @type {ComputedProperty<Record<string, Utils.Action>>}
@@ -69,7 +67,7 @@ export default Component.extend(I18n, {
     const {
       share,
       clipboardActions,
-    } = this.getProperties('share', 'clipboardActions');
+    } = this;
 
     return this.actionsCache.copyIdAction =
       clipboardActions.createCopyRecordIdAction({ record: share });

@@ -13,6 +13,7 @@ import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 export const entityType = 'share';
 
 export default Model.extend(GraphSingleModelMixin, {
+  index: attr('string'),
   name: attr('string'),
   hasHandle: attr('boolean'),
   chosenProviderId: attr('string'),

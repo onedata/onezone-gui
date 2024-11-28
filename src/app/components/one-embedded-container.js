@@ -20,8 +20,20 @@ import globals from 'onedata-gui-common/utils/globals';
 
 import {
   commonIframeInjectedProperties,
-  commonCallParentActionNames,
 } from 'onedata-gui-common/services/app-proxy';
+
+/**
+ * Collection of action names (strings), which will be injected to iframe from this
+ * component.
+ * @type {Array<string>}
+ */
+export const commonCallParentActionNames = Object.freeze([
+  'showOneproviderConnectionError',
+  'hideOneproviderConnectionError',
+  'getManageClusterUrl',
+  'callGlobalNotify',
+  'reloadShareList',
+]);
 
 export default Component.extend({
   classNames: ['one-embedded-container'],
@@ -33,6 +45,7 @@ export default Component.extend({
   embeddedIframeManager: service(),
   alertService: service('alert'),
   globalNotify: service(),
+  sidebarResources: service(),
 
   /**
    * @virtual
@@ -339,8 +352,13 @@ export default Component.extend({
           }
         });
     },
+
     callGlobalNotify(methodName, ...args) {
       return this.globalNotify[methodName](...args);
+    },
+
+    async reloadShareList() {
+      await this.sidebarResources.reloadShareList();
     },
   },
 });
