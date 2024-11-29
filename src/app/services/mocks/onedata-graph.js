@@ -15,6 +15,24 @@ import { get, getProperties } from '@ember/object';
 import { inject as service } from '@ember/service';
 import _ from 'lodash';
 import { listMarketplaceAspect } from 'onezone-gui/services/space-manager';
+import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
+
+function shareRecordToData(record) {
+  return {
+    index: record.index,
+    spaceId: parseGri(record.belongsTo('space').id()).entityId,
+    shareId: record.entityId,
+    name: record.name,
+    rootFileType: record.fileType,
+    // unused in onezone-gui code, does not belong to model
+    rootFilePublicId: '',
+    // unused in onezone-gui code, does not belong to model
+    rootFilePrivateId: '',
+    handleId: record.hasHandle ? '123456789' : null,
+    sharePublicUrl: 'http://www.example.com/private',
+    handlePublicUrl: 'http://www.example.com/public',
+  };
+}
 
 const spaceHandlers = {
   provider(operation) {
@@ -140,6 +158,45 @@ const spaceHandlers = {
       fullName: 'John Doe',
       username: 'joe',
       contactEmail: 'joe@example.com',
+    };
+  },
+  list_shares(operation, /* spaceId, data, authHint*/ ) {
+    if (operation !== 'create') {
+      throw messageNotSupported;
+    }
+    const { list, isLast } = this.handlers.space.list_shares_with_data.bind(this)(
+      ...arguments
+    );
+    return {
+      list: list.map(spaceData => spaceData.spaceId),
+      isLast,
+    };
+  },
+  list_shares_with_data(operation, spaceId, data, /* authHint */ ) {
+    if (operation !== 'create') {
+      throw messageNotSupported;
+    }
+    const { index = null, limit = 1000, offset = 0 } = data;
+    const shareRecords = this.store.peekAll('share')
+      .filter(record => record.scope === 'private');
+    let shares = shareRecords.map(record => shareRecordToData(record));
+    shares = shares.filter(share => share.spaceId === spaceId);
+    shares = _.sortBy(shares, 'index');
+    let startPos;
+    if (index === null) {
+      startPos = 0;
+    } else {
+      startPos = shares.findIndex(data => data.index === index);
+      if (startPos === -1) {
+        startPos = 0;
+      }
+    }
+    startPos += offset;
+    startPos = Math.max(startPos, 0);
+    const endPos = startPos + limit;
+    return {
+      list: shares.slice(startPos, endPos),
+      isLast: endPos >= shares.length,
     };
   },
 };

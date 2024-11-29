@@ -16,7 +16,7 @@ import {
   all as allFulfilled,
   hash as hashFulfilled,
 } from 'rsvp';
-import { get, set, setProperties } from '@ember/object';
+import { get, set } from '@ember/object';
 import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import harvesterPrivilegesFlags from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
@@ -81,10 +81,9 @@ const providerLocations = [
 //   [48.1173, -1.6778],
 // );
 
-const types = [
+const listTypes = [
   'space',
   'group',
-  'share',
   'provider',
   'linkedAccount',
   'cluster',
@@ -146,7 +145,7 @@ export default function generateDevelopmentModel(store) {
     .then(otherUsers => users = [user, ...otherUsers])
     // create main resources lists
     .then(() => hashFulfilled(
-      types.reduce((promiseHash, type) => {
+      listTypes.reduce((promiseHash, type) => {
         promiseHash[type] = createEntityRecords(store, type, names)
           .then(records => {
             switch (type) {
@@ -189,9 +188,8 @@ export default function generateDevelopmentModel(store) {
       const providers = listRecords.provider.get('list');
       const spaces = listRecords.space.get('list');
       const clusters = listRecords.cluster.get('list');
-      const shares = listRecords.share.get('list');
-      return allFulfilled([providers, spaces, clusters, shares])
-        .then(([providerList, spaceList, clusterList, shareList]) =>
+      return allFulfilled([providers, spaces, clusters])
+        .then(([providerList, spaceList, clusterList]) =>
           allFulfilled(spaceList.map(space => {
             space.set('supportSizes', _.zipObject(
               get(providers, 'content').mapBy('entityId'),
@@ -205,10 +203,7 @@ export default function generateDevelopmentModel(store) {
                 dirStatsServiceStatus: 'enabled',
               })
             ));
-            return allFulfilled([
-              createListRecord(store, 'provider', providerList),
-              createListRecord(store, 'share', shareList),
-            ]).then(([providerLr, shareLr]) => {
+            return createListRecord(store, 'provider', providerList).then(providerLr => {
               const generalGriData = {
                 entityType: 'share',
                 entityId: generateShareEntityId(get(space, 'entityId')),
@@ -223,6 +218,7 @@ export default function generateDevelopmentModel(store) {
                 fileType: 'dir',
                 space,
               };
+              generalData.index = getShareIndex(generalData);
               return store.createRecord(
                   'share',
                   Object.assign({ id: publicGri }, generalData)
@@ -234,15 +230,8 @@ export default function generateDevelopmentModel(store) {
                   )
                   .save()
                 )
-                .then(share => {
-                  get(shareLr, 'list').pushObject(share);
-                  return shareLr.save();
-                })
                 .then(() => {
-                  setProperties(space, {
-                    providerList: providerLr,
-                    shareList: shareLr,
-                  });
+                  set(space, 'providerList', providerLr);
                   return space.save();
                 });
             });
@@ -1323,4 +1312,8 @@ async function generateMarketplaceMock(store, listRecords) {
   }
 
   return await allFulfilled(spaceInfoRecords.map(record => record.save()));
+}
+
+function getShareIndex(share) {
+  return `${share.hasHandle ? '1' : '0'}\u0000${share.name.toLowerCase()}\u0000${share.name}`;
 }
