@@ -162,21 +162,18 @@ export default Component.extend(I18n, {
 
   /**
    * If actual token disappeared from the sidebar, redirects to token main page
-   * @returns {Promise}
+   * @returns {void}
    */
   redirectOnTokenDeletion() {
     const {
       navigationState,
       router,
-    } = this.getProperties('navigationState', 'router');
+    } = this;
     const tokenId = get(navigationState, 'activeResource.id');
-    return navigationState
-      .resourceCollectionContainsId(tokenId)
-      .then(contains => {
-        if (!contains) {
-          next(() => router.transitionTo('onedata.sidebar', 'tokens'));
-        }
-      });
+    const contains = navigationState.resourceCollectionContainsId(tokenId);
+    if (!contains) {
+      next(() => router.transitionTo('onedata.sidebar', 'tokens'));
+    }
   },
 
   actions: {

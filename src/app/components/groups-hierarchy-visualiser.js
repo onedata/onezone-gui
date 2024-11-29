@@ -693,23 +693,20 @@ export default Component.extend(I18n, {
 
   /**
    * If actual group disappeared from the sidebar, redirects to groups main page
-   * @returns {Promise<boolean>} resolves to true if redirect is needed
+   * @returns {boolean} resolves to true if redirect is needed
    */
   redirectOnGroupDeletion() {
     const {
       navigationState,
       group,
       router,
-    } = this.getProperties('navigationState', 'group', 'router');
+    } = this;
     const groupId = get(group, 'id');
-    return navigationState
-      .resourceCollectionContainsId(groupId)
-      .then(contains => {
-        if (!contains) {
-          next(() => router.transitionTo('onedata.sidebar', 'groups'));
-        }
-        return !contains;
-      });
+    const contains = navigationState.resourceCollectionContainsId(groupId);
+    if (!contains) {
+      next(() => router.transitionTo('onedata.sidebar', 'groups'));
+    }
+    return !contains;
   },
 
   /**
@@ -894,13 +891,12 @@ export default Component.extend(I18n, {
       } = this.getProperties('groupToRemove', 'groupActions');
       this.set('isRemovingGroup', true);
       return groupActions.deleteGroup(groupToRemove)
-        .then(() =>
-          this.redirectOnGroupDeletion().then(willRedirect => {
-            if (!willRedirect) {
-              safeExec(this, 'reloadModel');
-            }
-          })
-        )
+        .then(() => {
+          const willRedirect = this.redirectOnGroupDeletion();
+          if (!willRedirect) {
+            safeExec(this, 'reloadModel');
+          }
+        })
         .finally(() =>
           safeExec(this, 'setProperties', {
             isRemovingGroup: false,
