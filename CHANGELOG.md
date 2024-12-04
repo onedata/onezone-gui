@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12328 Added support for test custom login page
 * VFS-12517 Fixed opening main uploads views and deleting resources from sidebar
 * VFS-12511 Fixed mock of shares listing
 * VFS-12470 Changed static shares list to infinite scroll; changed resource resolving in routes
