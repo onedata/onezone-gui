@@ -67,7 +67,7 @@ describe('Integration | Component | content-harvesters-indices/index-form', func
         expect(formGroup.querySelector('.control-label'))
           .to.have.trimmed.text('Include metadata:');
         expect(toggleGroups).to.have.length(3);
-        ['Basic', 'JSON', 'RDF'].forEach((metadataType, index) => {
+        ['xattrs', 'JSON', 'RDF'].forEach((metadataType, index) => {
           const toggleGroup = toggleGroups[index];
           expect(toggleGroup.querySelector('.control-label'))
             .to.have.trimmed.text(metadataType);
