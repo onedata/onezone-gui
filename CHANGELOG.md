@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12396 Added cross-browser support for login message line-break formatting
 * VFS-12328 Added support for test custom login page
 * VFS-12517 Fixed opening main uploads views and deleting resources from sidebar
 * VFS-12511 Fixed mock of shares listing
