@@ -144,7 +144,7 @@ describe('Integration | Component | sidebar-tokens/token-item', function () {
       .resolves();
     const navigationState = lookupService(this, 'navigation-state');
     // to avoid redirecting after delete
-    sinon.stub(navigationState, 'resourceCollectionContainsId').resolves(true);
+    sinon.stub(navigationState, 'resourceCollectionContainsId').returns(true);
 
     await render(hbs `{{sidebar-tokens/token-item item=token}}`);
     await click('.token-menu-trigger');

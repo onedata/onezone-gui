@@ -128,7 +128,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
     registerService(this, 'i18n', I18nStub);
     registerService(this, 'navigation-state', Service.extend({
       resourceCollectionContainsId() {
-        return resolve(true);
+        return true;
       },
     }));
     sinon.stub(lookupService(this, 'router'), 'urlFor').returns('');

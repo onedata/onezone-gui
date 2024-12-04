@@ -140,21 +140,18 @@ export default Component.extend(I18n, {
 
   /**
    * If actual harvester disappeared from the sidebar, redirects to harvesters main page
-   * @returns {Promise}
+   * @returns {void}
    */
   redirectOnHarvesterRemove() {
     const {
       navigationState,
       router,
-    } = this.getProperties('navigationState', 'router');
+    } = this;
     const harvesterId = get(navigationState, 'activeResource.id');
-    return navigationState
-      .resourceCollectionContainsId(harvesterId)
-      .then(contains => {
-        if (!contains) {
-          next(() => router.transitionTo('onedata.sidebar', 'harvesters'));
-        }
-      });
+    const contains = navigationState.resourceCollectionContainsId(harvesterId);
+    if (!contains) {
+      next(() => router.transitionTo('onedata.sidebar', 'harvesters'));
+    }
   },
 
   actions: {
