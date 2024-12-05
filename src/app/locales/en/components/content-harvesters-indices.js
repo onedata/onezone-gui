@@ -21,7 +21,7 @@ export default {
         nothingEnabledError: 'At least one type must be enabled',
         metadataXattrs: {
           label: 'xattrs',
-          tip: 'Key-value pairs representing extended file attributes (xattrs).',
+          tip: 'Extended attributes — textual or binary key-value pairs for storing additional metadata, compatible with POSIX extended attributes.',
         },
         metadataJson: {
           label: 'JSON',
