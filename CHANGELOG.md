@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12528 Changed basic metadata to xattrs on harvester's indices page
 * VFS-12517 Fixed opening main uploads views and deleting resources from sidebar
 * VFS-12511 Fixed mock of shares listing
 * VFS-12470 Changed static shares list to infinite scroll; changed resource resolving in routes

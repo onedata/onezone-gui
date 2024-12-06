@@ -67,7 +67,7 @@ describe('Integration | Component | content-harvesters-indices/index-form', func
         expect(formGroup.querySelector('.control-label'))
           .to.have.trimmed.text('Include metadata:');
         expect(toggleGroups).to.have.length(3);
-        ['Basic', 'JSON', 'RDF'].forEach((metadataType, index) => {
+        ['xattrs', 'JSON', 'RDF'].forEach((metadataType, index) => {
           const toggleGroup = toggleGroups[index];
           expect(toggleGroup.querySelector('.control-label'))
             .to.have.trimmed.text(metadataType);
@@ -85,7 +85,7 @@ describe('Integration | Component | content-harvesters-indices/index-form', func
           'Specifies what types of file metadata should be harvested in this index. At least one type must be given.'
         );
         expect(await basicTooltip.getText()).to.equal(
-          'Key-value pairs representing extended file attributes (xattrs).'
+          'Extended attributes — textual or binary key-value pairs for storing additional metadata, compatible with POSIX extended attributes.'
         );
       }
     );

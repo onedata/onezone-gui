@@ -20,8 +20,8 @@ export default {
         tip: 'Specifies what types of file metadata should be harvested in this index. At least one type must be given.',
         nothingEnabledError: 'At least one type must be enabled',
         metadataXattrs: {
-          label: 'Basic',
-          tip: 'Key-value pairs representing extended file attributes (xattrs).',
+          label: 'xattrs',
+          tip: 'Extended attributes — textual or binary key-value pairs for storing additional metadata, compatible with POSIX extended attributes.',
         },
         metadataJson: {
           label: 'JSON',
