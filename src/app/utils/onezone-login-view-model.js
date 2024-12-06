@@ -97,7 +97,9 @@ export default LoginViewModel.extend({
       }
       const sanitizedMessage =
         DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] }).toString();
-      return htmlSafe(sanitizedMessage.replaceAll('\n', '<br>'));
+      const messageLines = sanitizedMessage.split('\n');
+      const messageParagraphed = messageLines.map(line => `<p>${line}</p>`).join('');
+      return htmlSafe(messageParagraphed);
     })();
     return promiseObject(promise);
   }),

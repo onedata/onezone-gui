@@ -39,6 +39,15 @@
       font-size: 120%;
     }
   }
+  .login-notification-admin-message {
+    p {
+      margin-top: 0;
+      margin-bottom: 0.4em;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
 
   @media (max-width: $screen-xs-max) {
     .zone-name {
