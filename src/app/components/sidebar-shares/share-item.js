@@ -36,10 +36,10 @@ export default Component.extend(I18n, {
    */
   share: reads('item'),
 
-  isOpenData: bool('item.hasHandle'),
+  isPublicData: bool('item.hasHandle'),
 
-  openDataTip: computed(function openDataTip() {
-    return this.t('openDataTip', {
+  publicDataTip: computed(function publicDataTip() {
+    return this.t('publicDataTip', {
       fileType: this.t('fileType.' + this.get('share.rootFileType')),
     });
   }),

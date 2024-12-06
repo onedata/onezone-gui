@@ -12,11 +12,11 @@
     {{/if}}
   {{/truncated-string}}
 </div>
-  {{#if isOpenData}}
+  {{#if isPublicData}}
     <StatusToolbar as |toolbar|>
       <toolbar.icon
         @icon="globe-cursor"
-        @hint={{openDataTip}}
+        @hint={{publicDataTip}}
       />
     </StatusToolbar>
   {{/if}}
