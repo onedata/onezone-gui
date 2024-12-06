@@ -49,7 +49,7 @@ describe('Integration | Component | onezone-login', function () {
     expect(getStyle(authIconImage, 'backgroundImage')).to.contain('/test/google.svg');
   });
 
-  it('renders sanitized sign-in notification with newlines on original login view', async function () {
+  it('renders sanitized sign-in notification with paragraphs on original login view', async function () {
     const authorizerManager = lookupService(this, 'authorizerManager');
     const guiMessageManager = lookupService(this, 'guiMessageManager');
     const getAuthorizersLock = defer();
@@ -87,6 +87,6 @@ describe('Integration | Component | onezone-login', function () {
     await getMessageLock.promise;
     await settled();
     expect(find('.login-notification-admin-message').innerHTML)
-      .to.match(/^\s*hello\s*<br>\s*world\s*$/);
+      .to.match(/^\s*<p>\s*hello\s*<\/p>\s*<p>\s*world\s*<\/p>\s*$/);
   });
 });
