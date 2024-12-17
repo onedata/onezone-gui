@@ -54,12 +54,14 @@ export default OnedataSidebarContentRoute.extend({
 
     const modelName = sidebarResources.getModelNameForRouteResourceType(resourceType);
     const entityType = recordManager.getEntityTypeForModelName(modelName);
+    // FIXME: być może do refaktoru - do przeniesienia do recordManager
+    const scope = entityType === 'share' ? 'private' : 'auto';
     if (entityType) {
       return gri({
         entityId: resourceId,
         entityType,
         aspect: 'instance',
-        scope: 'auto',
+        scope,
       });
     } else {
       return null;

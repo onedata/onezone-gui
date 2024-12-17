@@ -316,6 +316,9 @@ export class SharesSidebarItem {
   }
 }
 
+/**
+ * @implements {SidebarCollection}
+ */
 export class ChunksArraySidebarCollection {
   @tracked chunksArray;
 
@@ -333,6 +336,9 @@ export class ChunksArraySidebarCollection {
   }
 }
 
+/**
+ * @implements {SidebarCollection}
+ */
 export class ListModelSidebarCollection {
   @tracked listModel;
 
