@@ -12,11 +12,13 @@ import { computed, defineProperty } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import MergedChunksArray from 'onedata-gui-common/utils/merged-chunks-array';
+import ReplacingChunksArray from 'onedata-gui-common/utils/replacing-chunks-array';
 import computedLastProxyContent from 'onedata-gui-common/utils/computed-last-proxy-content';
 import { reads } from '@ember/object/computed';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import { entityType as shareEntityType } from 'onezone-gui/models/share';
+import VirtualListFetcher from 'onedata-gui-common/utils/virtual-list-fetcher';
 
 export default class OnezoneSidebarResources extends SidebarResources {
   @service providerManager;
@@ -66,10 +68,11 @@ export default class OnezoneSidebarResources extends SidebarResources {
         return new ListModelSidebarCollection(
           await this.tokenManager.getTokens()
         );
-      case 'spaces':
-        return new ListModelSidebarCollection(
-          await this.spaceManager.getSpaces()
-        );
+      case 'spaces': {
+        const spacesChunksArray = await this.spacesChunksArrayProxy;
+        await spacesChunksArray.initialLoad;
+        return new ChunksArraySidebarCollection(spacesChunksArray);
+      }
       case 'groups':
         return new ListModelSidebarCollection(
           await this.groupManager.getGroups()
@@ -181,6 +184,26 @@ export default class OnezoneSidebarResources extends SidebarResources {
         indexMargin: 10,
         initialJumpIndex: this.initialJumpIndex,
       });
+  }
+
+  // FIXME: musi być jakiś observer, żeby kopnąć listę, żeby się przebudowała; albo jakiś event
+
+  @computed()
+  get spacesChunksArrayProxy() {
+    const promise = (async () => {
+      const spaceList = await this.currentUser.user.spaceList;
+      const virtualListFetcher = new VirtualListFetcher(spaceList);
+      return ReplacingChunksArray.create({
+        fetch: (index, limit, offset) => {
+          return virtualListFetcher.fetch(index, limit, offset);
+        },
+        startIndex: 0,
+        endIndex: 50,
+        indexMargin: 10,
+        initialJumpIndex: this.initialJumpIndex,
+      });
+    })();
+    return promiseObject(promise);
   }
 
   init() {

@@ -47,6 +47,10 @@ export default class SidebarShares extends OneSidebar {
    */
   firstLevelItemComponent = 'sidebar-shares/share-item';
 
+  // FIXME: poniższy region będzie reużywany?
+
+  //#region infinite scroll sidebar
+
   isInfiniteScroll = true;
 
   rowHeight = 54;
@@ -58,6 +62,7 @@ export default class SidebarShares extends OneSidebar {
     return InfiniteScroll.create({
       entries: this.chunksArray,
       singleRowHeight: this.rowHeight,
+      itemIdProperty: 'entityId',
     });
   }
 
@@ -80,19 +85,26 @@ export default class SidebarShares extends OneSidebar {
   }
 
   /**
+   * @param {HTMLElement} element
+   * @returns {Promise}
+   */
+  async mountInfiniteScroll(element) {
+    await this.infiniteScroll.entries.initialLoad;
+    await waitForRender();
+    /** @type {HTMLElement} */
+    const itemsTable = element.querySelector('.one-sidebar-primary-item-list');
+    this.infiniteScroll.mount(itemsTable);
+    // TODO: VFS-12506 Try to optimize numer of reloads (not needed on first init)
+    this.chunksArray.scheduleReload();
+  }
+
+  //#endregion
+
+  /**
    * @override
    */
   didInsertElement() {
     super.didInsertElement(...arguments);
-
-    (async () => {
-      await this.infiniteScroll.entries.initialLoad;
-      await waitForRender();
-      /** @type {HTMLElement} */
-      const itemsTable = this.element.querySelector('.one-sidebar-primary-item-list');
-      this.infiniteScroll.mount(itemsTable);
-      // TODO: VFS-12506 Try to optimize numer of reloads (not needed on first init)
-      this.chunksArray.scheduleReload();
-    })();
+    this.mountInfiniteScroll(this.element);
   }
 }
