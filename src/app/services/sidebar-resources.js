@@ -12,13 +12,12 @@ import { computed, defineProperty } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import MergedChunksArray from 'onedata-gui-common/utils/merged-chunks-array';
-import ReplacingChunksArray from 'onedata-gui-common/utils/replacing-chunks-array';
 import computedLastProxyContent from 'onedata-gui-common/utils/computed-last-proxy-content';
 import { reads } from '@ember/object/computed';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import { entityType as shareEntityType } from 'onezone-gui/models/share';
-import VirtualListFetcher from 'onedata-gui-common/utils/virtual-list-fetcher';
+import createVirtualListChunksArray from 'onedata-gui-common/utils/create-virtual-list-chunks-array';
 
 export default class OnezoneSidebarResources extends SidebarResources {
   @service providerManager;
@@ -182,7 +181,6 @@ export default class OnezoneSidebarResources extends SidebarResources {
         startIndex: 0,
         endIndex: 50,
         indexMargin: 10,
-        initialJumpIndex: this.initialJumpIndex,
       });
   }
 
@@ -192,16 +190,7 @@ export default class OnezoneSidebarResources extends SidebarResources {
   get spacesChunksArrayProxy() {
     const promise = (async () => {
       const spaceList = await this.currentUser.user.spaceList;
-      const virtualListFetcher = new VirtualListFetcher(spaceList);
-      return ReplacingChunksArray.create({
-        fetch: (index, limit, offset) => {
-          return virtualListFetcher.fetch(index, limit, offset);
-        },
-        startIndex: 0,
-        endIndex: 50,
-        indexMargin: 10,
-        initialJumpIndex: this.initialJumpIndex,
-      });
+      return createVirtualListChunksArray(spaceList);
     })();
     return promiseObject(promise);
   }
@@ -240,6 +229,8 @@ export default class OnezoneSidebarResources extends SidebarResources {
     await this.cacheFor('sharesChunksArray')?.scheduleReload();
   }
 }
+
+// FIXME: wydzielić do osobnych plików
 
 export class SharesSidebarItem {
   /** @type {ShareListItem} */
