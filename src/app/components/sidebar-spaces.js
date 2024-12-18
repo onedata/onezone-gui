@@ -94,8 +94,6 @@ export default class extends OneSidebar.extend(I18n, UserProxyMixin) {
     /** @type {HTMLElement} */
     const itemsTable = element.querySelector('.one-sidebar-primary-item-list');
     this.infiniteScroll.mount(itemsTable);
-    // TODO: VFS-12506 Try to optimize numer of reloads (not needed on first init)
-    this.chunksArray.scheduleReload();
   }
 
   //#endregion
@@ -124,15 +122,6 @@ export default class extends OneSidebar.extend(I18n, UserProxyMixin) {
       this.sidebarType,
       this.maxMruCount
     );
-  }
-
-  init() {
-    super.init(...arguments);
-    // FIXME: debug code
-    ((name) => {
-      window[name] = this;
-      console.log(`window.${name}`, window[name]);
-    })('debug_sidebar_spaces');
   }
 
   /**
