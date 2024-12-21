@@ -9,15 +9,16 @@
 import { inject as service } from '@ember/service';
 import SidebarResources from 'onedata-gui-common/services/sidebar-resources';
 import { computed, defineProperty } from '@ember/object';
-import { tracked } from '@glimmer/tracking';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import MergedChunksArray from 'onedata-gui-common/utils/merged-chunks-array';
 import computedLastProxyContent from 'onedata-gui-common/utils/computed-last-proxy-content';
 import { reads } from '@ember/object/computed';
-import gri from 'onedata-gui-websocket-client/utils/gri';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
-import { entityType as shareEntityType } from 'onezone-gui/models/share';
 import createVirtualListChunksArray from 'onedata-gui-common/utils/create-virtual-list-chunks-array';
+import { SharesSidebarItem } from 'onezone-gui/utils/shares-sidebar-item';
+import { ChunksArraySidebarCollection } from 'onezone-gui/utils/chunks-array-sidebar-collection';
+import { ListModelSidebarCollection } from 'onezone-gui/utils/list-model-sidebar-collection';
+import { VirtualListChunksSidebarCollection } from 'onezone-gui/utils/virtual-list-chunks-sidebar-collection';
 
 export default class OnezoneSidebarResources extends SidebarResources {
   @service providerManager;
@@ -68,9 +69,10 @@ export default class OnezoneSidebarResources extends SidebarResources {
           await this.tokenManager.getTokens()
         );
       case 'spaces': {
-        const spacesChunksArray = await this.spacesChunksArrayProxy;
-        await spacesChunksArray.initialLoad;
-        return new ChunksArraySidebarCollection(spacesChunksArray);
+        /** @type {PromiseObject<VirtualListChunksArray>} */
+        const virtualListChunksArray = await this.spacesVirtualListChunksProxy;
+        await virtualListChunksArray.chunksArray.initialLoad;
+        return new VirtualListChunksSidebarCollection(virtualListChunksArray);
       }
       case 'groups':
         return new ListModelSidebarCollection(
@@ -186,10 +188,13 @@ export default class OnezoneSidebarResources extends SidebarResources {
 
   // FIXME: musi być jakiś observer, żeby kopnąć listę, żeby się przebudowała; albo jakiś event
 
+  /**
+   * @type {PromiseObject<VirtualListChunksArray>}
+   */
   @computed()
-  get spacesChunksArrayProxy() {
+  get spacesVirtualListChunksProxy() {
     const promise = (async () => {
-      const spaceList = await this.currentUser.user.spaceList;
+      const spaceList = await (await this.currentUser.userProxy).spaceList;
       return createVirtualListChunksArray(spaceList);
     })();
     return promiseObject(promise);
@@ -227,131 +232,5 @@ export default class OnezoneSidebarResources extends SidebarResources {
 
   async reloadShareList() {
     await this.cacheFor('sharesChunksArray')?.scheduleReload();
-  }
-}
-
-// FIXME: wydzielić do osobnych plików
-
-export class SharesSidebarItem {
-  /** @type {ShareListItem} */
-  shareData = undefined;
-
-  shareManager = undefined;
-  spaceManager = undefined;
-
-  constructor({ shareData, shareManager, spaceManager }) {
-    this.shareData = shareData;
-    this.shareManager = shareManager;
-    this.spaceManager = spaceManager;
-  }
-
-  //#region proxied properties
-
-  get index() {
-    return this.shareData.index;
-  }
-
-  get name() {
-    return this.shareData.name;
-  }
-
-  get spaceId() {
-    return this.shareData.spaceId;
-  }
-
-  /** @type {FileType} */
-  get rootFileType() {
-    return this.shareData.rootFileType;
-  }
-
-  get rootFilePrivateId() {
-    return this.shareData.rootFilePrivateId;
-  }
-
-  get rootFilePublicId() {
-    return this.shareData.rootFilePublicId;
-  }
-
-  get handleId() {
-    return this.shareData.handleId;
-  }
-
-  get handlePublicUrl() {
-    return this.shareData.handlePublicUrl;
-  }
-
-  get sharePublicUrl() {
-    return this.shareData.sharePublicUrl;
-  }
-
-  //#endregion
-
-  get id() {
-    return gri({
-      entityType: shareEntityType,
-      entityId: this.entityId,
-      aspect: 'instance',
-      scope: 'private',
-    });
-  }
-
-  get entityId() {
-    return this.shareData.shareId;
-  }
-
-  get hasHandle() {
-    return Boolean(this.handleId);
-  }
-
-  @computed
-  get shareProxy() {
-    return this.shareManager.getRecord(this.id, { reload: false });
-  }
-  @computed
-  get spaceProxy() {
-    return this.spaceManager.getRecordById(this.spaceId, {
-      reload: false,
-      backgroundReload: false,
-    });
-  }
-}
-
-/**
- * @implements {SidebarCollection}
- */
-export class ChunksArraySidebarCollection {
-  @tracked chunksArray;
-
-  constructor(chunksArray) {
-    this.chunksArray = chunksArray;
-  }
-
-  @computed('chunksArray.content.[]')
-  get array() {
-    return this.chunksArray.toArray();
-  }
-
-  get ids() {
-    return this.array.map(record => record.id);
-  }
-}
-
-/**
- * @implements {SidebarCollection}
- */
-export class ListModelSidebarCollection {
-  @tracked listModel;
-
-  constructor(listModel) {
-    this.listModel = listModel;
-  }
-
-  @computed('listModel.list.content.[]')
-  get array() {
-    return this.listModel?.list?.content.toArray();
-  }
-
-  get ids() {
-    return this.listModel?.belongsTo?.('list')?.ids?.() ?? [];
   }
 }

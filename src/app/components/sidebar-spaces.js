@@ -1,5 +1,5 @@
 /**
- * A sidebar for providers (extension of ``one-sidebar``)
+ * A sidebar for spaces.
  *
  * @author Jakub Liput, Michał Borzęcki
  * @copyright (C) 2017-2024 ACK CYFRONET AGH
@@ -8,7 +8,6 @@
 
 import OneSidebar from 'onedata-gui-common/components/one-sidebar';
 import template from 'onedata-gui-common/templates/components/one-sidebar';
-import I18n from 'onedata-gui-common/mixins/i18n';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
@@ -19,7 +18,7 @@ import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 
 @layout(template)
 @classNames('sidebar-spaces')
-export default class extends OneSidebar.extend(I18n, UserProxyMixin) {
+export default class extends OneSidebar.extend(UserProxyMixin) {
   /**
    * Note: `currentUser` service is needed by `UserProxyMixin`
    * which is needed by `space-item` to work.
@@ -96,6 +95,14 @@ export default class extends OneSidebar.extend(I18n, UserProxyMixin) {
     this.infiniteScroll.mount(itemsTable);
   }
 
+  /**
+   * @override
+   */
+  didInsertElement() {
+    super.didInsertElement(...arguments);
+    this.mountInfiniteScroll(this.element);
+  }
+
   //#endregion
 
   /**
@@ -126,9 +133,9 @@ export default class extends OneSidebar.extend(I18n, UserProxyMixin) {
 
   /**
    * @override
+   * @param {string} expression
    */
-  didInsertElement() {
-    super.didInsertElement(...arguments);
-    this.mountInfiniteScroll(this.element);
+  setFilter(expression) {
+    this.model.collection.setFilter(expression);
   }
 }
