@@ -15,6 +15,7 @@ import { layout, classNames } from '@ember-decorators/component';
 import { reads } from '@ember/object/computed';
 import InfiniteScroll from 'onedata-gui-common/utils/infinite-scroll';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
+import { debounce } from '@ember/runloop';
 
 @layout(template)
 @classNames('sidebar-spaces')
@@ -143,6 +144,11 @@ export default class extends OneSidebar.extend(UserProxyMixin) {
    * @param {string} expression
    */
   setFilter(expression) {
-    this.model.collection.setFilter(expression);
+    super.setFilter(expression);
+    debounce(this, 'setVirtualListFilter', 500);
+  }
+
+  setVirtualListFilter() {
+    this.model.collection.setFilter(this.filter);
   }
 }
