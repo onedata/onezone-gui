@@ -75,13 +75,13 @@ export default class extends OneSidebar.extend(UserProxyMixin) {
   /**
    * @override
    */
-  @reads('model.collection.array') sortedCollection;
+  @reads('model.collection.fullArray') sortedCollection;
 
   /**
    * Disable filtering features.
    * @override
    */
-  @reads('sortedCollection') filteredCollection;
+  @reads('model.collection.array') filteredCollection;
 
   /**
    * @param {HTMLElement} element

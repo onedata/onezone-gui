@@ -38,6 +38,11 @@ export class VirtualListChunksSidebarCollection {
     return this.array.map(record => record.id);
   }
 
+  @computed('virtualListChunksArray.listModel.list.content.[]')
+  get fullArray() {
+    return this.virtualListChunksArray.listModel.list.content?.toArray() ?? [];
+  }
+
   setFilter(expression) {
     this.virtualListChunksArray.setFilter(expression);
   }
