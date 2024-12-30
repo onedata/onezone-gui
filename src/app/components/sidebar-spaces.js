@@ -88,11 +88,18 @@ export default class extends OneSidebar.extend(UserProxyMixin) {
    * @returns {Promise}
    */
   async mountInfiniteScroll(element) {
-    await this.infiniteScroll.entries.initialLoad;
+    const chunksArray = this.infiniteScroll.entries;
+    await chunksArray.initialLoad;
     await waitForRender();
     /** @type {HTMLElement} */
     const itemsTable = element.querySelector('.one-sidebar-primary-item-list');
     this.infiniteScroll.mount(itemsTable);
+    const virtualListReloader =
+      this.model.collection.virtualListChunksArray.virtualListReloader;
+    virtualListReloader.onListChanged = async () => {
+      await waitForRender();
+      this.infiniteScroll.scrollHandler.listWatcher.scrollHandler();
+    };
   }
 
   /**
