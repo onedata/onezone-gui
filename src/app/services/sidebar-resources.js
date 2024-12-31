@@ -186,18 +186,17 @@ export default class OnezoneSidebarResources extends SidebarResources {
       });
   }
 
-  // FIXME: musi być jakiś observer, żeby kopnąć listę, żeby się przebudowała; albo jakiś event
-
   /**
    * @type {PromiseObject<VirtualListChunksArray>}
    */
   @computed()
   get spacesVirtualListChunksProxy() {
-    const promise = (async () => {
-      const spaceList = await (await this.currentUser.userProxy).spaceList;
-      return createVirtualListChunksArray(spaceList);
-    })();
-    return promiseObject(promise);
+    return promiseObject(this.resolveSpacesVirtualListChunks());
+  }
+
+  async resolveSpacesVirtualListChunks() {
+    const spaceList = await (await this.currentUser.userProxy).spaceList;
+    return createVirtualListChunksArray(spaceList);
   }
 
   init() {
