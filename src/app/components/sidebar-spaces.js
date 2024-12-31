@@ -111,6 +111,14 @@ export default class extends OneSidebar.extend(UserProxyMixin) {
     this.mountInfiniteScroll(this.element);
   }
 
+  /**
+   * @override
+   */
+  willDestroy() {
+    super.willDestroy(...arguments);
+    this.infiniteScroll?.destroy();
+  }
+
   //#endregion
 
   /**
