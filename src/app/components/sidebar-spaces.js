@@ -2,7 +2,7 @@
  * A sidebar for spaces.
  *
  * @author Jakub Liput, Michał Borzęcki
- * @copyright (C) 2017-2024 ACK CYFRONET AGH
+ * @copyright (C) 2017-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -98,8 +98,10 @@ export default class extends OneSidebar.extend(UserProxyMixin) {
     const virtualListReloader =
       this.model.collection.virtualListChunksArray.virtualListReloader;
     virtualListReloader.onListChanged = async () => {
-      await waitForRender();
-      this.infiniteScroll.scrollHandler.listWatcher.scrollHandler();
+      // FIXME: próba optymalizacji: jeśli po renderze aktywny item nie jest na widocznej liście
+      if (this.primaryItem) {
+        this.handlePrimaryItemChange();
+      }
     };
   }
 
@@ -117,6 +119,24 @@ export default class extends OneSidebar.extend(UserProxyMixin) {
   willDestroy() {
     super.willDestroy(...arguments);
     this.infiniteScroll?.destroy();
+  }
+
+  /**
+   * @override
+   */
+  async handlePrimaryItemChange() {
+    if (!this.primaryItem) {
+      return;
+    }
+    // scrollSidebarToActiveItem does the array jump internally
+    await this.scrollSidebarToActiveItem();
+    await waitForRender();
+    if (this.isDestroyed || this.isDestroying) {
+      return;
+    }
+    // After jump, the list has no front loaded, executing scroll handler causes
+    // the InfiniteScroll toolkit to trigger fetch prev.
+    this.infiniteScroll.scrollHandler.listWatcher.scrollHandler();
   }
 
   //#endregion
