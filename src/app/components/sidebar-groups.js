@@ -1,49 +1,49 @@
 /**
  * A sidebar for groups (extension of `one-sidebar`)
  *
- * @author Michał Borzęcki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @author Michał Borzęcki, Jakub Liput
+ * @copyright (C) 2018-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import { computed } from '@ember/object';
-import OneSidebar from 'onedata-gui-common/components/one-sidebar';
-import layout from 'onedata-gui-common/templates/components/one-sidebar';
-import I18n from 'onedata-gui-common/mixins/i18n';
+import InfiniteScrollSidebar from 'onedata-gui-common/components/infinite-scroll-sidebar';
+import template from 'onedata-gui-common/templates/components/one-sidebar';
+import { layout, classNames } from '@ember-decorators/component';
 
-export default OneSidebar.extend(I18n, {
-  layout,
-  classNames: ['sidebar-groups'],
+@layout(template)
+@classNames('sidebar-groups')
+export default class extends InfiniteScrollSidebar {
+  /**
+   * @override
+   */
+  i18nPrefix = 'components.sidebarGroups';
 
   /**
    * @override
    */
-  i18nPrefix: 'components.sidebarGroups',
+  model = null;
 
   /**
    * @override
    */
-  model: null,
+  firstLevelItemIcon = 'group';
 
   /**
    * @override
    */
-  firstLevelItemIcon: 'group',
+  sidebarType = 'groups';
 
   /**
    * @override
    */
-  sidebarType: 'groups',
+  firstLevelItemComponent = 'sidebar-groups/group-item';
 
   /**
    * @override
    */
-  firstLevelItemComponent: 'sidebar-groups/group-item',
-
-  /**
-   * @override
-   */
-  secondLevelItems: computed(function secondLevelItems() {
+  @computed()
+  get secondLevelItems() {
     // TODO uncomment overview
     return [{
       //   id: 'index',
@@ -58,5 +58,5 @@ export default OneSidebar.extend(I18n, {
       label: this.t('aspects.hierarchy'),
       icon: 'hierarchy',
     }];
-  }),
-});
+  }
+}

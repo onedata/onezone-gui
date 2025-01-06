@@ -69,15 +69,15 @@ export default class OnezoneSidebarResources extends SidebarResources {
           await this.tokenManager.getTokens()
         );
       case 'spaces': {
-        /** @type {PromiseObject<VirtualListChunksArray>} */
         const virtualListChunksArray = await this.spacesVirtualListChunksProxy;
         await virtualListChunksArray.chunksArray.initialLoad;
         return new VirtualListChunksSidebarCollection(virtualListChunksArray);
       }
-      case 'groups':
-        return new ListModelSidebarCollection(
-          await this.groupManager.getGroups()
-        );
+      case 'groups': {
+        const virtualListChunksArray = await this.groupsVirtualListChunksProxy;
+        await virtualListChunksArray.chunksArray.initialLoad;
+        return new VirtualListChunksSidebarCollection(virtualListChunksArray);
+      }
       case 'harvesters':
         return new ListModelSidebarCollection(
           await this.harvesterManager.getHarvesters()
@@ -171,7 +171,7 @@ export default class OnezoneSidebarResources extends SidebarResources {
     })());
   }
 
-  @computed
+  @computed()
   get sharesChunksArray() {
     const sidebarResources = this;
     return MergedChunksArray
@@ -191,11 +191,24 @@ export default class OnezoneSidebarResources extends SidebarResources {
    */
   @computed()
   get spacesVirtualListChunksProxy() {
-    return promiseObject(this.resolveSpacesVirtualListChunks());
+    return promiseObject(this.resolveUserVirtualList('space'));
   }
 
-  async resolveSpacesVirtualListChunks() {
-    const spaceList = await (await this.currentUser.userProxy).spaceList;
+  /**
+   * @type {PromiseObject<VirtualListChunksArray>}
+   */
+  @computed()
+  get groupsVirtualListChunksProxy() {
+    return promiseObject(this.resolveUserVirtualList('group'));
+  }
+
+  /**
+   *
+   * @param {'space'|'group'|'provider'|'token'|'linkedAccount'|'cluster'|'harvester'|'atmInventory'} listType
+   * @returns {Promise<VirtualListChunksArray>}
+   */
+  async resolveUserVirtualList(listType) {
+    const spaceList = await (await this.currentUser.userProxy)[`${listType}List`];
     return createVirtualListChunksArray(spaceList);
   }
 

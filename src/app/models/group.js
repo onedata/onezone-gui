@@ -69,6 +69,10 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
    */
   hasViewPrivilege: equal('scope', 'private'),
 
+  index: computed('name', 'entityId', function index() {
+    return `${this.name}\0${this.entityId}`;
+  }),
+
   joinSpace(token) {
     return this._joinRelation('space', token);
   },

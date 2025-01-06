@@ -51,8 +51,7 @@ export default class SidebarShares extends OneSidebar {
 
   //#region infinite scroll sidebar
 
-  isInfiniteScroll = true;
-
+  // FIXME: space i group mają standardowo 50 px
   rowHeight = 54;
 
   @reads('model.collection.chunksArray') chunksArray;

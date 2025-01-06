@@ -6,20 +6,17 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import OneSidebar from 'onedata-gui-common/components/one-sidebar';
+import InfiniteScrollSidebar from 'onedata-gui-common/components/infinite-scroll-sidebar';
 import template from 'onedata-gui-common/templates/components/one-sidebar';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import { layout, classNames } from '@ember-decorators/component';
-import { reads } from '@ember/object/computed';
-import InfiniteScroll from 'onedata-gui-common/utils/infinite-scroll';
-import waitForRender from 'onedata-gui-common/utils/wait-for-render';
-import { debounce } from '@ember/runloop';
 
+// FIXME: sprawdzić czy to layout jest potrzne (+sidebar-groups)
 @layout(template)
 @classNames('sidebar-spaces')
-export default class extends OneSidebar.extend(UserProxyMixin) {
+export default class extends InfiniteScrollSidebar.extend(UserProxyMixin) {
   /**
    * Note: `currentUser` service is needed by `UserProxyMixin`
    * which is needed by `space-item` to work.
@@ -56,91 +53,6 @@ export default class extends OneSidebar.extend(UserProxyMixin) {
    */
   sidebarType = 'spaces';
 
-  //#region infinite scroll sidebar
-
-  isInfiniteScroll = true;
-
-  rowHeight = 54;
-
-  @reads('model.collection.chunksArray') chunksArray;
-
-  @computed('chunksArray')
-  get infiniteScroll() {
-    return InfiniteScroll.create({
-      entries: this.chunksArray,
-      singleRowHeight: this.rowHeight,
-      itemIdProperty: 'entityId',
-    });
-  }
-
-  /**
-   * @override
-   */
-  @reads('model.collection.fullArray') sortedCollection;
-
-  /**
-   * Disable filtering features.
-   * @override
-   */
-  @reads('model.collection.array') filteredCollection;
-
-  /**
-   * @param {HTMLElement} element
-   * @returns {Promise}
-   */
-  async mountInfiniteScroll(element) {
-    const chunksArray = this.infiniteScroll.entries;
-    await chunksArray.initialLoad;
-    await waitForRender();
-    /** @type {HTMLElement} */
-    const itemsTable = element.querySelector('.one-sidebar-primary-item-list');
-    this.infiniteScroll.mount(itemsTable);
-    const virtualListReloader =
-      this.model.collection.virtualListChunksArray.virtualListReloader;
-    virtualListReloader.onListChanged = async () => {
-      // FIXME: próba optymalizacji: jeśli po renderze aktywny item nie jest na widocznej liście
-      if (this.primaryItem) {
-        this.handlePrimaryItemChange();
-      }
-    };
-  }
-
-  /**
-   * @override
-   */
-  didInsertElement() {
-    super.didInsertElement(...arguments);
-    this.mountInfiniteScroll(this.element);
-  }
-
-  /**
-   * @override
-   */
-  willDestroy() {
-    super.willDestroy(...arguments);
-    this.infiniteScroll?.destroy();
-  }
-
-  /**
-   * @override
-   */
-  async handlePrimaryItemChange() {
-    if (!this.primaryItem) {
-      return;
-    }
-    // scrollSidebarToActiveItem does the array jump internally
-    await this.scrollSidebarToActiveItem();
-    await waitForRender();
-    if (this.isDestroyed || this.isDestroying) {
-      return;
-    }
-    // After jump, the list has no front loaded, executing scroll handler causes
-    // the InfiniteScroll toolkit to trigger fetch prev.
-    this.infiniteScroll.scrollHandler.listWatcher.scrollHandler();
-  }
-
-  //#endregion
-
   /**
    * Number of items that can have MRU (most recently used) badge.
    * @type {ComputedProperty<number>}
@@ -153,7 +65,7 @@ export default class extends OneSidebar.extend(UserProxyMixin) {
 
   /**
    * List of MRU (most recently used) items IDs starting with MRU item.
-   * @type {ComputedProperty<number>}
+   * @type {ComputedProperty<Array<string>>}
    */
   @computed(
     'sidebarType',
@@ -167,16 +79,4 @@ export default class extends OneSidebar.extend(UserProxyMixin) {
     );
   }
 
-  /**
-   * @override
-   * @param {string} expression
-   */
-  setFilter(expression) {
-    super.setFilter(expression);
-    debounce(this, 'setVirtualListFilter', 500);
-  }
-
-  setVirtualListFilter() {
-    this.model.collection.setFilter(this.filter);
-  }
 }
