@@ -2,17 +2,17 @@
  * A sidebar for data providers (extension of ``one-sidebar``)
  *
  * @author Jakub Liput, Michał Borzęcki
- * @copyright (C) 2017-2018 ACK CYFRONET AGH
+ * @copyright (C) 2017-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import OneSidebar from 'onedata-gui-common/components/one-sidebar';
+import VirtualChunksListSidebar from 'onedata-gui-common/components/virtual-chunks-list-sidebar';
 import template from 'onedata-gui-common/templates/components/one-sidebar';
 import { classNames, layout } from '@ember-decorators/component';
 
 @layout(template)
 @classNames('sidebar-providers')
-export default class SidebarProviders extends OneSidebar {
+export default class SidebarProviders extends VirtualChunksListSidebar {
   /**
    * @override
    */
