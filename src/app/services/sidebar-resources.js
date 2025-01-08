@@ -56,10 +56,11 @@ export default class OnezoneSidebarResources extends SidebarResources {
         await this.sharesChunksArray.initialLoad;
         return new ChunksArraySidebarCollection(this.sharesChunksArray);
       }
-      case 'providers':
-        return new ListModelSidebarCollection(
-          await this.providerManager.getProviders()
-        );
+      case 'providers': {
+        const virtualListChunksArray = await this.providersVirtualListChunksProxy;
+        await virtualListChunksArray.chunksArray.initialLoad;
+        return new VirtualListChunksSidebarCollection(virtualListChunksArray);
+      }
       case 'clusters':
         return new ListModelSidebarCollection(
           await this.clusterManager.getClusters()
@@ -212,13 +213,21 @@ export default class OnezoneSidebarResources extends SidebarResources {
   }
 
   /**
+   * @type {PromiseObject<VirtualListChunksArray>}
+   */
+  @computed()
+  get providersVirtualListChunksProxy() {
+    return promiseObject(this.resolveUserVirtualList('provider'));
+  }
+
+  /**
    *
    * @param {'space'|'group'|'provider'|'token'|'linkedAccount'|'cluster'|'harvester'|'atmInventory'} listType
    * @returns {Promise<VirtualListChunksArray>}
    */
   async resolveUserVirtualList(listType) {
-    const spaceList = await (await this.currentUser.userProxy)[`${listType}List`];
-    return createVirtualListChunksArray(spaceList);
+    const listRecord = await (await this.currentUser.userProxy)[`${listType}List`];
+    return createVirtualListChunksArray(listRecord);
   }
 
   init() {

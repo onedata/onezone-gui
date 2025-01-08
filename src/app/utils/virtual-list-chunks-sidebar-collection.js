@@ -21,6 +21,8 @@ export class VirtualListChunksSidebarCollection {
     this.virtualListChunksArray = virtualListChunksArray;
   }
 
+  @reads('virtualListChunksArray.listModel') listModel;
+
   @reads('virtualListChunksArray.chunksArray') chunksArray;
 
   /**
@@ -38,7 +40,7 @@ export class VirtualListChunksSidebarCollection {
     return this.array.map(record => record.id);
   }
 
-  @computed('virtualListChunksArray.listModel.list.content.[]')
+  @computed('listModel.list.content.[]')
   get fullArray() {
     return this.virtualListChunksArray.listModel.list.content?.toArray() ?? [];
   }

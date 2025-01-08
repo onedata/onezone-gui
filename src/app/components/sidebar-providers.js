@@ -7,30 +7,29 @@
  */
 
 import OneSidebar from 'onedata-gui-common/components/one-sidebar';
-import layout from 'onedata-gui-common/templates/components/one-sidebar';
+import template from 'onedata-gui-common/templates/components/one-sidebar';
+import { classNames, layout } from '@ember-decorators/component';
 
-export default OneSidebar.extend({
-  layout,
-
-  classNames: ['sidebar-providers'],
+@layout(template)
+@classNames('sidebar-providers')
+export default class SidebarProviders extends OneSidebar {
+  /**
+   * @override
+   */
+  model = null;
 
   /**
    * @override
    */
-  model: null,
+  firstLevelItemIcon = 'provider';
 
   /**
    * @override
    */
-  firstLevelItemIcon: 'provider',
+  firstLevelItemComponent = 'sidebar-providers/provider-item';
 
   /**
    * @override
    */
-  firstLevelItemComponent: 'sidebar-providers/provider-item',
-
-  /**
-   * @override
-   */
-  sidebarType: 'providers',
-});
+  sidebarType = 'providers';
+}
