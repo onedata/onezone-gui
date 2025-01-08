@@ -1,45 +1,37 @@
-/**
- * A sidebar for automation inventories (extension of `one-sidebar`)
- *
- * @author Michał Borzęcki
- * @copyright (C) 2021 ACK CYFRONET AGH
- * @license This software is released under the MIT license cited in 'LICENSE.txt'.
- */
-
+import { classNames, layout } from '@ember-decorators/component';
 import { computed } from '@ember/object';
-import OneSidebar from 'onedata-gui-common/components/one-sidebar';
-import layout from 'onedata-gui-common/templates/components/one-sidebar';
-import I18n from 'onedata-gui-common/mixins/i18n';
+import template from 'onedata-gui-common/templates/components/one-sidebar';
 import recordIcon from 'onedata-gui-common/utils/record-icon';
+import VirtualChunksListSidebar from 'onedata-gui-common/components/virtual-chunks-list-sidebar';
 
-export default OneSidebar.extend(I18n, {
-  layout,
-  classNames: ['sidebar-atm-inventories'],
+@layout(template)
+@classNames('sidebar-atm-inventories')
+export default class SidebarAtmInventories extends VirtualChunksListSidebar {
+  /**
+   * @override
+   */
+  i18nPrefix = 'components.sidebarAtmInventories';
 
   /**
    * @override
    */
-  i18nPrefix: 'components.sidebarAtmInventories',
+  model = null;
 
   /**
    * @override
    */
-  model: null,
+  sidebarType = 'atm-inventories';
 
   /**
    * @override
    */
-  sidebarType: 'atm-inventories',
+  firstLevelItemComponent = 'sidebar-atm-inventories/atm-inventory-item';
 
   /**
    * @override
    */
-  firstLevelItemComponent: 'sidebar-atm-inventories/atm-inventory-item',
-
-  /**
-   * @override
-   */
-  secondLevelItems: computed(function secondLevelItems() {
+  @computed()
+  get secondLevelItems() {
     return [{
       id: 'workflows',
       label: this.t('aspects.workflows'),
@@ -53,5 +45,5 @@ export default OneSidebar.extend(I18n, {
       label: this.t('aspects.members'),
       icon: 'group',
     }];
-  }),
-});
+  }
+}

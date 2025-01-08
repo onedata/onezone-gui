@@ -82,10 +82,11 @@ export default class OnezoneSidebarResources extends SidebarResources {
         return new ListModelSidebarCollection(
           await this.harvesterManager.getHarvesters()
         );
-      case 'atm-inventories':
-        return new ListModelSidebarCollection(
-          await this.recordManager.getUserRecordList('atmInventory')
-        );
+      case 'atm-inventories': {
+        const virtualListChunksArray = await this.atmInventoriesVirtualListChunksProxy;
+        await virtualListChunksArray.chunksArray.initialLoad;
+        return new VirtualListChunksSidebarCollection(virtualListChunksArray);
+      }
       case 'uploads': {
         // TODO: VFS-12506 Maybe do it reactive with reads (but it was not earlier)
         const sidebarOneproviders = this.uploadManager.sidebarOneproviders;
@@ -200,6 +201,14 @@ export default class OnezoneSidebarResources extends SidebarResources {
   @computed()
   get groupsVirtualListChunksProxy() {
     return promiseObject(this.resolveUserVirtualList('group'));
+  }
+
+  /**
+   * @type {PromiseObject<VirtualListChunksArray>}
+   */
+  @computed()
+  get atmInventoriesVirtualListChunksProxy() {
+    return promiseObject(this.resolveUserVirtualList('atmInventory'));
   }
 
   /**

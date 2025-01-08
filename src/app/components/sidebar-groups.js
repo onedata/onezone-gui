@@ -13,7 +13,7 @@ import { layout, classNames } from '@ember-decorators/component';
 
 @layout(template)
 @classNames('sidebar-groups')
-export default class extends VirtualChunksListSidebar {
+export default class SidebarGroups extends VirtualChunksListSidebar {
   /**
    * @override
    */
