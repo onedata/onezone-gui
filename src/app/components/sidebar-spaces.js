@@ -6,7 +6,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import InfiniteScrollSidebar from 'onedata-gui-common/components/infinite-scroll-sidebar';
+import VirtualChunksListSidebar from 'onedata-gui-common/components/virtual-chunks-list-sidebar';
 import template from 'onedata-gui-common/templates/components/one-sidebar';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import { inject as service } from '@ember/service';
@@ -16,7 +16,7 @@ import { layout, classNames } from '@ember-decorators/component';
 // FIXME: sprawdzić czy to layout jest potrzne (+sidebar-groups)
 @layout(template)
 @classNames('sidebar-spaces')
-export default class extends InfiniteScrollSidebar.extend(UserProxyMixin) {
+export default class extends VirtualChunksListSidebar.extend(UserProxyMixin) {
   /**
    * Note: `currentUser` service is needed by `UserProxyMixin`
    * which is needed by `space-item` to work.
