@@ -79,10 +79,11 @@ export default class OnezoneSidebarResources extends SidebarResources {
         await virtualListChunksArray.chunksArray.initialLoad;
         return new VirtualListChunksSidebarCollection(virtualListChunksArray);
       }
-      case 'harvesters':
-        return new ListModelSidebarCollection(
-          await this.harvesterManager.getHarvesters()
-        );
+      case 'harvesters': {
+        const virtualListChunksArray = await this.harvestersVirtualListChunksProxy;
+        await virtualListChunksArray.chunksArray.initialLoad;
+        return new VirtualListChunksSidebarCollection(virtualListChunksArray);
+      }
       case 'atm-inventories': {
         const virtualListChunksArray = await this.atmInventoriesVirtualListChunksProxy;
         await virtualListChunksArray.chunksArray.initialLoad;
@@ -218,6 +219,14 @@ export default class OnezoneSidebarResources extends SidebarResources {
   @computed()
   get providersVirtualListChunksProxy() {
     return promiseObject(this.resolveUserVirtualList('provider'));
+  }
+
+  /**
+   * @type {PromiseObject<VirtualListChunksArray>}
+   */
+  @computed()
+  get harvestersVirtualListChunksProxy() {
+    return promiseObject(this.resolveUserVirtualList('harvester'));
   }
 
   /**

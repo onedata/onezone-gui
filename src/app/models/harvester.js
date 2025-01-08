@@ -77,4 +77,12 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   isEffectiveMember: computed('scope', function isEffectiveMember() {
     return ['private', 'protected'].includes(this.get('scope'));
   }),
+
+  /**
+   * Index for infinite scroll.
+   * @type {ComputedProperty<string>}
+   */
+  index: computed('name', 'entityId', function index() {
+    return `${this.name}\0${this.entityId}`;
+  }),
 }).reopenClass(StaticGraphModelMixin);

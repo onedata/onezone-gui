@@ -1,44 +1,38 @@
-/**
- * A sidebar for harvesters (extension of `one-sidebar`)
- *
- * @author Michał Borzęcki
- * @copyright (C) 2019 ACK CYFRONET AGH
- * @license This software is released under the MIT license cited in 'LICENSE.txt'.
- */
+// FIXME: jsdoc
 
+import { classNames, layout } from '@ember-decorators/component';
 import { computed } from '@ember/object';
-import OneSidebar from 'onedata-gui-common/components/one-sidebar';
-import layout from 'onedata-gui-common/templates/components/one-sidebar';
-import I18n from 'onedata-gui-common/mixins/i18n';
+import template from 'onedata-gui-common/templates/components/one-sidebar';
+import VirtualChunksListSidebar from 'onedata-gui-common/components/virtual-chunks-list-sidebar';
 
-export default OneSidebar.extend(I18n, {
-  layout,
-  classNames: ['sidebar-harvesters'],
+@layout(template)
+@classNames('sidebar-harvesters')
+export default class SidebarHarvesters extends VirtualChunksListSidebar {
+  /**
+   * @override
+   */
+  i18nPrefix = 'components.sidebarHarvesters';
 
   /**
    * @override
    */
-  i18nPrefix: 'components.sidebarHarvesters',
+  model = null;
 
   /**
    * @override
    */
-  model: null,
+  sidebarType = 'harvesters';
 
   /**
    * @override
    */
-  sidebarType: 'harvesters',
+  firstLevelItemComponent = 'sidebar-harvesters/harvester-item';
 
   /**
    * @override
    */
-  firstLevelItemComponent: 'sidebar-harvesters/harvester-item',
-
-  /**
-   * @override
-   */
-  secondLevelItems: computed(function secondLevelItems() {
+  @computed
+  get secondLevelItems() {
     return [{
       id: 'plugin',
       label: this.t('aspects.plugin'),
@@ -60,5 +54,5 @@ export default OneSidebar.extend(I18n, {
       label: this.t('aspects.config'),
       icon: 'settings',
     }];
-  }),
-});
+  }
+}
