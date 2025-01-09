@@ -14,11 +14,12 @@ import MergedChunksArray from 'onedata-gui-common/utils/merged-chunks-array';
 import computedLastProxyContent from 'onedata-gui-common/utils/computed-last-proxy-content';
 import { reads } from '@ember/object/computed';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
-import createVirtualListChunksArray from 'onedata-gui-common/utils/create-virtual-list-chunks-array';
 import { SharesSidebarItem } from 'onezone-gui/utils/shares-sidebar-item';
 import { ChunksArraySidebarCollection } from 'onezone-gui/utils/chunks-array-sidebar-collection';
 import { ListModelSidebarCollection } from 'onezone-gui/utils/list-model-sidebar-collection';
 import { VirtualListChunksSidebarCollection } from 'onezone-gui/utils/virtual-list-chunks-sidebar-collection';
+import VirtualListChunksArray from 'onedata-gui-common/utils/virtual-list-chunks-array';
+import TokensVirtualListChunksArray from 'onezone-gui/utils/tokens-virtual-list-chunks-array';
 
 export default class OnezoneSidebarResources extends SidebarResources {
   @service providerManager;
@@ -56,6 +57,7 @@ export default class OnezoneSidebarResources extends SidebarResources {
         await this.sharesChunksArray.initialLoad;
         return new ChunksArraySidebarCollection(this.sharesChunksArray);
       }
+      // FIXME: dla virtual list można ujednolicić - mamy nazwy
       case 'providers': {
         const virtualListChunksArray = await this.providersVirtualListChunksProxy;
         await virtualListChunksArray.chunksArray.initialLoad;
@@ -65,10 +67,11 @@ export default class OnezoneSidebarResources extends SidebarResources {
         return new ListModelSidebarCollection(
           await this.clusterManager.getClusters()
         );
-      case 'tokens':
-        return new ListModelSidebarCollection(
-          await this.tokenManager.getTokens()
-        );
+      case 'tokens': {
+        const virtualListChunksArray = await this.tokensVirtualListChunksProxy;
+        await virtualListChunksArray.chunksArray.initialLoad;
+        return new VirtualListChunksSidebarCollection(virtualListChunksArray);
+      }
       case 'spaces': {
         const virtualListChunksArray = await this.spacesVirtualListChunksProxy;
         await virtualListChunksArray.chunksArray.initialLoad;
@@ -225,6 +228,16 @@ export default class OnezoneSidebarResources extends SidebarResources {
    * @type {PromiseObject<VirtualListChunksArray>}
    */
   @computed()
+  get tokensVirtualListChunksProxy() {
+    return promiseObject(
+      this.resolveUserVirtualList('token', TokensVirtualListChunksArray)
+    );
+  }
+
+  /**
+   * @type {PromiseObject<VirtualListChunksArray>}
+   */
+  @computed()
   get harvestersVirtualListChunksProxy() {
     return promiseObject(this.resolveUserVirtualList('harvester'));
   }
@@ -234,9 +247,9 @@ export default class OnezoneSidebarResources extends SidebarResources {
    * @param {'space'|'group'|'provider'|'token'|'linkedAccount'|'cluster'|'harvester'|'atmInventory'} listType
    * @returns {Promise<VirtualListChunksArray>}
    */
-  async resolveUserVirtualList(listType) {
+  async resolveUserVirtualList(listType, VirtualListClass = VirtualListChunksArray) {
     const listRecord = await (await this.currentUser.userProxy)[`${listType}List`];
-    return createVirtualListChunksArray(listRecord);
+    return new VirtualListClass(listRecord);
   }
 
   init() {

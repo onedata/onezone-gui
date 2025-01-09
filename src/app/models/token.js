@@ -220,6 +220,10 @@ export default Model.extend(
      */
     privileges: reads('metadata.privileges'),
 
+    index: computed('name', 'entityId', function index() {
+      return `${this.isExpired}\0${this.name}\0${this.entityId}`;
+    }),
+
     validUntilObserver: observer('validUntil', function validUntilObserver() {
       const {
         validUntil,

@@ -45,7 +45,7 @@ export class VirtualListChunksSidebarCollection {
     return this.virtualListChunksArray.listModel.list.content?.toArray() ?? [];
   }
 
-  setFilter(expression) {
-    this.virtualListChunksArray.setFilter(expression);
+  setFilter({ expression, advanced }) {
+    this.virtualListChunksArray.setFilter({ expression, advanced });
   }
 }
