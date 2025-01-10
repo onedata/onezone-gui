@@ -48,6 +48,7 @@ export default class SidebarShares extends ChunksSidebar {
    */
   async didInsertElement() {
     await super.didInsertElement(...arguments);
+    // TODO: VFS-12506 Try to optimize numer of reloads (not needed on first init)
     this.chunksArray.scheduleReload();
   }
 }
