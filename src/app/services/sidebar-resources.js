@@ -152,7 +152,7 @@ export default class OnezoneSidebarResources extends SidebarResources {
   @computed('currentUser.user.spaceList.list')
   get spacesIdsProxy() {
     return promiseObject((async () => {
-      const user = this.currentUser.user;
+      const user = await this.currentUser.userProxy;
       const spaceList = await user.spaceList;
       return spaceList.hasMany('list').ids().map(gri => parseGri(gri).entityId);
     })());
@@ -180,6 +180,8 @@ export default class OnezoneSidebarResources extends SidebarResources {
   @computed()
   get sharesChunksArray() {
     const sidebarResources = this;
+    // FIXME: sidebarResources.fetchersProxy może być niezainicjalizowane;
+    // wywala się, jak wejdzie się z trybie prywatnym od razu na ścieżkę /shares
     return MergedChunksArray
       .extend({
         fetchers: reads('sidebarResources.fetchersProxy.content'),
