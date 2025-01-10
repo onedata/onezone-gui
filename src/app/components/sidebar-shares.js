@@ -42,4 +42,12 @@ export default class SidebarShares extends ChunksSidebar {
   get rowHeight() {
     return 54;
   }
+
+  /**
+   * @override
+   */
+  async didInsertElement() {
+    await super.didInsertElement(...arguments);
+    this.chunksArray.scheduleReload();
+  }
 }
