@@ -79,4 +79,45 @@ export default class extends VirtualChunksListSidebar.extend(UserProxyMixin) {
     );
   }
 
+  // FIXME: ugenerycznić; to będzie index w sourceArray, bo musi być porównywalne ze _start
+  get activeItemIndex() {
+    const primaryItemId = this.primaryItemId;
+    return this.chunksArray.sourceArray.toArray().findIndex(item =>
+      item?.id === primaryItemId
+    );
+  }
+
+  // FIXME: ugenerycznić
+  get activeItemHeight() {
+    return 510;
+  }
+
+  /**
+   * @override
+   */
+  init() {
+    super.init(...arguments);
+    const sidebar = this;
+    // FIXME: robocze
+    this.infiniteScroll.firstRowModel.computeHeight =
+      function spacesSidebarComputeHeight(chunksArray, computeItemsHeight) {
+        let additionalHeight = 0;
+        // FIXME: przekroczono active item (jest poza zakresem na górze listy renderowanej)
+        const activeItemIndex = sidebar.activeItemIndex;
+        if (activeItemIndex !== -1 && chunksArray._start > sidebar.activeItemIndex) {
+          additionalHeight =
+            sidebar.activeItemHeight - sidebar.rowHeight;
+          console.log('FIXME: additionalHeight', additionalHeight);
+        }
+        const value = computeItemsHeight() + additionalHeight;
+        console.log(
+          'FIXME: SidebarSpaces#computeHeight: _start; activeItemIndex; additionalHeight, height',
+          chunksArray._start,
+          sidebar.activeItemIndex,
+          additionalHeight,
+          value,
+        );
+        return value;
+      };
+  }
 }
