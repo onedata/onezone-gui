@@ -30,6 +30,13 @@ export default class SidebarAtmInventories extends VirtualChunksListSidebar {
   /**
    * @override
    */
+  get primaryItemHeight() {
+    return 188;
+  }
+
+  /**
+   * @override
+   */
   @computed()
   get secondLevelItems() {
     return [{

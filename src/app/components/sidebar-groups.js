@@ -42,6 +42,13 @@ export default class SidebarGroups extends VirtualChunksListSidebar {
   /**
    * @override
    */
+  get primaryItemHeight() {
+    return 142;
+  }
+
+  /**
+   * @override
+   */
   @computed()
   get secondLevelItems() {
     // TODO uncomment overview

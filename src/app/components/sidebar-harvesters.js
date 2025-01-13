@@ -31,6 +31,13 @@ export default class SidebarHarvesters extends VirtualChunksListSidebar {
   /**
    * @override
    */
+  get primaryItemHeight() {
+    return 280;
+  }
+
+  /**
+   * @override
+   */
   @computed
   get secondLevelItems() {
     return [{
