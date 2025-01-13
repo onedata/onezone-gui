@@ -47,6 +47,11 @@ export default class OnezoneSidebarResources extends SidebarResources {
   ]));
 
   /**
+   * @type {Object<string, SharesSidebarItem>}
+   */
+  shareItemsCache = {};
+
+  /**
    * @param {string} type
    * @returns {Promise<SidebarCollection>}
    */
@@ -275,13 +280,29 @@ export default class OnezoneSidebarResources extends SidebarResources {
     const shareManager = this.shareManager;
     const spaceManager = this.spaceManager;
     return {
-      array: array.map(shareData => new SharesSidebarItem({
+      array: array.map(shareData => this.getShareItem(
         shareData,
         shareManager,
         spaceManager,
-      })),
+      )),
       isLast,
     };
+  }
+
+  getShareItem(shareData, shareManager, spaceManager) {
+    const id = shareData.index;
+    let shareItem = this.shareItemsCache[id];
+    if (shareItem) {
+      shareItem.shareData = shareData;
+    } else {
+      shareItem = new SharesSidebarItem({
+        shareData,
+        shareManager,
+        spaceManager,
+      });
+      this.shareItemsCache[id] = shareItem;
+    }
+    return shareItem;
   }
 
   async reloadShareList() {
