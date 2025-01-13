@@ -80,11 +80,22 @@ export default class extends VirtualChunksListSidebar.extend(UserProxyMixin) {
   }
 
   // FIXME: ugenerycznić; to będzie index w sourceArray, bo musi być porównywalne ze _start
+  // FIXME: może mieć dziurę w implementacji jeśli pojawi się ten item
+  @computed(
+    'primaryItemId',
+    // Due to some issues with ReplacingChuksArray.sourceArray notifications, we observer
+    // `[]` of RCA, which causes recomputation practically on every scroll, which is bad
+    // for performance. Maybe it will be fixed in the future.
+    'chunksArray.[]'
+  )
   get activeItemIndex() {
     const primaryItemId = this.primaryItemId;
-    return this.chunksArray.sourceArray.toArray().findIndex(item =>
+    // FIXME: debug assignment
+    const index = this.chunksArray.sourceArray.toArray().findIndex(item =>
       item?.id === primaryItemId
     );
+    console.log('FIXME: get activeItemIndex: primaryItemId, index', primaryItemId, index);
+    return index;
   }
 
   // FIXME: ugenerycznić
@@ -98,6 +109,9 @@ export default class extends VirtualChunksListSidebar.extend(UserProxyMixin) {
   init() {
     super.init(...arguments);
     const sidebar = this;
+
+    this.addObserver('activeItemIndex', this, 'forceFirstRowHeightRecompute', false);
+
     // FIXME: robocze
     this.infiniteScroll.firstRowModel.computeHeight =
       function spacesSidebarComputeHeight(chunksArray, computeItemsHeight) {
@@ -107,7 +121,6 @@ export default class extends VirtualChunksListSidebar.extend(UserProxyMixin) {
         if (activeItemIndex !== -1 && chunksArray._start > sidebar.activeItemIndex) {
           additionalHeight =
             sidebar.activeItemHeight - sidebar.rowHeight;
-          console.log('FIXME: additionalHeight', additionalHeight);
         }
         const value = computeItemsHeight() + additionalHeight;
         console.log(
@@ -119,5 +132,15 @@ export default class extends VirtualChunksListSidebar.extend(UserProxyMixin) {
         );
         return value;
       };
+
+    // FIXME: debug code
+    ((name) => {
+      window[name] = this;
+      console.log(`window.${name}`, window[name]);
+    })('debug_sidebar_spaces');
+  }
+
+  forceFirstRowHeightRecompute() {
+    this.infiniteScroll.firstRowModel.notifyPropertyChange('height');
   }
 }
