@@ -7,16 +7,25 @@
  */
 
 import { computed } from '@ember/object';
-import { tracked } from '@glimmer/tracking';
 
 /**
  * @implements {SidebarCollection}
  */
 export class ChunksArraySidebarCollection {
-  @tracked chunksArray;
+  /** @type {ReplacingChunksArray} */
+  #chunksArray;
 
+  /** @type {ReplacingChunksArray} */
+  get chunksArray() {
+    return this.#chunksArray;
+  }
+
+  /**
+   * @param {ReplacingChunksArray} chunksArray
+   */
   constructor(chunksArray) {
-    this.chunksArray = chunksArray;
+    /** @type {ReplacingChunksArray} */
+    this.#chunksArray = chunksArray;
   }
 
   @computed('chunksArray.[]')
@@ -24,6 +33,7 @@ export class ChunksArraySidebarCollection {
     return this.chunksArray.toArray();
   }
 
+  @computed('array.@each.id')
   get ids() {
     return this.array.map(record => record.id);
   }
