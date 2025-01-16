@@ -2,7 +2,7 @@
  * A first-level item component for spaces sidebar
  *
  * @author Jakub Liput, Michał Borzęcki, Agnieszka Warchoł
- * @copyright (C) 2018-2024 ACK CYFRONET AGH
+ * @copyright (C) 2018-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -16,7 +16,6 @@ import bytesToString from 'onedata-gui-common/utils/bytes-to-string';
 import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import { reject, resolve } from 'rsvp';
 import { htmlSafe } from '@ember/string';
 
 export default Component.extend(I18n, {
@@ -278,6 +277,9 @@ export default Component.extend(I18n, {
     return maxOpacity - mruIndex * step;
   },
 
+  toggleRename(value) {
+    next(() => safeExec(this, 'set', 'isRenaming', value));
+  },
   actions: {
     editorClick(event) {
       if (this.get('isRenaming')) {
@@ -286,34 +288,37 @@ export default Component.extend(I18n, {
       }
     },
     toggleRename(value) {
-      next(() => safeExec(this, 'set', 'isRenaming', value));
+      this.toggleRename(value);
     },
-    rename(name) {
+    async rename(name) {
       if (!name || !name.length) {
-        return reject();
+        throw new Error('space-item#rename: no name provided');
       }
 
       const {
         space,
         globalNotify,
-      } = this.getProperties('space', 'globalNotify');
+      } = this;
 
       const oldName = get(space, 'name');
       if (oldName === name) {
-        this.send('toggleRename', false);
-        return resolve();
+        this.toggleRename(false);
+        return;
       }
       set(space, 'name', name);
-      return space.save()
-        .then(() => {
-          this.send('toggleRename', false);
-        })
-        .catch((error) => {
-          globalNotify.backendError(this.t('spacePersistence'), error);
-          // Restore old space name
-          set(space, 'name', oldName);
-          throw error;
-        });
+
+      try {
+        await space.save();
+        if (this.isDestroyed || this.isDestroying) {
+          return;
+        }
+        this.toggleRename(false);
+      } catch (error) {
+        globalNotify.backendError(this.t('spacePersistence'), error);
+        // Restore old space name
+        set(space, 'name', oldName);
+        throw error;
+      }
     },
   },
 });

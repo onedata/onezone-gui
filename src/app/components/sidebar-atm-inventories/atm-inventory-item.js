@@ -2,17 +2,15 @@
  * A first-level item component for automation inventories sidebar.
  *
  * @author Michał Borzęcki
- * @copyright (C) 2021 ACK CYFRONET AGH
+ * @copyright (C) 2021-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Component from '@ember/component';
-import { computed, get, set } from '@ember/object';
+import { computed, get, set, trySet } from '@ember/object';
 import { reads, collect } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
-import { reject, resolve } from 'rsvp';
 import I18n from 'onedata-gui-common/mixins/i18n';
-import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 // TODO: VFS-7655 Better inventory icon - now it is too light comparing to other,
 // bolder icons
@@ -135,7 +133,7 @@ export default Component.extend(I18n, {
   },
 
   toggleRename(value) {
-    this.set('isRenaming', value);
+    trySet(this, 'isRenaming', value);
   },
 
   actions: {
@@ -148,20 +146,20 @@ export default Component.extend(I18n, {
         event.preventDefault();
       }
     },
-    rename(name) {
+    async rename(name) {
       if (!name || !name.length) {
-        return reject();
+        throw new Error('atm-inventory-item#rename: no name provided');
       }
 
       const {
         atmInventory,
         workflowActions,
-      } = this.getProperties('atmInventory', 'workflowActions');
+      } = this;
 
       const oldName = get(atmInventory, 'name');
       if (oldName === name) {
         this.toggleRename(false);
-        return resolve();
+        return;
       }
 
       const atmInventoryDiff = { name };
@@ -170,13 +168,19 @@ export default Component.extend(I18n, {
         atmInventoryDiff,
       });
 
-      return action.execute().then(result => {
+      try {
+        const result = await action.execute();
         if (get(result, 'status') === 'failed') {
-          return reject();
+          throw new Error('atm-inventory-item#rename: rename action failed');
         } else {
-          safeExec(this, () => this.toggleRename(false));
+          if (this.isDestroyed || this.isDestroying) {
+            return;
+          }
+          this.toggleRename(false);
         }
-      }).finally(() => action.destroy());
+      } finally {
+        action.destroy();
+      }
     },
   },
 });

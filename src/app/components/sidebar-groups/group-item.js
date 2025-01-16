@@ -2,7 +2,7 @@
  * A first-level item component for groups sidebar
  *
  * @author Michał Borzęcki, Agnieszka Warchoł
- * @copyright (C) 2018-2020 ACK CYFRONET AGH
+ * @copyright (C) 2018-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -12,7 +12,6 @@ import { next } from '@ember/runloop';
 import { reads, collect } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/i18n';
-import { reject, resolve } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 export default Component.extend(I18n, {
@@ -154,6 +153,10 @@ export default Component.extend(I18n, {
     }
   },
 
+  toggleRename(value) {
+    next(() => safeExec(this, 'set', 'isRenaming', value));
+  },
+
   actions: {
     editorClick(event) {
       if (this.get('isRenaming')) {
@@ -162,34 +165,37 @@ export default Component.extend(I18n, {
       }
     },
     toggleRename(value) {
-      next(() => safeExec(this, 'set', 'isRenaming', value));
+      this.toggleRename(value);
     },
-    rename(name) {
+    async rename(name) {
       if (!name || !name.length) {
-        return reject();
+        throw new Error('group-item#rename: no name provided');
       }
 
       const {
         group,
         globalNotify,
-      } = this.getProperties('group', 'globalNotify');
+      } = this;
 
       const oldName = get(group, 'name');
       if (oldName === name) {
-        this.send('toggleRename', false);
-        return resolve();
+        this.toggleRename(false);
+        return;
       }
       set(group, 'name', name);
-      return group.save()
-        .then(() => {
-          this.send('toggleRename', false);
-        })
-        .catch((error) => {
-          globalNotify.backendError(this.t('groupPersistence'), error);
-          // Restore old group name
-          set(group, 'name', oldName);
-          throw error;
-        });
+
+      try {
+        await group.save();
+        if (this.isDestroyed || this.isDestroying) {
+          return;
+        }
+        this.toggleRename(false);
+      } catch (error) {
+        globalNotify.backendError(this.t('groupPersistence'), error);
+        // Restore old group name
+        set(group, 'name', oldName);
+        throw error;
+      }
     },
     showRemoveModal() {
       this.set('removeGroupModalOpen', true);
