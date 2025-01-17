@@ -2,7 +2,7 @@
  * Implements resources for Onezone GUI sidebar.
  *
  * @author Jakub Liput
- * @copyright (C) 2024 ACK CYFRONET AGH
+ * @copyright (C) 2024-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -10,16 +10,13 @@ import { inject as service } from '@ember/service';
 import SidebarResources from 'onedata-gui-common/services/sidebar-resources';
 import { computed, defineProperty } from '@ember/object';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
-import MergedChunksArray from 'onedata-gui-common/utils/merged-chunks-array';
 import computedLastProxyContent from 'onedata-gui-common/utils/computed-last-proxy-content';
-import { reads } from '@ember/object/computed';
-import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
-import { SharesSidebarItem } from 'onezone-gui/utils/shares-sidebar-item';
 import { ChunksArraySidebarCollection } from 'onezone-gui/utils/chunks-array-sidebar-collection';
 import { ListModelSidebarCollection } from 'onezone-gui/utils/list-model-sidebar-collection';
 import { VirtualListChunksSidebarCollection } from 'onezone-gui/utils/virtual-list-chunks-sidebar-collection';
 import VirtualListChunksArray from 'onedata-gui-common/utils/virtual-list-chunks-array';
 import TokensVirtualListChunksArray from 'onezone-gui/utils/tokens-virtual-list-chunks-array';
+import SharesChunksArray from 'onezone-gui/utils/shares-chunks-array';
 
 export default class OnezoneSidebarResources extends SidebarResources {
   @service providerManager;
@@ -47,18 +44,12 @@ export default class OnezoneSidebarResources extends SidebarResources {
   ]));
 
   /**
-   * @type {Object<string, SharesSidebarItem>}
-   */
-  shareItemsCache = {};
-
-  /**
    * @param {string} type
    * @returns {Promise<SidebarCollection>}
    */
   async getCollectionFor(type) {
     switch (type) {
       case 'shares': {
-        await this.fetchersProxy;
         await this.sharesChunksArray.initialLoad;
         return new ChunksArraySidebarCollection(this.sharesChunksArray);
       }
@@ -154,49 +145,17 @@ export default class OnezoneSidebarResources extends SidebarResources {
     }
   }
 
-  @computed('currentUser.user.spaceList.list')
-  get spacesIdsProxy() {
-    return promiseObject((async () => {
-      const user = await this.currentUser.userProxy;
-      const spaceList = await user.spaceList;
-      return spaceList.hasMany('list').ids().map(gri => parseGri(gri).entityId);
-    })());
-  }
-
   /**
-   * @type {PromiseObject<Array<(index, limit, offset) => ShareDataListPage>>}
+   * @type {SharesChunksArray}
    */
-  @computed('spacesIdsProxy')
-  get fetchersProxy() {
-    return promiseObject((async () => {
-      const spacesIds = await this.spacesIdsProxy;
-      return spacesIds.map(spaceId => {
-        return (index, limit, offset) => {
-          return this.getShareList(spaceId, {
-            index,
-            limit,
-            offset,
-          });
-        };
-      });
-    })());
-  }
-
   @computed()
   get sharesChunksArray() {
-    const sidebarResources = this;
-    // FIXME: sidebarResources.fetchersProxy może być niezainicjalizowane;
-    // wywala się, jak wejdzie się z trybie prywatnym od razu na ścieżkę /shares
-    return MergedChunksArray
-      .extend({
-        fetchers: reads('sidebarResources.fetchersProxy.content'),
-      })
-      .create({
-        sidebarResources,
-        startIndex: 0,
-        endIndex: 50,
-        indexMargin: 10,
-      });
+    return SharesChunksArray.create({
+      ownerSource: this,
+      startIndex: 0,
+      endIndex: 50,
+      indexMargin: 10,
+    });
   }
 
   /**
@@ -259,50 +218,12 @@ export default class OnezoneSidebarResources extends SidebarResources {
     return new VirtualListClass(listRecord);
   }
 
+  /**
+   * @override
+   */
   init() {
     super.init(...arguments);
     defineProperty(this, 'fetchers', computedLastProxyContent('fetchersProxy'));
-  }
-
-  /**
-   * @private
-   * @param {string} spaceId
-   * @param {InfiniteListQuery} listQuery
-   * @returns {ShareDataListPage}
-   */
-  async getShareList(spaceId, listQuery) {
-    const { index, limit, offset } = listQuery;
-    const { array, isLast } = await this.shareManager.getSpaceShareList(spaceId, {
-      index,
-      limit,
-      offset,
-    });
-    const shareManager = this.shareManager;
-    const spaceManager = this.spaceManager;
-    return {
-      array: array.map(shareData => this.getShareItem(
-        shareData,
-        shareManager,
-        spaceManager,
-      )),
-      isLast,
-    };
-  }
-
-  getShareItem(shareData, shareManager, spaceManager) {
-    const id = shareData.index;
-    let shareItem = this.shareItemsCache[id];
-    if (shareItem) {
-      shareItem.shareData = shareData;
-    } else {
-      shareItem = new SharesSidebarItem({
-        shareData,
-        shareManager,
-        spaceManager,
-      });
-      this.shareItemsCache[id] = shareItem;
-    }
-    return shareItem;
   }
 
   async reloadShareList() {
