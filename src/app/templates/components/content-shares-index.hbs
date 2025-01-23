@@ -27,10 +27,3 @@
     {{/container.body}}
   {{/oneprovider-view-container}}
 {{/promise-proxy-container}}
-
-<CopyButton
-  @clipboardText={{share.publicUrl}}
-  @success={{action "clipboardSuccess"}}
-  @error={{action "clipboardError"}}
-  class="hidden btn-public-url"
-/>
