@@ -5,6 +5,8 @@
 ### Latest changes
 
 * VFS-12461 Changed Open Data to Public Data naming
+* VFS-12530 Changed text and position Copy token in token sidebar
+* VFS-12267 Added support for "service unavailable" error
 * VFS-12396 Added cross-browser support for login message line-break formatting
 * VFS-12328 Added support for test custom login page
 * VFS-12528 Changed basic metadata to xattrs on harvester's indices page

@@ -33,7 +33,7 @@ export default {
     savingToken: 'saving token',
     renameAction: 'Rename',
     removeAction: 'Remove',
-    copyTokenAction: 'Copy token',
+    copyTokenAction: 'Copy to clipboard',
     revoked: 'revoked',
     expired: 'expired',
     token: 'token',

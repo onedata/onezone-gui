@@ -65,11 +65,6 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
   embeddedBrowserType: 'share',
 
   /**
-   * @override
-   */
-  isPublic: true,
-
-  /**
    * @override implements OneEmbeddedContainer
    * @type {string}
    */
