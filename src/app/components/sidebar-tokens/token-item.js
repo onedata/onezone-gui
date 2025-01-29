@@ -146,7 +146,7 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  actionsArray: collect('renameAction', 'removeAction', 'copyTokenAction', 'copyIdAction'),
+  actionsArray: collect('copyTokenAction', 'renameAction', 'removeAction', 'copyIdAction'),
 
   /**
    * @override
