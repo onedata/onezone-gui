@@ -40,6 +40,7 @@ export default class SidebarShares extends ChunksSidebar {
    * @override
    */
   get rowHeight() {
+    // the same as $sidebar-item-line-height-double-line in SCSS
     return 54;
   }
 
