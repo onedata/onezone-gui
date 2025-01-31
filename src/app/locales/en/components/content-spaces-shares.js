@@ -1,3 +1,3 @@
 export default {
-  listHeader: 'shares, open data',
+  listHeader: 'shares, public data',
 };

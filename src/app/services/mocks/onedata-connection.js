@@ -48,6 +48,7 @@ export default OnedataConnection.extend({
       'open-data',
       'open-science',
       'preliminary',
+      'public-data',
       'raw-data',
       'simulation',
       'spatial-data',

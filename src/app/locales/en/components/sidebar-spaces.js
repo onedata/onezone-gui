@@ -14,7 +14,7 @@ export default {
       data: 'Files',
       transfers: 'Transfers',
       datasets: 'Datasets, Archives',
-      shares: 'Shares, Open Data',
+      shares: 'Shares, Public Data',
       providers: 'Providers',
       members: 'Members',
       membership: 'Membership',

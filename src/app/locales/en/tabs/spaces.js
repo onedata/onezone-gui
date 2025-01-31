@@ -8,7 +8,7 @@ export default {
   aspects: {
     index: 'Space overview',
     data: 'Files',
-    shares: 'Shares, Open Data',
+    shares: 'Shares, Public Data',
     transfers: 'Transfers',
     datasets: 'Datasets, Archives',
     providers: 'Space providers',
