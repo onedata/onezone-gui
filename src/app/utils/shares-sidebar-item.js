@@ -1,5 +1,5 @@
 /**
- * FIXME: jsdoc
+ * Data for shares sidebar item.
  *
  * @author Jakub Liput
  * @copyright (C) 2024 ACK CYFRONET AGH
@@ -7,12 +7,13 @@
  */
 
 import { computed } from '@ember/object';
+import { tracked } from '@glimmer/tracking';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { entityType as shareEntityType } from 'onezone-gui/models/share';
 
 export class SharesSidebarItem {
   /** @type {ShareListItem} */
-  shareData = undefined;
+  @tracked shareData = undefined;
 
   shareManager = undefined;
   spaceManager = undefined;

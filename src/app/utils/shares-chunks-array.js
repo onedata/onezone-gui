@@ -23,7 +23,12 @@ export default class SharesChunksArray extends MergedChunksArray.extend(OwnerInj
   /**
    * @type {Object<string, SharesSidebarItem>}
    */
-  shareItemsCache = {};
+  shareItemsCacheByIndex = {};
+
+  /**
+   * @type {Object<string, SharesSidebarItem>}
+   */
+  shareItemsCacheById = {};
 
   @computed('currentUser.user.spaceList.list')
   get spacesIdsProxy() {
@@ -93,17 +98,28 @@ export default class SharesChunksArray extends MergedChunksArray.extend(OwnerInj
   }
 
   getShareItem(shareData, shareManager, spaceManager) {
-    const id = shareData.index;
-    let shareItem = this.shareItemsCache[id];
+    // When properties that are displayed and are variabled: name and handleId changes,
+    // then index changes, so the a unique share item should be made for each index.
+    const index = shareData.index;
+    const id = shareData.shareId;
+    let shareItem = this.shareItemsCacheByIndex[index];
     if (shareItem) {
       shareItem.shareData = shareData;
     } else {
-      shareItem = new SharesSidebarItem({
-        shareData,
-        shareManager,
-        spaceManager,
-      });
-      this.shareItemsCache[id] = shareItem;
+      const shareItemById = this.shareItemsCacheById[id];
+      if (shareItemById) {
+        // index of existing item changed
+        shareItem = shareItemById;
+        shareItem.shareData = shareData;
+      } else {
+        shareItem = new SharesSidebarItem({
+          shareData,
+          shareManager,
+          spaceManager,
+        });
+        this.shareItemsCacheByIndex[index] = shareItem;
+        this.shareItemsCacheById[id] = shareItem;
+      }
     }
     return shareItem;
   }
