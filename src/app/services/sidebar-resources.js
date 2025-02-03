@@ -8,9 +8,8 @@
 
 import { inject as service } from '@ember/service';
 import SidebarResources from 'onedata-gui-common/services/sidebar-resources';
-import { computed, defineProperty } from '@ember/object';
+import { computed } from '@ember/object';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
-import computedLastProxyContent from 'onedata-gui-common/utils/computed-last-proxy-content';
 import { ChunksArraySidebarCollection } from 'onezone-gui/utils/chunks-array-sidebar-collection';
 import { ListModelSidebarCollection } from 'onezone-gui/utils/list-model-sidebar-collection';
 import { VirtualListChunksSidebarCollection } from 'onezone-gui/utils/virtual-list-chunks-sidebar-collection';
@@ -227,6 +226,10 @@ export default class OnezoneSidebarResources extends SidebarResources {
   }
 
   async reloadShareList() {
-    await this.cacheFor('sharesChunksArray')?.scheduleReload();
+    const sharesChunksArray = this.cacheFor('sharesChunksArray');
+    if (sharesChunksArray) {
+      await sharesChunksArray.scheduleReload();
+      await sharesChunksArray.startChanged();
+    }
   }
 }
