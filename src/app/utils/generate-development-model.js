@@ -567,8 +567,10 @@ function createSharesRecords() {
 function createTokensRecords(store) {
   const promises = [];
   _.range(NUMBER_OF_TOKENS).forEach((i) => {
+    const name = 'Access token ' + i;
     const accessTokenPromise = store.createRecord('token', {
-      name: 'Access token ' + i,
+      name,
+      index: name,
       revoked: false,
       type: {
         accessToken: {},
@@ -636,8 +638,10 @@ function createTokensRecords(store) {
 
 function createGroupsRecords(store) {
   return allFulfilled(_.range(NUMBER_OF_GROUPS).map((index) => {
+    const name = `group${index}`;
     return store.createRecord('group', {
-      name: `group${index}`,
+      name,
+      index: name,
       scope: 'private',
       type: 'team',
       directMembership: true,
@@ -691,8 +695,10 @@ function createClusterRecords(store) {
 
 function createHarvesterRecords(store) {
   return allFulfilled(_.range(NUMBER_OF_HARVESTERS).map((index) => {
+    const name = `Harvester ${index}`;
     return store.createRecord('harvester', {
-      name: `Harvester ${index}`,
+      name,
+      index: name,
       scope: 'private',
       harvestingBackendType: 'elasticsearch_plugin',
       harvestingBackendEndpoint: '127.0.0.1:9200',
@@ -759,8 +765,10 @@ function createHarvesterRecords(store) {
 
 function createAtmInventoryRecords(store) {
   return allFulfilled(_.range(NUMBER_OF_ATM_INVENTORIES).map((index) => {
+    const name = `Inventory ${index}`;
     return store.createRecord('atmInventory', {
-      name: `Inventory ${index}`,
+      name,
+      index: name,
       scope: 'private',
       directMembership: true,
       currentUserEffPrivileges: atmInventoryPrivilegesFlags,
