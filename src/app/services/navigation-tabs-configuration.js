@@ -43,8 +43,9 @@ class OnezoneNavigationTabsConfiguration extends CommonNavigationTabsConfigurati
         if (!sidebarModel || !contentModel) {
           return this.defaultAspect;
         }
-        const supportingProviderIds = Object.keys(contentModel.resource.supportSizes);
-        if (!supportingProviderIds.length) {
+        const supportSizes = contentModel.resource?.supportSizes;
+        const supportingProviderIds = supportSizes && Object.keys(supportSizes);
+        if (!supportingProviderIds?.length) {
           return 'index';
         } else {
           return 'data';
