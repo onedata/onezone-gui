@@ -217,14 +217,6 @@ export default class OnezoneSidebarResources extends SidebarResources {
     return new VirtualListClass(listRecord);
   }
 
-  /**
-   * @override
-   */
-  init() {
-    super.init(...arguments);
-    defineProperty(this, 'fetchers', computedLastProxyContent('fetchersProxy'));
-  }
-
   async reloadShareList() {
     const sharesChunksArray = this.cacheFor('sharesChunksArray');
     if (sharesChunksArray) {

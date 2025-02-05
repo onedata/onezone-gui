@@ -7,10 +7,8 @@
  */
 
 import VirtualChunksListSidebar from 'onedata-gui-common/components/virtual-chunks-list-sidebar';
-import template from 'onedata-gui-common/templates/components/one-sidebar';
-import { classNames, layout } from '@ember-decorators/component';
+import { classNames } from '@ember-decorators/component';
 
-@layout(template)
 @classNames('sidebar-tokens')
 export default class SidebarTokens extends VirtualChunksListSidebar {
   /**

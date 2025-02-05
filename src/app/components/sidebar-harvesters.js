@@ -1,11 +1,15 @@
-// FIXME: jsdoc
+/**
+ * A sidebar for harvesters.
+ *
+ * @author Jakub Liput
+ * @copyright (C) 2025 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
 
-import { classNames, layout } from '@ember-decorators/component';
+import { classNames } from '@ember-decorators/component';
 import { computed } from '@ember/object';
-import template from 'onedata-gui-common/templates/components/one-sidebar';
 import VirtualChunksListSidebar from 'onedata-gui-common/components/virtual-chunks-list-sidebar';
 
-@layout(template)
 @classNames('sidebar-harvesters')
 export default class SidebarHarvesters extends VirtualChunksListSidebar {
   /**

@@ -8,10 +8,8 @@
 
 import { computed } from '@ember/object';
 import VirtualChunksListSidebar from 'onedata-gui-common/components/virtual-chunks-list-sidebar';
-import template from 'onedata-gui-common/templates/components/one-sidebar';
-import { layout, classNames } from '@ember-decorators/component';
+import { classNames } from '@ember-decorators/component';
 
-@layout(template)
 @classNames('sidebar-groups')
 export default class SidebarGroups extends VirtualChunksListSidebar {
   /**

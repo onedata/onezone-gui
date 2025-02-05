@@ -7,11 +7,9 @@
  */
 
 import ChunksSidebar from 'onedata-gui-common/components/chunks-sidebar';
-import template from 'onedata-gui-common/templates/components/one-sidebar';
-import { layout, classNames } from '@ember-decorators/component';
+import { classNames } from '@ember-decorators/component';
 import { inject as service } from '@ember/service';
 
-@layout(template)
 @classNames('sidebar-shares')
 export default class SidebarShares extends ChunksSidebar {
   @service shareManager;
@@ -54,5 +52,13 @@ export default class SidebarShares extends ChunksSidebar {
     // check if fetchPrev is needed because reload causes invalidation of start
     await this.chunksArray.startChanged();
   }
+
+  init() {
+    super.init(...arguments);
+    // FIXME: debug code
+    ((name) => {
+      window[name] = this;
+      console.log(`window.${name}`, window[name]);
+    })('debug_sidebar_shares');
   }
 }
