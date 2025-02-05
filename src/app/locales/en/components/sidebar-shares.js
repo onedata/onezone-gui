@@ -4,7 +4,7 @@ export default {
   shareItem: {
     space: 'Space',
     unknown: 'unknown',
-    openDataTip: 'This {{fileType}} is published as Open&nbsp;Data.',
+    publicDataTip: 'This {{fileType}} is exposed as Public&nbsp;Data.',
     fileType: {
       [FileType.Regular]: 'file',
       [FileType.Directory]: 'directory',

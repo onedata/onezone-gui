@@ -35,13 +35,4 @@ export default ContentOneproviderContainerBase.extend(I18n, {
    * @type {ComputedProperty<PromiseObject<Models.Space>>}
    */
   spaceProxy: reads('share.space'),
-
-  actions: {
-    clipboardSuccess() {
-      this.get('globalNotify').success(this.t('clipboardSuccess'));
-    },
-    clipboardError() {
-      this.get('globalNotify').error(this.t('clipboardError'));
-    },
-  },
 });
