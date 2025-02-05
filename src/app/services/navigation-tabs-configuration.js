@@ -4,7 +4,7 @@
  * Implementation for Onezone GUI.
  *
  * @author Jakub Liput
- * @copyright (C) 2024 ACK CYFRONET AGH
+ * @copyright (C) 2024-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -12,9 +12,11 @@ import CommonNavigationTabsConfiguration from 'onedata-gui-common/services/navig
 import { computed } from '@ember/object';
 import _ from 'lodash';
 import { inject as service } from '@ember/service';
+import gri from 'onedata-gui-websocket-client/utils/gri';
 
 class OnezoneNavigationTabsConfiguration extends CommonNavigationTabsConfiguration {
   @service currentUser;
+  @service recordManager;
 
   /**
    * @override
@@ -61,6 +63,31 @@ class OnezoneNavigationTabsConfiguration extends CommonNavigationTabsConfigurati
     };
     tabModels.push(uploadsTab);
     return tabModels;
+  }
+
+  /**
+   * @override
+   */
+  findOutResourceId(resourceId, resourceType) {
+    const {
+      recordManager,
+      sidebarResources,
+    } = this;
+
+    const modelName = sidebarResources.getModelNameForRouteResourceType(resourceType);
+    const entityType = recordManager.getEntityTypeForModelName(modelName);
+    // FIXME: być może do refaktoru - do przeniesienia do recordManager
+    const scope = entityType === 'share' ? 'private' : 'auto';
+    if (entityType) {
+      return gri({
+        entityId: resourceId,
+        entityType,
+        aspect: 'instance',
+        scope,
+      });
+    } else {
+      return null;
+    }
   }
 }
 
