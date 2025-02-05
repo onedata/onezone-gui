@@ -1,5 +1,5 @@
 /**
- * FIXME: jsdoc (i wszystkie inne pliki)
+ * A sidebar for automation inventories.
  *
  * @author Jakub Liput
  * @copyright (C) 2025 ACK CYFRONET AGH

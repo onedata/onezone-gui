@@ -13,6 +13,7 @@ import { computed } from '@ember/object';
 import _ from 'lodash';
 import { inject as service } from '@ember/service';
 import gri from 'onedata-gui-websocket-client/utils/gri';
+import { entityType as shareEntityType } from 'onezone-gui/models/share';
 
 class OnezoneNavigationTabsConfiguration extends CommonNavigationTabsConfiguration {
   @service currentUser;
@@ -76,8 +77,7 @@ class OnezoneNavigationTabsConfiguration extends CommonNavigationTabsConfigurati
 
     const modelName = sidebarResources.getModelNameForRouteResourceType(resourceType);
     const entityType = recordManager.getEntityTypeForModelName(modelName);
-    // FIXME: być może do refaktoru - do przeniesienia do recordManager
-    const scope = entityType === 'share' ? 'private' : 'auto';
+    const scope = entityType === shareEntityType ? 'private' : 'auto';
     if (entityType) {
       return gri({
         entityId: resourceId,
