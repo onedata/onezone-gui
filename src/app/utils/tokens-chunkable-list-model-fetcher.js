@@ -1,5 +1,5 @@
 /**
- * Simulates fetch function for getting infinite scroll data with source from the
+ * Simulates fetch function for getting infinite scroll tokens data with source from the
  * ListModel.
  *
  * @author Jakub Liput
@@ -7,14 +7,9 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import VirtualListFetcher from 'onedata-gui-common/utils/virtual-list-fetcher';
+import ChunkableListModelFetcher from 'onedata-gui-common/utils/chunkable-list-model-fetcher';
 
-/**
- * @typedef {Object} VirtualListFetcherItem
- * @property {string} index
- */
-
-export default class TokensVirtualListFetcher extends VirtualListFetcher {
+export default class TokensVirtualListFetcher extends ChunkableListModelFetcher {
   /**
    * @override
    * @param {Array<Models.Token>} items

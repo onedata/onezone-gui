@@ -1,16 +1,16 @@
 /**
- * A sidebar for data providers (extension of ``one-sidebar``)
+ * A sidebar for data providers.
  *
  * @author Jakub Liput, Michał Borzęcki
  * @copyright (C) 2017-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import VirtualChunksListSidebar from 'onedata-gui-common/components/virtual-chunks-list-sidebar';
+import ChunkableListModelSidebar from 'onedata-gui-common/components/chunkable-list-model-sidebar';
 import { classNames } from '@ember-decorators/component';
 
 @classNames('sidebar-providers')
-export default class SidebarProviders extends VirtualChunksListSidebar {
+export default class SidebarProviders extends ChunkableListModelSidebar {
   /**
    * @override
    */

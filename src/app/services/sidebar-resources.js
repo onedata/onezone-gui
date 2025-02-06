@@ -12,9 +12,9 @@ import { computed } from '@ember/object';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { ChunksArraySidebarCollection } from 'onezone-gui/utils/chunks-array-sidebar-collection';
 import { ListModelSidebarCollection } from 'onezone-gui/utils/list-model-sidebar-collection';
-import { VirtualListChunksSidebarCollection } from 'onezone-gui/utils/virtual-list-chunks-sidebar-collection';
-import VirtualListChunksArray from 'onedata-gui-common/utils/virtual-list-chunks-array';
-import TokensVirtualListChunksArray from 'onezone-gui/utils/tokens-virtual-list-chunks-array';
+import { ChunkableListModelSidebarCollection } from 'onezone-gui/utils/chunkable-list-model-sidebar-collection';
+import ChunkableListModel from 'onedata-gui-common/utils/chunkable-list-model';
+import TokensChunkableListModel from 'onezone-gui/utils/tokens-chunkable-list-model';
 import SharesChunksArray from 'onezone-gui/utils/shares-chunks-array';
 import { camelize } from '@ember/string';
 
@@ -57,52 +57,52 @@ export default class OnezoneSidebarResources extends SidebarResources {
   }
 
   /**
-   * @type {PromiseObject<VirtualListChunksArray>}
+   * @type {PromiseObject<ChunkableListModel>}
    */
   @computed()
-  get spacesVirtualListChunksProxy() {
+  get spacesChunkableListModelProxy() {
     return promiseObject(this.resolveUserVirtualList('space'));
   }
 
   /**
-   * @type {PromiseObject<VirtualListChunksArray>}
+   * @type {PromiseObject<ChunkableListModel>}
    */
   @computed()
-  get groupsVirtualListChunksProxy() {
+  get groupsChunkableListModelProxy() {
     return promiseObject(this.resolveUserVirtualList('group'));
   }
 
   /**
-   * @type {PromiseObject<VirtualListChunksArray>}
+   * @type {PromiseObject<ChunkableListModel>}
    */
   @computed()
-  get atmInventoriesVirtualListChunksProxy() {
+  get atmInventoriesChunkableListModelProxy() {
     return promiseObject(this.resolveUserVirtualList('atmInventory'));
   }
 
   /**
-   * @type {PromiseObject<VirtualListChunksArray>}
+   * @type {PromiseObject<ChunkableListModel>}
    */
   @computed()
-  get providersVirtualListChunksProxy() {
+  get providersChunkableListModelProxy() {
     return promiseObject(this.resolveUserVirtualList('provider'));
   }
 
   /**
-   * @type {PromiseObject<VirtualListChunksArray>}
+   * @type {PromiseObject<TokensChunkableListModel>}
    */
   @computed()
-  get tokensVirtualListChunksProxy() {
+  get tokensChunkableListModelProxy() {
     return promiseObject(
-      this.resolveUserVirtualList('token', TokensVirtualListChunksArray)
+      this.resolveUserVirtualList('token', TokensChunkableListModel)
     );
   }
 
   /**
-   * @type {PromiseObject<VirtualListChunksArray>}
+   * @type {PromiseObject<ChunkableListModel>}
    */
   @computed()
-  get harvestersVirtualListChunksProxy() {
+  get harvestersChunkableListModelProxy() {
     return promiseObject(this.resolveUserVirtualList('harvester'));
   }
 
@@ -186,23 +186,23 @@ export default class OnezoneSidebarResources extends SidebarResources {
 
   /**
    * @param {'tokens'|'spaces'|'groups'|'harvesters'|'atm-inventories'} resourceType
-   * @returns {Promise<VirtualListChunksSidebarCollection>}
+   * @returns {Promise<ChunkableListModelSidebarCollection>}
    */
   async createListChunksCollection(resourceType) {
     const camelizedResourceType = camelize(resourceType);
-    const virtualListChunksArray = await this[`${camelizedResourceType}VirtualListChunksProxy`];
-    await virtualListChunksArray.chunksArray.initialLoad;
-    return new VirtualListChunksSidebarCollection(virtualListChunksArray);
+    const chunkableListModel = await this[`${camelizedResourceType}ChunkableListModelProxy`];
+    await chunkableListModel.chunksArray.initialLoad;
+    return new ChunkableListModelSidebarCollection(chunkableListModel);
   }
 
   /**
    *
    * @param {'space'|'group'|'provider'|'token'|'linkedAccount'|'cluster'|'harvester'|'atmInventory'} listType
-   * @returns {Promise<VirtualListChunksArray>}
+   * @returns {Promise<ChunkableListModel>}
    */
-  async resolveUserVirtualList(listType, VirtualListClass = VirtualListChunksArray) {
+  async resolveUserVirtualList(listType, ChunkableListModelClass = ChunkableListModel) {
     const listRecord = await (await this.currentUser.userProxy)[`${listType}List`];
-    return new VirtualListClass(listRecord);
+    return new ChunkableListModelClass(listRecord);
   }
 
   async reloadShareList() {

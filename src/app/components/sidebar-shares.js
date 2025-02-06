@@ -6,12 +6,12 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import ChunksSidebar from 'onedata-gui-common/components/chunks-sidebar';
+import ChunksArraySidebar from 'onedata-gui-common/components/chunks-array-sidebar';
 import { classNames } from '@ember-decorators/component';
 import { inject as service } from '@ember/service';
 
 @classNames('sidebar-shares')
-export default class SidebarShares extends ChunksSidebar {
+export default class SidebarShares extends ChunksArraySidebar {
   @service shareManager;
 
   /**

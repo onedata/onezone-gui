@@ -8,10 +8,10 @@
 
 import { classNames } from '@ember-decorators/component';
 import { computed } from '@ember/object';
-import VirtualChunksListSidebar from 'onedata-gui-common/components/virtual-chunks-list-sidebar';
+import ChunkableListModelSidebar from 'onedata-gui-common/components/chunkable-list-model-sidebar';
 
 @classNames('sidebar-harvesters')
-export default class SidebarHarvesters extends VirtualChunksListSidebar {
+export default class SidebarHarvesters extends ChunkableListModelSidebar {
   /**
    * @override
    */

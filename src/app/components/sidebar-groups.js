@@ -1,5 +1,5 @@
 /**
- * A sidebar for groups (extension of `one-sidebar`)
+ * A sidebar for groups.
  *
  * @author Michał Borzęcki, Jakub Liput
  * @copyright (C) 2018-2025 ACK CYFRONET AGH
@@ -7,11 +7,11 @@
  */
 
 import { computed } from '@ember/object';
-import VirtualChunksListSidebar from 'onedata-gui-common/components/virtual-chunks-list-sidebar';
+import ChunkableListModelSidebar from 'onedata-gui-common/components/chunkable-list-model-sidebar';
 import { classNames } from '@ember-decorators/component';
 
 @classNames('sidebar-groups')
-export default class SidebarGroups extends VirtualChunksListSidebar {
+export default class SidebarGroups extends ChunkableListModelSidebar {
   /**
    * @override
    */

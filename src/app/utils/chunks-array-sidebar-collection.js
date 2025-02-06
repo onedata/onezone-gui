@@ -1,5 +1,8 @@
 /**
- * FIXME: doc
+ * Implementation of SidebarCollection (abstraction layer of collection for sidebar)
+ * that works on top of ReplacingChunksArray.
+ *
+ * It is suitable for models that have support for infinite scroll in backend.
  *
  * @author Jakub Liput
  * @copyright (C) 2024 ACK CYFRONET AGH

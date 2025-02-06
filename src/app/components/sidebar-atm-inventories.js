@@ -9,10 +9,10 @@
 import { classNames } from '@ember-decorators/component';
 import { computed } from '@ember/object';
 import recordIcon from 'onedata-gui-common/utils/record-icon';
-import VirtualChunksListSidebar from 'onedata-gui-common/components/virtual-chunks-list-sidebar';
+import ChunkableListModelSidebar from 'onedata-gui-common/components/chunkable-list-model-sidebar';
 
 @classNames('sidebar-atm-inventories')
-export default class SidebarAtmInventories extends VirtualChunksListSidebar {
+export default class SidebarAtmInventories extends ChunkableListModelSidebar {
   /**
    * @override
    */

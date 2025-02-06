@@ -1,5 +1,8 @@
 /**
- * FIXME: doc
+ * Implementation of SidebarCollection (abstraction layer of collection for sidebar)
+ * that works on top of list models (GRI models with `list` property).
+ *
+ * It is suitable for models that have list model available.
  *
  * @author Jakub Liput
  * @copyright (C) 2024 ACK CYFRONET AGH

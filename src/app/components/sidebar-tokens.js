@@ -1,16 +1,16 @@
 /**
- * A sidebar for tokens (extension of `one-sidebar`)
+ * A sidebar for tokens.
  *
  * @author Michał Borzęcki, Jakub Liput
  * @copyright (C) 2019-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import VirtualChunksListSidebar from 'onedata-gui-common/components/virtual-chunks-list-sidebar';
+import ChunkableListModelSidebar from 'onedata-gui-common/components/chunkable-list-model-sidebar';
 import { classNames } from '@ember-decorators/component';
 
 @classNames('sidebar-tokens')
-export default class SidebarTokens extends VirtualChunksListSidebar {
+export default class SidebarTokens extends ChunkableListModelSidebar {
   /**
    * @override
    */

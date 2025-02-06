@@ -13,17 +13,17 @@ import { tracked } from '@glimmer/tracking';
 /**
  * @implements {SidebarCollection}
  */
-export class VirtualListChunksSidebarCollection {
-  /** @type {VirtualListChunksArray} */
-  @tracked virtualListChunksArray;
+export class ChunkableListModelSidebarCollection {
+  /** @type {ChunkableListModel} */
+  @tracked chunkableListModel;
 
-  constructor(virtualListChunksArray) {
-    this.virtualListChunksArray = virtualListChunksArray;
+  constructor(chunkableListModel) {
+    this.chunkableListModel = chunkableListModel;
   }
 
-  @reads('virtualListChunksArray.listModel') listModel;
+  @reads('chunkableListModel.listModel') listModel;
 
-  @reads('virtualListChunksArray.chunksArray') chunksArray;
+  @reads('chunkableListModel.chunksArray') chunksArray;
 
   /**
    * @implements {SidebarCollection}
@@ -42,10 +42,10 @@ export class VirtualListChunksSidebarCollection {
 
   @computed('listModel.list.content.[]')
   get fullArray() {
-    return this.virtualListChunksArray.listModel.list.content?.toArray() ?? [];
+    return this.chunkableListModel.listModel.list.content?.toArray() ?? [];
   }
 
   setFilter({ expression, advanced }) {
-    this.virtualListChunksArray.setFilter({ expression, advanced });
+    this.chunkableListModel.setFilter({ expression, advanced });
   }
 }

@@ -6,14 +6,14 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import VirtualChunksListSidebar from 'onedata-gui-common/components/virtual-chunks-list-sidebar';
+import ChunkableListModelSidebar from 'onedata-gui-common/components/chunkable-list-model-sidebar';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import { classNames } from '@ember-decorators/component';
 
 @classNames('sidebar-spaces')
-export default class extends VirtualChunksListSidebar.extend(UserProxyMixin) {
+export default class extends ChunkableListModelSidebar.extend(UserProxyMixin) {
   /**
    * Note: `currentUser` service is needed by `UserProxyMixin`
    * which is needed by `space-item` to work.
