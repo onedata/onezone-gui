@@ -1,8 +1,9 @@
 /**
- * Implementation of SidebarCollection (abstraction layer of collection for sidebar)
- * that works on top of ReplacingChunksArray.
+ * Implementation of SidebarCollection (abstraction layer of collection for sidebar) that
+ * works on top of ReplacingChunksArray.
  *
- * It is suitable for models that have support for infinite scroll in backend.
+ * It is suitable for models that have support for infinite scroll in backend (eg.
+ * shares).
  *
  * @author Jakub Liput
  * @copyright (C) 2024 ACK CYFRONET AGH

@@ -1,5 +1,5 @@
 /**
- * FIXME: doc; opakowanie na ListModel (model) -> ChunkableListModelFetcher (view model) -> ChunksArray (view) <- ChunkableListModelReloader
+ * ChunkableListModel implementation for tokens - uses special fetcher class.
  *
  * @author Jakub Liput
  * @copyright (C) 2025 ACK CYFRONET AGH

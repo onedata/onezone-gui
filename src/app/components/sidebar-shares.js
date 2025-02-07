@@ -52,13 +52,4 @@ export default class SidebarShares extends ChunksArraySidebar {
     // check if fetchPrev is needed because reload causes invalidation of start
     await this.chunksArray.startChanged();
   }
-
-  init() {
-    super.init(...arguments);
-    // FIXME: debug code
-    ((name) => {
-      window[name] = this;
-      console.log(`window.${name}`, window[name]);
-    })('debug_sidebar_shares');
-  }
 }

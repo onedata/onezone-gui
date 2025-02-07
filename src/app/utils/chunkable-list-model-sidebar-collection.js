@@ -1,5 +1,8 @@
 /**
- * FIXME: doc
+ * Implementation of SidebarCollection (abstraction layer of collection for sidebar) that
+ * works on top of ChunkableListModel.
+ *
+ * It is suitable for models that are list by list models (eg. spaceList).
  *
  * @author Jakub Liput
  * @copyright (C) 2024 ACK CYFRONET AGH
@@ -43,6 +46,14 @@ export class ChunkableListModelSidebarCollection {
   @computed('listModel.list.content.[]')
   get fullArray() {
     return this.chunkableListModel.listModel.list.content?.toArray() ?? [];
+  }
+
+  @computed(
+    'fullArray',
+    'chunkableListModel.chunkableListModelFetcher.{filterExpression,filterAdvanced}'
+  )
+  get filteredFullArray() {
+    return this.chunkableListModel.chunkableListModelFetcher.filterItems(this.fullArray);
   }
 
   setFilter({ expression, advanced }) {

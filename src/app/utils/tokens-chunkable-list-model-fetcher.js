@@ -13,25 +13,14 @@ export default class TokensVirtualListFetcher extends ChunkableListModelFetcher 
   /**
    * @override
    * @param {Array<Models.Token>} items
-   * @returns {Array<Models.Token>}
-   */
-  filterItems(items) {
-    // FIXME: w sumie to mogłoby być w ogólnej klasie z virtual filterByAdvancedConditions do implementacji
-    const itemsByExpression = super.filterItems(items);
-    if (this.filterAdvanced) {
-      return this.filterByAdvancedConditions(itemsByExpression, this.filterAdvanced);
-    } else {
-      return itemsByExpression;
-    }
-  }
-
-  /**
-   * @private
-   * @param {Array<Models.Token>} items
    * @param {TokensSidebarAdvancedFilter} advancedFilter
    * @returns {Array<Models.Token>}
    */
   filterByAdvancedConditions(items, advancedFilter) {
+    if (!advancedFilter) {
+      return items;
+    }
+
     const {
       type,
       targetModelName,
