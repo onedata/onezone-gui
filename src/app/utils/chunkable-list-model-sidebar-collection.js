@@ -39,8 +39,14 @@ export class ChunkableListModelSidebarCollection {
   /**
    * @implements {SidebarCollection}
    */
+  @computed('array.@each.id')
   get ids() {
     return this.array.map(record => record.id);
+  }
+
+  @computed('fullArray.@each.id')
+  get allIds() {
+    return this.fullArray.map(record => record.id);
   }
 
   @computed('listModel.list.content.[]')
