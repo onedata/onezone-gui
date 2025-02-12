@@ -7,7 +7,7 @@
  */
 
 import Component from '@ember/component';
-import { computed, getProperties } from '@ember/object';
+import { computed, getProperties, trySet } from '@ember/object';
 import { sort } from '@ember/object/computed';
 import { debounce } from '@ember/runloop';
 import config from 'ember-get-config';
@@ -89,9 +89,13 @@ export default Component.extend(I18n, {
    */
   sortedCollection: sort('filteredCollection', 'collectionOrder'),
 
+  setSearchValue(value) {
+    trySet(this, 'searchValue', value);
+  },
+
   actions: {
     changeSearchValue(newValue) {
-      debounce(this, 'set', 'searchValue', newValue, typingActionDebouce);
+      debounce(this, 'setSearchValue', newValue, typingActionDebouce);
     },
   },
 });
