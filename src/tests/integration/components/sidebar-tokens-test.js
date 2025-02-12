@@ -10,7 +10,8 @@ import clearStore from '../../helpers/clear-store';
 import { all as allFulfilled } from 'rsvp';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { entityType as clusterEntityType } from 'onezone-gui/models/cluster';
-import { ListModelSidebarCollection } from 'onezone-gui/services/sidebar-resources';
+import { ChunkableListModelSidebarCollection } from 'onezone-gui/utils/chunkable-list-model-sidebar-collection';
+import ChunkableListModel from 'onedata-gui-common/utils/chunkable-list-model';
 
 describe('Integration | Component | sidebar-tokens', function () {
   const { beforeEach, afterEach } = setupRenderingTest();
@@ -86,36 +87,49 @@ describe('Integration | Component | sidebar-tokens', function () {
       list: tokens,
     }).save();
 
+    const chunkableListModel = new ChunkableListModel(tokenList);
+    const collection = new ChunkableListModelSidebarCollection(chunkableListModel);
     this.setProperties({
+      chunkableListModel,
+      tokens,
       model: {
-        collection: new ListModelSidebarCollection(tokenList),
+        collection,
       },
-      tokensOrder: [1, 2, 3, 0, 5, 4],
+      tokensOrder: [
+        'access token',
+        'identity token',
+        'invite token 1 cluster cluster1',
+        'invite token 2',
+        'access disabled',
+        'invite disabled cluster unknown',
+      ],
     });
   });
 
   afterEach(function () {
+    this.chunkableListModel?.destroy();
     clearStore();
   });
 
   it('renders all tokens', async function () {
-    const tokens = await this.get('model.collection.array');
-
     await render(hbs `{{sidebar-tokens model=model}}`);
 
     const renderedTokens = findAll('.token-item');
-    expect(renderedTokens).to.have.length(tokens.length);
+    expect(renderedTokens).to.have.length(this.tokens.length);
   });
 
   it('renders tokens in correct order', async function () {
-    const tokens = await this.get('model.collection.array');
     const tokensOrder = this.get('tokensOrder');
 
-    await render(hbs `{{sidebar-tokens model=model}}`);
+    await render(hbs`{{sidebar-tokens model=model}}`);
+
+    const renderedTokens = findAll('.token-item').map((element) =>
+      element.querySelector('.token-name').textContent.trim()
+    ).join(', ');
+
     findAll('.token-item').forEach((element, index) => {
-      const originIndex = tokensOrder[index];
-      expect(element.querySelector('.token-name'))
-        .to.contain.text(get(tokens.objectAt(originIndex), 'name'));
+      expect(element.querySelector('.token-name'), `rendered tokens: ${renderedTokens}`)
+        .to.contain.text(tokensOrder[index]);
     });
   });
 

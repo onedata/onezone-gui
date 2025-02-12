@@ -66,3 +66,5 @@ export class ChunkableListModelSidebarCollection {
     this.chunkableListModel.setFilter({ expression, advanced });
   }
 }
+
+export default ChunkableListModelSidebarCollection;

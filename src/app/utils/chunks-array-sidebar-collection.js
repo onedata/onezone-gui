@@ -42,3 +42,5 @@ export class ChunksArraySidebarCollection {
     return this.array.map(record => record.id);
   }
 }
+
+export default ChunksArraySidebarCollection;

@@ -31,3 +31,5 @@ export class ListModelSidebarCollection {
     return this.listModel?.belongsTo?.('list')?.ids?.() ?? [];
   }
 }
+
+export default ListModelSidebarCollection;
