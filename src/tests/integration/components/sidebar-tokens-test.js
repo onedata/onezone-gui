@@ -3,7 +3,6 @@ import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render, click, find, findAll } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
-import { get } from '@ember/object';
 import { selectChoose } from 'ember-power-select/test-support/helpers';
 import { lookupService } from '../../helpers/stub-service';
 import clearStore from '../../helpers/clear-store';
@@ -11,7 +10,7 @@ import { all as allFulfilled } from 'rsvp';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { entityType as clusterEntityType } from 'onezone-gui/models/cluster';
 import { ChunkableListModelSidebarCollection } from 'onezone-gui/utils/chunkable-list-model-sidebar-collection';
-import ChunkableListModel from 'onedata-gui-common/utils/chunkable-list-model';
+import TokensChunkableListModel from 'onezone-gui/utils/tokens-chunkable-list-model';
 
 describe('Integration | Component | sidebar-tokens', function () {
   const { beforeEach, afterEach } = setupRenderingTest();
@@ -87,7 +86,7 @@ describe('Integration | Component | sidebar-tokens', function () {
       list: tokens,
     }).save();
 
-    const chunkableListModel = new ChunkableListModel(tokenList);
+    const chunkableListModel = new TokensChunkableListModel(tokenList);
     const collection = new ChunkableListModelSidebarCollection(chunkableListModel);
     this.setProperties({
       chunkableListModel,
