@@ -175,8 +175,6 @@ export default class OnezoneSidebarResources extends SidebarResources {
    */
   getItemsSortingFor(resourceType) {
     switch (resourceType) {
-      case 'tokens':
-        return ['isActive:desc', 'isObsolete', 'name'];
       case 'uploads':
         return ['isAllOneproviders:desc', 'name'];
       default:
