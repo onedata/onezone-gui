@@ -94,6 +94,17 @@ export default Component.extend(I18n, {
     })();
   },
 
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.infiniteScroll?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
   initInfiniteScroll() {
     if (this.infiniteScroll) {
       throw new Error('inifiniteScroll is already initialized');
