@@ -14,6 +14,7 @@ import _ from 'lodash';
 import { inject as service } from '@ember/service';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { entityType as shareEntityType } from 'onezone-gui/models/share';
+import { entityType as providerEntityType } from 'onezone-gui/models/provider';
 
 class OnezoneNavigationTabsConfiguration extends CommonNavigationTabsConfiguration {
   @service currentUser;
@@ -75,8 +76,17 @@ class OnezoneNavigationTabsConfiguration extends CommonNavigationTabsConfigurati
       sidebarResources,
     } = this;
 
-    const modelName = sidebarResources.getModelNameForRouteResourceType(resourceType);
-    const entityType = recordManager.getEntityTypeForModelName(modelName);
+    if (resourceType === 'uploads' && resourceId === 'all') {
+      return resourceId;
+    }
+
+    let entityType;
+    if (resourceType === 'uploads') {
+      entityType = providerEntityType;
+    } else {
+      const modelName = sidebarResources.getModelNameForRouteResourceType(resourceType);
+      entityType = recordManager.getEntityTypeForModelName(modelName);
+    }
     const scope = entityType === shareEntityType ? 'private' : 'auto';
     if (entityType) {
       return gri({

@@ -79,10 +79,7 @@ export default Service.extend(I18n, {
   allOneprovidersItem: computed(
     function allOneprovidersItem() {
       return EmberObject.create({
-        id: gri({
-          entityType: 'provider',
-          entityId: 'all',
-        }),
+        id: 'all',
         entityId: 'all',
         isAllOneproviders: true,
         name: this.t('allUploads'),
