@@ -1,18 +1,18 @@
-{{#global-modal
-  classNames="choose-space-to-advertise-modal"
-  modalId=modalId
+<GlobalModal
+  @classNames="choose-space-to-advertise-modal"
+  @modalId={{modalId}}
   as |modal|
-}}
+>
 
-  {{#modal.header}}
+  <modal.header>
     <h1>
-      {{one-icon icon="sign-info-rounded"}}
+      <OneIcon @icon="sign-info-rounded" />
       <span class="one-label">{{tt this "header"}}</span>
     </h1>
-  {{/modal.header}}
+  </modal.header>
 
-  {{#modal.body}}
-    {{#promise-proxy-container proxy=allSpacesProxy}}
+  <modal.body>
+    <PromiseProxyContainer @proxy={{allSpacesProxy}}>
       {{#if noSpaces}}
         <p>{{tt this "noSpacesText"}}</p>
       {{else if areAllSpacesAdvertised}}
@@ -30,33 +30,29 @@
           as |space|
         >
           <div class="option-container">
-            {{#truncated-string class="text"}}
-              {{name-conflict item=space}}
-            {{/truncated-string}}
+            <TruncatedString class="text">
+              <NameConflict @item={{space}} />
+            </TruncatedString>
           </div>
         </OneDropdown>
       {{/if}}
-    {{/promise-proxy-container}}
-  {{/modal.body}}
+    </PromiseProxyContainer>
+  </modal.body>
 
-  {{#modal.footer class="btn-toolbar"}}
-    {{#one-button
-      type="default"
-      class="cancel-btn"
-      onClick=modal.close
-    }}
+  <modal.footer class="btn-toolbar">
+    <OneButton class="cancel-btn" @type="default" @onClick={{modal.close}}>
       {{tt this closeButtonType}}
-    {{/one-button}}
+    </OneButton>
     {{#if isProceedButtonVisible}}
-      {{#one-button
-        type="primary"
+      <OneButton
         class="proceed-btn"
-        disabled=(not isProceedAvailable)
-        onClick=(if isProceedAvailable (action modal.submit selectedSpace.entityId))
-      }}
+        @type="primary"
+        @disabled={{not isProceedAvailable}}
+        @onClick={{if isProceedAvailable (action modal.submit selectedSpace.entityId)}}
+      >
         {{tt this "proceed"}}
-      {{/one-button}}
+      </OneButton>
     {{/if}}
-  {{/modal.footer}}
+  </modal.footer>
 
-{{/global-modal}}
+</GlobalModal>

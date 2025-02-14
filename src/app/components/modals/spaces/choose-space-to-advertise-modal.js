@@ -13,6 +13,7 @@ import I18n from 'onedata-gui-common/mixins/i18n';
 import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { not, promise, conditional, raw, isEmpty, and, notEmpty } from 'ember-awesome-macros';
+import _ from 'lodash';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -52,7 +53,12 @@ export default Component.extend(I18n, {
   nonAdvertisedSpaces: computed(
     'allSpaces.@each.advertisedInMarketplace',
     function nonAdvertisedSpaces() {
-      return this.allSpaces?.filter((spc) => !spc.advertisedInMarketplace) ?? [];
+      if (!this.allSpaces) {
+        return [];
+      }
+      const nonAdvertised =
+        this.allSpaces.filter(space => !space.advertisedInMarketplace);
+      return _.sortBy(nonAdvertised, 'index');
     }
   ),
 
