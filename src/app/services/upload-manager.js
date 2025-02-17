@@ -3,7 +3,7 @@
  * dealing with UploadObject objects.
  *
  * @author Michał Borzęcki
- * @copyright (C) 2019-2020 ACK CYFRONET AGH
+ * @copyright (C) 2019-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -27,7 +27,6 @@ import {
   collect,
 } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/i18n';
-import gri from 'onedata-gui-websocket-client/utils/gri';
 import _ from 'lodash';
 import preventPageUnload from 'onedata-gui-common/utils/prevent-page-unload';
 import globals from 'onedata-gui-common/utils/globals';
