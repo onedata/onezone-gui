@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12542 Added custom fingerprint hashes based on file content and current git revision for some assets
 * VFS-12461 Changed Open Data to Public Data naming
 * VFS-12530 Changed text and position Copy token in token sidebar
 * VFS-12267 Added support for "service unavailable" error
