@@ -1,10 +1,10 @@
 <div class="row content-row header-row">
   <h1 class="with-back relative nowrap">
     <a class="content-back-link" {{action "backSlide"}}>
-      {{record-icon
-        modelName="atmLambda"
-        class="content-back-resource-icon"
-      }}{{one-icon icon="arrow-left" class="content-back-arrow-icon"}}
+      <RecordIcon @modelName="atmLambda" class="content-back-resource-icon" /><OneIcon
+        @icon="arrow-left"
+        class="content-back-arrow-icon"
+      />
     </a>
     <div class="resource-name">
       {{headerText}}
@@ -16,27 +16,28 @@
     </div>
     <div class="btn-toolbar">
       {{#if (contains dumpAction globalActions)}}
-        {{#one-button
-          type="default"
-          onClick=dumpAction.executeCallback
-          disabled=dumpAction.disabled
-          size="sm"
-          class=(concat-classes dumpAction.classNames "hidden-xs")
-        }}
-          {{one-icon icon=dumpAction.icon}}
+        <OneButton
+          @type="default"
+          @onClick={{dumpAction.executeCallback}}
+          @disabled={{dumpAction.disabled}}
+          @size="sm"
+          class={{concat-classes dumpAction.classNames "hidden-xs"}}
+        >
+          <OneIcon @icon={{dumpAction.icon}} />
           <span class="text">{{dumpAction.title}}</span>
-        {{/one-button}}
+        </OneButton>
       {{/if}}
     </div>
   </h1>
 </div>
 <div class="row content-row">
-  {{content-atm-inventories-lambdas/atm-lambda-form
-    mode=formMode
-    revision=atmLambdaRevision
-    defaultAtmResourceSpec=onedataConnection.defaultAtmResourceSpec
-    onSubmit=(action "onFormSubmit")
-    onCancel=onBackSlide
-  }}
+  <ContentAtmInventoriesLambdas::AtmLambdaForm
+    @mode={{formMode}}
+    @revision={{atmLambdaRevision}}
+    @defaultAtmResourceSpec={{onedataConnection.defaultAtmResourceSpec}}
+    @onSubmit={{action "onFormSubmit"}}
+    @onCancel={{onBackSlide}}
+  />
 </div>
 {{yield}}
+

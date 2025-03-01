@@ -1,38 +1,30 @@
-{{#global-modal
-  classNames="api-samples-modal"
-  modalId=modalId
-  size="lg"
-  as |modal|
-}}
-  {{#modal.header}}
+<GlobalModal @classNames="api-samples-modal" @modalId={{modalId}} @size="lg" as |modal|>
+  <modal.header>
     <h1>
       <span class="one-label">{{tt this "header"}}</span>
     </h1>
     <h2 class="normal-case">
-      {{#truncated-string class="record-name"}}
+      <TruncatedString @class="record-name">
         <div class="inline-icon-container">
-          {{one-icon icon=icon}}
+          <OneIcon @icon={{icon}} />
         </div>
         {{record.name}}
-      {{/truncated-string}}
+      </TruncatedString>
     </h2>
-  {{/modal.header}}
-  {{#modal.body}}
-    {{#promise-proxy-container
-      proxy=apiSamplesProxy
-      sizeClass="sm"
-      centered=false
-      spinnerBlockClass="loading-api-command absolute-middle-centered"
-    }}
-      {{api-samples
-        apiSamples=apiSamples
-        apiSubject=apiSubject
-      }}
-    {{/promise-proxy-container}}
-  {{/modal.body}}
-  {{#modal.footer class="btn-toolbar"}}
-    {{#one-button type="default" class="modal-close" onClick=modal.close}}
+  </modal.header>
+  <modal.body>
+    <PromiseProxyContainer
+      @proxy={{apiSamplesProxy}}
+      @sizeClass="sm"
+      @centered={{false}}
+      @spinnerBlockClass="loading-api-command absolute-middle-centered"
+    >
+      <ApiSamples @apiSamples={{apiSamples}} @apiSubject={{apiSubject}} />
+    </PromiseProxyContainer>
+  </modal.body>
+  <modal.footer @class="btn-toolbar">
+    <OneButton @type="default" @class="modal-close" @onClick={{modal.close}}>
       {{tt this "close"}}
-    {{/one-button}}
-  {{/modal.footer}}
-{{/global-modal}}
+    </OneButton>
+  </modal.footer>
+</GlobalModal>

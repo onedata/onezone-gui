@@ -1,10 +1,13 @@
 <div class="row content-row header-row">
   <h1 class="with-back relative nowrap normal-case">
     <a class="content-back-link" {{action "backSlide"}}>
-      {{record-icon
-        modelName="atmWorkflowSchema"
+      <RecordIcon
+        @modelName="atmWorkflowSchema"
         class="content-back-resource-icon"
-      }}{{one-icon icon="arrow-left" class="content-back-arrow-icon"}}
+      /><OneIcon
+        @icon="arrow-left"
+        class="content-back-arrow-icon"
+      />
     </a>
     <div class="resource-name">
       {{atmWorkflowSchema.name}}
@@ -19,72 +22,74 @@
             class="warning-icon"
             src={{root-url "assets/images/sign-warning-large.svg"}}
           />
-          {{one-tooltip
-            triggerElement=(local-selector elementId ".warning-icon")
-            title=(tt this
+          <OneTooltip @triggerElement={{local-selector elementId ".warning-icon"}} @title={{tt this
               (concat
                 "validationWarning."
                 (if (gt visualiserDataValidationErrors.length 1) "multi" "single")
               )
               issuesCount=visualiserDataValidationErrors.length
-            )
-          }}
+            }} />
         </span>
       {{/if}}
       <span>
-        {{#one-button
-          type="default"
-          onClick=dumpAction.executeCallback
-          disabled=dumpAction.disabled
-          size="sm"
-          class=(concat-classes dumpAction.classNames "hidden-xs")
-        }}
-          {{one-icon icon=dumpAction.icon}}
+        <OneButton
+          @type="default"
+          @onClick={{dumpAction.executeCallback}}
+          @size="sm"
+          @disabled={{dumpAction.disabled}}
+          class={{concat-classes dumpAction.classNames "hidden-xs"}}
+        >
+          <OneIcon @icon={{dumpAction.icon}} />
           <span class="text">{{dumpAction.title}}</span>
-        {{/one-button}}
+        </OneButton>
         {{#if dumpAction.tip}}
-          {{one-tooltip title=dumpAction.tip}}
+          <OneTooltip @title={{dumpAction.tip}} />
         {{/if}}
       </span>
       <span>
-        {{#one-button
-          type="primary"
-          buttonType="submit"
-          size="sm"
+        <OneButton
+          @disabled={{isSaveBtnDisabled}}
+          @onClick={{action "save"}}
+          @type="primary"
+          @buttonType="submit"
+          @size="sm"
           class="btn-save"
-          disabled=isSaveBtnDisabled
-          onClick=(action "save")
-        }}
+        >
           {{tt this "saveBtn"}}
-        {{/one-button}}
+        </OneButton>
         {{#if saveBtnTip}}
-          {{one-tooltip title=saveBtnTip}}
+          <OneTooltip @title={{saveBtnTip}} />
         {{/if}}
       </span>
     </div>
   </h1>
 </div>
-{{#bs-tab
-  activeId=activeTab
-  onChange=(action "onTabChange")
+<BsTab
+  @activeId={{activeTab}}
+  @onChange={{action "onTabChange"}}
   class="only-tab-bar bs-tab-onedata bs-tab-modern fill-flex-using-column"
-  fade=false
+  @fade={{false}}
   as |tab|
-}}
-  {{#tab.pane id="editor" title=(tt this "tabs.editor") class="fill-flex-using-column no-padding"}}
-    {{workflow-visualiser
-      mode="edit"
-      rawData=visualiserData
-      actionsFactory=actionsFactory
-      onChange=(action "visualiserDataChange")
-    }}
-  {{/tab.pane}}
-  {{#tab.pane id="details" title=(tt this "tabs.details")}}
-    {{content-atm-inventories-workflows/revision-details-form
-      atmWorkflowSchema=atmWorkflowSchema
-      revisionNumber=revisionNumber
-      onChange=(action "detailsDataChange")
-    }}
-  {{/tab.pane}}
-{{/bs-tab}}
+>
+  <tab.pane
+    id="editor"
+    @title={{tt this "tabs.editor"}}
+    class="fill-flex-using-column no-padding"
+  >
+    <WorkflowVisualiser
+      @rawData={{visualiserData}}
+      @actionsFactory={{actionsFactory}}
+      @onChange={{action "visualiserDataChange"}}
+      @mode="edit"
+    />
+  </tab.pane>
+  <tab.pane id="details" @title={{tt this "tabs.details"}}>
+    <ContentAtmInventoriesWorkflows::RevisionDetailsForm
+      @atmWorkflowSchema={{atmWorkflowSchema}}
+      @revisionNumber={{revisionNumber}}
+      @onChange={{action "detailsDataChange"}}
+    />
+  </tab.pane>
+</BsTab>
 {{yield}}
+

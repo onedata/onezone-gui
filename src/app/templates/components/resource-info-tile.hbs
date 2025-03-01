@@ -1,35 +1,33 @@
-{{#one-tile title=(tt this "title") isLink=false class="resource-info-tile"}}
-  {{#promise-proxy-container proxy=creatorProxy}}
+<OneTile @title={{tt this "title"}} @isLink={{false}} @class="resource-info-tile">
+  <PromiseProxyContainer @proxy={{creatorProxy}}>
     <table class="table table-condensed">
       <tbody>
         <tr>
           <td class="property-name">{{tt this "name"}}</td>
           <td class="property-value">
-            {{one-inline-editor value=record.name onSave=(action "saveName") class="resource-name"}}
+            <OneInlineEditor
+              @value={{record.name}}
+              @onSave={{action "saveName"}}
+              class="resource-name"
+            />
           </td>
         </tr>
         <tr>
           <td class="property-name">{{tt this "creator"}}</td>
           {{#if (eq creatorIcon "user")}}
             <td class="property-value user-info">
-              {{record-info-with-icon
-                record=creatorProxy.content
-              }}
+              <RecordInfoWithIcon @record={{creatorProxy.content}} />
             </td>
           {{else}}
-            {{#truncated-string
-              tagName="td"
-              class=(concat-classes
-                "property-value creator"
-                (if creatorIcon "has-icon")
-                (if isSpecialCreator "special")
-              )
-            }}
+            <TruncatedString
+              @tagName="td"
+              class={{concat-classes "property-value creator" (if creatorIcon "has-icon") (if isSpecialCreator "special")}}
+            >
               {{#if creatorIcon}}
-                {{one-icon icon=creatorIcon}}
+                <OneIcon @icon={{creatorIcon}} />
               {{/if}}
               {{creatorName}}
-            {{/truncated-string}}
+            </TruncatedString>
           {{/if}}
         </tr>
         <tr>
@@ -40,14 +38,15 @@
         <tr>
           <td class="property-name">{{tt this "id"}}</td>
           <td class="property-value id">
-            {{one-clipboard-line
-              size="sm"
-              value=record.entityId
-              showText=false
-              btnType="success"}}
+            <OneClipboardLine
+              @size="sm"
+              @value={{record.entityId}}
+              @showText={{false}}
+              @btnType="success"
+            />
           </td>
         </tr>
       </tbody>
     </table>
-  {{/promise-proxy-container}}
-{{/one-tile}}
+  </PromiseProxyContainer>
+</OneTile>

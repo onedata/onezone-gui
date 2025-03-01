@@ -8,7 +8,7 @@
     disabled={{isTokenInputDisabled}}
   >
   {{#if pendingCheckTime}}
-    {{spin-spinner-block sizeClass="xs"}}
+    <SpinSpinnerBlock @sizeClass="xs" />
   {{/if}}
 </div>
 {{#if invalidTokenErrorOccured}}
@@ -21,38 +21,38 @@
       {{errorTranslation}}
     </div>
   {{else}}
-    {{resource-load-error reason=error}}
+    <ResourceLoadError @reason={{error}} />
   {{/if}}
 {{/if}}
-{{#one-collapse collapsed=(not (and isTokenChecked isTokenValid))}}
+<OneCollapse @collapsed={{not (and isTokenChecked isTokenValid)}}>
   {{#if typeText}}
     <div class="type-info">
       <p class="token-type">
         {{typeText}}
         {{#if (media "isMobile")}}
-          {{one-icon
-            id=recordIdInfoTriggerId
-            icon="circle-id"
+          <OneIcon
+            @id={{recordIdInfoTriggerId}}
+            @icon="circle-id"
             class="record-info-icon id-icon icon-trigger id-trigger clickable"
-          }}
-          {{#one-webui-popover
+          />
+          <OneWebuiPopover
             class="id-info"
-            popoverStyle="id-info token-invite-target-id-info"
-            triggerSelector=(concat "#" recordIdInfoTriggerId)
+            @popoverStyle="id-info token-invite-target-id-info"
+            @triggerSelector={{concat "#" recordIdInfoTriggerId}}
             as |popover|
-          }}
+          >
             <div class="form-group without-margin">
               <label class="control-label">
                 {{tt this "recordId" targetModelName=inviteTargetModelNameTranslation}}:
               </label>
-              {{one-clipboard-line
-                size="sm"
-                value=inviteTargetRecord.entityId
-                showText=false
-                btnType="default"
-              }}
+              <OneClipboardLine
+                @size="sm"
+                @value={{inviteTargetRecord.entityId}}
+                @showText={{false}}
+                @btnType="default"
+              />
             </div>
-          {{/one-webui-popover}}
+          </OneWebuiPopover>
         {{/if}}
       </p>
       {{#if hasUnresolvedTargetName}}
@@ -70,19 +70,16 @@
         </div>
       {{/if}}
       {{#unless (or (media "isMobile") noJoinMessage)}}
-        {{join-image
+        <JoinImage
           class="consume-token-image"
-          joiningModelName=(or joiningRecordSelectorModelName "user")
-          joiningRecord=(if joiningRecordSelectorModelName
-            selectedJoiningRecordOption.value
-            currentUser
-          )
-          inviteTargetModelName=inviteTargetModelName
-          inviteTargetModelNameTranslation=inviteTargetModelNameTranslation
-          inviteTargetRecord=inviteTargetRecord
-          arrowLabelType=(if spaceHarvesterRelationToken "add" "join")
-          placeholderUnderSubjectImage=(tt this "placeholderUnderSubjectImage")
-        }}
+          @joiningModelName={{or joiningRecordSelectorModelName "user"}}
+          @joiningRecord={{if joiningRecordSelectorModelName selectedJoiningRecordOption.value currentUser}}
+          @inviteTargetModelName={{inviteTargetModelName}}
+          @inviteTargetModelNameTranslation={{inviteTargetModelNameTranslation}}
+          @inviteTargetRecord={{inviteTargetRecord}}
+          @arrowLabelType={{if spaceHarvesterRelationToken "add" "join"}}
+          @placeholderUnderSubjectImage={{tt this "placeholderUnderSubjectImage"}}
+        />
       {{/unless}}
     </div>
   {{/if}}
@@ -93,7 +90,7 @@
   {{/if}}
   {{#if joiningRecordSelectorModelName}}
     <div class="joining-record-container">
-      {{#promise-proxy-container proxy=joiningRecordSelectorOptionsProxy sizeClass="sm"}}
+      <PromiseProxyContainer @proxy={{joiningRecordSelectorOptionsProxy}} @sizeClass="sm">
         <p class="selector-description">{{joiningRecordSelectorDescription}}</p>
         <div class="joining-record-selector">
           <OneDropdown
@@ -107,34 +104,31 @@
             as |recordOption|
           >
             <div class="option-container">
-              {{one-icon icon=recordOption.icon}}
-              {{#truncated-string class="text"}}
-                {{name-conflict item=recordOption.value}}
-              {{/truncated-string}}
+              <OneIcon @icon={{recordOption.icon}} />
+              <TruncatedString @class="text">
+                <NameConflict @item={{recordOption.value}} />
+              </TruncatedString>
             </div>
           </OneDropdown>
         </div>
-      {{/promise-proxy-container}}
+      </PromiseProxyContainer>
     </div>
   {{/if}}
   {{#if showJoinBtn}}
     <div class="option-buttons">
-      {{#one-button
-        class="discard-btn btn btn-lg btn-warning"
-        onClick=(action "cancel")
-      }}
+      <OneButton @class="discard-btn btn btn-lg btn-warning" @onClick={{action "cancel"}}>
         {{tt this "cancelBtn"}}
-      {{/one-button}}
-      {{#one-button
-        type="primary"
-        size="lg"
+      </OneButton>
+      <OneButton
+        @type="primary"
+        @size="lg"
         class="confirm-btn"
-        disabled=isConfirmBtnDisabled
-        onClick=(action "confirm")
-      }}
+        @disabled={{isConfirmBtnDisabled}}
+        @onClick={{action "confirm"}}
+      >
         {{tt this "confirmBtn"}}
-      {{/one-button}}
+      </OneButton>
     </div>
   {{/if}}
-{{/one-collapse}}
+</OneCollapse>
 {{yield}}

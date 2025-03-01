@@ -1,10 +1,10 @@
 <div class="icon-section">
-  {{one-icon icon="space"}}
+  <OneIcon @icon="space" />
 </div>
 <div class="content-section">
-  {{spin-spinner-block
-    sizeClass="md"
+  <SpinSpinnerBlock
+    @sizeClass="md"
     class="absolute-middle-centered item-loading-spinner-block"
-  }}
+  />
 </div>
 {{yield}}

@@ -1,16 +1,13 @@
 {{#if renderRefreshSpinner}}
-  {{spin-spinner-block
-    sizeClass="lg"
-    class="absolute-middle-centered refresh-spinner"
-  }}
+  <SpinSpinnerBlock @sizeClass="lg" class="absolute-middle-centered refresh-spinner" />
 {{/if}}
 {{#if (and (not viewModel.entries.length) (not viewModel.isRefreshing))}}
   <div class="no-spaces-container">
     {{#if viewModel.isAnyFilterActive}}
-      {{one-icon class="no-spaces-icon" icon="search"}}
+      <OneIcon class="no-spaces-icon" @icon="search" />
       <span class="no-spaces-text">{{tt this "noMatchingResults"}}</span>
     {{else}}
-      {{one-icon class="no-spaces-icon" icon="space-empty"}}
+      <OneIcon class="no-spaces-icon" @icon="space-empty" />
       <span class="no-spaces-text">{{tt this "noSpacesAvailable"}}</span>
     {{/if}}
   </div>
@@ -23,22 +20,19 @@
   ></li>
   {{#if showFetchPrevLoader}}
     <li class="special-row loading-row">
-      {{spin-spinner-block sizeClass="sm" class="absolute-middle-centered"}}
+      <SpinSpinnerBlock @sizeClass="sm" class="absolute-middle-centered" />
     </li>
   {{/if}}
   {{#each entries key="id" as |spaceItem|}}
     {{#if (not spaceItem.id)}}
-      {{content-spaces-marketplace/item-placeholder}}
+      <ContentSpacesMarketplace::ItemPlaceholder />
     {{else}}
-      {{content-spaces-marketplace/item
-        viewModel=viewModel
-        spaceItem=spaceItem
-      }}
+      <ContentSpacesMarketplace::Item @viewModel={{viewModel}} @spaceItem={{spaceItem}} />
     {{/if}}
   {{/each}}
   {{#if showFetchNextLoader}}
     <li class="special-row loading-row">
-      {{spin-spinner-block sizeClass="sm" class="absolute-middle-centered"}}
+      <SpinSpinnerBlock @sizeClass="sm" class="absolute-middle-centered" />
     </li>
   {{/if}}
 </ul>

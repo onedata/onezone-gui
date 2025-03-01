@@ -2,17 +2,17 @@
   <div class="public-content">
     <div class="container">
       <h1 class="public-title">{{header}}</h1>
-      {{wysiwyg-editor mode="show" content=content}}
+      <WysiwygEditor @mode="show" @content={{content}} />
     </div>
   </div>
-  {{#public-footer}}
+  <PublicFooter>
     <div class="back-to-main-page">
-      {{#link-to "index"}}
-        {{one-icon icon="home"}}
+      <LinkTo @route="index">
+        <OneIcon @icon="home" />
         {{#unless (media "isMobile")}}
           <span>{{tt this "backToMainPage"}}</span>
         {{/unless}}
-      {{/link-to}}
+      </LinkTo>
     </div>
-  {{/public-footer}}
+  </PublicFooter>
 </div>

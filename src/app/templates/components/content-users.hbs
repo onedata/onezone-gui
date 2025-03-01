@@ -1,49 +1,64 @@
 <div class="row content-row header-row hidden-xs">
   <h1 class="with-menu">
     <span class="one-label">{{tt this "profile"}}</span>
-    {{actions-toolbar
-      actionsArray=globalActions
-      isMinimized=true
-      renderImmediately=true
-    }}
+    <ActionsToolbar
+      @actionsArray={{globalActions}}
+      @isMinimized={{true}}
+      @renderImmediately={{true}}
+    />
   </h1>
 </div>
 <div class="content-row">
   <h1>{{tt this "fullName"}}</h1>
   <div class="indented-row">
-    {{one-icon icon="user-profile" class="user-image"}}
-    {{one-inline-editor value=user.fullName onSave=(action "saveFullName") class="full-name-editor"}}
+    <OneIcon @icon="user-profile" @class="user-image" />
+    <OneInlineEditor
+      @value={{user.fullName}}
+      @onSave={{action "saveFullName"}}
+      class="full-name-editor"
+    />
   </div>
 </div>
 <div class="content-row">
-  <h1><span class="one-label">{{tt this "username"}}</span> {{one-label-tip title=(tt this (if user.basicAuthEnabled "usernameWithBasicAuthHint" "usernameNoBasicAuthHint"))}}</h1>
+  <h1><span class="one-label">{{tt this "username"}}</span> <OneLabelTip
+    @title={{tt this (if user.basicAuthEnabled "usernameWithBasicAuthHint" "usernameNoBasicAuthHint")}}
+  /></h1>
   <div class="indented-row">
-    {{one-inline-editor value=user.username onSave=(action "saveUsername") class="username-editor"}}
+    <OneInlineEditor
+      @value={{user.username}}
+      @onSave={{action "saveUsername"}}
+      class="username-editor"
+    />
   </div>
 </div>
 {{#if showPasswordSection}}
   <div class="content-row">
     <h1>{{tt this "password"}}</h1>
-    <div class="indented-row change-password-row {{if isChangingPassword "is-changing-password"}}">
+    <div
+      class="indented-row change-password-row {{if isChangingPassword "
+    >
       {{#if user.username}}
         {{#if isChangingPassword}}
-          {{user-credentials-form
-            centered=false
-            verifyCurrentPassword=user.hasPassword
-            changingPassword=isChangingPassword
-            submit=(action "saveNewPassword")
-            cancel=(action "stopPasswordChange")}}
+          <UserCredentialsForm
+            @centered={{false}}
+            @verifyCurrentPassword={{user.hasPassword}}
+            @changingPassword={{isChangingPassword}}
+            @submit={{action "saveNewPassword"}}
+            @cancel={{action "stopPasswordChange"}}
+          />
         {{else}}
-          {{one-inline-editor
-            value=passwordString
+          <OneInlineEditor
+            @value={{passwordString}}
             class="password-editor-trigger"
-            onEdit=(action "startPasswordChange")}}
+            @onEdit={{action "startPasswordChange"}}
+          />
         {{/if}}
       {{else}}
-        {{one-inline-editor
+        <OneInlineEditor
           class="password-editor-trigger no-username"
-          staticPlaceholder=(tt this "setUsernameFirst")
-          isEditing=false}}
+          @staticPlaceholder={{tt this "setUsernameFirst"}}
+          @isEditing={{false}}
+        />
       {{/if}}
     </div>
   </div>
@@ -51,76 +66,80 @@
 <div class="content-row">
   <h1><span class="one-label">{{tt this "userId"}}</span></h1>
   <div class="indented-row indented-row-more">
-    {{one-clipboard-line value=user.entityId class="user-id-clipboard-line"}}
+    <OneClipboardLine @value={{user.entityId}} @class="user-id-clipboard-line" />
   </div>
 </div>
 <div class="content-row">
   <h1>{{tt this "linkedAccounts"}}</h1>
   <ul class="indented-row indented-row-more linked-accounts-list">
-    {{#promise-proxy-container proxy=linkedAccountsProxy}}
+    <PromiseProxyContainer @proxy={{linkedAccountsProxy}}>
       {{#each accountsInfo as |accountInfo|}}
-        <li class="linked-account full-auth-icon content-row {{accountInfo.account.idp}}-account">
-          {{login-box/auth-icon-box-list/auth-icon-box
-            authId=accountInfo.account.idp
-            iconPath=accountInfo.authorizer.iconPath
-            iconBackgroundColor=accountInfo.authorizer.iconBackgroundColor
-          }}
+        <li
+          class="linked-account full-auth-icon content-row {{accountInfo.account.idp}}-account"
+        >
+          <LoginBox::AuthIconBoxList::AuthIconBox
+            @authId={{accountInfo.account.idp}}
+            @iconPath={{accountInfo.authorizer.iconPath}}
+            @iconBackgroundColor={{accountInfo.authorizer.iconBackgroundColor}}
+          />
           <div class="account-description">
-            {{#truncated-string class="account-type"}}
+            <TruncatedString @class="account-type">
               {{accountInfo.authorizer.displayName}}
-            {{/truncated-string}}
+            </TruncatedString>
             {{#each accountInfo.account.emails as |email|}}
-              {{#truncated-string class="account-email"}}
+              <TruncatedString @class="account-email">
                 {{email}}
-              {{/truncated-string}}
+              </TruncatedString>
             {{/each}}
           </div>
         </li>
       {{/each}}
       <li class="linked-account full-auth-icon content-row add-account">
-        {{#login-box/auth-icon-box-list/auth-icon-box
-          authId="add"
-          authIconStyle=""
-          aStyle=""
+        <LoginBox::AuthIconBoxList::AuthIconBox
+          @authId="add"
+          @authIconStyle=""
+          @aStyle=""
           class="auth-icon-box-linked-account"
-          click=(action "toggleAuthorizersDropdown")
-        }}
+          @click={{action "toggleAuthorizersDropdown"}}
+        >
           <span class="plus-icon">+</span>
-        {{/login-box/auth-icon-box-list/auth-icon-box}}
+        </LoginBox::AuthIconBoxList::AuthIconBox>
         <div class="account-description">
-          <div class="show-dropdown-description animated fast" {{action "toggleAuthorizersDropdown"}}>
+          <div
+            class="show-dropdown-description animated fast"
+          >
             {{tt this "addAccount"}}
           </div>
-          {{authorizers-dropdown
-            authorizers=authorizersForSelect
-            onSelect=(action "authorizerSelected")
-            selectedAuthorizer=_selectedAuthorizer
-            activeAuthorizer=_selectedAuthorizer
-            disabled=_selectedAuthorizer
-            placeholder=(tt this "addAccountDropdownPlaceholder")
-            renderInPlace=true
-            verticalPosition="above"
+          <AuthorizersDropdown
+            @authorizers={{authorizersForSelect}}
+            @onSelect={{action "authorizerSelected"}}
+            @selectedAuthorizer={{_selectedAuthorizer}}
+            @activeAuthorizer={{_selectedAuthorizer}}
+            @disabled={{_selectedAuthorizer}}
+            @placeholder={{tt this "addAccountDropdownPlaceholder"}}
+            @renderInPlace={{true}}
+            @verticalPosition="above"
             class="animated fast hide"
-          }}
+          />
         </div>
       </li>
-    {{/promise-proxy-container}}
+    </PromiseProxyContainer>
   </ul>
 </div>
 
-{{#render-later triggerRender=deleteAccountOpened}}
-  {{#proceed-process-modal
-    opened=deleteAccountOpened
-    modalIcon="sign-warning-rounded"
-    modalClass="delete-account-modal"
-    headerText=(tt this "deleteAccountModal.header")
-    cancelButtonText=(tt this "deleteAccountModal.cancel")
-    proceedButtonText=(tt this "deleteAccountModal.remove")
-    proceedDisabled=(not deleteConfirmChecked)
-    close=(action (mut deleteAccountOpened) false)
-    proceed=(action "removeUser")
-    onHidden=(action "removeModalHidden")
-  }}
+<RenderLater @triggerRender={{deleteAccountOpened}}>
+  <ProceedProcessModal
+    @opened={{deleteAccountOpened}}
+    @modalIcon="sign-warning-rounded"
+    @modalClass="delete-account-modal"
+    @headerText={{tt this "deleteAccountModal.header"}}
+    @cancelButtonText={{tt this "deleteAccountModal.cancel"}}
+    @proceedButtonText={{tt this "deleteAccountModal.remove"}}
+    @proceedDisabled={{not deleteConfirmChecked}}
+    @close={{action (mut deleteAccountOpened) false}}
+    @proceed={{action "removeUser"}}
+    @onHidden={{action "removeModalHidden"}}
+  >
     <p>{{tt this "deleteAccountModal.textRemoveWarning"}}</p>
     <p>{{tt this "deleteAccountModal.textRecreate"}}</p>
     <div class="row account-details">
@@ -130,34 +149,34 @@
       <div class="row account-details-row">
         <div class="col-key">{{tt this "deleteAccountModal.fullName"}}</div>
         <div class="col-value col-value-full-name">
-          {{#truncated-string}}{{user.fullName}}{{/truncated-string}}
+          <TruncatedString>{{user.fullName}}</TruncatedString>
         </div>
       </div>
       <div class="row account-details-row">
         <div class="col-key">{{tt this "deleteAccountModal.username"}}</div>
         <div class="col-value col-value-username">
-          {{#truncated-string}}{{user.username}}{{/truncated-string}}
+          <TruncatedString>{{user.username}}</TruncatedString>
         </div>
       </div>
       <div class="row account-details-row">
         <div class="col-key">{{tt this "deleteAccountModal.id"}}</div>
         <div class="col-value col-value-user-id">
-          {{#truncated-string}}{{user.entityId}}{{/truncated-string}}
+          <TruncatedString>{{user.entityId}}</TruncatedString>
         </div>
       </div>
       <div class="row account-details-row">
         <div class="col-key">{{tt this "deleteAccountModal.createdAt"}}</div>
         <div class="col-value col-value-user-created-at">
-          {{#truncated-string}}{{createdAtString}}{{/truncated-string}}
+          <TruncatedString>{{createdAtString}}</TruncatedString>
         </div>
       </div>
     </div>
     <div class="row content-row no-border row-understand-notice">
-      {{one-checkbox
+      <OneCheckbox
         class="danger one-checkbox-danger one-checkbox-understand"
-        checked=deleteConfirmChecked
-        update=(action (mut deleteConfirmChecked))
-      }}
+        @checked={{deleteConfirmChecked}}
+        @update={{action (mut deleteConfirmChecked)}}
+      />
       <div
         class="text-understand"
         {{action (mut deleteConfirmChecked) (not deleteConfirmChecked)}}
@@ -165,5 +184,5 @@
         {{tt this "deleteAccountModal.textUnderstand"}}
       </div>
     </div>
-  {{/proceed-process-modal}}
-{{/render-later}}
+  </ProceedProcessModal>
+</RenderLater>

@@ -5,7 +5,7 @@
   </div>
   <div class="iconified-block">
     <div class="icon-section">
-      {{one-icon icon="overview"}}
+      <OneIcon @icon="overview" />
     </div>
     <div class="dir-stats-config content-section">
       <div class="content-section-header">
@@ -15,15 +15,15 @@
         >
           {{tt this "dirStatsService.label"}}
         </label>
-        {{one-way-toggle
+        <OneWayToggle
           class="form-control toggle-field-dir-stats-config"
-          inputId="dir-stats-config"
-          checked=dirStatsServiceEnabled
-          spinnerSide=(if (media "isMobile") "left" "right")
-          update=(action "changeDirStatsServiceEnabled")
-          isReadOnly=dirStatsToggleDisabled
-          lockHint=dirStatsToggleLockHint
-        }}
+          @inputId="dir-stats-config"
+          @checked={{dirStatsServiceEnabled}}
+          @spinnerSide={{if (media "isMobile") "left" "right"}}
+          @update={{action "changeDirStatsServiceEnabled"}}
+          @isReadOnly={{dirStatsToggleDisabled}}
+          @lockHint={{dirStatsToggleLockHint}}
+        />
       </div>
       <div class="subheader-text dir-stats-config-info">
         {{tt this "dirStatsService.description"}}
@@ -36,14 +36,14 @@
       </div>
       {{#if (not dirStatsServiceEnabled)}}
         <p>
-          {{one-icon class="dir-stats-icon" icon="warning"}}
+          <OneIcon class="dir-stats-icon" @icon="warning" />
           <span class="dir-stats-warning">
             {{tt this "dirStatsService.recomputingWarning"}}
           </span>
         </p>
       {{/if}}
       <p>
-        {{one-icon class="dir-stats-icon" icon="warning"}}
+        <OneIcon class="dir-stats-icon" @icon="warning" />
         <span class="dir-stats-warning">
           {{tt this "dirStatsService.additionalLoadWarning"}}
         </span>
@@ -52,7 +52,7 @@
   </div>
   <div class="iconified-block">
     <div class="icon-section">
-      {{one-icon icon="support"}}
+      <OneIcon @icon="support" />
     </div>
     <div class="accounting-config content-section">
       <div class="content-section-header">
@@ -62,13 +62,13 @@
         >
           {{tt this "accounting.label"}}
         </label>
-        {{one-way-toggle
+        <OneWayToggle
           class="form-control toggle-field-accounting"
-          inputId="accounting-enabled"
-          checked=accountingEnabled
-          isReadOnly=true
-          lockHint=(tt this "accounting.disabledAccounting")
-        }}
+          @inputId="accounting-enabled"
+          @checked={{accountingEnabled}}
+          @isReadOnly={{true}}
+          @lockHint={{tt this "accounting.disabledAccounting"}}
+        />
       </div>
       <div class="subheader-text accounting-info">
         {{tt this "accounting.description"}}

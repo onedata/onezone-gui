@@ -1,6 +1,6 @@
-{{#promise-proxy-container proxy=tokenDataSource}}
+<PromiseProxyContainer @proxy={{tokenDataSource}}>
   <form class="form form-horizontal form-component">
-    {{form-component/field-renderer field=basicGroup}}
+    <FormComponent::FieldRenderer @field={{basicGroup}} />
     {{#if (or (eq mode "create") hasVisibleCaveats)}}
       <h1 class="caveats-header">
         {{tt this "fields.caveats.header"}}
@@ -11,10 +11,10 @@
           onClick={{if (not disableCaveatsCollapse) (action "toggleCaveatsGroup")}}
         >
           {{tt this (if areAllCaveatsExpanded "hideCaveats" "showCaveats")}}
-          {{one-icon
-            icon=(if areAllCaveatsExpanded "arrow-up" "arrow-down")
+          <OneIcon
+            @icon={{if areAllCaveatsExpanded "arrow-up" "arrow-down"}}
             class="toggle-icon"
-          }}
+          />
         </a>
         {{#if (and (not areAllCaveatsExpanded) (not hasVisibleCaveats))}}
           <p class="no-caveats-warning">
@@ -24,7 +24,7 @@
           </p>
         {{/if}}
       {{/if}}
-      {{form-component/field-renderer field=caveatsGroup}}
+      <FormComponent::FieldRenderer @field={{caveatsGroup}} />
     {{/if}}
     {{#if isDataAccessCaveatWarningVisible}}
       <div class="data-access-caveat-warning token-alert alert alert-warning">
@@ -53,7 +53,8 @@
                   (array "Interface" "Readonly" "Path" "ObjectId")
                   as |tPart|
                 }}
-                  <li>{{tt this (concat "dataAccessCaveatWarning.details" tPart "Item")}}</li>
+                  <li
+                  >{{tt this (concat "dataAccessCaveatWarning.details" tPart "Item")}}</li>
                 {{/each}}
               </ul>
             </p>
@@ -61,10 +62,10 @@
               {{tt this "dataAccessCaveatWarning.detailsNeverEnclose"}}
             </p>
             <p>
-              {{one-doc-see-more
-                linkName=(tt this "dataAccessCaveatWarning.documentationLink")
-                topic="tokens-data-access-caveats"
-              }}
+              <OneDocSeeMore
+                @linkName={{tt this "dataAccessCaveatWarning.documentationLink"}}
+                @topic="tokens-data-access-caveats"
+              />
             </p>
           </div>
         {{/if}}
@@ -97,7 +98,8 @@
                   (array "Service" "Interface" "Readonly" "Path" "ObjectId")
                   as |tPart|
                 }}
-                  <li>{{tt this (concat "serviceCaveatWarning.details" tPart "Item")}}</li>
+                  <li
+                  >{{tt this (concat "serviceCaveatWarning.details" tPart "Item")}}</li>
                 {{/each}}
               </ul>
             </p>
@@ -105,10 +107,10 @@
               {{tt this "serviceCaveatWarning.detailsNeverEnclose"}}
             </p>
             <p>
-              {{one-doc-see-more
-                linkName=(tt this "serviceCaveatWarning.documentationLink")
-                topic="tokens-security-privacy"
-              }}
+              <OneDocSeeMore
+                @linkName={{tt this "serviceCaveatWarning.documentationLink"}}
+                @topic="tokens-security-privacy"
+              />
             </p>
           </div>
         {{/if}}
@@ -116,26 +118,26 @@
     {{/if}}
     <div class="btn-toolbar footer-buttons">
       {{#if (not-eq mode "view")}}
-        {{#one-button
-          type="primary"
+        <OneButton
+          @type="primary"
           class="submit-token"
-          disabled=(not fields.isValid)
-          onClick=(action "submit")
-        }}
+          @disabled={{not fields.isValid}}
+          @onClick={{action "submit"}}
+        >
           {{submitBtnText}}
-        {{/one-button}}
+        </OneButton>
       {{/if}}
       {{#if (eq mode "edit")}}
-        {{#one-button
-          type="warning"
+        <OneButton
+          @type="warning"
           class="cancel-edition"
-          disabled=isSubmitting
-          onClick=onCancel
-        }}
+          @disabled={{isSubmitting}}
+          @onClick={{onCancel}}
+        >
           {{tt this "cancel"}}
-        {{/one-button}}
+        </OneButton>
       {{/if}}
     </div>
   </form>
   {{yield}}
-{{/promise-proxy-container}}
+</PromiseProxyContainer>

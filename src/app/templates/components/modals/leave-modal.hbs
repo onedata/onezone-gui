@@ -1,19 +1,13 @@
-{{#global-modal
-  classNames="leave-modal"
-  allowClose=(not isSubmitting)
-  modalId=modalId
-  size=(if isCurrentUserIndirectMember "lg" null)
-  as |modal|
-}}
-  {{#modal.header}}
+<GlobalModal @classNames="leave-modal" @allowClose={{not isSubmitting}} @modalId={{modalId}} @size={{if isCurrentUserIndirectMember "lg" null}} as |modal|>
+  <modal.header>
     <h1>
-      {{one-icon icon="sign-warning-rounded"}}
+      <OneIcon @icon="sign-warning-rounded" />
       <span class="one-label">{{modalHeader}}</span>
     </h1>
-  {{/modal.header}}
+  </modal.header>
 
-  {{#modal.body class="loadable-row"}}
-    {{#promise-proxy-container proxy=loadingProxy}}
+  <modal.body @class="loadable-row">
+    <PromiseProxyContainer @proxy={{loadingProxy}}>
       {{#if isCurrentUserDirectMember}}
         <p>
           {{tt this "areYouSure"
@@ -27,38 +21,38 @@
         {{#if infoText.beforeMemberships}}
           <p>{{infoText.beforeMemberships}}</p>
         {{/if}}
-        {{membership-visualiser
-          contextRecord=currentUser
-          targetRecord=recordToLeave
-          maxPathsNumber=4
-          visibleBlocks=3
-          hideDirectMembership=true
-        }}
+        <MembershipVisualiser
+          @contextRecord={{currentUser}}
+          @targetRecord={{recordToLeave}}
+          @maxPathsNumber={{4}}
+          @visibleBlocks={{3}}
+          @hideDirectMembership={{true}}
+        />
         {{#if infoText.afterMemberships}}
           <p>{{infoText.afterMemberships}}</p>
         {{/if}}
       {{/if}}
-    {{/promise-proxy-container}}
-  {{/modal.body}}
+    </PromiseProxyContainer>
+  </modal.body>
 
-  {{#modal.footer class="btn-toolbar"}}
-    {{#one-button
-      type="default"
+  <modal.footer @class="btn-toolbar">
+    <OneButton
+      @type="default"
       class="cancel-btn"
-      onClick=modal.close
-      disabled=isSubmitting
-    }}
+      @onClick={{modal.close}}
+      @disabled={{isSubmitting}}
+    >
       {{tt this (if isCurrentUserDirectMember "buttons.cancel" "buttons.close")}}
-    {{/one-button}}
+    </OneButton>
     {{#if isCurrentUserDirectMember}}
-      {{#one-button
-        type="danger"
-        buttonType="submit"
+      <OneButton
+        @type="danger"
+        @buttonType="submit"
         class="submit-btn proceed"
-        onClick=(action "submit" modal.submit)
-      }}
+        @onClick={{action "submit" modal.submit}}
+      >
         {{tt this "buttons.submit"}}
-      {{/one-button}}
+      </OneButton>
     {{/if}}
-  {{/modal.footer}}
-{{/global-modal}}
+  </modal.footer>
+</GlobalModal>

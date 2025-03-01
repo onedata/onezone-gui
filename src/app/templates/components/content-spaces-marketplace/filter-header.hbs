@@ -1,21 +1,22 @@
 <div class="form-group search-form-group">
   <div class="input-group with-icon-addon">
-    {{search-bar
-      placeholder=(tt this "searchPlaceholder")
-      search=(action "changeSearchValue") class="form-control"
-    }}
+    <SearchBar
+      @placeholder={{tt this "searchPlaceholder"}}
+      @search={{action "changeSearchValue"}}
+      class="form-control"
+    />
     <div class="input-group-addon">
-      {{one-icon icon="search"}}
+      <OneIcon @icon="search" />
     </div>
   </div>
 </div>
 <div class="form-group tags-filter-form-group">
-  {{tags-input
-    tags=(or tags (array))
-    tagEditorComponentName="space-configuration/space-tags-selector"
-    isClearButtonVisible=true
-    editPlaceholder=(tt this "tagsFilterPlaceholder")
-    onChange=(action "changeTagsFilter")
-  }}
+  <TagsInput
+    @tags={{or tags (array )}}
+    @tagEditorComponentName="space-configuration/space-tags-selector"
+    @isClearButtonVisible={{true}}
+    @editPlaceholder={{tt this "tagsFilterPlaceholder"}}
+    @onChange={{action "changeTagsFilter"}}
+  />
 </div>
 {{yield}}

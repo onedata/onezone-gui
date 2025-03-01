@@ -3,15 +3,15 @@
     class={{concat-classes "provider-info-container nav-link" (if isActive "active")}}
     onclick={{action "anchorClicked"}}
   >
-    {{record-info-with-icon
-      record=provider
-      recordType="provider"
+    <RecordInfoWithIcon
+      @record={{provider}}
+      @recordType="provider"
       class="provider-info-name"
-    }}
+    />
     {{#unless isInRequiredVersion}}
-      {{#one-icon class="provider-warning-icon" icon="sign-warning-rounded"}}
-        {{one-tooltip title=(tt this "versionTooLowWarning")}}
-      {{/one-icon}}
+      <OneIcon @class="provider-warning-icon" @icon="sign-warning-rounded">
+        <OneTooltip @title={{tt this "versionTooLowWarning"}} />
+      </OneIcon>
     {{/unless}}
   </span>
 {{else if (eq item.type "overview")}}
@@ -21,7 +21,7 @@
     ignoreTouchAction=true
   >
     <div class="inline-icon-container not-animation">
-      {{one-icon icon=item.icon}}
+      <OneIcon @icon={{item.icon}} />
     </div>
     <span class="tab-name one-label">{{tt this "overviewName"}}</span>
   </div>

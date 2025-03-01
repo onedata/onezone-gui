@@ -1,10 +1,4 @@
-{{#one-tile
-  title=(tt this "title")
-  isLink=isLink
-  class=tileClass
-  aspect=aspect
-  moreText=moreText
-}}
+<OneTile @title={{tt this "title"}} @isLink={{isLink}} @class={{tileClass}} @aspect={{aspect}} @moreText={{moreText}}>
   {{#unless description}}
     <figure class="main-figure">
       <img class="main-image" src="assets/images/settings-circle-filled.svg">
@@ -15,10 +9,10 @@
   {{/unless}}
   {{#if organizationName}}
     <div class="tile-element organization-name-row">
-      {{one-icon icon="organization" class="organization-name-icon"}}
-      {{#truncated-string class="organization-name"}}
+      <OneIcon @icon="organization" @class="organization-name-icon" />
+      <TruncatedString @class="organization-name">
         <span >{{organizationName}}</span>
-      {{/truncated-string}}
+      </TruncatedString>
     </div>
   {{/if}}
   {{#if topMessage}}
@@ -27,20 +21,17 @@
     </div>
   {{/if}}
   {{#unless noTags}}
-    {{tags-input
+    <TagsInput
       class="tile-element space-tags static-value"
-      tags=inputTags
-      readonly=true
-      readonlyTagsDisplayLimit=readonlyTagsDisplayLimit
-      onEvaluateMoreTagsText=(action "evaluateMoreTagsText")
-    }}
+      @tags={{inputTags}}
+      @readonly={{true}}
+      @readonlyTagsDisplayLimit={{readonlyTagsDisplayLimit}}
+      @onEvaluateMoreTagsText={{action "evaluateMoreTagsText"}}
+    />
   {{/unless}}
   {{#if description}}
     <div class="tile-element description-row">
-      {{one-markdown-to-html
-        class="markdown-view"
-        markdown=description
-      }}
+      <OneMarkdownToHtml @class="markdown-view" @markdown={{description}} />
     </div>
   {{/if}}
-{{/one-tile}}
+</OneTile>

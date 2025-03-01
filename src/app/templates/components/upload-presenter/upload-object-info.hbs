@@ -4,33 +4,30 @@
   onclick={{action "toggleExpand" value="target"}}
 >
   <div class="upload-object-heading-row {{if isExpandable "clickable"}}">
-    {{one-icon
-      class=(concat uploadObject.objectType "-icon upload-object-icon")
-      icon=objectIcon
-    }}
+    <OneIcon
+      class={{concat uploadObject.objectType "-icon upload-object-icon"}}
+      @icon={{objectIcon}}
+    />
     {{#if fileUrl}}
-      {{#truncated-string class="upload-object-name"}}
+      <TruncatedString @class="upload-object-name">
         <a href={{fileUrl}} class="black upload-object-link">
           {{uploadObject.objectName}}
         </a>
-      {{/truncated-string}}
+      </TruncatedString>
     {{else}}
-      {{#truncated-string class="upload-object-name"}}
+      <TruncatedString @class="upload-object-name">
         {{uploadObject.objectName}}
-      {{/truncated-string}}
+      </TruncatedString>
     {{/if}}
     <div class="upload-object-icons">
       {{#if (eq uploadObject.state "failed")}}
-        {{upload-presenter/error-indicator uploadObject=uploadObject}}
+        <UploadPresenter::ErrorIndicator @uploadObject={{uploadObject}} />
       {{/if}}
       {{#if isExpandable}}
-        {{one-icon
-          class=(concat-classes
-            "upload-object-expanded-icon"
-            (if isExpanded "expanded")
-          )
-          icon="arrow-down"
-        }}
+        <OneIcon
+          class={{concat-classes "upload-object-expanded-icon" (if isExpanded "expanded")}}
+          @icon="arrow-down"
+        />
       {{/if}}
     </div>
     {{#unless isCancelledDirectory}}
@@ -43,12 +40,12 @@
         {{/if}}
       </div>
     {{/unless}}
-    {{upload-presenter/cancel-upload
-      onCancel=onCancel
-      canCancel=uploadObject.canBeCancelled
-      isCancelled=uploadObject.isCancelled
-      iconClass="upload-object-cancel"
-    }}
+    <UploadPresenter::CancelUpload
+      @onCancel={{onCancel}}
+      @canCancel={{uploadObject.canBeCancelled}}
+      @isCancelled={{uploadObject.isCancelled}}
+      @iconClass="upload-object-cancel"
+    />
   </div>
   <div class="progress upload-object-progress-bar">
     <div
@@ -57,12 +54,9 @@
       style={{unless isCancelledDirectory progressBarWidthStyle}}
     >
     </div>
-    {{one-tooltip
-      title=(if uploadObject.isCancelled
-        (tt this "cancelled")
-        (concat uploadObject.progress "%")
-      )
-      delayShow=200
-    }}
+    <OneTooltip
+      @title={{if uploadObject.isCancelled (tt this "cancelled") (concat uploadObject.progress "%")}}
+      @delayShow={{200}}
+    />
   </div>
 </div>
