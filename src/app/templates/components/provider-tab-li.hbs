@@ -9,7 +9,7 @@
       class="provider-info-name"
     />
     {{#unless isInRequiredVersion}}
-      <OneIcon @class="provider-warning-icon" @icon="sign-warning-rounded">
+      <OneIcon class="provider-warning-icon" @icon="sign-warning-rounded">
         <OneTooltip @title={{tt this "versionTooLowWarning"}} />
       </OneIcon>
     {{/unless}}

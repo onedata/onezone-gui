@@ -15,7 +15,7 @@
   />
 {{/if}}
 
-<RecordIcon @class="box-icon" @record={{groupBox.group}} @useSubtypeIcon={{true}} />
+<RecordIcon class="box-icon" @record={{groupBox.group}} @useSubtypeIcon={{true}} />
 
 {{!-- optimization: rendering editor only when needed --}}
 {{#if isRenaming}}
@@ -30,7 +30,7 @@
     @inputClasses="input-sm"
   />
 {{else}}
-  <TruncatedString @class="group-name">{{groupBox.group.name}}</TruncatedString>
+  <TruncatedString class="group-name">{{groupBox.group.name}}</TruncatedString>
 {{/if}}
 
 <GroupsHierarchyVisualiser::GroupBoxRelation @relationType="parents" @group={{groupBox.group}} @expandRelation={{showParents}} @isExpanded={{parentsRelationActive}} />
@@ -38,7 +38,7 @@
 <GroupsHierarchyVisualiser::GroupBoxRelation @relationType="children" @group={{groupBox.group}} @expandRelation={{showChildren}} @isExpanded={{childrenRelationActive}} />
 
 {{#if groupBox.group.directMembership}}
-  <OneIcon @icon="user" @class="direct-membership-icon">
+  <OneIcon @icon="user" class="direct-membership-icon">
     <OneTooltip @title={{tt this "youAreDirectMember"}} />
   </OneIcon>
 {{/if}}

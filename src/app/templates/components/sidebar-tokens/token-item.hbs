@@ -1,4 +1,4 @@
-<OneIcon @icon={{iconName}} @class="sidebar-item-icon" />
+<OneIcon @icon={{iconName}} class="sidebar-item-icon" />
 {{#if isRenaming}}
   <OneInlineEditor
     @isEditing={{true}}
@@ -12,11 +12,11 @@
   />
 {{else}}
   <div class="sidebar-item-title">
-    <TruncatedString @class={{if (not token.isActive) "sidebar-item-title-upper"}}>
-      <NameConflict @item={{item}} @tagName="span" @class="one-label token-name" />
+    <TruncatedString class={{if (not token.isActive) "sidebar-item-title-upper"}}>
+      <NameConflict @item={{item}} @tagName="span" class="one-label token-name" />
     </TruncatedString>
     {{#if (not token.isActive)}}
-      <TruncatedString @class="sidebar-item-title-lower">
+      <TruncatedString class="sidebar-item-title-lower">
         {{tt this (if token.isObsolete "expired" "revoked")}}
       </TruncatedString>
     {{/if}}

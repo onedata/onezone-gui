@@ -5,7 +5,7 @@
         <img class="main-image" src={{imagePath}}>
       </figure>
     </carousel.slide>
-    <carousel.slide @slideId="selector" @class="record-selector-slide">
+    <carousel.slide @slideId="selector" class="record-selector-slide">
       <div class="top-bar">
         <a class="template-back" onClick={{action "onTemplateBackClick"}}>
           &laquo; {{t (concat i18nGenericPrefix "back")}}
@@ -13,7 +13,7 @@
         {{#if recordsProxy.length}}
           <div class="form-group-light">
             <div class="input-group input-group-sm with-icon-addon">
-              <SearchBar @search={{action (mut filter)}} @class="form-control" />
+              <SearchBar @search={{action (mut filter)}} class="form-control" />
               <div class="input-group-addon">
                 <OneIcon @icon="search" />
               </div>
@@ -22,7 +22,7 @@
         {{/if}}
       </div>
       <RenderLater @triggerRender={{eq activeSlideId "selector"}}>
-        <PerfectScrollbarElement @class="records-container">
+        <PerfectScrollbarElement class="records-container">
           <PromiseProxyContainer @proxy={{recordsProxy}}>
             {{#if filteredRecords.length}}
               <ul class="records-list">

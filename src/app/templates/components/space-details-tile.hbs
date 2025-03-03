@@ -1,4 +1,4 @@
-<OneTile @title={{tt this "title"}} @isLink={{isLink}} @class={{tileClass}} @aspect={{aspect}} @moreText={{moreText}}>
+<OneTile @title={{tt this "title"}} @isLink={{isLink}} class={{tileClass}} @aspect={{aspect}} @moreText={{moreText}}>
   {{#unless description}}
     <figure class="main-figure">
       <img class="main-image" src="assets/images/settings-circle-filled.svg">
@@ -9,8 +9,8 @@
   {{/unless}}
   {{#if organizationName}}
     <div class="tile-element organization-name-row">
-      <OneIcon @icon="organization" @class="organization-name-icon" />
-      <TruncatedString @class="organization-name">
+      <OneIcon @icon="organization" class="organization-name-icon" />
+      <TruncatedString class="organization-name">
         <span >{{organizationName}}</span>
       </TruncatedString>
     </div>
@@ -31,7 +31,7 @@
   {{/unless}}
   {{#if description}}
     <div class="tile-element description-row">
-      <OneMarkdownToHtml @class="markdown-view" @markdown={{description}} />
+      <OneMarkdownToHtml class="markdown-view" @markdown={{description}} />
     </div>
   {{/if}}
 </OneTile>

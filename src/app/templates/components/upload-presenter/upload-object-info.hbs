@@ -9,13 +9,13 @@
       @icon={{objectIcon}}
     />
     {{#if fileUrl}}
-      <TruncatedString @class="upload-object-name">
+      <TruncatedString class="upload-object-name">
         <a href={{fileUrl}} class="black upload-object-link">
           {{uploadObject.objectName}}
         </a>
       </TruncatedString>
     {{else}}
-      <TruncatedString @class="upload-object-name">
+      <TruncatedString class="upload-object-name">
         {{uploadObject.objectName}}
       </TruncatedString>
     {{/if}}

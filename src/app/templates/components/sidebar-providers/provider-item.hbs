@@ -1,6 +1,6 @@
-<OneIconTagged @class={{concat "sidebar-item-icon" (if offline " item-error")}} @icon="provider" @tagIcon={{if offline "x"}} @shadowType="none" />
-<TruncatedString @class="sidebar-item-title">
-  <NameConflict @item={{item}} @tagName="span" @class="one-label" />
+<OneIconTagged class={{concat "sidebar-item-icon" (if offline " item-error")}} @icon="provider" @tagIcon={{if offline "x"}} @shadowType="none" />
+<TruncatedString class="sidebar-item-title">
+  <NameConflict @item={{item}} @tagName="span" class="one-label" />
 </TruncatedString>
 {{#if (or _spaceIdsLoaded _spacesLoaded)}}
   <StatusToolbar as |toolbar|>

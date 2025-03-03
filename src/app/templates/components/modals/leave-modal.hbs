@@ -6,7 +6,7 @@
     </h1>
   </modal.header>
 
-  <modal.body @class="loadable-row">
+  <modal.body class="loadable-row">
     <PromiseProxyContainer @proxy={{loadingProxy}}>
       {{#if isCurrentUserDirectMember}}
         <p>
@@ -35,7 +35,7 @@
     </PromiseProxyContainer>
   </modal.body>
 
-  <modal.footer @class="btn-toolbar">
+  <modal.footer class="btn-toolbar">
     <OneButton
       @type="default"
       class="cancel-btn"

@@ -1,4 +1,4 @@
-<OneIcon @class={{concat-classes "cancel-action" iconClass (concat "cancel-ack-" parentView.elementId) (if canCancel "clickable" "disabled")}} @icon="ban-left" @click={{action "toggleAckPopover" (not ackPopoverOpened)}}>
+<OneIcon class={{concat-classes "cancel-action" iconClass (concat "cancel-ack-" parentView.elementId) (if canCancel "clickable" "disabled")}} @icon="ban-left" @click={{action "toggleAckPopover" (not ackPopoverOpened)}}>
   <OneTooltip @title={{tt this (if isCancelled "cancelled" "cancel")}} />
 </OneIcon>
 {{#if canCancel}}

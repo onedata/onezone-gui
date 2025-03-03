@@ -11,14 +11,14 @@
     <div class="row content-row header-row hidden-xs">
       <h1 class="with-back relative nowrap">
         <a class="content-back-link" {{action "backToTemplates"}}>
-          <OneIcon @icon="tokens" @class="content-back-resource-icon" /><OneIcon
+          <OneIcon @icon="tokens" class="content-back-resource-icon" /><OneIcon
             @icon="arrow-left"
             class="content-back-arrow-icon"
           />
         </a>
         <div class="resource-name">
           {{tt this "header"}}
-            <TruncatedString @tagName="small" @class="template-name">
+            <TruncatedString @tagName="small" class="template-name">
               {{tt this "fromTemplateHeader"
                 templateName=(t (concat "components.tokenTemplateSelector.templates." lastSelectedTemplateName ".title"))
               }}

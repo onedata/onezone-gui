@@ -7,21 +7,21 @@
     @onChange={{action "typeChanged"}}
     as |bg|
   >
-    <bg.button @type="default" @class="btn-sm btn-all" @value="all">
+    <bg.button @type="default" class="btn-sm btn-all" @value="all">
       {{tt this "typeFilter.values.all"}}
     </bg.button>
-    <bg.button @type="default" @class="btn-sm btn-access" @value="access">
+    <bg.button @type="default" class="btn-sm btn-access" @value="access">
       {{tt this "typeFilter.values.access"}}
     </bg.button>
-    <bg.button @type="default" @class="btn-sm btn-identity" @value="identity">
+    <bg.button @type="default" class="btn-sm btn-identity" @value="identity">
       {{tt this "typeFilter.values.identity"}}
     </bg.button>
-    <bg.button @type="default" @class="btn-sm btn-invite" @value="invite">
+    <bg.button @type="default" class="btn-sm btn-invite" @value="invite">
       {{tt this "typeFilter.values.invite"}}
     </bg.button>
   </BsButtonGroup>
 </div>
-<OneCollapse @collapsed={{not isTargetFilterVisible}} @class="target-filter-row-collapse">
+<OneCollapse @collapsed={{not isTargetFilterVisible}} class="target-filter-row-collapse">
   <div class="target-filter-row filter-row">
     <label class="filter-label">{{tt this "targetFilter.label"}}:</label>
     <div class="filter-control target-filter">
@@ -36,9 +36,9 @@
         @renderInPlace={{true}}
         as |option|
       >
-        <TruncatedString @class="option-container">
+        <TruncatedString class="option-container">
           {{#if option.icon}}
-            <OneIcon @class="model-icon" @icon={{option.icon}} />
+            <OneIcon class="model-icon" @icon={{option.icon}} />
           {{/if}}
           <span
             class="text model-name"

@@ -3,10 +3,10 @@
   <figcaption class="subject-image-label">
     {{#if joiningRecord}}
       <div class="subject-description">
-        <TruncatedString @class="text subject-name">
+        <TruncatedString class="text subject-name">
           {{joiningRecord.name}}
         </TruncatedString>
-        <OneIcon @icon="browser-info" @class="record-info-icon joining-record-info-trigger popover-info-trigger" @click={{action
+        <OneIcon @icon="browser-info" class="record-info-icon joining-record-info-trigger popover-info-trigger" @click={{action
             (mut joiningRecordInfoOpened)
             (not joiningRecordInfoOpened)
             bubbles=false
@@ -21,7 +21,7 @@
         </RecordInfoPopover>
       </div>
     {{else}}
-      <TruncatedString @class="text select-below-label">
+      <TruncatedString class="text select-below-label">
         {{placeholderUnderSubjectImage}}
       </TruncatedString>
     {{/if}}
@@ -38,10 +38,10 @@
   <figcaption class="subject-image-label subject-name">
     <div class="subject-description">
       {{#if inviteTargetRecord.name}}
-        <TruncatedString @class="text">
+        <TruncatedString class="text">
           {{inviteTargetRecord.name}}
         </TruncatedString>
-        <OneIcon @icon="browser-info" @class="record-info-icon target-record-info-trigger popover-info-trigger" @click={{action
+        <OneIcon @icon="browser-info" class="record-info-icon target-record-info-trigger popover-info-trigger" @click={{action
             (mut targetRecordInfoOpened)
             (not targetRecordInfoOpened)
             bubbles=false
@@ -56,7 +56,7 @@
           }}
         </RecordInfoPopover>
       {{else}}
-        <TruncatedString @class="text unknown-text">
+        <TruncatedString class="text unknown-text">
           {{tt this "placeholderUnderSubjectImage"}}
         </TruncatedString>
         <OneIcon

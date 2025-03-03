@@ -1,6 +1,6 @@
 <div class="row content-row header-row hidden-xs">
   <h1 class="normal-case">
-    <TruncatedString @class="one-label">{{space.name}}</TruncatedString>
+    <TruncatedString class="one-label">{{space.name}}</TruncatedString>
     <ActionsToolbar @actionsArray={{globalActions}} @isMinimized={{false}} />
   </h1>
 </div>
@@ -27,7 +27,7 @@
             {{#if dataProviderProxy.content}}
               {{dataProviderProxy.name}}
             {{else}}
-              <OneIcon @icon="sign-warning-rounded" @class="offline-warning-icon" />
+              <OneIcon @icon="sign-warning-rounded" class="offline-warning-icon" />
               <span class="offline-text">{{tt this "providersOfflineText"}}</span>
             {{/if}}
           </TruncatedString>

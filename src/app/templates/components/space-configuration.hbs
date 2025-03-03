@@ -91,14 +91,14 @@
       as |bg|
     >
       <div class="btn-group" role="group">
-        <bg.button @type="default" @class="btn-sm btn-description-view" @value="view">
-          <OneIcon @class="tab-icon" @icon="view" />
+        <bg.button @type="default" class="btn-sm btn-description-view" @value="view">
+          <OneIcon class="tab-icon" @icon="view" />
           <div class="tab-name">{{tt this "description.radio.view"}}</div>
         </bg.button>
       </div>
       <div class="btn-group" role="group">
-        <bg.button @type="default" @class="btn-sm btn-description-edit" @value="edit">
-          <OneIcon @class="tab-icon" @icon="markdown" />
+        <bg.button @type="default" class="btn-sm btn-description-edit" @value="edit">
+          <OneIcon class="tab-icon" @icon="markdown" />
           <div class="tab-name">{{tt this "description.radio.edit"}}</div>
         </bg.button>
       </div>
@@ -139,7 +139,7 @@
   }}
   >
     {{#if (eq descriptionEditorMode "view")}}
-      <PerfectScrollbarElement @class="markdown-container">
+      <PerfectScrollbarElement class="markdown-container">
         {{#unless isCurrentDescriptionEmpty}}
           <OneMarkdownToHtml
             class="markdown-view space-description-markdown-view"
@@ -158,7 +158,7 @@
               <span
                 class="description-empty-text"
               >{{tt this "description.emptyText"}}</span>
-              <OneIcon @icon="browser-rename" @class="description-empty-icon" />
+              <OneIcon @icon="browser-rename" class="description-empty-icon" />
             </div>
           {{/if}}
         {{/unless}}
@@ -183,7 +183,7 @@
   </div>
   {{#if (and isAdvertised (not isMarketplaceEnabled))}}
     <div class="field-alert marketplace-disabled-alert">
-      <OneIcon @class="field-alert-icon" @icon="sign-warning-rounded" />
+      <OneIcon class="field-alert-icon" @icon="sign-warning-rounded" />
       <span class="text">{{tt this "advertisedInDisabledMarketplace"}}</span>
     </div>
   {{/if}}

@@ -4,7 +4,7 @@
       <span class="one-label">{{tt this "header"}}</span>
     </h1>
     <h2 class="normal-case">
-      <TruncatedString @class="record-name">
+      <TruncatedString class="record-name">
         <div class="inline-icon-container">
           <OneIcon @icon={{icon}} />
         </div>
@@ -22,8 +22,8 @@
       <ApiSamples @apiSamples={{apiSamples}} @apiSubject={{apiSubject}} />
     </PromiseProxyContainer>
   </modal.body>
-  <modal.footer @class="btn-toolbar">
-    <OneButton @type="default" @class="modal-close" @onClick={{modal.close}}>
+  <modal.footer class="btn-toolbar">
+    <OneButton @type="default" class="modal-close" @onClick={{modal.close}}>
       {{tt this "close"}}
     </OneButton>
   </modal.footer>

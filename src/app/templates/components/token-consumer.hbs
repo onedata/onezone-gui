@@ -105,7 +105,7 @@
           >
             <div class="option-container">
               <OneIcon @icon={{recordOption.icon}} />
-              <TruncatedString @class="text">
+              <TruncatedString class="text">
                 <NameConflict @item={{recordOption.value}} />
               </TruncatedString>
             </div>
@@ -116,7 +116,7 @@
   {{/if}}
   {{#if showJoinBtn}}
     <div class="option-buttons">
-      <OneButton @class="discard-btn btn btn-lg btn-warning" @onClick={{action "cancel"}}>
+      <OneButton class="discard-btn btn btn-lg btn-warning" @onClick={{action "cancel"}}>
         {{tt this "cancelBtn"}}
       </OneButton>
       <OneButton

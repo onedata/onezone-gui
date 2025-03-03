@@ -11,7 +11,7 @@
 <div class="content-row">
   <h1>{{tt this "fullName"}}</h1>
   <div class="indented-row">
-    <OneIcon @icon="user-profile" @class="user-image" />
+    <OneIcon @icon="user-profile" class="user-image" />
     <OneInlineEditor
       @value={{user.fullName}}
       @onSave={{action "saveFullName"}}
@@ -66,7 +66,7 @@
 <div class="content-row">
   <h1><span class="one-label">{{tt this "userId"}}</span></h1>
   <div class="indented-row indented-row-more">
-    <OneClipboardLine @value={{user.entityId}} @class="user-id-clipboard-line" />
+    <OneClipboardLine @value={{user.entityId}} class="user-id-clipboard-line" />
   </div>
 </div>
 <div class="content-row">
@@ -83,11 +83,11 @@
             @iconBackgroundColor={{accountInfo.authorizer.iconBackgroundColor}}
           />
           <div class="account-description">
-            <TruncatedString @class="account-type">
+            <TruncatedString class="account-type">
               {{accountInfo.authorizer.displayName}}
             </TruncatedString>
             {{#each accountInfo.account.emails as |email|}}
-              <TruncatedString @class="account-email">
+              <TruncatedString class="account-email">
                 {{email}}
               </TruncatedString>
             {{/each}}
