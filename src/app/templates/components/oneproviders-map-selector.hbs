@@ -14,17 +14,17 @@
       >
         {{#if (and (gte x 0) (lte x map.width) (gte y 0) (lte y map.height))}}
           <OneproviderMapCircle
-            class={{concat "oneprovider-map-circle-" (model-routable-id square.providers.0)}}
+            class={{concat "oneprovider-map-circle-" (model-routable-id square.providers.[0])}}
             @mapSize={{1500}}
             @scale={{mult oneproviderCircleScale map.containerScale}}
             @oneproviders={{square.providers}}
             @isSelected={{contains selectedOneprovider square.providers}}
-            @click={{if (eq square.providers.length 1) (action onOneproviderSelected square.providers.0)}}
+            @click={{if (eq square.providers.length 1) (action onOneproviderSelected square.providers.[0])}}
           />
           {{#if (gt square.providers.length 1)}}
             <OneWebuiPopover
               class="oneproviders-selector-popover"
-              @triggerSelector={{concat ".oneprovider-map-circle-" (model-routable-id square.providers.0)}}
+              @triggerSelector={{concat ".oneprovider-map-circle-" (model-routable-id square.providers.[0])}}
               @padding={{false}}
               @popoverStyle="oneproviders-selector"
               @windowEvent="oneprovidersSelectorRefresh"
