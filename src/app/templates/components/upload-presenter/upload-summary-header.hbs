@@ -20,7 +20,7 @@
   <OneIcon
     class={{concat-classes "upload-summary-header-toggle-minimize clickable" (if isMinimized "minimized")}}
     @icon="move-down"
-    @click={{action "onToggleMinimize"}}
+    onclick={{action "onToggleMinimize"}}
   >
     <OneTooltip @title={{tt this (if isMinimized "makeFloating" "minimize")}} />
   </OneIcon>

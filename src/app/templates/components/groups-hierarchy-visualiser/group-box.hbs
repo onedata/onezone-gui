@@ -46,7 +46,7 @@
   <OneIcon
     @icon="settings-circle-filled"
     class={{concat "actions-trigger group-actions-trigger actions-group-" elementId}}
-    @click={{action "toggleActions" (not actionsOpened)}}
+    onclick={{action "toggleActions" (not actionsOpened)}}
   />
   {{!-- optimization: rendering actions popover on user click instead of rendering it on init --}}
   <RenderLater @triggerRender={{actionsOpened}}>

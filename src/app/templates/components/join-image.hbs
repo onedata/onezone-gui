@@ -6,11 +6,15 @@
         <TruncatedString class="text subject-name">
           {{joiningRecord.name}}
         </TruncatedString>
-        <OneIcon @icon="browser-info" class="record-info-icon joining-record-info-trigger popover-info-trigger" @click={{action
+        <OneIcon
+          @icon="browser-info"
+          class="record-info-icon joining-record-info-trigger popover-info-trigger"
+          onclick={{action
             (mut joiningRecordInfoOpened)
             (not joiningRecordInfoOpened)
             bubbles=false
-          }} />
+          }}
+        />
         <RecordInfoPopover
           @isOpened={{joiningRecordInfoOpened}}
           @triggerSelector={{local-selector elementId ".joining-record-info-trigger"}}
@@ -41,11 +45,15 @@
         <TruncatedString class="text">
           {{inviteTargetRecord.name}}
         </TruncatedString>
-        <OneIcon @icon="browser-info" class="record-info-icon target-record-info-trigger popover-info-trigger" @click={{action
+        <OneIcon
+          @icon="browser-info"
+          class="record-info-icon target-record-info-trigger popover-info-trigger"
+          onclick={{action
             (mut targetRecordInfoOpened)
             (not targetRecordInfoOpened)
             bubbles=false
-          }} />
+          }}
+        />
         <RecordInfoPopover
           @isOpened={{targetRecordInfoOpened}}
           @triggerSelector={{local-selector elementId ".target-record-info-trigger"}}
