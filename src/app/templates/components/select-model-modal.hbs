@@ -1,4 +1,14 @@
-<ProceedProcessModal @opened={{opened}} @close={{close}} @proceed={{action "proceed"}} @processing={{processing}} @modalClass={{concat-classes "select-model-modal" modalClass}} @headerText={{headerText}} @proceedButtonClass={{or proceedButtonClass "btn btn-primary proceed"}} @proceedButtonText={{proceedButtonText}} @proceedDisabled={{proceedDisabled}}>
+<ProceedProcessModal
+  @opened={{opened}}
+  @close={{close}}
+  @proceed={{action "proceed"}}
+  @processing={{processing}}
+  @modalClass={{concat-classes "select-model-modal" modalClass}}
+  @headerText={{headerText}}
+  @proceedButtonClass={{or proceedButtonClass "btn btn-primary proceed"}}
+  @proceedButtonText={{proceedButtonText}}
+  @proceedDisabled={{proceedDisabled}}
+>
   <p class="input-top-description">
     {{messageText}}
   </p>

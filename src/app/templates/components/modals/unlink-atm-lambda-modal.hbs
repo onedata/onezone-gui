@@ -1,4 +1,8 @@
-<GlobalModal @classNames="unlink-atm-lambda-modal" @allowClose={{not isSubmitting}} @modalId={{modalId}} as |modal|>
+<GlobalModal
+  @classNames="unlink-atm-lambda-modal"
+  @allowClose={{not isSubmitting}}
+  @modalId={{modalId}} as |modal|
+>
   <modal.header>
     <h1>
       <OneIcon @icon="sign-warning-rounded" />

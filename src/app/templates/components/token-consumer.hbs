@@ -73,7 +73,10 @@
         <JoinImage
           class="consume-token-image"
           @joiningModelName={{or joiningRecordSelectorModelName "user"}}
-          @joiningRecord={{if joiningRecordSelectorModelName selectedJoiningRecordOption.value currentUser}}
+          @joiningRecord={{if joiningRecordSelectorModelName
+            selectedJoiningRecordOption.value
+            currentUser
+          }}
           @inviteTargetModelName={{inviteTargetModelName}}
           @inviteTargetModelNameTranslation={{inviteTargetModelNameTranslation}}
           @inviteTargetRecord={{inviteTargetRecord}}

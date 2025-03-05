@@ -38,7 +38,9 @@
         class="organization-name"
         @value={{organizationName}}
         @isSaveDisabled={{blankInlineErrors.organizationName}}
-        @saveButtonTip={{if blankInlineErrors.organizationName (tt this "fieldCannotBeEmptyWhenAdvertising")}}
+        @saveButtonTip={{if blankInlineErrors.organizationName
+          (tt this "fieldCannotBeEmptyWhenAdvertising")
+        }}
         @onSave={{action "saveValue" "organizationName"}}
         @onInputValueChanged={{action "inlineEditorChange" "organizationName"}}
         @onEdit={{action "inlineEditorStateChanged" "organizationName"}}
@@ -166,7 +168,10 @@
     {{/if}}
     <RenderLater @triggerRender={{eq descriptionEditorMode "edit"}}>
       <EmberAce
-        class={{concat-classes "fill-flex-using-column" (unless (eq descriptionEditorMode "edit") "hidden")}}
+        class={{concat-classes
+          "fill-flex-using-column"
+          (unless (eq descriptionEditorMode "edit") "hidden")
+        }}
         @editorClass="fill-flex-using-column"
         @value={{currentDescription}}
         @mode="ace/mode/markdown"

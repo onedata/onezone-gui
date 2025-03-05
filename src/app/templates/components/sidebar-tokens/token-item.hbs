@@ -23,7 +23,14 @@
   </div>
 {{/if}}
 
-<ActionsToolbar @isMinimized={{true}} @dropdownPlacement="auto" @actionsArray={{actionsArray}} @toolbarToggleClasses="token-menu-trigger" @toolbarClasses="btn-toolbar" @popoverClass="token-toolbar-popover" />
+<ActionsToolbar
+  @isMinimized={{true}}
+  @dropdownPlacement="auto"
+  @actionsArray={{actionsArray}}
+  @toolbarToggleClasses="token-menu-trigger"
+  @toolbarClasses="btn-toolbar"
+  @popoverClass="token-toolbar-popover"
+/>
 <RenderLater @triggerRender={{isRemoveTokenModalOpened}} as |renderLater|>
   <RemoveTokenModal
     @opened={{isRemoveTokenModalOpened}}

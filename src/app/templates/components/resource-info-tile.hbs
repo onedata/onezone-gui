@@ -21,7 +21,11 @@
           {{else}}
             <TruncatedString
               @tagName="td"
-              class={{concat-classes "property-value creator" (if creatorIcon "has-icon") (if isSpecialCreator "special")}}
+              class={{concat-classes
+                "property-value creator"
+                (if creatorIcon "has-icon")
+                (if isSpecialCreator "special")
+              }}
             >
               {{#if creatorIcon}}
                 <OneIcon @icon={{creatorIcon}} />

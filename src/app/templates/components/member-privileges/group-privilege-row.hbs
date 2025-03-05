@@ -15,12 +15,35 @@
   </div>
 </td>
 {{#if isDirect}}
-  <MemberPrivileges::GroupPrivilegesCell @privileges={{privileges}} @groupPrivilegeName={{privilegesGroup.text}} @inputChanged={{action "inputChanged"}} @form={{form}} @isDirect={{true}} @editionEnabled={{editionEnabled}} @newGrantedEffPrivCount={{0}} @arePrivilegesUpToDate={{true}} @isUnknownEffPrivStatus={{false}} @isPrivilegesToggleDisabled={{isPrivilegesToggleDisabled}} @targetRecordType={{targetRecordType}} />
+  <MemberPrivileges::GroupPrivilegesCell
+    @privileges={{privileges}}
+    @groupPrivilegeName={{privilegesGroup.text}}
+    @inputChanged={{action "inputChanged"}}
+    @form={{form}}
+    @isDirect={{true}}
+    @editionEnabled={{editionEnabled}}
+    @newGrantedEffPrivCount={{0}}
+    @arePrivilegesUpToDate={{true}}
+    @isUnknownEffPrivStatus={{false}}
+    @isPrivilegesToggleDisabled={{isPrivilegesToggleDisabled}}
+    @targetRecordType={{targetRecordType}}
+  />
 {{else}}
   <td class="toggle-column direct group na">{{tt this "na"}}</td>
 {{/if}}
 {{#if (not isBulkEdit)}}
   <PromiseProxyContainer @proxy={{isUnknownEffPrivStatus}} @sizeClass="xxs">
-    <MemberPrivileges::GroupPrivilegesCell @privileges={{effectivePrivilegeValues}} @groupPrivilegeName={{privilegesGroup.text}} @inputChanged={{action "inputChanged"}} @form={{form}} @isDirect={{false}} @newGrantedEffPrivCount={{newGrantedEffPrivCount}} @arePrivilegesUpToDate={{arePrivilegesUpToDate}} @isUnknownEffPrivStatus={{isUnknownEffPrivStatus.content}} @isPrivilegesToggleDisabled={{isPrivilegesToggleDisabled}} @targetRecordType={{targetRecordType}} />
+    <MemberPrivileges::GroupPrivilegesCell
+      @privileges={{effectivePrivilegeValues}}
+      @groupPrivilegeName={{privilegesGroup.text}}
+      @inputChanged={{action "inputChanged"}}
+      @form={{form}}
+      @isDirect={{false}}
+      @newGrantedEffPrivCount={{newGrantedEffPrivCount}}
+      @arePrivilegesUpToDate={{arePrivilegesUpToDate}}
+      @isUnknownEffPrivStatus={{isUnknownEffPrivStatus.content}}
+      @isPrivilegesToggleDisabled={{isPrivilegesToggleDisabled}}
+      @targetRecordType={{targetRecordType}}
+    />
   </PromiseProxyContainer>
 {{/if}}

@@ -1,4 +1,9 @@
-<RecordInfoWithIcon @record={{provider}} @recordType="provider" class="provider-info-name provider-item-name-line" @iconColor={{color}} />
+<RecordInfoWithIcon
+  @record={{provider}}
+  @recordType="provider"
+  class="provider-info-name provider-item-name-line"
+  @iconColor={{color}}
+/>
 {{#if _renderStatus}}
   <StatusToolbar class={{unless providerActions.length "push-right"}} as |toolbar|>
     {{#if showSupportedSpacesCount}}

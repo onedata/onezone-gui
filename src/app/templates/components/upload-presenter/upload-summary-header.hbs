@@ -18,7 +18,10 @@
 </div>
 <div class="upload-summary-header-icons">
   <OneIcon
-    class={{concat-classes "upload-summary-header-toggle-minimize clickable" (if isMinimized "minimized")}}
+    class={{concat-classes
+      "upload-summary-header-toggle-minimize clickable"
+      (if isMinimized "minimized")
+    }}
     @icon="move-down"
     onclick={{action "onToggleMinimize"}}
   >

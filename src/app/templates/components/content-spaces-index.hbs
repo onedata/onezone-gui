@@ -58,12 +58,16 @@
         @aspect={{if isSupported "providers" "support"}}
         @footerText={{if isSupported (tt this "addSupport")}}
         @footerTextIcon={{if isSupported "provider-add"}}
-        @footerLinkToParams={{if (and isSupported hasAddSupportPrivilege) (array "onedata.sidebar.content.aspect" "spaces" spaceId "support")}}
+        @footerLinkToParams={{if (and isSupported hasAddSupportPrivilege)
+          (array "onedata.sidebar.content.aspect" "spaces" spaceId "support")
+        }}
         @tooltipText={{noAddSupportPrivilegeTooltipText}}
         @footerClass={{if (not hasAddSupportPrivilege) "not-allowed"}}
       >
         <LoadingContainer
-          @isLoading={{not (or space.providerList.isLoaded space.providerList.list.isFulfilled)}}
+          @isLoading={{not
+            (or space.providerList.isLoaded space.providerList.list.isFulfilled)
+          }}
         >
           {{#if isSupported}}
             <div class="support-chart-container absolute-align-middle-center full-width">

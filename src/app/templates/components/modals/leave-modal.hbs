@@ -1,4 +1,10 @@
-<GlobalModal @classNames="leave-modal" @allowClose={{not isSubmitting}} @modalId={{modalId}} @size={{if isCurrentUserIndirectMember "lg" null}} as |modal|>
+<GlobalModal
+  @classNames="leave-modal"
+  @allowClose={{not isSubmitting}}
+  @modalId={{modalId}}
+  @size={{if isCurrentUserIndirectMember "lg" null}}
+  as |modal|
+>
   <modal.header>
     <h1>
       <OneIcon @icon="sign-warning-rounded" />

@@ -1,4 +1,7 @@
-<TokenTemplateSelector::TemplateTile @templateName={{templateName}} @onClick={{if (eq activeSlideId "intro") (action "onIntroClick")}}>
+<TokenTemplateSelector::TemplateTile
+  @templateName={{templateName}}
+  @onClick={{if (eq activeSlideId "intro") (action "onIntroClick")}}
+>
   <OneCarousel @activeSlideId={{activeSlideId}} as |carousel|>
     <carousel.slide @slideId="intro">
       <figure class="main-figure">
