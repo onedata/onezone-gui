@@ -71,8 +71,9 @@
   @fade={{false}}
   as |tab|
 >
+  {{!-- NOTE: tab.pane uses @id= instead of id= --}}
   <tab.pane
-    id="editor"
+    @id="editor"
     @title={{tt this "tabs.editor"}}
     class="fill-flex-using-column no-padding"
   >
@@ -83,7 +84,7 @@
       @mode="edit"
     />
   </tab.pane>
-  <tab.pane id="details" @title={{tt this "tabs.details"}}>
+  <tab.pane @id="details" @title={{tt this "tabs.details"}}>
     <ContentAtmInventoriesWorkflows::RevisionDetailsForm
       @atmWorkflowSchema={{atmWorkflowSchema}}
       @revisionNumber={{revisionNumber}}
