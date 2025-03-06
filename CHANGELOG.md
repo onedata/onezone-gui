@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12622 Refactored OneIcon component to Glimmer
 * VFS-12543 Fixed possible infinite scroll list trimming after first item disappeared and list reload
 * VFS-12554 Changed main sidebars to render only visible subset of items to improve performance (infinite scroll)
 * VFS-12461 Changed Open Data to Public Data naming
