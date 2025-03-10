@@ -30,7 +30,7 @@
   {{json-editor
     value=editorValue
     disabled=isSaving
-    readonly=(eq mode "view")
+    isReadOnly=(eq mode "view")
     acceptEmptyString=true
     onChange=(action "configurationChange")}}
 {{/promise-proxy-container}}
