@@ -1,7 +1,7 @@
-<listItem.header
-  @disableToggleIcon={{true}}
-  class={{concat-classes "index-entry" (if isIdPresenterVisible "popover-active")}}
->
+{{#listItem.header
+  disableToggleIcon=true
+  class=(concat-classes "index-entry" (if isIdPresenterVisible "popover-active"))
+}}
   <span class="item-icon-container">
     <OneIcon class="item-icon" @icon="index" />
     <OneTooltip @title={{index.name}} @placement="top" @triggerEvents="hover" />
@@ -55,8 +55,8 @@
     @actionsArray={{indexActions}}
     @actionsArg={{index}}
   />
-</listItem.header>
-<listItem.content>
+{{/listItem.header}}
+{{#listItem.content}}
   {{!-- fade=false to prevent scroll issues during tabs animation --}}
   <BsTab class="bs-tab-onedata bs-tab-modern" @fade={{false}} as |tab|>
     <tab.pane
@@ -82,4 +82,4 @@
       <ContentHarvestersIndices::IndexForm @mode="view" @index={{index}} />
     </tab.pane>
   </BsTab>
-</listItem.content>
+{{/listItem.content}}
