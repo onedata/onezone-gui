@@ -1,4 +1,4 @@
-{{record-icon class="sidebar-item-icon" record=item useSubtypeIcon=true}}
+<RecordIcon class="sidebar-item-icon" @record={{item}} @useSubtypeIcon={{true}} />
 {{#if isRenaming}}
   {{one-inline-editor
     isEditing=true
