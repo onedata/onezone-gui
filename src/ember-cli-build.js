@@ -12,7 +12,7 @@ const defineSassBreakpoints = require(
   './lib/onedata-gui-common/addon/utils/define-sass-breakpoints'
 );
 const { CustomBroccoliHasher } = require(
-  './lib/onedata-gui-common/addom/utils/custom-broccoli-hasher'
+  './lib/onedata-gui-common/addon/utils/custom-broccoli-hasher'
 );
 
 const colors = require('./lib/onedata-gui-common/config/colors');
