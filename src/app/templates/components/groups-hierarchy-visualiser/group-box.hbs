@@ -33,9 +33,19 @@
   <TruncatedString class="group-name">{{groupBox.group.name}}</TruncatedString>
 {{/if}}
 
-<GroupsHierarchyVisualiser::GroupBoxRelation @relationType="parents" @group={{groupBox.group}} @expandRelation={{showParents}} @isExpanded={{parentsRelationActive}} />
+<GroupsHierarchyVisualiser::GroupBoxRelation
+  @relationType="parents"
+  @group={{groupBox.group}}
+  @expandRelation={{showParents}}
+  @isExpanded={{parentsRelationActive}}
+/>
 
-<GroupsHierarchyVisualiser::GroupBoxRelation @relationType="children" @group={{groupBox.group}} @expandRelation={{showChildren}} @isExpanded={{childrenRelationActive}} />
+<GroupsHierarchyVisualiser::GroupBoxRelation
+  @relationType="children"
+  @group={{groupBox.group}}
+  @expandRelation={{showChildren}}
+  @isExpanded={{childrenRelationActive}}
+/>
 
 {{#if groupBox.group.directMembership}}
   <OneIcon @icon="user" class="direct-membership-icon">
