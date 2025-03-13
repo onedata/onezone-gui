@@ -111,7 +111,7 @@ describe('Integration | Component | sidebar-tokens', function () {
   });
 
   it('renders all tokens', async function () {
-    await render(hbs `{{sidebar-tokens model=model}}`);
+    await renderComponent();
 
     const renderedTokens = findAll('.token-item');
     expect(renderedTokens).to.have.length(this.tokens.length);
@@ -120,7 +120,7 @@ describe('Integration | Component | sidebar-tokens', function () {
   it('renders tokens in correct order', async function () {
     const tokensOrder = this.get('tokensOrder');
 
-    await render(hbs`{{sidebar-tokens model=model}}`);
+    await renderComponent();
 
     const renderedTokens = findAll('.token-item').map((element) =>
       element.querySelector('.token-name').textContent.trim()
@@ -133,7 +133,7 @@ describe('Integration | Component | sidebar-tokens', function () {
   });
 
   it('shows advanced token filters by default', async function () {
-    await render(hbs `{{sidebar-tokens model=model}}`);
+    await renderComponent();
 
     expect(find('.advanced-filters-collapse.in .advanced-token-filters'))
       .to.exist;
@@ -150,7 +150,7 @@ describe('Integration | Component | sidebar-tokens', function () {
     count: 3,
   }].forEach(({ type, count }) => {
     it(`shows only ${type} tokens, when type filter is "${type}"`, async function () {
-      await render(hbs `{{sidebar-tokens model=model}}`);
+      await renderComponent();
 
       await click(`.btn-${type}`);
       const renderedTokens = findAll('.token-item');
@@ -164,7 +164,7 @@ describe('Integration | Component | sidebar-tokens', function () {
   it(
     'shows only cluster invite tokens, when type filter is "invite" and target filter is "cluster - all"',
     async function () {
-      await render(hbs `{{sidebar-tokens model=model}}`);
+      await renderComponent();
 
       await click('.btn-invite');
       await selectChoose('.target-model-filter', 'Cluster');
@@ -180,7 +180,7 @@ describe('Integration | Component | sidebar-tokens', function () {
   it(
     'shows only cluster invite tokens, when type filter is "invite" and target filter is "cluster - cluster1"',
     async function () {
-      await render(hbs `{{sidebar-tokens model=model}}`);
+      await renderComponent();
 
       await click('.btn-invite');
       await selectChoose('.target-model-filter', 'Cluster');
@@ -195,7 +195,7 @@ describe('Integration | Component | sidebar-tokens', function () {
   it(
     'does not take "invite" dedicated filters into account after change from "invite" to "access" filter',
     async function () {
-      await render(hbs`{{sidebar-tokens model=model}}`);
+      await renderComponent();
 
       await click('.btn-invite');
       await selectChoose('.target-model-filter', 'Cluster');
@@ -209,6 +209,14 @@ describe('Integration | Component | sidebar-tokens', function () {
     }
   );
 });
+
+async function renderComponent() {
+  await render(hbs`
+    <PerfectScrollbarElement>
+      <SidebarTokens @model={{this.model}} />
+    </PerfectScrollbarElement>
+  `);
+}
 
 function createTokenRecord(store, data = {}) {
   return store.createRecord('token', data);
