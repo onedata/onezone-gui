@@ -1,18 +1,19 @@
-{{#proceed-process-modal
-  opened=opened
-  close=close
-  proceed=(action "proceed")
-  processing=processing
-  modalClass=(concat-classes "select-model-modal" modalClass)
-  headerText=headerText
-  proceedButtonClass=(or proceedButtonClass "btn btn-primary proceed")
-  proceedButtonText=proceedButtonText
-  proceedDisabled=proceedDisabled}}
+<ProceedProcessModal
+  @opened={{opened}}
+  @close={{close}}
+  @proceed={{action "proceed"}}
+  @processing={{processing}}
+  @modalClass={{concat-classes "select-model-modal" modalClass}}
+  @headerText={{headerText}}
+  @proceedButtonClass={{or proceedButtonClass "btn btn-primary proceed"}}
+  @proceedButtonText={{proceedButtonText}}
+  @proceedDisabled={{proceedDisabled}}
+>
   <p class="input-top-description">
     {{messageText}}
   </p>
   <div class="dropdown-container">
-    {{#promise-proxy-container proxy=records sizeClass="sm"}}
+    <PromiseProxyContainer @proxy={{records}} @sizeClass="sm">
       <OneDropdown
         @options={{recordsForDropdown}}
         @selected={{selectedRecord}}
@@ -23,12 +24,12 @@
         as |record|
       >
         <div class="option-container">
-          {{#truncated-string}}
-            {{one-icon icon=recordIcon}}
+          <TruncatedString>
+            <OneIcon @icon={{recordIcon}} />
             <span class="text record-name">{{record.name}}</span>
-          {{/truncated-string}}
+          </TruncatedString>
         </div>
       </OneDropdown>
-    {{/promise-proxy-container}}
+    </PromiseProxyContainer>
   </div>
-{{/proceed-process-modal}}
+</ProceedProcessModal>

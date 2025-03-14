@@ -1,9 +1,9 @@
-{{#one-icon
+<OneIcon
   class="upload-object-error-icon text-danger clickable"
-  icon="checkbox-filled-warning"
-  click=(action "showErrorModal")
-}}
+  @icon="checkbox-filled-warning"
+  onclick={{action "showErrorModal"}}
+>
   {{#if errorMessage}}
-    {{one-tooltip title=errorMessage}}
+    <OneTooltip @title={{errorMessage}} />
   {{/if}}
-{{/one-icon}}
+</OneIcon>

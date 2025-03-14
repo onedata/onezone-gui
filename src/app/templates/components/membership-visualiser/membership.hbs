@@ -1,26 +1,27 @@
-{{#promise-proxy-container proxy=recordsProxy sizeClass="xs"}}
-  {{#perfect-scrollbar-element
+<PromiseProxyContainer @proxy={{recordsProxy}} @sizeClass="xs">
+  <PerfectScrollbarElement
     class="membership-scrollbar-element"
-    suppressScrollY=true
-    onScroll=(action "scroll")
-  }}
-    {{membership-visualiser/membership-path
-      pathElements=pathElements
-      modifyPrivileges=modifyPrivileges
-      removeRelation=removeRelation
-      view=view
-      onPan=(action "pan")
-      isCondensed=isCondensed}}
-  {{/perfect-scrollbar-element}}
+    @suppressScrollY={{true}}
+    @onScroll={{action "scroll"}}
+  >
+    <MembershipVisualiser::MembershipPath
+      @pathElements={{pathElements}}
+      @modifyPrivileges={{modifyPrivileges}}
+      @removeRelation={{removeRelation}}
+      @view={{view}}
+      @onPan={{action "pan"}}
+      @isCondensed={{isCondensed}}
+    />
+  </PerfectScrollbarElement>
   <div class="bar-nav">
     {{#if scrollLeftButton}}
       <div class="scroll-button scroll-left" {{action "moveLeft"}}>
-        {{one-icon icon="arrow-left"}}
+        <OneIcon @icon="arrow-left" />
       </div>
     {{/if}}
     {{#if scrollRightButton}}
       <div class="scroll-button scroll-right" {{action "moveRight"}}>
-        {{one-icon icon="arrow-right"}}
+        <OneIcon @icon="arrow-right" />
       </div>
     {{/if}}
   </div>
@@ -29,4 +30,4 @@
       {{membershipDescription}}
     </div>
   {{/if}}
-{{/promise-proxy-container}}
+</PromiseProxyContainer>

@@ -1,20 +1,20 @@
 <div class="icon-section">
-  {{record-icon record=atmLambda}}
+  <RecordIcon @record={{atmLambda}} />
 </div>
 <div class="content-section">
   <div class="details">
-    {{#truncated-string class="lambda-name"}}{{latestRevisionName}}{{/truncated-string}}
+    <TruncatedString class="lambda-name">{{latestRevisionName}}</TruncatedString>
     {{#if latestRevisionSummary}}
       <div class="lambda-summary">{{latestRevisionSummary}}</div>
     {{/if}}
   </div>
-  {{#revisions-table
-    revisionRegistry=atmLambda.revisionRegistry
-    revisionActionsFactory=revisionActionsFactory
-    customColumnsCount=(if (eq mode "selection") 3 2)
-    onRevisionClick=(unless (eq mode "selection") (action "clickRevision"))
+  <RevisionsTable
+    @revisionRegistry={{atmLambda.revisionRegistry}}
+    @revisionActionsFactory={{revisionActionsFactory}}
+    @customColumnsCount={{if (eq mode "selection") 3 2}}
+    @onRevisionClick={{unless (eq mode "selection") (action "clickRevision")}}
     as |section data|
-  }}
+  >
     {{#if (eq section "header")}}
       <th class="revisions-table-header-cell name-column filling-column">
         {{tt this "columns.name.title"}}
@@ -34,47 +34,48 @@
       </td>
       {{#if (eq mode "selection")}}
         <td class="revisions-table-data-cell buttons">
-          {{#one-button
-            type="default"
-            size="sm"
+          <OneButton
+            @type="default"
+            @size="sm"
             class="clickable add-to-workflow-action-trigger"
-            onClick=(action "addToWorkflowSchema" data.revisionNumber)
-          }}
-            {{one-icon icon="plus"}}
+            @onClick={{action "addToWorkflowSchema" data.revisionNumber}}
+          >
+            <OneIcon @icon="plus" />
             <span class="text">{{tt this "columns.buttons.addToWorkflow"}}</span>
-          {{/one-button}}
+          </OneButton>
         </td>
       {{/if}}
     {{/if}}
-  {{/revisions-table}}
-  {{one-menu-toggle
-    class=(concat-classes
+  </RevisionsTable>
+  <OneMenuToggle
+    class={{concat-classes
       "atm-lambda-actions-trigger clickable"
       (concat "actions-trigger-" elementId)
       (if areActionsOpened "active")
-    )
-    click=(action "toggleActionsOpen" (not areActionsOpened))
-  }}
-  {{#render-later triggerRender=areActionsOpened}}
-    {{#one-webui-popover
-      class="atm-lambda-actions"
-      padding=false
-      popoverStyle="with-dropdown"
-      triggerSelector=(concat ".actions-trigger-" elementId)
-      open=areActionsOpened
-      onToggle=(action "toggleActionsOpen")
-      as |popover|
     }}
-      {{#click-outside
-        onClickOutside=(action "toggleActionsOpen" false)
-        exceptSelector=(concat ".actions-trigger-" elementId)
-      }}
-        {{actions-popover-content
-          actionsArray=atmLambdaActionsArray
-          actionClicked=(action "toggleActionsOpen" false)
-        }}
-      {{/click-outside}}
-    {{/one-webui-popover}}
-  {{/render-later}}
+    @click={{action "toggleActionsOpen" (not areActionsOpened)}}
+  />
+  <RenderLater @triggerRender={{areActionsOpened}}>
+    <OneWebuiPopover
+      class="atm-lambda-actions"
+      @padding={{false}}
+      @popoverStyle="with-dropdown"
+      @triggerSelector={{concat ".actions-trigger-" elementId}}
+      @open={{areActionsOpened}}
+      @onToggle={{action "toggleActionsOpen"}}
+      as |popover|
+    >
+      <ClickOutside
+        @onClickOutside={{action "toggleActionsOpen" false}}
+        @exceptSelector={{concat ".actions-trigger-" elementId}}
+      >
+        <ActionsPopoverContent
+          @actionsArray={{atmLambdaActionsArray}}
+          @actionClicked={{action "toggleActionsOpen" false}}
+        />
+      </ClickOutside>
+    </OneWebuiPopover>
+  </RenderLater>
 </div>
 {{yield}}
+

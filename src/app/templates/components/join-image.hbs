@@ -3,31 +3,31 @@
   <figcaption class="subject-image-label">
     {{#if joiningRecord}}
       <div class="subject-description">
-        {{#truncated-string class="text subject-name"}}
+        <TruncatedString class="text subject-name">
           {{joiningRecord.name}}
-        {{/truncated-string}}
-        {{one-icon
-          icon="browser-info"
+        </TruncatedString>
+        <OneIcon
+          @icon="browser-info"
           class="record-info-icon joining-record-info-trigger popover-info-trigger"
-          click=(action
+          onclick={{action
             (mut joiningRecordInfoOpened)
             (not joiningRecordInfoOpened)
             bubbles=false
-          )
-        }}
-        {{#record-info-popover
-          isOpened=joiningRecordInfoOpened
-          triggerSelector=(local-selector elementId ".joining-record-info-trigger")
-        }}
+          }}
+        />
+        <RecordInfoPopover
+          @isOpened={{joiningRecordInfoOpened}}
+          @triggerSelector={{local-selector elementId ".joining-record-info-trigger"}}
+        >
           {{component (concat joiningModelName "-info-content")
             record=joiningRecord
           }}
-        {{/record-info-popover}}
+        </RecordInfoPopover>
       </div>
     {{else}}
-      {{#truncated-string class="text select-below-label"}}
+      <TruncatedString class="text select-below-label">
         {{placeholderUnderSubjectImage}}
-      {{/truncated-string}}
+      </TruncatedString>
     {{/if}}
   </figcaption>
 </figure>
@@ -42,54 +42,54 @@
   <figcaption class="subject-image-label subject-name">
     <div class="subject-description">
       {{#if inviteTargetRecord.name}}
-        {{#truncated-string class="text"}}
+        <TruncatedString class="text">
           {{inviteTargetRecord.name}}
-        {{/truncated-string}}
-        {{one-icon
-          icon="browser-info"
+        </TruncatedString>
+        <OneIcon
+          @icon="browser-info"
           class="record-info-icon target-record-info-trigger popover-info-trigger"
-          click=(action
+          onclick={{action
             (mut targetRecordInfoOpened)
             (not targetRecordInfoOpened)
             bubbles=false
-          )
-        }}
-        {{#record-info-popover
-          isOpened=targetRecordInfoOpened
-          triggerSelector=(local-selector elementId ".target-record-info-trigger")
-        }}
+          }}
+        />
+        <RecordInfoPopover
+          @isOpened={{targetRecordInfoOpened}}
+          @triggerSelector={{local-selector elementId ".target-record-info-trigger"}}
+        >
           {{component inviteTargetInfoComponentName
             record=inviteTargetRecord
             showDetails=showDetailsInTargetInfoPopover
           }}
-        {{/record-info-popover}}
+        </RecordInfoPopover>
       {{else}}
-        {{#truncated-string class="text unknown-text"}}
+        <TruncatedString class="text unknown-text">
           {{tt this "placeholderUnderSubjectImage"}}
-        {{/truncated-string}}
-        {{one-icon
-          id=recordIdInfoTriggerId
-          icon="circle-id"
+        </TruncatedString>
+        <OneIcon
+          id={{recordIdInfoTriggerId}}
+          @icon="circle-id"
           class="record-info-icon id-icon icon-trigger id-trigger clickable"
-        }}
-        {{#one-webui-popover
+        />
+        <OneWebuiPopover
           class="id-info"
-          popoverStyle="id-info token-invite-target-id-info"
-          triggerSelector=(concat "#" recordIdInfoTriggerId)
+          @popoverStyle="id-info token-invite-target-id-info"
+          @triggerSelector={{concat "#" recordIdInfoTriggerId}}
           as |popover|
-        }}
+        >
           <div class="form-group without-margin">
             <label class="control-label">
               {{tt this "recordId" targetModelName=inviteTargetModelNameTranslation}}:
             </label>
-            {{one-clipboard-line
-              size="sm"
-              value=inviteTargetRecord.entityId
-              showText=false
-              btnType="default"
-            }}
+            <OneClipboardLine
+              @size="sm"
+              @value={{inviteTargetRecord.entityId}}
+              @showText={{false}}
+              @btnType="default"
+            />
           </div>
-        {{/one-webui-popover}}
+        </OneWebuiPopover>
       {{/if}}
     </div>
   </figcaption>

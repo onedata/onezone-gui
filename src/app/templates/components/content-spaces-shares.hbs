@@ -1,19 +1,19 @@
-{{#oneprovider-view-container
-  contentContainerClass="content-spaces-shares-content"
-  space=space
-  oneproviderId=oneproviderId
-  mapSelectorEnabled=false
-  resourceType="shares"
-  oneproviderIdChanged=(action "oneproviderIdChanged")
-  hasEmbeddedIframesChanged=(action "hasEmbeddedIframesChanged")
+<OneproviderViewContainer
+  @contentContainerClass="content-spaces-shares-content"
+  @space={{space}}
+  @oneproviderId={{oneproviderId}}
+  @mapSelectorEnabled={{false}}
+  @resourceType="shares"
+  @oneproviderIdChanged={{action "oneproviderIdChanged"}}
+  @hasEmbeddedIframesChanged={{action "hasEmbeddedIframesChanged"}}
   as |container|
-}}
-  {{#container.header class="content-spaces-shares-header"}}
+>
+  <container.header class="content-spaces-shares-header">
     {{#if shareId}}
       <h1 class="normal-case with-back with-menu">
         <span class="one-label">
-          {{#truncated-string}}
-            {{#link-to (query-params options=blankShareIdOptions) class="content-back-link"}}
+          <TruncatedString>
+            <LinkTo @query={{hash options=blankShareIdOptions}} class="content-back-link">
               <OneIcon
                 @icon="browser-share"
                 class="content-back-resource-icon"
@@ -21,23 +21,27 @@
                 @icon="arrow-left"
                 class="content-back-arrow-icon"
               />
-            {{/link-to}}
+            </LinkTo>
             <span class="share-name resource-name">
-              {{name-conflict item=shareProxy.content tagName="span" class="one-label"}}
+              <NameConflict
+                @item={{shareProxy.content}}
+                @tagName="span"
+                class="one-label"
+              />
             </span>
-          {{/truncated-string}}
+          </TruncatedString>
         </span>
       </h1>
     {{else}}
       <h1>{{tt this "listHeader"}}</h1>
     {{/if}}
-  {{/container.header}}
-  {{#container.body}}
-    {{embedded-content-space-shares
-      oneprovider=container.selectedProvider
-      baseUrl=container.contentIframeBaseUrl
-      spaceId=space.entityId
-      onShowShareList=(action "onShowShareList")
-    }}
-  {{/container.body}}
-{{/oneprovider-view-container}}
+  </container.header>
+  <container.body>
+    <EmbeddedContentSpaceShares
+      @oneprovider={{container.selectedProvider}}
+      @baseUrl={{container.contentIframeBaseUrl}}
+      @spaceId={{space.entityId}}
+      @onShowShareList={{action "onShowShareList"}}
+    />
+  </container.body>
+</OneproviderViewContainer>

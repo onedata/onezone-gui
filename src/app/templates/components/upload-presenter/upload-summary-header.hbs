@@ -7,28 +7,30 @@
     <span class="space"> </span>
     <span class="progress-text">({{uploadObject.progress}}%)</span>
     {{#if (eq uploadObject.state "failed")}}
-      {{upload-presenter/error-indicator uploadObject=uploadObject}}
+      <UploadPresenter::ErrorIndicator @uploadObject={{uploadObject}} />
     {{/if}}
   </div>
   {{#if (and uploadObject.space uploadObject.oneprovider)}}
-    {{#truncated-string class="summary-oneprovider"}}{{uploadObject.space.name}} - {{uploadObject.oneprovider.name}}{{/truncated-string}}
+    <TruncatedString
+      class="summary-oneprovider"
+    >{{uploadObject.space.name}} - {{uploadObject.oneprovider.name}}</TruncatedString>
   {{/if}}
 </div>
 <div class="upload-summary-header-icons">
-  {{#one-icon
-    class=(concat-classes
+  <OneIcon
+    class={{concat-classes
       "upload-summary-header-toggle-minimize clickable"
       (if isMinimized "minimized")
-    )
-    icon="move-down"
-    click=(action "onToggleMinimize")
-  }}
-    {{one-tooltip title=(tt this (if isMinimized "makeFloating" "minimize"))}}
-  {{/one-icon}}
-  {{upload-presenter/cancel-upload
-    onCancel=onCancel
-    canCancel=uploadObject.canBeCancelled
-    isCancelled=uploadObject.isCancelled
-    iconClass="upload-summary-header-cancel"
-  }}
+    }}
+    @icon="move-down"
+    onclick={{action "onToggleMinimize"}}
+  >
+    <OneTooltip @title={{tt this (if isMinimized "makeFloating" "minimize")}} />
+  </OneIcon>
+  <UploadPresenter::CancelUpload
+    @onCancel={{onCancel}}
+    @canCancel={{uploadObject.canBeCancelled}}
+    @isCancelled={{uploadObject.isCancelled}}
+    @iconClass="upload-summary-header-cancel"
+  />
 </div>

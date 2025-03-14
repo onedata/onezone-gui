@@ -1,15 +1,21 @@
 <div class="row content-row header-row">
   <h1 class="with-back relative nowrap">
     <a class="content-back-link" {{action "backSlide"}}>
-      {{record-icon
-        modelName=(if (eq mode "create") "atmLambda" "atmWorkflowSchema")
-        class="content-back-resource-icon"
-      }}{{one-icon icon="arrow-left" class="content-back-arrow-icon"}}
+      <RecordIcon
+        @modelName={{if (eq mode "create") "atmLambda" "atmWorkflowSchema"}}
+        class="content-back-resource-icon" /><OneIcon
+        @icon="arrow-left"
+        class="content-back-arrow-icon"
+      />
     </a>
     <div class="resource-name">{{headerText}}</div>
   </h1>
 </div>
 <div class="task-form-container">
+  {{!--
+    TODO: VFS-12694 For some unknown reason, turing this component invocation into
+    AngleBrackets cause SYNC_OBSERVER cleanup test to fail
+  --}}
   {{workflow-visualiser/task-form
     mode=mode
     atmLambda=atmLambda
@@ -22,23 +28,24 @@
     onChange=(action "formDataChanged")
   }}
   <div class="btn-toolbar">
-    {{#one-button
-      type="primary"
-      buttonType="submit"
+    <OneButton
+      @type="primary"
+      @buttonType="submit"
       class="btn-submit clickable"
-      onClick=(action "submit")
-      disabled=(not isDataValid)
-    }}
+      @onClick={{action "submit"}}
+      @disabled={{not isDataValid}}
+    >
       {{submitBtnText}}
-    {{/one-button}}
-    {{#one-button
-      type="default"
+    </OneButton>
+    <OneButton
+      @type="default"
       class="btn-cancel clickable"
-      disabled=isSubmittingData
-      onClick=(action "cancel")
-    }}
+      @disabled={{isSubmittingData}}
+      @onClick={{action "cancel"}}
+    >
       {{tt this "buttons.cancel"}}
-    {{/one-button}}
+    </OneButton>
   </div>
 </div>
 {{yield}}
+

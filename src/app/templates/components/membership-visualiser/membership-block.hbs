@@ -1,12 +1,6 @@
 {{#if isCondensed}}
-  {{one-icon
-    class="type-icon"
-    icon=iconName
-  }}
-  {{#truncated-string class="record-name"}}{{record.name}}{{/truncated-string}}
+  <OneIcon class="type-icon" @icon={{iconName}} />
+  <TruncatedString class="record-name">{{record.name}}</TruncatedString>
 {{else}}
-  {{record-info-with-icon
-    record=record
-    icon=iconName
-  }}
+  <RecordInfoWithIcon @record={{record}} @icon={{iconName}} />
 {{/if}}

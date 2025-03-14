@@ -1,20 +1,20 @@
-{{one-icon class="sidebar-item-icon" icon=icon}}
+<OneIcon class="sidebar-item-icon" @icon={{icon}} />
 <div class="sidebar-item-title">
-  {{#truncated-string class="sidebar-item-title-upper"}}
+  <TruncatedString class="sidebar-item-title-upper">
     {{#if item.name}}
-      {{name-conflict item=item tagName="span" class="one-label share-name"}}
+      <NameConflict @item={{item}} @tagName="span" class="one-label share-name" />
     {{else}}
       <span class="one-label share-name no-name">...</span>
     {{/if}}
-  {{/truncated-string}}
-  {{#truncated-string class="sidebar-item-title-lower"}}
+  </TruncatedString>
+  <TruncatedString class="sidebar-item-title-lower">
     <strong>{{tt this "space"}}:</strong>
     {{#if spaceProxy.name}}
       <span class="space-name">{{spaceProxy.name}}</span>
     {{else}}
       <em>{{tt this "unknown"}}</em>
     {{/if}}
-  {{/truncated-string}}
+  </TruncatedString>
 </div>
   {{#if isPublicData}}
     <StatusToolbar as |toolbar|>
@@ -25,9 +25,9 @@
     </StatusToolbar>
   {{/if}}
 {{#unless inSidenav}}
-  {{actions-toolbar
-    isMinimized=true
-    dropdownPlacement="auto"
-    actionsArray=itemActions
-  }}
+  <ActionsToolbar
+    @isMinimized={{true}}
+    @dropdownPlacement="auto"
+    @actionsArray={{itemActions}}
+  />
 {{/unless}}

@@ -2,60 +2,62 @@
   {{#if (eq mode "selection")}}
     <h1 class="with-back relative nowrap">
       <a class="content-back-link" {{action "backSlide"}}>
-        {{record-icon
-          modelName="atmWorkflowSchema"
+        <RecordIcon
+          @modelName="atmWorkflowSchema"
           class="content-back-resource-icon"
-        }}{{one-icon icon="arrow-left" class="content-back-arrow-icon"}}
+        /><OneIcon
+          @icon="arrow-left"
+          class="content-back-arrow-icon"
+        />
       </a>
       <span class="resource-name">{{headerText}}</span>
-      {{actions-toolbar isMinimized=false actionsArray=globalActions}}
+      <ActionsToolbar @isMinimized={{false}} @actionsArray={{globalActions}} />
     </h1>
   {{else}}
     <h1>
       <span class="one-label">{{headerText}}</span>
-      {{actions-toolbar isMinimized=false actionsArray=globalActions}}
+      <ActionsToolbar @isMinimized={{false}} @actionsArray={{globalActions}} />
     </h1>
   {{/if}}
 </div>
-{{#promise-proxy-container proxy=loadingDataProxy}}
+<PromiseProxyContainer @proxy={{loadingDataProxy}}>
   {{#if hasSomeLambdas}}
     <div class="row content-row">
-      {{content-atm-inventories-lambdas/atm-lambdas-list
-        atmInventory=atmInventory
-        collection=atmLambdasProxy.content
-        allCollection=allAtmLambdasProxy.content
-        mode=mode
-        onAddToAtmWorkflowSchema=onAddToAtmWorkflowSchema
-        onRevisionClick=onRevisionClick
-        onRevisionCreate=onRevisionCreate
-        onRevisionCreated=onRevisionCreated
-      }}
+      <ContentAtmInventoriesLambdas::AtmLambdasList
+        @atmInventory={{atmInventory}}
+        @collection={{atmLambdasProxy.content}}
+        @allCollection={{allAtmLambdasProxy.content}}
+        @mode={{mode}}
+        @onAddToAtmWorkflowSchema={{onAddToAtmWorkflowSchema}}
+        @onRevisionClick={{onRevisionClick}}
+        @onRevisionCreate={{onRevisionCreate}}
+        @onRevisionCreated={{onRevisionCreated}}
+      />
     </div>
   {{else}}
-    {{#content-info
+    <ContentInfo
       class="scroll-breakpoint-500"
-      header=(tt this "noLambdasHeader")
-      text=(tt this "noLambdasText")
-    }}
-      {{#one-button
-        type="primary"
-        size="lg"
-        class=(concat-classes
+      @header={{tt this "noLambdasHeader"}}
+      @text={{tt this "noLambdasText"}}
+    >
+      <OneButton
+        @type="primary"
+        @size="lg"
+        class={{concat-classes
           addNewAtmLambdaAction.class
           (if addNewAtmLambdaAction.disabled "disabled")
-        )
-        onClick=(if
-          addNewAtmLambdaAction.disabled
+        }}
+        @onClick={{if addNewAtmLambdaAction.disabled
           (no-action)
           addNewAtmLambdaAction.action
-        )
-      }}
+        }}
+      >
         {{addNewAtmLambdaAction.title}}
         {{#if addNewAtmLambdaAction.tip}}
-          {{one-tooltip title=addNewAtmLambdaAction.tip}}
+          <OneTooltip @title={{addNewAtmLambdaAction.tip}} />
         {{/if}}
-      {{/one-button}}
-    {{/content-info}}
+      </OneButton>
+    </ContentInfo>
   {{/if}}
-{{/promise-proxy-container}}
+</PromiseProxyContainer>
 {{yield}}

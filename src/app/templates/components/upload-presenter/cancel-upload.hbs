@@ -1,38 +1,42 @@
-{{#one-icon
-  class=(concat-classes
+<OneIcon
+  class={{concat-classes
     "cancel-action"
     iconClass
     (concat "cancel-ack-" parentView.elementId)
     (if canCancel "clickable" "disabled")
-  )
-  icon="ban-left"
-  click=(action "toggleAckPopover" (not ackPopoverOpened))}}
-  {{one-tooltip title=(tt this (if isCancelled "cancelled" "cancel"))
-}}
-{{/one-icon}}
+  }}
+  @icon="ban-left"
+  onclick={{action "toggleAckPopover" (not ackPopoverOpened)}}
+>
+  <OneTooltip @title={{tt this (if isCancelled "cancelled" "cancel")}} />
+</OneIcon>
 {{#if canCancel}}
-  {{#render-later triggerRender=ackPopoverOpened}}
-    {{#one-webui-popover
+  <RenderLater @triggerRender={{ackPopoverOpened}}>
+    <OneWebuiPopover
       class="cancel-ack"
-      triggerSelector=(concat ".cancel-ack-" parentView.elementId)
-      open=ackPopoverOpened
-    }}
-      {{#click-outside
-        onClickOutside=(action "toggleAckPopover" false)
-        exceptSelector=(concat ".cancel-ack-" parentView.elementId)
-      }}
+      @triggerSelector={{concat ".cancel-ack-" parentView.elementId}}
+      @open={{ackPopoverOpened}}
+    >
+      <ClickOutside
+        @onClickOutside={{action "toggleAckPopover" false}}
+        @exceptSelector={{concat ".cancel-ack-" parentView.elementId}}
+      >
         <h1>{{tt this "ackHeader"}}</h1>
         <p>{{tt this "ackMessage"}}</p>
         <div class="text-right">
-          {{#one-button type="default" size="sm" onClick=(action "toggleAckPopover" false)}}
+          <OneButton
+            @type="default"
+            @size="sm"
+            @onClick={{action "toggleAckPopover" false}}
+          >
             {{tt this "ackNo"}}
-          {{/one-button}}
-          {{#one-button type="danger" size="sm" onClick=(action "cancel")}}
-            {{one-icon icon="ban-left"}}
+          </OneButton>
+          <OneButton @type="danger" @size="sm" @onClick={{action "cancel"}}>
+            <OneIcon @icon="ban-left" />
             <span class="text">{{tt this "ackYes"}}</span>
-          {{/one-button}}
+          </OneButton>
         </div>
-      {{/click-outside}}
-    {{/one-webui-popover}}
-  {{/render-later}}
+      </ClickOutside>
+    </OneWebuiPopover>
+  </RenderLater>
 {{/if}}

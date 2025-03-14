@@ -1,5 +1,3 @@
-{{#one-icon
-  class="type-icon"
-  icon="no-view"}}
-  {{one-tooltip title=(tt this "notAllowed")}}
-{{/one-icon}}
+<OneIcon class="type-icon" @icon="no-view">
+  <OneTooltip @title={{tt this "notAllowed"}} />
+</OneIcon>

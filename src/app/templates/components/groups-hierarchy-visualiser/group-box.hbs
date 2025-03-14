@@ -1,76 +1,85 @@
 {{#if groupBox.leftLine.isVisible}}
-  {{groups-hierarchy-visualiser/group-box-line
+  <GroupsHierarchyVisualiser::GroupBoxLine
     class="line-to-parent"
-    line=groupBox.leftLine
-    modifyPrivileges=modifyPrivileges
-    removeRelation=removeRelation}}
+    @line={{groupBox.leftLine}}
+    @modifyPrivileges={{modifyPrivileges}}
+    @removeRelation={{removeRelation}}
+  />
 {{/if}}
 {{#if groupBox.rightLine.isVisible}}
-  {{groups-hierarchy-visualiser/group-box-line
+  <GroupsHierarchyVisualiser::GroupBoxLine
     class="line-to-child"
-    line=groupBox.rightLine
-    modifyPrivileges=modifyPrivileges
-    removeRelation=removeRelation}}
+    @line={{groupBox.rightLine}}
+    @modifyPrivileges={{modifyPrivileges}}
+    @removeRelation={{removeRelation}}
+  />
 {{/if}}
 
-{{record-icon class="box-icon" record=groupBox.group useSubtypeIcon=true}}
+<RecordIcon class="box-icon" @record={{groupBox.group}} @useSubtypeIcon={{true}} />
 
 {{!-- optimization: rendering editor only when needed --}}
 {{#if isRenaming}}
-  {{one-inline-editor
-    isEditing=isRenaming
-    value=groupBox.group.name
-    showEmptyInfo=false
-    onSave=(action "rename")
-    editOnClick=false
-    onEdit=(action (mut isRenaming))
+  <OneInlineEditor
+    @isEditing={{isRenaming}}
+    @value={{groupBox.group.name}}
+    @showEmptyInfo={{false}}
+    @onSave={{action "rename"}}
+    @editOnClick={{false}}
+    @onEdit={{action (mut isRenaming)}}
     class="one-label name-editor"
-    inputClasses="input-sm"}}
+    @inputClasses="input-sm"
+  />
 {{else}}
-  {{#truncated-string class="group-name"}}{{groupBox.group.name}}{{/truncated-string}}
+  <TruncatedString class="group-name">{{groupBox.group.name}}</TruncatedString>
 {{/if}}
 
-{{groups-hierarchy-visualiser/group-box-relation
-  relationType="parents"
-  group=groupBox.group
-  expandRelation=showParents
-  isExpanded=parentsRelationActive}}
+<GroupsHierarchyVisualiser::GroupBoxRelation
+  @relationType="parents"
+  @group={{groupBox.group}}
+  @expandRelation={{showParents}}
+  @isExpanded={{parentsRelationActive}}
+/>
 
-{{groups-hierarchy-visualiser/group-box-relation
-  relationType="children"
-  group=groupBox.group
-  expandRelation=showChildren
-  isExpanded=childrenRelationActive}}
+<GroupsHierarchyVisualiser::GroupBoxRelation
+  @relationType="children"
+  @group={{groupBox.group}}
+  @expandRelation={{showChildren}}
+  @isExpanded={{childrenRelationActive}}
+/>
 
 {{#if groupBox.group.directMembership}}
-  {{#one-icon icon="user" class="direct-membership-icon"}}
-    {{one-tooltip title=(tt this "youAreDirectMember")}}
-  {{/one-icon}}
+  <OneIcon @icon="user" class="direct-membership-icon">
+    <OneTooltip @title={{tt this "youAreDirectMember"}} />
+  </OneIcon>
 {{/if}}
 {{#if groupBox.group.isEffectiveMember}}
-  {{one-icon
-    icon="settings-circle-filled"
-    class=(concat "actions-trigger group-actions-trigger actions-group-" elementId)
-    click=(action "toggleActions" (not actionsOpened))}}
+  <OneIcon
+    @icon="settings-circle-filled"
+    class={{concat "actions-trigger group-actions-trigger actions-group-" elementId}}
+    onclick={{action "toggleActions" (not actionsOpened)}}
+  />
   {{!-- optimization: rendering actions popover on user click instead of rendering it on init --}}
-  {{#render-later triggerRender=actionsOpened}}
-    {{#one-webui-popover
+  <RenderLater @triggerRender={{actionsOpened}}>
+    <OneWebuiPopover
       class="group-actions"
-      padding=false
-      popoverStyle="with-dropdown"
-      triggerSelector=(concat ".actions-group-" elementId)
-      open=actionsOpened
-      placement="context-menu"
-      onToggle=(action "toggleActions") as |popover|}}
-      {{#click-outside
-        onClickOutside=(action "toggleActions" false)
-        exceptSelector=(concat ".actions-group-" elementId)
-      }}
-        {{actions-popover-content
+      @padding={{false}}
+      @popoverStyle="with-dropdown"
+      @triggerSelector={{concat ".actions-group-" elementId}}
+      @open={{actionsOpened}}
+      @placement="context-menu"
+      @onToggle={{action "toggleActions"}}
+      as |popover|
+    >
+      <ClickOutside
+        @onClickOutside={{action "toggleActions" false}}
+        @exceptSelector={{concat ".actions-group-" elementId}}
+      >
+        <ActionsPopoverContent
           class="groups-hierarchy-visualiser-actions"
-          actionsArray=groupActions
-          actionClicked=(action "toggleActions" false)}}
-      {{/click-outside}}
-    {{/one-webui-popover}}
-  {{/render-later}}
+          @actionsArray={{groupActions}}
+          @actionClicked={{action "toggleActions" false}}
+        />
+      </ClickOutside>
+    </OneWebuiPopover>
+  </RenderLater>
 {{/if}}

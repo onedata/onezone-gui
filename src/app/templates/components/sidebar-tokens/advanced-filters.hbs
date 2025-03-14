@@ -1,27 +1,27 @@
 <div class="type-filter-row filter-row">
   <label class="filter-label">{{tt this "typeFilter.label"}}:</label>
-  {{#bs-button-group
-    value=selectedType
+  <BsButtonGroup
+    @value={{selectedType}}
     class="type-filter filter-control"
-    type="radio"
-    onChange=(action "typeChanged")
+    @type="radio"
+    @onChange={{action "typeChanged"}}
     as |bg|
-  }}
-    {{#bg.button type="default" class="btn-sm btn-all" value="all"}}
+  >
+    <bg.button @type="default" class="btn-sm btn-all" @value="all">
       {{tt this "typeFilter.values.all"}}
-    {{/bg.button}}
-    {{#bg.button type="default" class="btn-sm btn-access" value="access"}}
+    </bg.button>
+    <bg.button @type="default" class="btn-sm btn-access" @value="access">
       {{tt this "typeFilter.values.access"}}
-    {{/bg.button}}
-    {{#bg.button type="default" class="btn-sm btn-identity" value="identity"}}
+    </bg.button>
+    <bg.button @type="default" class="btn-sm btn-identity" @value="identity">
       {{tt this "typeFilter.values.identity"}}
-    {{/bg.button}}
-    {{#bg.button type="default" class="btn-sm btn-invite" value="invite"}}
+    </bg.button>
+    <bg.button @type="default" class="btn-sm btn-invite" @value="invite">
       {{tt this "typeFilter.values.invite"}}
-    {{/bg.button}}
-  {{/bs-button-group}}
+    </bg.button>
+  </BsButtonGroup>
 </div>
-{{#one-collapse collapsed=(not isTargetFilterVisible) class="target-filter-row-collapse"}}
+<OneCollapse @collapsed={{not isTargetFilterVisible}} class="target-filter-row-collapse">
   <div class="target-filter-row filter-row">
     <label class="filter-label">{{tt this "targetFilter.label"}}:</label>
     <div class="filter-control target-filter">
@@ -36,12 +36,14 @@
         @renderInPlace={{true}}
         as |option|
       >
-        {{#truncated-string class="option-container"}}
+        <TruncatedString class="option-container">
           {{#if option.icon}}
-            {{one-icon class="model-icon" icon=option.icon}}
+            <OneIcon class="model-icon" @icon={{option.icon}} />
           {{/if}}
-          <span class="text model-name">{{tt this (concat "targetFilter.model.options." option.modelName)}}</span>
-        {{/truncated-string}}
+          <span
+            class="text model-name"
+          >{{tt this (concat "targetFilter.model.options." option.modelName)}}</span>
+        </TruncatedString>
       </OneDropdown>
       <OneDropdown
         class="target-record-filter"
@@ -56,10 +58,10 @@
         @searchEnabled={{true}}
         as |option|
       >
-        {{#truncated-string}}
+        <TruncatedString>
           {{option.name}}
-        {{/truncated-string}}
+        </TruncatedString>
       </OneDropdown>
     </div>
   </div>
-{{/one-collapse}}
+</OneCollapse>

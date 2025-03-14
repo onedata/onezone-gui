@@ -1,4 +1,4 @@
-{{one-icon class="sidebar-item-icon" icon=oneproviderIcon}}
-{{#truncated-string class="sidebar-item-title"}}
-  {{name-conflict item=oneprovider tagName="span" class="one-label"}}
-{{/truncated-string}}
+<OneIcon class="sidebar-item-icon" @icon={{oneproviderIcon}} />
+<TruncatedString class="sidebar-item-title">
+  <NameConflict @item={{oneprovider}} @tagName="span" class="one-label" />
+</TruncatedString>
