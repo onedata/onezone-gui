@@ -2,7 +2,7 @@
  * A first-level item component for harvesters sidebar
  *
  * @author Michał Borzęcki, Agnieszka Warchoł
- * @copyright (C) 2019-2020 ACK CYFRONET AGH
+ * @copyright (C) 2019-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -12,7 +12,6 @@ import { next } from '@ember/runloop';
 import { reads, collect } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/i18n';
-import { reject, resolve } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 export default Component.extend(I18n, {
@@ -154,6 +153,10 @@ export default Component.extend(I18n, {
     }
   },
 
+  toggleRename(value) {
+    next(() => safeExec(this, 'set', 'isRenaming', value));
+  },
+
   actions: {
     editorClick(event) {
       if (this.get('isRenaming')) {
@@ -162,34 +165,36 @@ export default Component.extend(I18n, {
       }
     },
     toggleRename(value) {
-      next(() => safeExec(this, 'set', 'isRenaming', value));
+      this.toggleRename(value);
     },
-    rename(name) {
+    async rename(name) {
       if (!name || !name.length) {
-        return reject();
+        throw new Error('harvester-item#rename: no name provided');
       }
 
       const {
         harvester,
         globalNotify,
-      } = this.getProperties('harvester', 'globalNotify');
+      } = this;
 
       const oldName = get(harvester, 'name');
       if (oldName === name) {
-        this.send('toggleRename', false);
-        return resolve();
+        this.toggleRename(false);
+        return;
       }
       set(harvester, 'name', name);
-      return harvester.save()
-        .then(() => {
-          this.send('toggleRename', false);
-        })
-        .catch((error) => {
-          globalNotify.backendError(this.t('persistingHarvester'), error);
-          // Restore old name
-          set(harvester, 'name', oldName);
-          throw error;
-        });
+
+      try {
+        await harvester.save();
+        if (this.isDestroyed || this.isDestroying) {
+          return;
+        }
+      } catch (error) {
+        globalNotify.backendError(this.t('persistingHarvester'), error);
+        // Restore old name
+        set(harvester, 'name', oldName);
+        throw error;
+      }
     },
     showRemoveModal() {
       this.set('isRemoveModalOpened', true);

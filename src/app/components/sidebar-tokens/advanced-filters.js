@@ -16,6 +16,17 @@ import { equal, raw } from 'ember-awesome-macros';
 import { scheduleOnce } from '@ember/runloop';
 import recordIcon from 'onedata-gui-common/utils/record-icon';
 
+/**
+ * @typedef {'all'|'access'|'identity'|'invite'} TokenTypeFilter
+ */
+
+/**
+ * @typedef {Object} TokensSidebarAdvancedFilter
+ * @property {TokenTypeFilter} type
+ * @property {string} targetModelName 'space'|'group'|...
+ * @property {Ember.Model|null} targetRecord null|Models.*; null means all records
+ */
+
 export default Component.extend(I18n, {
   classNames: ['advanced-filters', 'advanced-token-filters'],
 
@@ -29,14 +40,7 @@ export default Component.extend(I18n, {
   /**
    * @virtual
    * @type {Function}
-   * @param {Object} filtersState object:
-   *   ```
-   *   {
-   *     type: 'all'|'access'|'identity'|'invite',
-   *     targetModelName: 'space'|'group'|...
-   *     targetRecord: null|Models.* // null means all records
-   *   }
-   *   ```
+   * @param {TokensSidebarAdvancedFilter} filtersState
    * @returns {undefined}
    */
   onChange: notImplementedIgnore,
@@ -48,7 +52,7 @@ export default Component.extend(I18n, {
   collection: undefined,
 
   /**
-   * @type {string}
+   * @type {TokenTypeFilter}
    */
   selectedType: 'all',
 

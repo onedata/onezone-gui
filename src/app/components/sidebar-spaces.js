@@ -1,80 +1,97 @@
 /**
- * A sidebar for providers (extension of ``one-sidebar``)
+ * A sidebar for spaces.
  *
  * @author Jakub Liput, Michał Borzęcki
- * @copyright (C) 2017-2020 ACK CYFRONET AGH
+ * @copyright (C) 2017-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import OneSidebar from 'onedata-gui-common/components/one-sidebar';
-import layout from 'onedata-gui-common/templates/components/one-sidebar';
-import I18n from 'onedata-gui-common/mixins/i18n';
+import ChunkableListModelSidebar from 'onedata-gui-common/components/chunkable-list-model-sidebar';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
+import { classNames } from '@ember-decorators/component';
 
-export default OneSidebar.extend(I18n, UserProxyMixin, {
-  layout,
-
+@classNames('sidebar-spaces')
+export default class extends ChunkableListModelSidebar.extend(UserProxyMixin) {
   /**
    * Note: `currentUser` service is needed by `UserProxyMixin`
    * which is needed by `space-item` to work.
    * @type {Ember.Service}
    */
-  currentUser: service(),
-  navigationTabsConfiguration: service(),
+  @service currentUser;
+  @service navigationTabsConfiguration;
 
-  i18nPrefix: 'components.sidebarSpaces',
-
-  classNames: ['sidebar-spaces'],
-
-  /**
-   * @override
-   */
-  model: null,
+  /** @override */
+  i18nPrefix = 'components.sidebarSpaces';
 
   /**
    * @override
    */
-  firstLevelItemIcon: 'space',
+  model = null;
 
   /**
    * @override
    */
-  firstLevelItemComponent: 'sidebar-spaces/space-item',
+  firstLevelItemIcon = 'space';
 
   /**
    * @override
    */
-  secondLevelItemsComponent: 'sidebar-spaces/second-level-items',
+  firstLevelItemComponent = 'sidebar-spaces/space-item';
 
   /**
    * @override
    */
-  sidebarType: 'spaces',
+  secondLevelItemsComponent = 'sidebar-spaces/second-level-items';
+
+  /**
+   * @override
+   */
+  sidebarType = 'spaces';
 
   /**
    * Number of items that can have MRU (most recently used) badge.
    * @type {ComputedProperty<number>}
    */
-  maxMruCount: computed('sortedCollection.length', function maxMruCount() {
+  @computed('sortedCollection.length')
+  get maxMruCount() {
     const itemsCount = this.sortedCollection.length;
     return itemsCount > 1 ? Math.ceil(itemsCount / 5) : 0;
-  }),
+  }
 
   /**
    * List of MRU (most recently used) items IDs starting with MRU item.
-   * @type {ComputedProperty<number>}
+   * @type {ComputedProperty<Array<string>>}
    */
-  mruList: computed(
+  @computed(
     'sidebarType',
     'maxMruCount',
     'navigationTabsConfiguration.recentlyUsedWriteTimestamp',
-    function mruList() {
-      return this.navigationTabsConfiguration.getRecentlyUsedResourceIds(
-        this.sidebarType,
-        this.maxMruCount
-      );
-    }
-  ),
-});
+  )
+  get mruList() {
+    return this.navigationTabsConfiguration.getRecentlyUsedResourceIds(
+      this.sidebarType,
+      this.maxMruCount
+    );
+  }
+
+  /**
+   * @override
+   */
+  get primaryItemHeight() {
+    return 510;
+  }
+
+  /**
+   * @override
+   */
+  init() {
+    super.init(...arguments);
+    this.addObserver('primaryItemSourceArrayIndex', this, 'forceFirstRowHeightRecompute', false);
+  }
+
+  forceFirstRowHeightRecompute() {
+    this.infiniteScroll.firstRowModel.notifyPropertyChange('height');
+  }
+}

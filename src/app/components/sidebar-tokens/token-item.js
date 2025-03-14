@@ -2,7 +2,7 @@
  * A first-level item component for tokens sidebar
  *
  * @author Michał Borzęcki
- * @copyright (C) 2019 ACK CYFRONET AGH
+ * @copyright (C) 2019-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -13,7 +13,6 @@ import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { next } from '@ember/runloop';
-import { reject, resolve } from 'rsvp';
 
 const tokenTypeToIconNameMapping = {
   invite: 'token-invite',
@@ -176,6 +175,10 @@ export default Component.extend(I18n, {
     }
   },
 
+  toggleRename(value) {
+    next(() => safeExec(this, 'set', 'isRenaming', value));
+  },
+
   actions: {
     editorClick(event) {
       if (this.get('isRenaming')) {
@@ -184,29 +187,34 @@ export default Component.extend(I18n, {
       }
     },
     toggleRename(value) {
-      next(() => safeExec(this, 'set', 'isRenaming', value));
+      this.toggleRename(value);
     },
-    rename(name) {
+    async rename(name) {
       if (!name || !name.length) {
-        return reject();
+        throw new Error('token-item#rename: no name provided');
       }
 
       const {
         token,
         globalNotify,
-      } = this.getProperties('token', 'globalNotify');
+      } = this;
 
       set(token, 'name', name);
-      return (get(token, 'hasDirtyAttributes') ? token.save() : resolve())
-        .then(() => {
-          this.send('toggleRename', false);
-        })
-        .catch((error) => {
-          globalNotify.backendError(this.t('savingToken'), error);
-          // Restore old name
-          token.rollbackAttributes();
-          throw error;
-        });
+
+      try {
+        if (token.hasDirtyAttributes) {
+          await token.save();
+          if (this.isDestroyed || this.isDestroying) {
+            return;
+          }
+        }
+        this.toggleRename(false);
+      } catch (error) {
+        globalNotify.backendError(this.t('savingToken'), error);
+        // Restore old name
+        token.rollbackAttributes();
+        throw error;
+      }
     },
     remove() {
       const {

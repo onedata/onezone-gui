@@ -83,6 +83,10 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
 
   //#region utils
 
+  index: computed('name', 'entityId', function index() {
+    return `${this.name}\0${this.entityId}`;
+  }),
+
   /**
    * True, if user has a "View space" privilege
    * @type {Ember.ComputedProperty<boolean>}

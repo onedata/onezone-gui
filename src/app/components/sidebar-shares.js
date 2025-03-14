@@ -1,36 +1,23 @@
 /**
- * A sidebar for shares (extension of `one-sidebar`)
+ * A sidebar for shares.
  *
  * @author Jakub Liput
- * @copyright (C) 2019-2024 ACK CYFRONET AGH
+ * @copyright (C) 2019-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import OneSidebar from 'onedata-gui-common/components/one-sidebar';
-import template from 'onedata-gui-common/templates/components/one-sidebar';
-import { layout, classNames } from '@ember-decorators/component';
-import { computed } from '@ember/object';
-import InfiniteScroll from 'onedata-gui-common/utils/infinite-scroll';
+import ChunksArraySidebar from 'onedata-gui-common/components/chunks-array-sidebar';
+import { classNames } from '@ember-decorators/component';
 import { inject as service } from '@ember/service';
-import { reads } from '@ember/object/computed';
-import waitForRender from 'onedata-gui-common/utils/wait-for-render';
-import ConflictIdsArray from 'onedata-gui-common/utils/conflict-ids-array';
 
-// TODO: VFS-12506 Maybe create common class for sidebars with infinite scroll
-@layout(template)
 @classNames('sidebar-shares')
-export default class SidebarShares extends OneSidebar {
+export default class SidebarShares extends ChunksArraySidebar {
   @service shareManager;
 
   /**
    * @override
    */
   model = null;
-
-  /**
-   * @override
-   */
-  isFilteringEnabled = false;
 
   /**
    * @override
@@ -47,52 +34,22 @@ export default class SidebarShares extends OneSidebar {
    */
   firstLevelItemComponent = 'sidebar-shares/share-item';
 
-  isInfiniteScroll = true;
-
-  rowHeight = 54;
-
-  @reads('model.collection.chunksArray') chunksArray;
-
-  @computed('chunksArray')
-  get infiniteScroll() {
-    return InfiniteScroll.create({
-      entries: this.chunksArray,
-      singleRowHeight: this.rowHeight,
-    });
+  /**
+   * @override
+   */
+  get rowHeight() {
+    // the same as $sidebar-item-line-height-double-line in SCSS
+    return 54;
   }
 
   /**
    * @override
    */
-  @reads('model.collection.array') sortedCollection;
-
-  /**
-   * Disable filtering features.
-   * @override
-   */
-  @computed('sortedCollection')
-  get filteredCollection() {
-    return ConflictIdsArray.create({
-      content: this.sortedCollection,
-      diffProperty: 'entityId',
-      conflictProperty: 'name',
-    });
-  }
-
-  /**
-   * @override
-   */
-  didInsertElement() {
-    super.didInsertElement(...arguments);
-
-    (async () => {
-      await this.infiniteScroll.entries.initialLoad;
-      await waitForRender();
-      /** @type {HTMLElement} */
-      const itemsTable = this.element.querySelector('.one-sidebar-primary-item-list');
-      this.infiniteScroll.mount(itemsTable);
-      // TODO: VFS-12506 Try to optimize numer of reloads (not needed on first init)
-      this.chunksArray.scheduleReload();
-    })();
+  async didInsertElement() {
+    await super.didInsertElement(...arguments);
+    // TODO: VFS-12506 Try to optimize numer of reloads (not needed on first init)
+    await this.chunksArray.scheduleReload();
+    // check if fetchPrev is needed because reload causes invalidation of start
+    await this.chunksArray.startChanged();
   }
 }

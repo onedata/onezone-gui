@@ -220,6 +220,12 @@ export default Model.extend(
      */
     privileges: reads('metadata.privileges'),
 
+    index: computed('isActive', 'isObsolete', 'name', 'entityId', function index() {
+      const activeIndex = this.isActive ? '0' : '1';
+      const obsoleteIndex = this.isObsolete ? '1' : '0';
+      return `${activeIndex}\0${obsoleteIndex}\0${this.name}\0${this.entityId}`;
+    }),
+
     validUntilObserver: observer('validUntil', function validUntilObserver() {
       const {
         validUntil,

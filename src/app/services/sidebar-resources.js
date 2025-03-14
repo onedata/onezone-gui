@@ -2,21 +2,21 @@
  * Implements resources for Onezone GUI sidebar.
  *
  * @author Jakub Liput
- * @copyright (C) 2024 ACK CYFRONET AGH
+ * @copyright (C) 2024-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import { inject as service } from '@ember/service';
 import SidebarResources from 'onedata-gui-common/services/sidebar-resources';
-import { computed, defineProperty } from '@ember/object';
-import { tracked } from '@glimmer/tracking';
+import { computed } from '@ember/object';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
-import MergedChunksArray from 'onedata-gui-common/utils/merged-chunks-array';
-import computedLastProxyContent from 'onedata-gui-common/utils/computed-last-proxy-content';
-import { reads } from '@ember/object/computed';
-import gri from 'onedata-gui-websocket-client/utils/gri';
-import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
-import { entityType as shareEntityType } from 'onezone-gui/models/share';
+import { ChunksArraySidebarCollection } from 'onezone-gui/utils/chunks-array-sidebar-collection';
+import { ListModelSidebarCollection } from 'onezone-gui/utils/list-model-sidebar-collection';
+import { ChunkableListModelSidebarCollection } from 'onezone-gui/utils/chunkable-list-model-sidebar-collection';
+import ChunkableListModel from 'onedata-gui-common/utils/chunkable-list-model';
+import TokensChunkableListModel from 'onezone-gui/utils/tokens-chunkable-list-model';
+import SharesChunksArray from 'onezone-gui/utils/shares-chunks-array';
+import { camelize } from '@ember/string';
 
 export default class OnezoneSidebarResources extends SidebarResources {
   @service providerManager;
@@ -44,44 +44,89 @@ export default class OnezoneSidebarResources extends SidebarResources {
   ]));
 
   /**
+   * @type {SharesChunksArray}
+   */
+  @computed()
+  get sharesChunksArray() {
+    return SharesChunksArray.create({
+      ownerSource: this,
+      startIndex: 0,
+      endIndex: 50,
+      indexMargin: 10,
+    });
+  }
+
+  /**
+   * @type {PromiseObject<ChunkableListModel>}
+   */
+  @computed()
+  get spacesChunkableListModelProxy() {
+    return promiseObject(this.resolveUserVirtualList('space'));
+  }
+
+  /**
+   * @type {PromiseObject<ChunkableListModel>}
+   */
+  @computed()
+  get groupsChunkableListModelProxy() {
+    return promiseObject(this.resolveUserVirtualList('group'));
+  }
+
+  /**
+   * @type {PromiseObject<ChunkableListModel>}
+   */
+  @computed()
+  get atmInventoriesChunkableListModelProxy() {
+    return promiseObject(this.resolveUserVirtualList('atmInventory'));
+  }
+
+  /**
+   * @type {PromiseObject<ChunkableListModel>}
+   */
+  @computed()
+  get providersChunkableListModelProxy() {
+    return promiseObject(this.resolveUserVirtualList('provider'));
+  }
+
+  /**
+   * @type {PromiseObject<TokensChunkableListModel>}
+   */
+  @computed()
+  get tokensChunkableListModelProxy() {
+    return promiseObject(
+      this.resolveUserVirtualList('token', TokensChunkableListModel)
+    );
+  }
+
+  /**
+   * @type {PromiseObject<ChunkableListModel>}
+   */
+  @computed()
+  get harvestersChunkableListModelProxy() {
+    return promiseObject(this.resolveUserVirtualList('harvester'));
+  }
+
+  /**
    * @param {string} type
    * @returns {Promise<SidebarCollection>}
    */
   async getCollectionFor(type) {
     switch (type) {
       case 'shares': {
-        await this.fetchersProxy;
         await this.sharesChunksArray.initialLoad;
         return new ChunksArraySidebarCollection(this.sharesChunksArray);
       }
-      case 'providers':
-        return new ListModelSidebarCollection(
-          await this.providerManager.getProviders()
-        );
       case 'clusters':
         return new ListModelSidebarCollection(
           await this.clusterManager.getClusters()
         );
-      case 'tokens':
-        return new ListModelSidebarCollection(
-          await this.tokenManager.getTokens()
-        );
       case 'spaces':
-        return new ListModelSidebarCollection(
-          await this.spaceManager.getSpaces()
-        );
+      case 'providers':
       case 'groups':
-        return new ListModelSidebarCollection(
-          await this.groupManager.getGroups()
-        );
+      case 'tokens':
       case 'harvesters':
-        return new ListModelSidebarCollection(
-          await this.harvesterManager.getHarvesters()
-        );
       case 'atm-inventories':
-        return new ListModelSidebarCollection(
-          await this.recordManager.getUserRecordList('atmInventory')
-        );
+        return await this.createListChunksCollection(type);
       case 'uploads': {
         // TODO: VFS-12506 Maybe do it reactive with reads (but it was not earlier)
         const sidebarOneproviders = this.uploadManager.sidebarOneproviders;
@@ -130,8 +175,6 @@ export default class OnezoneSidebarResources extends SidebarResources {
    */
   getItemsSortingFor(resourceType) {
     switch (resourceType) {
-      case 'tokens':
-        return ['isActive:desc', 'isObsolete', 'name'];
       case 'uploads':
         return ['isAllOneproviders:desc', 'name'];
       default:
@@ -139,199 +182,32 @@ export default class OnezoneSidebarResources extends SidebarResources {
     }
   }
 
-  @computed('currentUser.user.spaceList.list')
-  get spacesIdsProxy() {
-    return promiseObject((async () => {
-      const user = this.currentUser.user;
-      const spaceList = await user.spaceList;
-      return spaceList.hasMany('list').ids().map(gri => parseGri(gri).entityId);
-    })());
+  /**
+   * @param {'tokens'|'spaces'|'groups'|'harvesters'|'atm-inventories'} resourceType
+   * @returns {Promise<ChunkableListModelSidebarCollection>}
+   */
+  async createListChunksCollection(resourceType) {
+    const camelizedResourceType = camelize(resourceType);
+    const chunkableListModel = await this[`${camelizedResourceType}ChunkableListModelProxy`];
+    await chunkableListModel.chunksArray.initialLoad;
+    return new ChunkableListModelSidebarCollection(chunkableListModel);
   }
 
   /**
-   * @type {PromiseObject<Array<(index, limit, offset) => ShareDataListPage>>}
+   *
+   * @param {'space'|'group'|'provider'|'token'|'linkedAccount'|'cluster'|'harvester'|'atmInventory'} listType
+   * @returns {Promise<ChunkableListModel>}
    */
-  @computed('spacesIdsProxy')
-  get fetchersProxy() {
-    return promiseObject((async () => {
-      const spacesIds = await this.spacesIdsProxy;
-      return spacesIds.map(spaceId => {
-        return (index, limit, offset) => {
-          return this.getShareList(spaceId, {
-            index,
-            limit,
-            offset,
-          });
-        };
-      });
-    })());
-  }
-
-  @computed
-  get sharesChunksArray() {
-    const sidebarResources = this;
-    return MergedChunksArray
-      .extend({
-        fetchers: reads('sidebarResources.fetchersProxy.content'),
-      })
-      .create({
-        sidebarResources,
-        startIndex: 0,
-        endIndex: 50,
-        indexMargin: 10,
-        initialJumpIndex: this.initialJumpIndex,
-      });
-  }
-
-  init() {
-    super.init(...arguments);
-    defineProperty(this, 'fetchers', computedLastProxyContent('fetchersProxy'));
-  }
-
-  /**
-   * @private
-   * @param {string} spaceId
-   * @param {InfiniteListQuery} listQuery
-   * @returns {ShareDataListPage}
-   */
-  async getShareList(spaceId, listQuery) {
-    const { index, limit, offset } = listQuery;
-    const { array, isLast } = await this.shareManager.getSpaceShareList(spaceId, {
-      index,
-      limit,
-      offset,
-    });
-    const shareManager = this.shareManager;
-    const spaceManager = this.spaceManager;
-    return {
-      array: array.map(shareData => new SharesSidebarItem({
-        shareData,
-        shareManager,
-        spaceManager,
-      })),
-      isLast,
-    };
+  async resolveUserVirtualList(listType, ChunkableListModelClass = ChunkableListModel) {
+    const listRecord = await (await this.currentUser.userProxy)[`${listType}List`];
+    return new ChunkableListModelClass(listRecord);
   }
 
   async reloadShareList() {
-    await this.cacheFor('sharesChunksArray')?.scheduleReload();
-  }
-}
-
-export class SharesSidebarItem {
-  /** @type {ShareListItem} */
-  shareData = undefined;
-
-  shareManager = undefined;
-  spaceManager = undefined;
-
-  constructor({ shareData, shareManager, spaceManager }) {
-    this.shareData = shareData;
-    this.shareManager = shareManager;
-    this.spaceManager = spaceManager;
-  }
-
-  //#region proxied properties
-
-  get index() {
-    return this.shareData.index;
-  }
-
-  get name() {
-    return this.shareData.name;
-  }
-
-  get spaceId() {
-    return this.shareData.spaceId;
-  }
-
-  /** @type {FileType} */
-  get rootFileType() {
-    return this.shareData.rootFileType;
-  }
-
-  get rootFilePrivateId() {
-    return this.shareData.rootFilePrivateId;
-  }
-
-  get rootFilePublicId() {
-    return this.shareData.rootFilePublicId;
-  }
-
-  get handleId() {
-    return this.shareData.handleId;
-  }
-
-  get handlePublicUrl() {
-    return this.shareData.handlePublicUrl;
-  }
-
-  get sharePublicUrl() {
-    return this.shareData.sharePublicUrl;
-  }
-
-  //#endregion
-
-  get id() {
-    return gri({
-      entityType: shareEntityType,
-      entityId: this.entityId,
-      aspect: 'instance',
-      scope: 'private',
-    });
-  }
-
-  get entityId() {
-    return this.shareData.shareId;
-  }
-
-  get hasHandle() {
-    return Boolean(this.handleId);
-  }
-
-  @computed
-  get shareProxy() {
-    return this.shareManager.getRecord(this.id, { reload: false });
-  }
-  @computed
-  get spaceProxy() {
-    return this.spaceManager.getRecordById(this.spaceId, {
-      reload: false,
-      backgroundReload: false,
-    });
-  }
-}
-
-export class ChunksArraySidebarCollection {
-  @tracked chunksArray;
-
-  constructor(chunksArray) {
-    this.chunksArray = chunksArray;
-  }
-
-  @computed('chunksArray.content.[]')
-  get array() {
-    return this.chunksArray.toArray();
-  }
-
-  get ids() {
-    return this.array.map(record => record.id);
-  }
-}
-
-export class ListModelSidebarCollection {
-  @tracked listModel;
-
-  constructor(listModel) {
-    this.listModel = listModel;
-  }
-
-  @computed('listModel.list.content.[]')
-  get array() {
-    return this.listModel?.list?.content.toArray();
-  }
-
-  get ids() {
-    return this.listModel?.belongsTo?.('list')?.ids?.() ?? [];
+    const sharesChunksArray = this.cacheFor('sharesChunksArray');
+    if (sharesChunksArray) {
+      await sharesChunksArray.scheduleReload();
+      await sharesChunksArray.startChanged();
+    }
   }
 }

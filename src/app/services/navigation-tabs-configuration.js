@@ -4,7 +4,7 @@
  * Implementation for Onezone GUI.
  *
  * @author Jakub Liput
- * @copyright (C) 2024 ACK CYFRONET AGH
+ * @copyright (C) 2024-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -12,9 +12,13 @@ import CommonNavigationTabsConfiguration from 'onedata-gui-common/services/navig
 import { computed } from '@ember/object';
 import _ from 'lodash';
 import { inject as service } from '@ember/service';
+import gri from 'onedata-gui-websocket-client/utils/gri';
+import { entityType as shareEntityType } from 'onezone-gui/models/share';
+import { entityType as providerEntityType } from 'onezone-gui/models/provider';
 
 class OnezoneNavigationTabsConfiguration extends CommonNavigationTabsConfiguration {
   @service currentUser;
+  @service recordManager;
 
   /**
    * @override
@@ -43,8 +47,9 @@ class OnezoneNavigationTabsConfiguration extends CommonNavigationTabsConfigurati
         if (!sidebarModel || !contentModel) {
           return this.defaultAspect;
         }
-        const supportingProviderIds = Object.keys(contentModel.resource.supportSizes);
-        if (!supportingProviderIds.length) {
+        const supportSizes = contentModel.resource?.supportSizes;
+        const supportingProviderIds = supportSizes && Object.keys(supportSizes);
+        if (!supportingProviderIds?.length) {
           return 'index';
         } else {
           return 'data';
@@ -60,6 +65,39 @@ class OnezoneNavigationTabsConfiguration extends CommonNavigationTabsConfigurati
     };
     tabModels.push(uploadsTab);
     return tabModels;
+  }
+
+  /**
+   * @override
+   */
+  findOutResourceId(resourceId, resourceType) {
+    const {
+      recordManager,
+      sidebarResources,
+    } = this;
+
+    if (resourceType === 'uploads' && resourceId === 'all') {
+      return resourceId;
+    }
+
+    let entityType;
+    if (resourceType === 'uploads') {
+      entityType = providerEntityType;
+    } else {
+      const modelName = sidebarResources.getModelNameForRouteResourceType(resourceType);
+      entityType = recordManager.getEntityTypeForModelName(modelName);
+    }
+    const scope = entityType === shareEntityType ? 'private' : 'auto';
+    if (entityType) {
+      return gri({
+        entityId: resourceId,
+        entityType,
+        aspect: 'instance',
+        scope,
+      });
+    } else {
+      return null;
+    }
   }
 }
 

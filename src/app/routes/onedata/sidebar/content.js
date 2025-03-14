@@ -10,7 +10,6 @@
 
 import OnedataSidebarContentRoute from 'onedata-gui-common/routes/onedata/sidebar/content';
 import modelRoutableId from 'onezone-gui/utils/model-routable-id';
-import gri from 'onedata-gui-websocket-client/utils/gri';
 import { inject as service } from '@ember/service';
 
 /**
@@ -41,28 +40,5 @@ export default OnedataSidebarContentRoute.extend({
   availableResourceId(resourceId, collection) {
     const griIds = collection.ids;
     return findGri(griIds, resourceId);
-  },
-
-  /**
-   * @override
-   */
-  findOutResourceId(resourceId, resourceType) {
-    const {
-      recordManager,
-      sidebarResources,
-    } = this;
-
-    const modelName = sidebarResources.getModelNameForRouteResourceType(resourceType);
-    const entityType = recordManager.getEntityTypeForModelName(modelName);
-    if (entityType) {
-      return gri({
-        entityId: resourceId,
-        entityType,
-        aspect: 'instance',
-        scope: 'auto',
-      });
-    } else {
-      return null;
-    }
   },
 });

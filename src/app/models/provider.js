@@ -41,6 +41,10 @@ export default Model.extend(GraphSingleModelMixin, {
     return getOneproviderPath(clusterId);
   }),
 
+  index: computed('name', 'entityId', function index() {
+    return `${this.name}\0${this.entityId}`;
+  }),
+
   //#region Aliases and backward-compatibility
   host: alias('domain'),
   status: computed('online', function getStatus() {

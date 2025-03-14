@@ -12,7 +12,11 @@
   />
 {{else}}
   <TruncatedString class="sidebar-item-title sidebar-spaces-item-title">
-    <NameConflict @item={{item}} @tagName="span" class="one-label" />
+    {{#if item.name}}
+      <NameConflict @item={{item}} @tagName="span" class="one-label" />
+    {{else}}
+      <span class="one-label no-name">...</span>
+    {{/if}}
   </TruncatedString>
   {{#if isRecentlyUsedIconShown}}
     <OneIcon

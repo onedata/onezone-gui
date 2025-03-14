@@ -7,13 +7,13 @@
  *     modifications.
  *
  * @author Michał Borzęcki
- * @copyright (C) 2021 ACK CYFRONET AGH
+ * @copyright (C) 2021-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/i18n';
-import { computed, get } from '@ember/object';
+import { computed, get, trySet } from '@ember/object';
 import { sort } from '@ember/object/computed';
 import { debounce } from '@ember/runloop';
 import config from 'ember-get-config';
@@ -149,9 +149,13 @@ export default Component.extend(I18n, {
    */
   sortedCollection: sort('filteredCollection', 'collectionOrder'),
 
+  setSearchValue(value) {
+    trySet(this, 'searchValue', value);
+  },
+
   actions: {
     changeSearchValue(newValue) {
-      debounce(this, 'set', 'searchValue', newValue, typingActionDebouce);
+      debounce(this, 'setSearchValue', newValue, typingActionDebouce);
     },
   },
 });
