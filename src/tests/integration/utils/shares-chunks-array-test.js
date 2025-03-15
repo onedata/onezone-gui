@@ -28,52 +28,8 @@ describe('Integration | Utility | shares-chunks-array', function () {
   it('exposes shares collected from multiple spaces', async function () {
     // given
     const spacesCount = 3;
-    const store = lookupService(this, 'store');
-    const shareManager = lookupService(this, 'shareManager');
-    const user = await store.createRecord('user', {});
-    const currentUserService = lookupService(this, 'currentUser');
-    const userProxy = promiseObject((async () => user)());
-    defineProperty(currentUserService, 'userProxy', {
-      get() {
-        return userProxy;
-      },
-    });
-    const spaceNames = _.times(spacesCount, i => `space-${i}`);
-    const spacePromises = spaceNames.map(name => {
-      return store.createRecord('space', {
-        name,
-      }).save();
-    });
-    const spaces = await allFulfilled(spacePromises);
-    const shareItems = spaces.map(space => {
-      const index = `${space.name}-share`;
-      const spaceId = space.entityId;
-      return { shareId: `sh${spaceId}`, index, name: index, spaceId };
-    });
-    await allFulfilled(shareItems.map(shareItem => {
-      const { index, name, spaceId, shareId } = shareItem;
-      const space = spaces.find(space => space.entityId === spaceId);
-      const id = gri({
-        entityType: shareEntityType,
-        entityId: shareId,
-        aspect: 'instance',
-      });
-      const share = store.createRecord('share', { id, index, name, space });
-      return share.save();
-    }));
-    async function getSpaceShareList(spaceId, /* { index, limit, offset } */ ) {
-      const shareItem = shareItems.find(shareItem => shareItem.spaceId === spaceId);
-      return {
-        array: [shareItem],
-        isLast: true,
-      };
-    }
-    shareManager.getSpaceShareList = getSpaceShareList;
-    // sinon.stub(shareManager, 'getSpaceShareList').callsFake(getSpaceShareList);
-    const spaceList = await store.createRecord('spaceList', {
-      list: spaces,
-    }).save();
-    user.set('spaceList', spaceList);
+    this.helper = new Helper(this);
+    await this.helper.given({ spacesCount });
 
     // when
     this.chunksArray = SharesChunksArray.create({ ownerSource: this.owner });
@@ -86,4 +42,112 @@ describe('Integration | Utility | shares-chunks-array', function () {
       _.times(spacesCount, i => `space-${i}-share`)
     );
   });
+
+  // FIXME:
+  // it('changes progress from 0 to 0.1 when 1/10 of multi fetchers are done', async function () {
+  //   // given
+  //   const spacesCount = 9;
+  //   this.helper = new Helper(this);
+  //   await this.helper.given({ spacesCount });
+
+  //   // when
+  //   this.chunksArray = SharesChunksArray.create({ ownerSource: this.owner });
+  //   await this.chunksArray.initialLoad;
+  //   const array = this.chunksArray.toArray();
+  // });
 });
+
+class Helper {
+  /**
+   * @param {Mocha.Context} mochaContext
+   */
+  constructor(mochaContext) {
+    /** @type {Mocha.Context} */
+    this.mochaContext = mochaContext;
+  }
+
+  get store() {
+    return this.getService('store');
+  }
+
+  getService(serviceName) {
+    return lookupService(this.mochaContext, serviceName);
+  }
+
+  async givenUser() {
+    if (this.user) {
+      throw new Error('mock: user already initialized');
+    }
+
+    this.user = await this.store.createRecord('user', {});
+    const currentUserService = lookupService(this.mochaContext, 'currentUser');
+    const userProxy = promiseObject((async () => this.user)());
+    defineProperty(currentUserService, 'userProxy', {
+      get() {
+        return userProxy;
+      },
+    });
+  }
+
+  async givenSpaces({ spacesCount }) {
+    if (!this.user) {
+      throw new Error('mock: user not initialized');
+    }
+    if (this.spaces) {
+      throw new Error('mock: spaces already initialized');
+    }
+
+    const spaceNames = _.times(spacesCount, i => `space-${i}`);
+    const spacePromises = spaceNames.map(name => {
+      return this.store.createRecord('space', {
+        name,
+      }).save();
+    });
+    this.spaces = await allFulfilled(spacePromises);
+    const spaceList = await this.store.createRecord('spaceList', {
+      list: this.spaces,
+    }).save();
+    this.user.set('spaceList', spaceList);
+  }
+
+  async givenShares() {
+    if (!this.spaces) {
+      throw new Error('mock: spaces not initialized');
+    }
+
+    this.shareItems = this.spaces.map(space => {
+      const index = `${space.name}-share`;
+      const spaceId = space.entityId;
+      return { shareId: `sh${spaceId}`, index, name: index, spaceId };
+    });
+    await allFulfilled(this.shareItems.map(shareItem => {
+      const { index, name, spaceId, shareId } = shareItem;
+      const space = this.spaces.find(space => space.entityId === spaceId);
+      const id = gri({
+        entityType: shareEntityType,
+        entityId: shareId,
+        aspect: 'instance',
+      });
+      const share = this.store.createRecord('share', { id, index, name, space });
+      return share.save();
+    }));
+  }
+
+  async given({ spacesCount }) {
+    await this.givenUser();
+    await this.givenSpaces({ spacesCount });
+    await this.givenShares();
+    const shareManager = this.getService('shareManager');
+    const helper = this;
+    async function getSpaceShareList(spaceId, /* { index, limit, offset } */ ) {
+      const shareItem = helper.shareItems.find(shareItem =>
+        shareItem.spaceId === spaceId
+      );
+      return {
+        array: [shareItem],
+        isLast: true,
+      };
+    }
+    shareManager.getSpaceShareList = getSpaceShareList;
+  }
+}
