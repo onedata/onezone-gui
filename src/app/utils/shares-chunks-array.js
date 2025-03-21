@@ -13,13 +13,14 @@ import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import { inject as service } from '@ember/service';
 import _ from 'lodash';
-import ShareListMultiFetcher, { StatusEnum as MultiFetcherStatusEnum } from './share-list-multi-fetcher';
+import ShareListMultiFetcher, { ShareListMultiFetcherStatus as MultiFetcherStatusEnum } from './share-list-multi-fetcher';
 import ShareListFetcherToolkit from './share-list-fetcher-toolkit';
 
 export default class SharesChunksArray extends MergedChunksArray.extend(OwnerInjector) {
   @service currentUser;
   @service shareManager;
   @service spaceManager;
+  @service batchRequestRegistry;
 
   /**
    * How many spaces will be queried for share list in single batch.
@@ -99,6 +100,7 @@ export default class SharesChunksArray extends MergedChunksArray.extend(OwnerInj
       };
       const multiFetchers = spacesIdsChunks.map(spacesIdsChunk => {
         const multiFetcher = new ShareListMultiFetcher(
+          this.batchRequestRegistry,
           this.fetcherToolkit,
           spacesIdsChunk
         );

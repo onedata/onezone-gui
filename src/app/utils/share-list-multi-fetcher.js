@@ -9,12 +9,15 @@
 
 import { all as allFulfilled } from 'rsvp';
 import { mergeResults } from 'onedata-gui-common/utils/merged-chunks-array';
+import GrisBatchContainerSpec from 'onedata-gui-websocket-client/utils/gris-batch-container-spec';
+import { OwsGraphOperation } from 'onedata-gui-websocket-client/services/onedata-graph';
+import { spaceShareListGri } from 'onezone-gui/services/share-manager';
+import sleep from 'onedata-gui-common/utils/sleep';
 
 /**
- * @typedef {'init'|'pending'|'settled'} ShareListMultiFetcherStatus
+ * @enum {'init'|'pending'|'settled'}
  */
-
-export const StatusEnum = Object.freeze({
+export const ShareListMultiFetcherStatus = Object.freeze({
   Init: 'init',
   Pending: 'pending',
   Settled: 'settled',
@@ -30,19 +33,22 @@ export default class ShareListMultiFetcher {
   //#region state
 
   /** @type {ShareListMultiFetcherStatus} */
-  fetchStatus = StatusEnum.Init;
+  fetchStatus = ShareListMultiFetcherStatus.Init;
 
   //#endregion
 
   /**
-   * @param {Array<string>} spacesIds
+   * @param {BatchRequestRegistryService} batchRequestRegistry
    * @param {ShareListFetcherToolkit} fetcherToolkit
+   * @param {Array<string>} spacesIds
    */
-  constructor(fetcherToolkit, spacesIds) {
+  constructor(batchRequestRegistry, fetcherToolkit, spacesIds) {
     /** @type {Array<string>}  */
     this.spacesIds = spacesIds;
     /** @type {ShareListFetcherToolkit} */
     this.fetcherToolkit = fetcherToolkit;
+    /** @type {BatchRequestRegistryService} */
+    this.batchRequestRegistry = batchRequestRegistry;
   }
 
   /**
@@ -53,18 +59,32 @@ export default class ShareListMultiFetcher {
    */
   async fetch(index, limit, offset) {
     try {
-      this.changeStatus(StatusEnum.Pending);
-      const promises = this.spacesIds.map(spaceId => {
-        return this.fetcherToolkit.getShareList(spaceId, {
-          index,
-          limit,
-          offset,
+      this.changeStatus(ShareListMultiFetcherStatus.Pending);
+      const shareListGris = this.spacesIds.map(spaceId => spaceShareListGri(spaceId));
+      const containerSpec = new GrisBatchContainerSpec(
+        OwsGraphOperation.Create,
+        shareListGris
+      );
+      const batchContainer = this.batchRequestRegistry.createContainer(containerSpec);
+      try {
+        const promises = this.spacesIds.map(spaceId => {
+          return this.fetcherToolkit.getShareList(spaceId, {
+            index,
+            limit,
+            offset,
+          });
         });
-      });
-      const results = await allFulfilled(promises);
-      return mergeResults(results, { index, size: limit, offset });
+        (async () => {
+          await sleep(0);
+          batchContainer.flush();
+        })();
+        const results = await allFulfilled(promises);
+        return mergeResults(results, { index, size: limit, offset });
+      } finally {
+        this.batchRequestRegistry.destroy(batchContainer);
+      }
     } finally {
-      this.changeStatus(StatusEnum.Settled);
+      this.changeStatus(ShareListMultiFetcherStatus.Settled);
     }
   }
 
@@ -73,13 +93,19 @@ export default class ShareListMultiFetcher {
    * @param {ShareListMultiFetcherStatus} status
    */
   changeStatus(status) {
-    if (status === StatusEnum.Init) {
+    if (status === ShareListMultiFetcherStatus.Init) {
       throw new Error('ShareListMultiFetcher: cannot reinitialize state');
     }
-    if (this.fetchStatus === StatusEnum.Pending && status === StatusEnum.Pending) {
+    if (
+      this.fetchStatus === ShareListMultiFetcherStatus.Pending &&
+      status === ShareListMultiFetcherStatus.Pending
+    ) {
       throw new Error('ShareListMultiFetcher: fetch is already pending');
     }
-    if (this.fetchStatus === StatusEnum.Init && status === StatusEnum.Settled) {
+    if (
+      this.fetchStatus === ShareListMultiFetcherStatus.Init &&
+      status === ShareListMultiFetcherStatus.Settled
+    ) {
       throw new Error(
         'ShareListMultiFetcher: tried to set settled state without pending'
       );

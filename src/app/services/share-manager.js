@@ -53,12 +53,7 @@ export default class ShareManager extends Service {
    */
   async getSpaceShareList(spaceId, listQuery, options) {
     const onlyIds = Boolean(options?.onlyIds);
-    const getListGri = gri({
-      entityType: spaceEntityType,
-      entityId: spaceId,
-      aspect: onlyIds ? listSpaceSharesIdsAspect : listSpaceSharesAspect,
-      scope: 'private',
-    });
+    const getListGri = spaceShareListGri(spaceId, onlyIds);
     const { list: array, isLast } = await this.onedataGraph.request({
       gri: getListGri,
       operation: 'create',
@@ -72,4 +67,19 @@ export default class ShareManager extends Service {
     }
     return { array, isLast };
   }
+}
+
+/**
+ * @param {string} spaceId
+ * @param { boolean } onlyIds If false, generates GRI for fetching list of share data
+ *   objects. If true, generates GRI for resource with list of shares IDs only.
+ * @returns {string}
+ */
+export function spaceShareListGri(spaceId, onlyIds = false) {
+  return gri({
+    entityType: spaceEntityType,
+    entityId: spaceId,
+    aspect: onlyIds ? listSpaceSharesIdsAspect : listSpaceSharesAspect,
+    scope: 'private',
+  });
 }
