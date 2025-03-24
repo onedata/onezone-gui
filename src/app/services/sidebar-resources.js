@@ -35,6 +35,7 @@ export default class OnezoneSidebarResources extends SidebarResources {
   @service uploadManager;
   @service recordManager;
   @service workflowActions;
+  @service batchRequestRegistry;
 
   /**
    * @override
@@ -199,8 +200,11 @@ export default class OnezoneSidebarResources extends SidebarResources {
    * @returns {Promise<ChunkableListModel>}
    */
   async resolveUserVirtualList(listType, ChunkableListModelClass = ChunkableListModel) {
-    const listRecord = await (await this.currentUser.userProxy)[`${listType}List`];
-    return new ChunkableListModelClass(listRecord);
+    const listModel = await (await this.currentUser.userProxy)[`${listType}List`];
+    return new ChunkableListModelClass({
+      listModel,
+      batchRequestRegistry: this.batchRequestRegistry,
+    });
   }
 
   async reloadShareList() {

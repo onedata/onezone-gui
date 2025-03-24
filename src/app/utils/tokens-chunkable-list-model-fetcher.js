@@ -9,7 +9,7 @@
 
 import ChunkableListModelFetcher from 'onedata-gui-common/utils/chunkable-list-model-fetcher';
 
-export default class TokensVirtualListFetcher extends ChunkableListModelFetcher {
+export default class TokensChunkableListModelFetcher extends ChunkableListModelFetcher {
   /**
    * @override
    * @param {Array<Models.Token>} items
