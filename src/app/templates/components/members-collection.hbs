@@ -21,7 +21,7 @@
         actionsArray=collectionActions
       }}
     {{/list.header}}
-    {{#each membersProxyList key="id" as |memberProxy|}}
+    {{#each paginator.activePageArray key="id" as |memberProxy|}}
       {{#list.item
         class=(concat-classes "member-item" (concat "member-" memberProxy.member.entityId))
         selectionValue=(if (and (not onlyDirect) (not (contains memberProxy.member directMembers))) null memberProxy)
@@ -210,5 +210,14 @@
     {{else}}
       {{yield list}}
     {{/each}}
+    {{#if (and (not isListCollapsed) (gt paginator.pagesCount 1))}}
+      <PagesControl
+        @activePageNumber={{paginator.activePageNumber}}
+        @pagesCount={{paginator.pagesCount}}
+        @pageSize={{paginator.pageSize}}
+        @hasPageNumberInput={{not (or (media "isTablet") (media "isMobile"))}}
+        @onPageChange={{paginator.changeActivePageNumber}}
+      />
+    {{/if}}
   {{/one-collapsible-list}}
 {{/promise-proxy-container}}

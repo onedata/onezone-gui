@@ -36,6 +36,7 @@ import { later, cancel } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import joinStrings from 'onedata-gui-common/utils/i18n/join-strings';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import ArrayPaginator from 'onedata-gui-common/utils/array-paginator';
 
 const fallbackActionsGenerator = () => [];
 
@@ -221,6 +222,13 @@ export default Component.extend(I18n, {
    * @type {Array<PrivilegeRecordProxy>}
    */
   privilegesRecordProxyCache: undefined,
+
+  /**
+   * @type {Utils.ArrayPaginator}
+   */
+  paginator: undefined,
+
+  pageSize: 10,
 
   /**
    * @type {SafeString | string}
@@ -642,6 +650,14 @@ export default Component.extend(I18n, {
     this.membersObserver();
     this.groupsObserver();
     this.set('privilegesRecordProxyCache', []);
+    this.set('paginator', ArrayPaginator.extend({
+      array: computed('parent.membersProxyList', function array() {
+        return this.parent.membersProxyList ?? [];
+      }),
+      pageSize: reads('parent.pageSize'),
+    }).create({
+      parent: this,
+    }));
   },
 
   /**

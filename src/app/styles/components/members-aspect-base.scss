@@ -200,6 +200,11 @@
     }
   }
 
+  .pages-control {
+    justify-content: center;
+    padding: $padding-base-vertical 0;
+  }
+
   @media (min-width: $screen-sm-min) {
     .item-modified-header {
       padding-right: 230px;
