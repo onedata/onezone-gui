@@ -165,14 +165,9 @@ export default class OnezoneSidebarResourcesService extends SidebarResources {
   createSharesSidebarModelLoader() {
     const deferred = defer();
     const sidebarModelLoader = new SidebarModelLoader('shares', deferred.promise);
-
+    sidebarModelLoader.batchProgress = this.sharesChunksArray.batchProgress;
     (async () => {
       await this.sharesChunksArray.initialLoad;
-      // FIXME: batchProgress pojawia się w arrayu dopiero przy uruchomieniu executeAllFetchers, które jest przy uruchomieniu fetch
-      // czyli musielibyśmy czekać na initialLoad (formalnie)
-      // prawdopodobnie trzeba umożliwić konstruowanie SidebarBatchProgress bez totalCount i dopiero potem dodawać totalCount
-      // można by zrobić coś w rodzaju metody init
-      sidebarModelLoader.batchProgress = this.sharesChunksArray.batchProgress;
       deferred.resolve(new ChunksArraySidebarCollection(this.sharesChunksArray));
     })();
     return sidebarModelLoader;

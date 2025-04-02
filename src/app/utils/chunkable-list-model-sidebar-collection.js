@@ -18,15 +18,18 @@ import { tracked } from '@glimmer/tracking';
  */
 export class ChunkableListModelSidebarCollection {
   /** @type {ChunkableListModel} */
-  @tracked chunkableListModel;
+  @tracked
+  chunkableListModel;
 
   constructor(chunkableListModel) {
     this.chunkableListModel = chunkableListModel;
   }
 
-  @reads('chunkableListModel.listModel') listModel;
+  @reads('chunkableListModel.listModel')
+  listModel;
 
-  @reads('chunkableListModel.chunksArray') chunksArray;
+  @reads('chunkableListModel.chunksArray')
+  chunksArray;
 
   /**
    * @implements {SidebarCollection}

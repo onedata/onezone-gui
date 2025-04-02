@@ -32,6 +32,9 @@ export default class SharesChunksArray extends MergedChunksArray.extend(OwnerInj
 
   //#region state
 
+  /** @type {SidebarBatchProgress} */
+  #batchProgress = new SidebarBatchProgress();
+
   /** @type {boolean} */
   isPrepareFetchersPending = false;
 
@@ -55,6 +58,11 @@ export default class SharesChunksArray extends MergedChunksArray.extend(OwnerInj
     })());
   }
 
+  get batchProgress() {
+    return this.#batchProgress;
+  }
+
+  /** @override */
   init() {
     super.init(...arguments);
     this.fetcherToolkit = new ShareListFetcherToolkit({
@@ -135,7 +143,7 @@ export default class SharesChunksArray extends MergedChunksArray.extend(OwnerInj
     /** @type {Array<ShareListMultiFetcher>} */
     const multiFetchers = this.multiFetchers;
     const totalCount = _.sumBy(multiFetchers, 'spacesIds.length');
-    this.batchProgress = new SidebarBatchProgress(totalCount);
+    this.batchProgress.reset(totalCount);
     const results = [];
     for (const multiFetcher of multiFetchers) {
       results.push(await multiFetcher.fetch(index, size, offset));
