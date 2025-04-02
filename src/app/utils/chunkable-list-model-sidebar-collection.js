@@ -62,6 +62,13 @@ export class ChunkableListModelSidebarCollection {
     return this.chunkableListModel.chunkableListModelFetcher.filterItems(this.fullArray);
   }
 
+  /**
+   * @type {SidebarBatchProgress|null}
+   */
+  get batchProgress() {
+    return this.chunkableListModel.batchProgress;
+  }
+
   setFilter({ expression, advanced }) {
     this.chunkableListModel.setFilter({ expression, advanced });
   }

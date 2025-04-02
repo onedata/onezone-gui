@@ -75,13 +75,14 @@ export default class ShareListMultiFetcher {
           });
         });
         (async () => {
+          // FIXME: komentarz, albo zmienić rodzaj strategii flushowania
           await sleep(0);
           batchContainer.flush();
         })();
         const results = await allFulfilled(promises);
         return mergeResults(results, { index, size: limit, offset });
       } finally {
-        this.batchRequestRegistry.destroy(batchContainer);
+        this.batchRequestRegistry.destroyContainer(batchContainer);
       }
     } finally {
       this.changeStatus(ShareListMultiFetcherStatus.Settled);
