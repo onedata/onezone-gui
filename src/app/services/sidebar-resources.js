@@ -141,38 +141,6 @@ export default class OnezoneSidebarResourcesService extends SidebarResources {
     }
   }
 
-  // FIXME: więcej resourceType - albo dodać typedef lepiej
-  /**
-   * @private
-   * @param {OnezoneUserListResourceCategory} resourceType
-   * @returns {SidebarModelLoader}
-   */
-  createListSidebarModelLoader(resourceType) {
-    const deferred = defer();
-    const sidebarModelLoader = new SidebarModelLoader(resourceType, deferred.promise);
-    // Code below resolves collection for SidebarModelLoader, but also initializes its
-    // batchProgress.
-    (async () => {
-      const camelizedResourceType = camelize(resourceType);
-      const chunkableListModel = await this[`${camelizedResourceType}ChunkableListModelProxy`];
-      sidebarModelLoader.batchProgress = chunkableListModel.batchProgress;
-      await chunkableListModel.chunksArray.initialLoad;
-      deferred.resolve(new ChunkableListModelSidebarCollection(chunkableListModel));
-    })();
-    return sidebarModelLoader;
-  }
-
-  createSharesSidebarModelLoader() {
-    const deferred = defer();
-    const sidebarModelLoader = new SidebarModelLoader('shares', deferred.promise);
-    sidebarModelLoader.batchProgress = this.sharesChunksArray.batchProgress;
-    (async () => {
-      await this.sharesChunksArray.initialLoad;
-      deferred.resolve(new ChunksArraySidebarCollection(this.sharesChunksArray));
-    })();
-    return sidebarModelLoader;
-  }
-
   /**
    * @override
    * @param {OnedataResourceCategory} resourceCategory
@@ -187,42 +155,14 @@ export default class OnezoneSidebarResourcesService extends SidebarResources {
       case 'harvesters':
       case 'atm-inventories':
         return this.createListSidebarModelLoader(resourceCategory);
-      case 'shares': {
+      case 'shares':
         return this.createSharesSidebarModelLoader();
-      }
       case 'clusters':
-        // FIXME: implement
-        throw new Error('clusters not implemented');
-        // return new ListModelSidebarCollection(
-        //   await this.clusterManager.getClusters()
-        // );
-      case 'uploads': {
-        // FIXME: implement
-        throw new Error('uploads not implemented');
-        // // TODO: VFS-12506 Maybe do it reactive with reads (but it was not earlier)
-        // const sidebarOneproviders = this.uploadManager.sidebarOneproviders;
-        // return {
-        //   get array() {
-        //     return sidebarOneproviders;
-        //   },
-        //   get ids() {
-        //     return sidebarOneproviders.map(record => record.id);
-        //   },
-        // };
-      }
-      case 'users': {
-        // FIXME: implement
-        throw new Error('users not implemented');
-        // const user = await this.currentUser.getCurrentUserRecord();
-        // return {
-        //   get array() {
-        //     return [user];
-        //   },
-        //   get ids() {
-        //     return [user.id];
-        //   },
-        // };
-      }
+        return this.createClustersSidebarModelLoader();
+      case 'uploads':
+        return this.createUploadsSidebarModelLoader();
+      case 'users':
+        return this.createUsersSidebarModelLoader();
       default:
         throw new Error('SidebarResources: no such collection: ' + resourceCategory);
     }
@@ -247,5 +187,88 @@ export default class OnezoneSidebarResourcesService extends SidebarResources {
       await sharesChunksArray.scheduleReload();
       await sharesChunksArray.startChanged();
     }
+  }
+
+  /**
+   * @private
+   * @param {OnezoneUserListResourceCategory} resourceType
+   * @returns {SidebarModelLoader}
+   */
+  createListSidebarModelLoader(resourceType) {
+    const deferred = defer();
+    const sidebarModelLoader = new SidebarModelLoader(resourceType, deferred.promise);
+    // Code below resolves collection for SidebarModelLoader, but also initializes its
+    // progressTracker.
+    (async () => {
+      const camelizedResourceType = camelize(resourceType);
+      const chunkableListModel =
+        await this[`${camelizedResourceType}ChunkableListModelProxy`];
+      sidebarModelLoader.progressTracker = chunkableListModel.progressTracker;
+      await chunkableListModel.chunksArray.initialLoad;
+      deferred.resolve(new ChunkableListModelSidebarCollection(chunkableListModel));
+    })();
+    return sidebarModelLoader;
+  }
+
+  /**
+   * @private
+   * @returns {SidebarModelLoader}
+   */
+  createSharesSidebarModelLoader() {
+    const sidebarCollectionPromise = (async () => {
+      await this.sharesChunksArray.initialLoad;
+      return new ChunksArraySidebarCollection(this.sharesChunksArray);
+    })();
+    const sidebarModelLoader = new SidebarModelLoader('shares', sidebarCollectionPromise);
+    sidebarModelLoader.progressTracker = this.sharesChunksArray.progressTracker;
+    return sidebarModelLoader;
+  }
+
+  /**
+   * @private
+   * @returns {SidebarModelLoader}
+   */
+  createClustersSidebarModelLoader() {
+    const collectionResolver = async () => new ListModelSidebarCollection(
+      await this.clusterManager.getClusters()
+    );
+    return new SidebarModelLoader('clusters', collectionResolver());
+  }
+
+  /**
+   * @private
+   * @returns {SidebarModelLoader}
+   */
+  createUploadsSidebarModelLoader() {
+    // TODO: VFS-12506 Maybe do it reactive with reads (but it was not earlier)
+    const sidebarOneproviders = this.uploadManager.sidebarOneproviders;
+    const collectionResolver = async () => ({
+      get array() {
+        return sidebarOneproviders;
+      },
+      get ids() {
+        return sidebarOneproviders.map(record => record.id);
+      },
+    });
+    return new SidebarModelLoader('uploads', collectionResolver());
+  }
+
+  /**
+   * @private
+   * @returns {SidebarModelLoader}
+   */
+  createUsersSidebarModelLoader() {
+    const collectionResolver = async () => {
+      const user = await this.currentUser.getCurrentUserRecord();
+      return {
+        get array() {
+          return [user];
+        },
+        get ids() {
+          return [user.id];
+        },
+      };
+    };
+    return new SidebarModelLoader('users', collectionResolver());
   }
 }

@@ -66,10 +66,10 @@ export class ChunkableListModelSidebarCollection {
   }
 
   /**
-   * @type {SidebarBatchProgress|null}
+   * @type {ProgressTracker|null}
    */
-  get batchProgress() {
-    return this.chunkableListModel.batchProgress;
+  get progressTracker() {
+    return this.chunkableListModel.progressTracker;
   }
 
   setFilter({ expression, advanced }) {

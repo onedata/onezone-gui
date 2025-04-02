@@ -13,9 +13,9 @@ import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import { inject as service } from '@ember/service';
 import _ from 'lodash';
-import ShareListMultiFetcher, { ShareListMultiFetcherStatus as MultiFetcherStatusEnum } from './share-list-multi-fetcher';
+import ShareListMultiFetcher from './share-list-multi-fetcher';
 import ShareListFetcherToolkit from './share-list-fetcher-toolkit';
-import SidebarBatchProgress from 'onedata-gui-common/utils/sidebar-batch-progress';
+import ProgressTracker from 'onedata-gui-common/utils/progress-tracker';
 import { Mutex } from 'async-mutex';
 
 export default class SharesChunksArray extends MergedChunksArray.extend(OwnerInjector) {
@@ -32,8 +32,8 @@ export default class SharesChunksArray extends MergedChunksArray.extend(OwnerInj
 
   //#region state
 
-  /** @type {SidebarBatchProgress} */
-  #batchProgress = new SidebarBatchProgress();
+  /** @type {ProgressTracker} */
+  #progressTracker = new ProgressTracker();
 
   /** @type {boolean} */
   isPrepareFetchersPending = false;
@@ -58,8 +58,8 @@ export default class SharesChunksArray extends MergedChunksArray.extend(OwnerInj
     })());
   }
 
-  get batchProgress() {
-    return this.#batchProgress;
+  get progressTracker() {
+    return this.#progressTracker;
   }
 
   /** @override */
@@ -143,11 +143,11 @@ export default class SharesChunksArray extends MergedChunksArray.extend(OwnerInj
     /** @type {Array<ShareListMultiFetcher>} */
     const multiFetchers = this.multiFetchers;
     const totalCount = _.sumBy(multiFetchers, 'spacesIds.length');
-    this.batchProgress.reset(totalCount);
+    this.progressTracker.reset(totalCount);
     const results = [];
     for (const multiFetcher of multiFetchers) {
       results.push(await multiFetcher.fetch(index, size, offset));
-      this.batchProgress.doneCount += multiFetcher.spacesIds.length;
+      this.progressTracker.doneCount += multiFetcher.spacesIds.length;
     }
     return results;
   }
