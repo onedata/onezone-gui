@@ -164,7 +164,7 @@ export default class OnezoneSidebarResourcesService extends SidebarResources {
       case 'users':
         return this.createUsersSidebarModelLoader();
       default:
-        throw new Error('SidebarResources: no such collection: ' + resourceCategory);
+        throw new Error(`SidebarResources: no such collection: ${resourceCategory}`);
     }
   }
 

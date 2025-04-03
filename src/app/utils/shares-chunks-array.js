@@ -81,9 +81,9 @@ export default class SharesChunksArray extends MergedChunksArray.extend(OwnerInj
   }
 
   /**
-   * FIXME: zmiana opisu
-   * Every function in this array is intended to fetch shares (in infinite-scoll way) for
-   * n-spaces, where `n` is controlled by `this.spacesBatchSize`.
+   * Creates multi fetchers - objects that invokes mulitple share list fetches in single
+   * batch, for n-spaces, where `n` is controlled by `this.spacesBatchSize`.
+   * These multi fetchers can be used in main fetch method.
    * @returns {Promise<Array<ShareListMultiFetcher>>}
    */
   async createMultiFetchers() {

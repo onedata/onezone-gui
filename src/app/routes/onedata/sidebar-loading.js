@@ -1,4 +1,10 @@
-// FIXME: jsdoc
+/**
+ * Handles loading state for sidebar route: renders proper loading templates.
+ *
+ * @author Jakub Liput
+ * @copyright (C) 2025 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
 
 import Route from '@ember/routing/route';
 

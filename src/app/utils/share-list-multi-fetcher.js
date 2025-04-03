@@ -12,7 +12,7 @@ import { mergeResults } from 'onedata-gui-common/utils/merged-chunks-array';
 import GrisBatchContainerSpec from 'onedata-gui-websocket-client/utils/gris-batch-container-spec';
 import { OwsGraphOperation } from 'onedata-gui-websocket-client/services/onedata-graph';
 import { spaceShareListGri } from 'onezone-gui/services/share-manager';
-import sleep from 'onedata-gui-common/utils/sleep';
+import { DebouncedBatchFlushStrategy } from 'onedata-gui-websocket-client/utils/batch-flush-strategies';
 
 /**
  * @enum {'init'|'pending'|'settled'}
@@ -65,7 +65,10 @@ export default class ShareListMultiFetcher {
         OwsGraphOperation.Create,
         shareListGris
       );
-      const batchContainer = this.batchRequestRegistry.createContainer(containerSpec);
+      const batchContainer = this.batchRequestRegistry.createContainer(
+        containerSpec,
+        DebouncedBatchFlushStrategy
+      );
       try {
         const promises = this.spacesIds.map(spaceId => {
           return this.fetcherToolkit.getShareList(spaceId, {
@@ -74,11 +77,7 @@ export default class ShareListMultiFetcher {
             offset,
           });
         });
-        (async () => {
-          // FIXME: komentarz, albo zmienić rodzaj strategii flushowania
-          await sleep(0);
-          batchContainer.flush();
-        })();
+        batchContainer.scheduleFlush();
         const results = await allFulfilled(promises);
         return mergeResults(results, { index, size: limit, offset });
       } finally {
