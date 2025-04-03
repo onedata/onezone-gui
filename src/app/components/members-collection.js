@@ -231,6 +231,18 @@ export default Component.extend(I18n, {
   pageSize: 10,
 
   /**
+   * @type {string}
+   */
+  searchQuery: undefined,
+
+  /**
+   * @type {string}
+   */
+  typeForPageControl: computed('listHeader', function typeForPageControl() {
+    return this.listHeader.string.toLowerCase();
+  }),
+
+  /**
    * @type {SafeString | string}
    */
   effListHeader: computed('listHeader', 'members.length', function effListHeader() {
@@ -243,6 +255,16 @@ export default Component.extend(I18n, {
       `${typeof this.listHeader === 'string' ? _.escape(this.listHeader) : this.listHeader} (${membersCount})`
     );
   }),
+
+  isFiltered: computed(
+    'members.length',
+    'membersProxyList.length',
+    function isFiltered() {
+      const membersCount = this.members?.length ?? 0;
+      const membersProxyListCount = this.membersProxyList.length;
+      return membersCount !== membersProxyListCount;
+    }
+  ),
 
   /**
    * @type {Ember.ComputedProperty<string>}
@@ -461,6 +483,7 @@ export default Component.extend(I18n, {
     'members.@each.{entityId,name,username}',
     'onlyDirect',
     'directMembers.[]',
+    'searchQuery',
     function membersObserver() {
       const {
         owners,
@@ -479,6 +502,7 @@ export default Component.extend(I18n, {
         effectiveItemActionsGenerator,
         griAspect,
         griGroupAspects,
+        searchQuery,
       } = this.getProperties(
         'owners',
         'directMembers',
@@ -496,6 +520,7 @@ export default Component.extend(I18n, {
         'effectiveItemActionsGenerator',
         'griAspect',
         'griGroupAspects',
+        'searchQuery',
       );
       if (isListCollapsed === undefined && collapseForNumber &&
         members?.length > collapseForNumber) {
@@ -512,15 +537,20 @@ export default Component.extend(I18n, {
           name,
           username,
         } = getProperties(member, 'entityId', 'name', 'username');
-        let key = member === currentUserMember ? '0\n' : '1\n';
-        key += (owners || []).includes(member) ? '0\n' : '1\n';
-        key += this.directMembers?.includes(member) ? '0\n' : '1\n';
-        key += `${name}\n`;
-        if (subjectType === 'user') {
-          key += `${username || '\n'}\n`;
+        if (
+          (searchQuery && name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          !searchQuery
+        ) {
+          let key = member === currentUserMember ? '0\n' : '1\n';
+          key += (owners || []).includes(member) ? '0\n' : '1\n';
+          key += this.directMembers?.includes(member) ? '0\n' : '1\n';
+          key += `${name}\n`;
+          if (subjectType === 'user') {
+            key += `${username || '\n'}\n`;
+          }
+          key += entityId;
+          membersSortKeys.set(key, member);
         }
-        key += entityId;
-        membersSortKeys.set(key, member);
       });
       const orderedMembers = [...membersSortKeys.keys()].sort()
         .map(key => membersSortKeys.get(key));
@@ -746,6 +776,9 @@ export default Component.extend(I18n, {
     },
     highlightMemberships(groups) {
       this.set('highlightedMembers', groups);
+    },
+    onInput(value) {
+      this.set('searchQuery', value);
     },
   },
 });

@@ -10,9 +10,19 @@
   }}
     {{#list.header
       title=effListHeader
-      searchVisible=members.length
+      searchVisible=false
       withPlaceForDots=true
     }}
+      {{#if members.length}}
+        <div class="form-group form-group-sm form-group-light search-group collapse-animation collapse-small {{if _isListCollapsed "collapse-hidden"}}">
+          <div class="input-group with-icon-addon">
+            <SearchBar @search={{action "onInput"}} class="form-control" />
+            <div class="input-group-addon">
+              <OneIcon @icon="search" />
+            </div>
+          </div>
+        </div>
+      {{/if}}
       {{actions-toolbar
         isMinimized=true
         toolbarClasses=""
@@ -217,6 +227,9 @@
         @pageSize={{paginator.pageSize}}
         @hasPageNumberInput={{not (or (media "isTablet") (media "isMobile"))}}
         @onPageChange={{paginator.changeActivePageNumber}}
+        @customPerPageText={{tt this "perPage" type=typeForPageControl}}
+        @customFilteredText={{tt this "filteredResults"}}
+        @isFiltered={{isFiltered}}
       />
     {{/if}}
   {{/one-collapsible-list}}

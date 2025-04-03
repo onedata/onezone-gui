@@ -26,4 +26,6 @@ export default {
   showDescriptions: 'Show descriptions',
   memberships: 'Memberships',
   membershipsTip: 'Visualization of effective membership paths, showing via what groups this member inherits membership in this {{entityType}}.',
+  perPage: '{{type}} per page',
+  filteredResults: 'filtered results',
 };
