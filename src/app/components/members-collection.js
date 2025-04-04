@@ -153,6 +153,12 @@ export default Component.extend(I18n, {
   onlyDirect: false,
 
   /**
+   * @type {number}
+   * @virtual optional
+   */
+  pageSize: 10,
+
+  /**
    * Is calculated by `membersObserver`
    * @type {Array<Utils/MembersCollection/ItemProxy>}
    */
@@ -227,8 +233,6 @@ export default Component.extend(I18n, {
    * @type {Utils.ArrayPaginator}
    */
   paginator: undefined,
-
-  pageSize: 10,
 
   /**
    * @type {string}
@@ -496,8 +500,6 @@ export default Component.extend(I18n, {
         membersProxyList,
         groupedPrivilegesFlags,
         currentUser,
-        isListCollapsed,
-        collapseForNumber,
         itemActionsGenerator,
         effectiveItemActionsGenerator,
         griAspect,
@@ -514,18 +516,12 @@ export default Component.extend(I18n, {
         'membersProxyList',
         'groupedPrivilegesFlags',
         'currentUser',
-        'isListCollapsed',
-        'collapseForNumber',
         'itemActionsGenerator',
         'effectiveItemActionsGenerator',
         'griAspect',
         'griGroupAspects',
         'searchQuery',
       );
-      if (isListCollapsed === undefined && collapseForNumber &&
-        members?.length > collapseForNumber) {
-        this.set('isListCollapsed', true);
-      }
       // Create ordered list of members. Records should be sorted by name except
       // current user record and owners - they should be always at the top.
       const currentUserMember =
