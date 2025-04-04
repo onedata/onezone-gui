@@ -79,7 +79,9 @@ export default class ShareListMultiFetcher {
         });
         batchContainer.scheduleFlush();
         const results = await allFulfilled(promises);
-        return mergeResults(results, { index, size: limit, offset });
+        // Setting size to null, because we want full results to be passed down to main
+        // merge.
+        return mergeResults(results, { index, size: null, offset });
       } finally {
         this.batchRequestRegistry.destroyContainer(batchContainer);
       }
