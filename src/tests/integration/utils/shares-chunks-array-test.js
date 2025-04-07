@@ -87,7 +87,7 @@ describe('Integration | Utility | shares-chunks-array', function () {
     await settled();
 
     // then
-    expect(this.chunksArray.progress).to.equal(0.2);
+    expect(this.chunksArray.progressTracker.progress).to.equal(0.2);
 
     // when 2
     for (let i = 5; i < 25; ++i) {
