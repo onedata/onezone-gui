@@ -17,7 +17,7 @@ export default class SidebarLoadingRoute extends Route {
       into: 'onedata',
       outlet: 'sidebar',
     });
-    this.render('-internal-loading', {
+    this.render('-sidebar-content-loading', {
       into: 'onedata',
       outlet: 'content',
     });
