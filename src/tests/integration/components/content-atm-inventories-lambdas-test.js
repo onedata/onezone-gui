@@ -378,9 +378,7 @@ describe('Integration | Component | content-atm-inventories-lambdas (main)', fun
 });
 
 async function renderComponent() {
-  await render(hbs `{{content-atm-inventories-lambdas
-    atmInventory=atmInventory
-  }}`);
+  await render(hbs `<ContentAtmInventoriesLambdas @atmInventory={{atmInventory}} />`);
 }
 
 function itAllowsToGetBackToList(enterEditorCallback, expectedListQueryParams) {

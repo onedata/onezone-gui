@@ -52,13 +52,13 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
   });
 
   it('has class "advanced-token-filters"', async function () {
-    await render(hbs `{{sidebar-tokens/advanced-filters}}`);
+    await render(hbs `<SidebarTokens::AdvancedFilters />`);
 
     expect(find('.advanced-token-filters')).to.exist;
   });
 
   it('shows "type" filter', async function () {
-    await render(hbs `{{sidebar-tokens/advanced-filters}}`);
+    await render(hbs `<SidebarTokens::AdvancedFilters />`);
 
     const typeFilterRow = find('.type-filter-row');
     expect(typeFilterRow).to.exist;
@@ -70,7 +70,7 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
   });
 
   it('uses "All" as a default value of "type" filter', async function () {
-    await render(hbs `{{sidebar-tokens/advanced-filters}}`);
+    await render(hbs `<SidebarTokens::AdvancedFilters />`);
 
     const typeFilterRow = find('.type-filter-row');
     expect(typeFilterRow.querySelector('.btn-all')).to.have.class('active');
@@ -84,7 +84,7 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
     this.set('change', changeSpy);
 
     await render(hbs `
-      {{sidebar-tokens/advanced-filters onChange=(action change)}}
+      <SidebarTokens::AdvancedFilters @onChange={{action change}} />
     `);
 
     expect(changeSpy).to.be.calledOnce;
@@ -100,7 +100,7 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
     this.set('change', changeSpy);
 
     await render(hbs `
-      {{sidebar-tokens/advanced-filters onChange=(action change)}}
+      <SidebarTokens::AdvancedFilters @onChange={{action change}} />
     `);
 
     for (const type of ['access', 'identity', 'invite', 'all']) {
@@ -114,7 +114,7 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
   });
 
   it('shows target filter when type filter equals "invite"', async function () {
-    await render(hbs `{{sidebar-tokens/advanced-filters}}`);
+    await render(hbs `<SidebarTokens::AdvancedFilters />`);
 
     await selectType('invite');
     const targetFilterRow =
@@ -134,7 +134,7 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
     it(
       `does not show target filter when type filter equals "${type}"`,
       async function () {
-        await render(hbs `{{sidebar-tokens/advanced-filters}}`);
+        await render(hbs `<SidebarTokens::AdvancedFilters />`);
 
         await selectType(type);
         expect(find('.target-filter-row-collapse')).to.not.have.class('in');
@@ -144,7 +144,7 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
 
   it('shows possible target models according to passed tokens', async function () {
     await render(hbs `
-      {{sidebar-tokens/advanced-filters collection=tokensCollection}}
+      <SidebarTokens::AdvancedFilters @collection={{tokensCollection}} />
     `);
 
     await selectType('invite');
@@ -171,9 +171,10 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
       .concat([possibleTargetModels[0]]);
 
     await render(hbs `
-      {{sidebar-tokens/advanced-filters
-        collection=tokensCollection
-        onChange=(action change)}}
+      <SidebarTokens::AdvancedFilters
+        @collection={{tokensCollection}}
+        @onChange={{action change}}
+      />
     `);
 
     await selectType('invite');
@@ -189,7 +190,7 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
 
   it('disables target record filter when target model is set to "All"', async function () {
     await render(hbs `
-      {{sidebar-tokens/advanced-filters collection=tokensCollection}}
+      <SidebarTokens::AdvancedFilters @collection={{tokensCollection}} />
     `);
 
     await selectType('invite');
@@ -201,7 +202,7 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
     'enables target record filter when target model is set to item different than "All"',
     async function () {
       await render(hbs `
-        {{sidebar-tokens/advanced-filters collection=tokensCollection}}
+        <SidebarTokens::AdvancedFilters @collection={{tokensCollection}} />
       `);
 
       await selectType('invite');
@@ -216,7 +217,7 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
       `renders "All" and two records in target record filter when target model is set to "${name}"`,
       async function () {
         await render(hbs `
-          {{sidebar-tokens/advanced-filters collection=tokensCollection}}
+          <SidebarTokens::AdvancedFilters @collection={{tokensCollection}} />
         `);
         await selectType('invite');
         await selectChoose('.target-model-filter', name);
@@ -242,9 +243,10 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
       .mapBy('tokenTarget');
 
     await render(hbs `
-      {{sidebar-tokens/advanced-filters
-        collection=tokensCollection
-        onChange=(action change)}}
+      <SidebarTokens::AdvancedFilters
+        @collection={{tokensCollection}}
+        @onChange={{action change}}
+      />
     `);
     await selectType('invite');
     await selectChoose('.target-model-filter', 'Cluster');
@@ -272,7 +274,7 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
     ]);
 
     await render(hbs `
-      {{sidebar-tokens/advanced-filters collection=tokensCollection}}
+      <SidebarTokens::AdvancedFilters @collection={{tokensCollection}} />
     `);
 
     await selectType('invite');
@@ -294,9 +296,10 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
     this.set('change', changeSpy);
 
     await render(hbs `
-      {{sidebar-tokens/advanced-filters
-        collection=tokensCollection
-        onChange=(action change)}}
+      <SidebarTokens::AdvancedFilters
+        @collection={{tokensCollection}}
+        @onChange={{action change}}
+      />
     `);
 
     await selectType('invite');
@@ -317,9 +320,10 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
       this.set('change', changeSpy);
 
       await render(hbs `
-        {{sidebar-tokens/advanced-filters
-          collection=tokensCollection
-          onChange=(action change)}}
+        <SidebarTokens::AdvancedFilters
+          @collection={{tokensCollection}}
+          @onChange={{action change}}
+        />
       `);
 
       await selectType('invite');
@@ -349,9 +353,10 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
       this.set('change', changeSpy);
 
       await render(hbs `
-        {{sidebar-tokens/advanced-filters
-          collection=tokensCollection
-          onChange=(action change)}}
+        <SidebarTokens::AdvancedFilters
+          @collection={{tokensCollection}}
+          @onChange={{action change}}
+        />
       `);
 
       await selectType('invite');
@@ -386,9 +391,10 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
       this.set('change', changeSpy);
 
       await render(hbs `
-        {{sidebar-tokens/advanced-filters
-          collection=tokensCollection
-          onChange=(action change)}}
+        <SidebarTokens::AdvancedFilters
+          @collection={{tokensCollection}}
+          @onChange={{action change}}
+        />
       `);
 
       await selectType('invite');

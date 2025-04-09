@@ -117,7 +117,7 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
       context: this.get('context'),
     });
 
-    await render(hbs `{{global-modal-mounter}}`);
+    await render(hbs `<GlobalModalMounter />`);
     this.action.execute();
     await settled();
 
@@ -130,7 +130,7 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
       context: this.get('context'),
     });
 
-    await render(hbs `{{global-modal-mounter}}`);
+    await render(hbs `<GlobalModalMounter />`);
     this.action.execute();
     await settled();
 
@@ -156,7 +156,7 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
       },
     });
 
-    await render(hbs `{{global-modal-mounter}}`);
+    await render(hbs `<GlobalModalMounter />`);
     this.action.execute();
     await settled();
 
@@ -186,7 +186,7 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
       context,
     });
 
-    await render(hbs `{{global-modal-mounter}}`);
+    await render(hbs `<GlobalModalMounter />`);
     this.action.execute();
     await settled();
 
@@ -213,7 +213,7 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
         context: this.get('context'),
       });
 
-      await render(hbs `{{global-modal-mounter}}`);
+      await render(hbs `<GlobalModalMounter />`);
       const resultPromise = this.action.execute();
       await settled();
 
@@ -245,7 +245,7 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
       'success'
     );
 
-    await render(hbs `{{global-modal-mounter}}`);
+    await render(hbs `<GlobalModalMounter />`);
     const actionResultPromise = this.action.execute();
     await settled();
 
@@ -286,7 +286,7 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
         'backendError'
       );
 
-      await render(hbs `{{global-modal-mounter}}`);
+      await render(hbs `<GlobalModalMounter />`);
       const actionResultPromise = this.action.execute();
       await settled();
 
@@ -323,7 +323,7 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
         'backendError'
       );
 
-      await render(hbs `{{global-modal-mounter}}`);
+      await render(hbs `<GlobalModalMounter />`);
       const actionResultPromise = this.action.execute();
       await settled();
 

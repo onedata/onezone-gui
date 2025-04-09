@@ -163,6 +163,6 @@ describe(
 
 async function renderComponent() {
   await render(hbs `
-    {{sidebar-atm-inventories/atm-inventory-item item=atmInventory}}
+    <SidebarAtmInventories::AtmInventoryItem @item={{atmInventory}} />
   `);
 }

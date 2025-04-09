@@ -18,7 +18,9 @@ describe('Integration | Component | content-atm-inventories-workflows/atm-workfl
     });
 
     it('has class "atm-workflow-schema-details-form"', async function () {
-      await render(hbs `{{content-atm-inventories-workflows/atm-workflow-schema-details-form}}`);
+      await render(
+        hbs`<ContentAtmInventoriesWorkflows::AtmWorkflowSchemaDetailsForm />`
+      );
 
       expect(this.element.children).to.have.length(1);
       expect(this.element.children[0])
@@ -151,12 +153,12 @@ describe('Integration | Component | content-atm-inventories-workflows/atm-workfl
 
 async function renderComponent() {
   await render(hbs `
-    {{content-atm-inventories-workflows/atm-workflow-schema-details-form
-      mode=mode
-      atmWorkflowSchema=atmWorkflowSchema
-      onChange=changeSpy
-      isDisabled=isDisabled
-    }}
+    <ContentAtmInventoriesWorkflows::AtmWorkflowSchemaDetailsForm
+      @mode={{mode}}
+      @atmWorkflowSchema={{atmWorkflowSchema}}
+      @onChange={{changeSpy}}
+      @isDisabled={{isDisabled}}
+    />
   `);
 }
 

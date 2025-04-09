@@ -22,8 +22,7 @@ describe(
 
       this.set('columnSeparator', columnSeparator);
       await render(hbs `
-        {{groups-hierarchy-visualiser/column-separator
-          separator=columnSeparator}}
+        <GroupsHierarchyVisualiser::ColumnSeparator @separator={{columnSeparator}} />
       `);
 
       const separator = find('.column-separator');
@@ -58,8 +57,7 @@ describe(
 
       this.set('columnSeparator', columnSeparator);
       await render(hbs `
-        {{groups-hierarchy-visualiser/column-separator
-          separator=columnSeparator}}
+        <GroupsHierarchyVisualiser::ColumnSeparator @separator={{columnSeparator}} />
       `);
 
       const separator = find('.column-separator');

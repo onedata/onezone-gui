@@ -27,10 +27,10 @@ describe('Integration | Component | content-clusters-deregister', function () {
       const deregister = sinon.spy();
       this.set('deregister', deregister);
 
-      await render(hbs `{{content-clusters-deregister
-        cluster=cluster
-        deregister=deregister
-      }}`);
+      await render(hbs `<ContentClustersDeregister
+        @cluster={{cluster}}
+        @deregister={{deregister}}
+      />`);
 
       expect(find('.btn-deregister')).to.have.attr('disabled');
       await click('.btn-deregister');
@@ -47,11 +47,11 @@ describe('Integration | Component | content-clusters-deregister', function () {
       this.set('deregister', deregister);
       this.set('afterDeregister', afterDeregister);
 
-      await render(hbs `{{content-clusters-deregister
-        cluster=cluster
-        deregister=deregister
-        afterDeregister=afterDeregister
-      }}`);
+      await render(hbs `<ContentClustersDeregister
+        @cluster={{cluster}}
+        @deregister={{deregister}}
+        @afterDeregister={{afterDeregister}}
+      />`);
 
       await click('.one-checkbox-understand');
       await click('.btn-deregister');
@@ -82,12 +82,12 @@ describe('Integration | Component | content-clusters-deregister', function () {
         getOneproviderClusterResourceStats
       );
 
-      await render(hbs `{{content-clusters-deregister
-        cluster=cluster
-        deregister=deregister
-        afterDeregister=afterDeregister
-        getOneproviderClusterResourceStats=getOneproviderClusterResourceStats
-      }}`);
+      await render(hbs `<ContentClustersDeregister
+        @cluster={{cluster}}
+        @deregister={{deregister}}
+        @afterDeregister={{afterDeregister}}
+        @getOneproviderClusterResourceStats={{getOneproviderClusterResourceStats}}
+      />`);
 
       expect(find('.row-cluster-oneprovider-stats')).to.exist;
       expect(find('.li-creation-time-count .active-since-date').textContent)

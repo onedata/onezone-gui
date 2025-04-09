@@ -82,7 +82,7 @@ describe('Integration | Component | content-spaces-harvesters', function () {
       promiseObject(new Promise(() => {}))
     );
 
-    await render(hbs `{{content-spaces-harvesters space=space}}`);
+    await render(hbs `<ContentSpacesHarvesters @space={{space}} />`);
 
     expect(find('.spinner')).to.exist;
     expect(find('.resources-list')).to.not.exist;
@@ -93,7 +93,7 @@ describe('Integration | Component | content-spaces-harvesters', function () {
   it('shows info page when there are no harvesters yet', async function () {
     mockEmptyHarvestersList(this);
 
-    await render(hbs `{{content-spaces-harvesters space=space}}`);
+    await render(hbs `<ContentSpacesHarvesters @space={{space}} />`);
 
     expect(find('.spinner')).to.not.exist;
     expect(find('.resources-list')).to.not.exist;
@@ -128,7 +128,7 @@ describe('Integration | Component | content-spaces-harvesters', function () {
   });
 
   it('shows list of space harvesters', async function () {
-    await render(hbs `{{content-spaces-harvesters space=space}}`);
+    await render(hbs `<ContentSpacesHarvesters @space={{space}} />`);
 
     expect(find('.spinner')).to.not.exist;
     expect(find('.resource-load-error')).to.not.exist;
@@ -140,7 +140,7 @@ describe('Integration | Component | content-spaces-harvesters', function () {
   });
 
   it('performs removing harvester from space', async function () {
-    await render(hbs `{{content-spaces-harvesters space=space}}`);
+    await render(hbs `<ContentSpacesHarvesters @space={{space}} />`);
 
     const executeStub = sinon.stub(RemoveHarvesterFromSpaceAction.prototype, 'execute')
       .callsFake(function () {
@@ -158,7 +158,7 @@ describe('Integration | Component | content-spaces-harvesters', function () {
     async function () {
       mockEmptyHarvestersList(this);
 
-      await render(hbs `{{content-spaces-harvesters space=space}}`);
+      await render(hbs `<ContentSpacesHarvesters @space={{space}} />`);
 
       this.get('space.harvesterList.content.list.content').pushObjects([{
         name: 'harvester1',
@@ -175,7 +175,7 @@ describe('Integration | Component | content-spaces-harvesters', function () {
   it(
     'changes list view to empty info view when harvesters have been removed',
     async function () {
-      await render(hbs `{{content-spaces-harvesters space=space}}`);
+      await render(hbs `<ContentSpacesHarvesters @space={{space}} />`);
 
       this.get('space.harvesterList.content.list.content').clear();
       await settled();
@@ -213,7 +213,7 @@ describe('Integration | Component | content-spaces-harvesters', function () {
         'plugin',
       ).returns('#correct-url');
 
-    await render(hbs `{{content-spaces-harvesters space=space}}`);
+    await render(hbs `<ContentSpacesHarvesters @space={{space}} />`);
 
     const harvesterItems = findAll('.resource-item a');
     expect(harvesterItems).to.have.length(1);
@@ -224,7 +224,7 @@ describe('Integration | Component | content-spaces-harvesters', function () {
     suppressRejections();
     this.set('space.harvesterList', promiseObject(reject('someError')));
 
-    await render(hbs `{{content-spaces-harvesters space=space}}`);
+    await render(hbs `<ContentSpacesHarvesters @space={{space}} />`);
 
     expect(find('.spinner')).to.not.exist;
     expect(find('.resources-list')).to.not.exist;
@@ -245,7 +245,7 @@ function mockEmptyHarvestersList(testSuite) {
 }
 
 async function testAddingHarvester(triggerActionCallback) {
-  await render(hbs `{{content-spaces-harvesters space=space}}`);
+  await render(hbs `<ContentSpacesHarvesters @space={{space}} />`);
 
   const executeStub = sinon.stub(AddHarvesterToSpaceAction.prototype, 'execute')
     .callsFake(function () {
@@ -257,7 +257,7 @@ async function testAddingHarvester(triggerActionCallback) {
 }
 
 async function testInvitingHarvesterUsingToken(triggerActionCallback) {
-  await render(hbs `{{content-spaces-harvesters space=space}}`);
+  await render(hbs `<ContentSpacesHarvesters @space={{space}} />`);
 
   const executeStub = sinon.stub(GenerateInviteTokenAction.prototype, 'execute')
     .callsFake(function () {

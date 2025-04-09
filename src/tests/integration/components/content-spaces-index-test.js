@@ -88,10 +88,10 @@ describe('Integration | Component | content-spaces-index', function () {
     });
     this.set('space', space);
 
-    await render(hbs `{{content-spaces-index
-      space=space
-      showResourceMembershipTile=false
-    }}`);
+    await render(hbs `<ContentSpacesIndex
+      @space={{space}}
+      @showResourceMembershipTile={{false}}
+    />`);
 
     expect(
       find('.resource-browse-tile .main-figure .one-label').textContent,
@@ -332,8 +332,6 @@ class Helper {
   }
   async render() {
     await this.beforeRender();
-    await render(hbs `{{content-spaces-index
-      space=space
-    }}`);
+    await render(hbs `<ContentSpacesIndex @space={{space}} />`);
   }
 }

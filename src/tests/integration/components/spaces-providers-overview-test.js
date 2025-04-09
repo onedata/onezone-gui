@@ -72,10 +72,10 @@ describe('Integration | Component | spaces-providers-overview', function () {
   });
 
   it('renders providers list, atlas and support chart ', async function () {
-    await render(hbs `{{spaces-providers-overview
-      space=space
-      providersProxy=space.providerList.list
-    }}`);
+    await render(hbs `<SpacesProvidersOverview
+      @space={{space}}
+      @providersProxy={{space.providerList.list}}
+    />`);
 
     expect(find('.space-providers-list'), 'providers list').to.exist;
     expect(find('.space-providers-atlas'), 'providers atlas').to.exist;

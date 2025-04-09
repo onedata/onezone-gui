@@ -82,7 +82,7 @@ describe('Integration | Component | content-atm-inventories-workflows/editor-vie
     });
 
     it('has class "content-atm-inventories-workflows-editor-view"', async function () {
-      await render(hbs `{{content-atm-inventories-workflows/editor-view}}`);
+      await render(hbs `<ContentAtmInventoriesWorkflows::EditorView />`);
 
       expect(this.element.children).to.have.length(1);
       expect(this.element.children[0])
@@ -194,9 +194,9 @@ describe('Integration | Component | content-atm-inventories-workflows/editor-vie
   });
 
 async function renderComponent() {
-  await render(hbs `{{content-atm-inventories-workflows/editor-view
-    atmWorkflowSchema=atmWorkflowSchema
-    revisionNumber=revisionNumber
-    onBackSlide=backSlideSpy
-  }}`);
+  await render(hbs `<ContentAtmInventoriesWorkflows::EditorView
+    @atmWorkflowSchema={{atmWorkflowSchema}}
+    @revisionNumber={{revisionNumber}}
+    @onBackSlide={{backSlideSpy}}
+  />`);
 }

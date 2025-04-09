@@ -26,14 +26,14 @@ describe('Integration | Component | content-harvesters-indices/index-form', func
   setupRenderingTest();
 
   it('has class "content-harvesters-indices-index-form"', async function () {
-    await render(hbs `{{content-harvesters-indices/index-form}}`);
+    await render(hbs `<ContentHarvestersIndices::IndexForm />`);
 
     expect(findAll('.content-harvesters-indices-index-form')).to.have.length(1);
   });
 
   context('in create mode', function () {
     it('shows empty text input with "Name" label and no placeholder', async function () {
-      await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
+      await render(hbs `<ContentHarvestersIndices::IndexForm @mode="create" />`);
 
       const formGroup = find('.name-field');
       const input = formGroup.querySelector('input');
@@ -45,7 +45,7 @@ describe('Integration | Component | content-harvesters-indices/index-form', func
     });
 
     it('shows empty textearea with "Schema" label and no placeholder', async function () {
-      await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
+      await render(hbs `<ContentHarvestersIndices::IndexForm @mode="create" />`);
 
       const formGroup = find('.schema-field');
       const textarea = formGroup.querySelector('textarea');
@@ -59,7 +59,7 @@ describe('Integration | Component | content-harvesters-indices/index-form', func
     it(
       'shows three preselected toggles: basic (with tooltip), JSON and RDF with "Include metadata" label and tooltip',
       async function () {
-        await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
+        await render(hbs `<ContentHarvestersIndices::IndexForm @mode="create" />`);
 
         const formGroup = find('.includeMetadata-field');
         const toggleGroups = formGroup.querySelectorAll('.toggle-field-renderer');
@@ -93,7 +93,7 @@ describe('Integration | Component | content-harvesters-indices/index-form', func
     it(
       'shows 6 preselected toggles: "file name", "file type", "space id", "dataset info", "archive info" and "metadata existence flags" with "Include file details" label and tooltip',
       async function () {
-        await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
+        await render(hbs `<ContentHarvestersIndices::IndexForm @mode="create" />`);
 
         const formGroup = find('.includeFileDetails-field');
         const toggleGroups = formGroup.querySelectorAll('.toggle-field-renderer');
@@ -128,7 +128,7 @@ describe('Integration | Component | content-harvesters-indices/index-form', func
     it(
       'shows preselected toggle with "Include rejection reason" label and tooltip',
       async function () {
-        await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
+        await render(hbs `<ContentHarvestersIndices::IndexForm @mode="create" />`);
 
         const formGroup = find('.includeRejectionReason-field');
         expect(formGroup).to.exist;
@@ -148,7 +148,7 @@ describe('Integration | Component | content-harvesters-indices/index-form', func
     it(
       'shows preselected toggle with "Retry on rejection" label and tooltip',
       async function () {
-        await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
+        await render(hbs `<ContentHarvestersIndices::IndexForm @mode="create" />`);
 
         const formGroup = find('.retryOnRejection-field');
         expect(formGroup).to.exist;
@@ -178,7 +178,7 @@ describe('Integration | Component | content-harvesters-indices/index-form', func
       it(
         `${isOptional ? 'does not show any' : 'shows'} validation error when "${fieldName}" field is empty`,
         async function () {
-          await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
+          await render(hbs `<ContentHarvestersIndices::IndexForm @mode="create" />`);
 
           await focus(fieldInputSelector);
           await blur(fieldInputSelector);
@@ -193,7 +193,7 @@ describe('Integration | Component | content-harvesters-indices/index-form', func
       it(
         `does not show any validation error when "${fieldName}" field is not empty`,
         async function () {
-          await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
+          await render(hbs `<ContentHarvestersIndices::IndexForm @mode="create" />`);
 
           await fillIn(fieldInputSelector, 'abc');
           await blur(fieldInputSelector);
@@ -214,7 +214,7 @@ describe('Integration | Component | content-harvesters-indices/index-form', func
           testDescription += ` and RDF metadata is ${rdfMetadataSelected ? '' : 'un'}checked`;
 
           it(testDescription, async function () {
-            await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
+            await render(hbs `<ContentHarvestersIndices::IndexForm @mode="create" />`);
 
             const metadataToggles = findAll('.includeMetadata-field .one-way-toggle');
             // Uncheck all toggles to make sure, that the validation state will be visible
@@ -246,7 +246,7 @@ describe('Integration | Component | content-harvesters-indices/index-form', func
     });
 
     it('does not have any field in "view" mode', async function () {
-      await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
+      await render(hbs `<ContentHarvestersIndices::IndexForm @mode="create" />`);
 
       expect(find('.field-view-mode')).to.not.exist;
     });
@@ -254,7 +254,7 @@ describe('Integration | Component | content-harvesters-indices/index-form', func
     it(
       'has enabled "Cancel" button and disabled "Create index" button on init',
       async function () {
-        await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
+        await render(hbs `<ContentHarvestersIndices::IndexForm @mode="create" />`);
 
         const cancel = find('button.cancel-btn');
         const create = find('button.create-btn');
@@ -270,7 +270,7 @@ describe('Integration | Component | content-harvesters-indices/index-form', func
     it(
       'has enabled "Create index" button when index name has been provided',
       async function () {
-        await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
+        await render(hbs `<ContentHarvestersIndices::IndexForm @mode="create" />`);
 
         await fillIn('.name-field input', 'abc');
         expect(find('.create-btn')).to.not.have.attr('disabled');
@@ -280,7 +280,7 @@ describe('Integration | Component | content-harvesters-indices/index-form', func
     it(
       'disables "Create index" button when the whole form is correct except "include metadata" toggles',
       async function () {
-        await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
+        await render(hbs `<ContentHarvestersIndices::IndexForm @mode="create" />`);
 
         const metadataToggles = findAll('.includeMetadata-field .one-way-toggle');
         await fillIn('.name-field input', 'abc');
@@ -291,10 +291,10 @@ describe('Integration | Component | content-harvesters-indices/index-form', func
 
     it('calls "onCancel" callback on "Cancel" button click', async function () {
       const cancelSpy = this.set('cancelSpy', sinon.spy());
-      await render(hbs `{{content-harvesters-indices/index-form
-        mode="create"
-        onCancel=cancelSpy
-      }}`);
+      await render(hbs `<ContentHarvestersIndices::IndexForm
+        @mode="create"
+        @onCancel={{cancelSpy}}
+      />`);
 
       expect(cancelSpy).to.not.be.called;
       await click('.cancel-btn');
@@ -330,10 +330,10 @@ describe('Integration | Component | content-harvesters-indices/index-form', func
         async function () {
           const createStub = this.set('createStub', sinon.stub().resolves());
 
-          await render(hbs `{{content-harvesters-indices/index-form
-            mode="create"
-            onCreate=createStub
-          }}`);
+          await render(hbs `<ContentHarvestersIndices::IndexForm
+            @mode="create"
+            @onCreate={{createStub}}
+          />`);
 
           await fillIn('.name-field input', 'abc');
           await fillIn('.schema-field textarea', 'someschema');
@@ -365,10 +365,10 @@ describe('Integration | Component | content-harvesters-indices/index-form', func
       async function () {
         this.set('onCreate', () => new Promise(() => {}));
 
-        await render(hbs `{{content-harvesters-indices/index-form
-          mode="create"
-          onCreate=onCreate
-        }}`);
+        await render(hbs `<ContentHarvestersIndices::IndexForm
+          @mode="create"
+          @onCreate={{onCreate}}
+        />`);
 
         await fillIn('.name-field input', 'abc');
         await click('.create-btn');
@@ -398,19 +398,19 @@ describe('Integration | Component | content-harvesters-indices/index-form', func
     });
 
     it('does not have any field in "edit" mode', async function () {
-      await render(hbs `{{content-harvesters-indices/index-form
-        mode="view"
-        index=index
-      }}`);
+      await render(hbs `<ContentHarvestersIndices::IndexForm
+        @mode="view"
+        @index={{index}}
+      />`);
 
       expect(find('.field-edit-mode')).to.not.exist;
     });
 
     it('does not show "name" field', async function () {
-      await render(hbs `{{content-harvesters-indices/index-form
-        mode="view"
-        index=index
-      }}`);
+      await render(hbs `<ContentHarvestersIndices::IndexForm
+        @mode="view"
+        @index={{index}}
+      />`);
 
       expect(find('.name-field')).to.not.exist;
     });
@@ -476,20 +476,20 @@ describe('Integration | Component | content-harvesters-indices/index-form', func
         );
         Object.assign(checks, alteredChecks);
 
-        await render(hbs `{{content-harvesters-indices/index-form
-          mode="view"
-          index=index
-        }}`);
+        await render(hbs `<ContentHarvestersIndices::IndexForm
+          @mode="view"
+          @index={{index}}
+        />`);
 
         Object.values(checks).forEach(check => check());
       });
     });
 
     it('does not show any action buttons', async function () {
-      await render(hbs `{{content-harvesters-indices/index-form
-        mode="view"
-        index=index
-      }}`);
+      await render(hbs `<ContentHarvestersIndices::IndexForm
+        @mode="view"
+        @index={{index}}
+      />`);
 
       expect(find('button')).to.not.exist;
     });

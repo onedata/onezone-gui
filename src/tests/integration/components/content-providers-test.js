@@ -54,10 +54,10 @@ describe('Integration | Component | content-providers', function () {
         transitionToProviderRedirect,
       });
 
-      await render(hbs `{{content-providers
-        providerList=providerList
-        transitionToProviderRedirect=transitionToProviderRedirect
-      }}`);
+      await render(hbs `<ContentProviders
+        @providerList={{providerList}}
+        @transitionToProviderRedirect={{transitionToProviderRedirect}}
+      />`);
 
       await doubleClick('.provider-place-id1');
       expect(globals.window.open).to.be.calledOnce;

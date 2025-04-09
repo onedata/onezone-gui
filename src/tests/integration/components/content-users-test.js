@@ -60,28 +60,28 @@ describe('Integration | Component | content-users', function () {
   });
 
   it('renders full name', async function () {
-    await render(hbs `{{content-users user=user}}`);
+    await render(hbs `<ContentUsers @user={{user}} />`);
 
     expect(find('.full-name-editor'))
       .to.have.trimmed.text(this.get('user.fullName'));
   });
 
   it('renders username', async function () {
-    await render(hbs `{{content-users user=user}}`);
+    await render(hbs `<ContentUsers @user={{user}} />`);
 
     expect(find('.username-editor'))
       .to.have.trimmed.text(this.get('user.username'));
   });
 
   it('renders copiable user id', async function () {
-    await render(hbs `{{content-users user=user}}`);
+    await render(hbs `<ContentUsers @user={{user}} />`);
 
     expect(find('.user-id-clipboard-line input'))
       .to.have.value(this.get('user.entityId'));
   });
 
   it('renders linked account', async function () {
-    await render(hbs `{{content-users user=user}}`);
+    await render(hbs `<ContentUsers @user={{user}} />`);
 
     expect(find('.google-account'), 'google-account').to.exist;
     expect(
@@ -93,7 +93,7 @@ describe('Integration | Component | content-users', function () {
   });
 
   it('allows to change display name', async function () {
-    await render(hbs `{{content-users user=user}}`);
+    await render(hbs `<ContentUsers @user={{user}} />`);
     const user = this.get('user');
     const newName = 'testName';
     const saveSpy = sinon.spy(() => resolve());
@@ -109,7 +109,7 @@ describe('Integration | Component | content-users', function () {
   });
 
   it('allows to change username', async function () {
-    await render(hbs `{{content-users user=user}}`);
+    await render(hbs `<ContentUsers @user={{user}} />`);
     const user = this.get('user');
     const newUsername = 'testUsername';
     const saveSpy = sinon.spy(() => resolve());
@@ -125,7 +125,7 @@ describe('Integration | Component | content-users', function () {
   });
 
   it('renders password section for user with basicAuth enabled', async function () {
-    await render(hbs `{{content-users user=user}}`);
+    await render(hbs `<ContentUsers @user={{user}} />`);
 
     expect(find('.change-password-row .one-inline-editor')).to.exist;
   });
@@ -134,7 +134,7 @@ describe('Integration | Component | content-users', function () {
     'does not render password section for user with basicAuth disabled',
     async function () {
       this.set('user.basicAuthEnabled', false);
-      await render(hbs `{{content-users user=user}}`);
+      await render(hbs `<ContentUsers @user={{user}} />`);
 
       expect(find('.change-password-row .one-inline-editor')).to.not.exist;
     }

@@ -105,10 +105,10 @@ function showsErrorWhenDumpIsEmpty(atmModelName, errorMessage) {
 }
 
 async function renderComponent() {
-  await render(hbs `{{modals/apply-atm-record-dump-modal/dump-details
-    atmModelName=atmModelName
-    dump=dump
-  }}`);
+  await render(hbs `<Modals::ApplyAtmRecordDumpModal::DumpDetails
+    @atmModelName={{atmModelName}}
+    @dump={{dump}}
+  />`);
 }
 
 function expectDetails({ name, summary, revisionNumber }) {

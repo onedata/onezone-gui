@@ -47,10 +47,7 @@ describe('Integration | Component | invite-token-generator', function () {
     stubCreateToken(this, ['userJoinGroup', 'group0'], resolve(correctToken));
 
     await render(hbs `
-      {{invite-token-generator
-        inviteType="userJoinGroup"
-        targetRecord=targetRecord
-      }}
+      <InviteTokenGenerator @inviteType="userJoinGroup" @targetRecord={{targetRecord}} />
     `);
 
     expect(this.get('createTokenStub')).to.be.calledOnce;
@@ -65,10 +62,7 @@ describe('Integration | Component | invite-token-generator', function () {
     stubCreateToken(this, ['userJoinGroup', 'group0'], new Promise(() => {}));
 
     await render(hbs `
-      {{invite-token-generator
-        inviteType="userJoinGroup"
-        targetRecord=targetRecord
-      }}
+      <InviteTokenGenerator @inviteType="userJoinGroup" @targetRecord={{targetRecord}} />
     `);
 
     expect(this.get('createTokenStub')).to.be.calledOnce;
@@ -82,10 +76,7 @@ describe('Integration | Component | invite-token-generator', function () {
     stubCreateToken(this, ['userJoinGroup', 'group0'], reject('tokenError'));
 
     await render(hbs `
-      {{invite-token-generator
-        inviteType="userJoinGroup"
-        targetRecord=targetRecord
-      }}
+      <InviteTokenGenerator @inviteType="userJoinGroup" @targetRecord={{targetRecord}} />
     `);
 
     expect(this.get('createTokenStub')).to.be.calledOnce;
@@ -124,10 +115,7 @@ describe('Integration | Component | invite-token-generator', function () {
     });
 
     await render(hbs `
-      {{invite-token-generator
-        inviteType="userJoinGroup"
-        targetRecord=targetRecord
-      }}
+      <InviteTokenGenerator @inviteType="userJoinGroup" @targetRecord={{targetRecord}} />
     `);
 
     expect(find('.custom-token-action')).to.have.attr('href', 'correctUrl');
@@ -141,11 +129,11 @@ describe('Integration | Component | invite-token-generator', function () {
       this.set('clickHandler', clickSpy);
 
       await render(hbs `
-        {{invite-token-generator
-          inviteType="userJoinGroup"
-          targetRecord=targetRecord
-          onCustomTokenClick=(action clickHandler)
-        }}
+        <InviteTokenGenerator
+          @inviteType="userJoinGroup"
+          @targetRecord={{targetRecord}}
+          @onCustomTokenClick={{action clickHandler}}
+        />
       `);
 
       await click('.custom-token-action');
@@ -230,7 +218,7 @@ describe('Integration | Component | invite-token-generator', function () {
       this.set('inviteType', inviteType);
       stubCreateToken(this, [inviteType, undefined], resolve());
 
-      await render(hbs `{{invite-token-generator inviteType=inviteType}}`);
+      await render(hbs `<InviteTokenGenerator @inviteType={{inviteType}} />`);
 
       if (subjectDescription) {
         expect(find('.subject-description')).to.have.trimmed.text(subjectDescription);
@@ -245,7 +233,7 @@ describe('Integration | Component | invite-token-generator', function () {
         this.set('inviteType', inviteType);
         stubCreateToken(this, [inviteType, undefined], resolve());
 
-        await render(hbs `{{invite-token-generator inviteType=inviteType}}`);
+        await render(hbs `<InviteTokenGenerator @inviteType={{inviteType}} />`);
 
         expect(find('.limitations-text'))
           .to.have.trimmed.text(limitationsDescription);
@@ -257,7 +245,7 @@ describe('Integration | Component | invite-token-generator', function () {
         this.set('inviteType', inviteType);
         stubCreateToken(this, [inviteType, undefined], resolve());
 
-        await render(hbs `{{invite-token-generator inviteType=inviteType}}`);
+        await render(hbs `<InviteTokenGenerator @inviteType={{inviteType}} />`);
 
         expect(find('.custom-token-action')).to.not.exist;
       });
@@ -266,7 +254,7 @@ describe('Integration | Component | invite-token-generator', function () {
         this.set('inviteType', inviteType);
         stubCreateToken(this, [inviteType, undefined], resolve());
 
-        await render(hbs `{{invite-token-generator inviteType=inviteType}}`);
+        await render(hbs `<InviteTokenGenerator @inviteType={{inviteType}} />`);
 
         expect(find('.custom-token-action')).to.exist;
       });
@@ -287,10 +275,7 @@ describe('Integration | Component | invite-token-generator', function () {
       );
 
       await render(hbs `
-        {{invite-token-generator
-          inviteType="onedatify"
-          targetRecord=targetRecord
-        }}
+        <InviteTokenGenerator @inviteType="onedatify" @targetRecord={{targetRecord}} />
       `);
 
       expect(find('.token-textarea').value).to.match(
@@ -305,10 +290,10 @@ describe('Integration | Component | invite-token-generator', function () {
       stubCreateToken(this, ['registerOneprovider'], resolve('registertoken'));
 
       await render(hbs `
-        {{invite-token-generator
-          inviteType="onedatifyWithImport"
-          targetRecord=targetRecord
-        }}
+        <InviteTokenGenerator
+          @inviteType="onedatifyWithImport"
+          @targetRecord={{targetRecord}}
+        />
       `);
 
       expect(find('.token-textarea').value).to.match(
@@ -327,10 +312,10 @@ describe('Integration | Component | invite-token-generator', function () {
           );
 
           await render(hbs `
-            {{invite-token-generator
-              inviteType="onedatify"
-              targetRecord=targetRecord
-            }}
+            <InviteTokenGenerator
+              @inviteType="onedatify"
+              @targetRecord={{targetRecord}}
+            />
           `);
 
           expect(find('.variables-description')).to.not.exist;
@@ -353,10 +338,7 @@ describe('Integration | Component | invite-token-generator', function () {
       );
 
       await render(hbs `
-        {{invite-token-generator
-          inviteType="onedatify"
-          targetRecord=targetRecord
-        }}
+        <InviteTokenGenerator @inviteType="onedatify" @targetRecord={{targetRecord}} />
       `);
 
       expect(find('.token-textarea').value).to.match(
@@ -370,10 +352,10 @@ describe('Integration | Component | invite-token-generator', function () {
       stubCreateToken(this, ['supportSpace', 'space0'], resolve('supporttoken'));
 
       await render(hbs `
-        {{invite-token-generator
-          inviteType="onedatifyWithImport"
-          targetRecord=targetRecord
-        }}
+        <InviteTokenGenerator
+          @inviteType="onedatifyWithImport"
+          @targetRecord={{targetRecord}}
+        />
       `);
 
       expect(find('.token-textarea').value).to.match(
@@ -392,10 +374,10 @@ describe('Integration | Component | invite-token-generator', function () {
           );
 
           await render(hbs `
-            {{invite-token-generator
-              inviteType="onedatify"
-              targetRecord=targetRecord
-            }}
+            <InviteTokenGenerator
+              @inviteType="onedatify"
+              @targetRecord={{targetRecord}}
+            />
           `);
 
           expect(find('.limitations-text').textContent.trim()).to.equal(

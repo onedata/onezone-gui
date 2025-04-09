@@ -114,7 +114,7 @@ describe('Integration | Component | content-atm-inventories-workflows/atm-workfl
     });
 
     it('has class "atm-workflow-schemas-list"', async function () {
-      await render(hbs `{{content-atm-inventories-workflows/atm-workflow-schemas-list}}`);
+      await render(hbs `<ContentAtmInventoriesWorkflows::AtmWorkflowSchemasList />`);
 
       expect(this.element.children).to.have.length(1);
       expect(this.element.children[0])
@@ -448,9 +448,9 @@ describe('Integration | Component | content-atm-inventories-workflows/atm-workfl
   });
 
 async function renderComponent() {
-  await render(hbs `{{content-atm-inventories-workflows/atm-workflow-schemas-list
-    collection=collection
-    onRevisionCreated=revisionCreatedSpy
-    onRevisionClick=workflowRevisionClickedSpy
-  }}`);
+  await render(hbs `<ContentAtmInventoriesWorkflows::AtmWorkflowSchemasList
+    @collection={{collection}}
+    @onRevisionCreated={{revisionCreatedSpy}}
+    @onRevisionClick={{workflowRevisionClickedSpy}}
+  />`);
 }

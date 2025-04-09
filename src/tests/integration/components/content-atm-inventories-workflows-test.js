@@ -726,9 +726,7 @@ describe('Integration | Component | content-atm-inventories-workflows (main)', f
 });
 
 async function renderComponent() {
-  await render(hbs `{{content-atm-inventories-workflows
-    atmInventory=atmInventory
-  }}`);
+  await render(hbs `<ContentAtmInventoriesWorkflows @atmInventory={{atmInventory}} />`);
 }
 
 function expectSlideContainsView(slideId, viewName) {

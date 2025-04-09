@@ -93,10 +93,10 @@ describe('Integration | Component | modals/apply-atm-record-dump-modal/inventory
   });
 
 async function renderComponent() {
-  await render(hbs `{{modals/apply-atm-record-dump-modal/inventory-selector
-    atmInventories=atmInventories
-    selectedAtmInventory=selectedAtmInventory
-    onChange=onChange
-    isDisabled=isDisabled
-  }}`);
+  await render(hbs `<Modals::ApplyAtmRecordDumpModal::InventorySelector
+    @atmInventories={{atmInventories}}
+    @selectedAtmInventory={{selectedAtmInventory}}
+    @onChange={{onChange}}
+    @isDisabled={{isDisabled}}
+  />`);
 }

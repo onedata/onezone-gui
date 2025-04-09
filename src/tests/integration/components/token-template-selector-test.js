@@ -69,7 +69,7 @@ describe('Integration | Component | token-template-selector', function () {
   it('notifies about selected template', async function () {
     const selectedSpy = this.set('selectedSpy', sinon.spy());
 
-    await render(hbs `{{token-template-selector onTemplateSelected=selectedSpy}}`);
+    await render(hbs `<TokenTemplateSelector @onTemplateSelected={{selectedSpy}} />`);
     await click('.template-custom');
 
     expect(selectedSpy).to.be.calledOnce.and.to.be.calledWith('custom', sinon.match({}));

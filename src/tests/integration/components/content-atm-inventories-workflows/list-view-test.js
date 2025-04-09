@@ -66,7 +66,7 @@ describe('Integration | Component | content-atm-inventories-workflows/list-view'
     });
 
     it('has class "content-atm-inventories-workflows-list-view"', async function () {
-      await render(hbs `{{content-atm-inventories-workflows/list-view}}`);
+      await render(hbs `<ContentAtmInventoriesWorkflows::ListView />`);
 
       expect(this.element.children).to.have.length(1);
       expect(this.element.children[0])
@@ -146,10 +146,10 @@ describe('Integration | Component | content-atm-inventories-workflows/list-view'
   });
 
 async function renderComponent() {
-  await render(hbs `{{content-atm-inventories-workflows/list-view
-    atmInventory=atmInventory
-    onAddAtmWorkflowSchema=addFunctionSpy
-    onOpenAtmWorkflowSchemaRevision=openAtmWorkflowSchemaRevisionSpy
-    onCreatedAtmWorkflowSchemaRevision=createdAtmWorkflowSchemaRevisionSpy
-  }}`);
+  await render(hbs `<ContentAtmInventoriesWorkflows::ListView
+    @atmInventory={{atmInventory}}
+    @onAddAtmWorkflowSchema={{addFunctionSpy}}
+    @onOpenAtmWorkflowSchemaRevision={{openAtmWorkflowSchemaRevisionSpy}}
+    @onCreatedAtmWorkflowSchemaRevision={{createdAtmWorkflowSchemaRevisionSpy}}
+  />`);
 }

@@ -142,7 +142,7 @@ describe(
     });
 
     it('has class "atm-lambdas-list"', async function () {
-      await render(hbs `{{content-atm-inventories-lambdas/atm-lambdas-list}}`);
+      await render(hbs `<ContentAtmInventoriesLambdas::AtmLambdasList />`);
 
       expect(this.element.children).to.have.length(1);
       expect(this.element.children[0]).to.have.class('atm-lambdas-list');
@@ -492,15 +492,15 @@ describe(
 );
 
 async function renderComponent() {
-  await render(hbs `{{content-atm-inventories-lambdas/atm-lambdas-list
-    collection=collection
-    allCollection=allCollection
-    atmInventory=atmInventory
-    mode=mode
-    onAddToAtmWorkflowSchema=addToAtmWorkflowSchemaSpy
-    onRevisionClick=lambdaRevisionClickedSpy
-    onRevisionCreate=onRevisionCreate
-  }}`);
+  await render(hbs `<ContentAtmInventoriesLambdas::AtmLambdasList
+    @collection={{collection}}
+    @allCollection={{allCollection}}
+    @atmInventory={{atmInventory}}
+    @mode={{mode}}
+    @onAddToAtmWorkflowSchema={{addToAtmWorkflowSchemaSpy}}
+    @onRevisionClick={{lambdaRevisionClickedSpy}}
+    @onRevisionCreate={{onRevisionCreate}}
+  />`);
 }
 
 function itAllowsToChooseLambdaActions(actionsSpec) {

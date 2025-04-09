@@ -25,7 +25,7 @@ describe('Integration | Component | sidebar-tokens/token-item', function () {
   });
 
   it('shows token name', async function () {
-    await render(hbs `{{sidebar-tokens/token-item item=token}}`);
+    await render(hbs `<SidebarTokens::TokenItem @item={{token}} />`);
 
     expect(find('.token-name')).to.contain.text(this.get('token.name'));
   });
@@ -33,7 +33,7 @@ describe('Integration | Component | sidebar-tokens/token-item', function () {
   it('shows "invitation" icon for invite token', async function () {
     set(this.get('token'), 'typeName', 'invite');
 
-    await render(hbs `{{sidebar-tokens/token-item item=token}}`);
+    await render(hbs `<SidebarTokens::TokenItem @item={{token}} />`);
 
     expect(find('.oneicon-token-invite')).to.exist;
   });
@@ -41,7 +41,7 @@ describe('Integration | Component | sidebar-tokens/token-item', function () {
   it('shows "access-token" icon for access token', async function () {
     set(this.get('token'), 'typeName', 'access');
 
-    await render(hbs `{{sidebar-tokens/token-item item=token}}`);
+    await render(hbs `<SidebarTokens::TokenItem @item={{token}} />`);
 
     expect(find('.oneicon-token-access')).to.exist;
   });
@@ -49,7 +49,7 @@ describe('Integration | Component | sidebar-tokens/token-item', function () {
   it('shows "tokens" icon for unknown token', async function () {
     set(this.get('token'), 'typeName', undefined);
 
-    await render(hbs `{{sidebar-tokens/token-item item=token}}`);
+    await render(hbs `<SidebarTokens::TokenItem @item={{token}} />`);
 
     expect(find('.oneicon-tokens')).to.exist;
   });
@@ -60,7 +60,7 @@ describe('Integration | Component | sidebar-tokens/token-item', function () {
       revoked: true,
     });
 
-    await render(hbs `{{sidebar-tokens/token-item item=token}}`);
+    await render(hbs `<SidebarTokens::TokenItem @item={{token}} />`);
 
     expect(find('.sidebar-item-title-upper')).to.contain.text(this.get('token.name'));
     expect(find('.sidebar-item-title-lower')).to.contain.text('revoked');
@@ -72,7 +72,7 @@ describe('Integration | Component | sidebar-tokens/token-item', function () {
       isObsolete: true,
     });
 
-    await render(hbs `{{sidebar-tokens/token-item item=token}}`);
+    await render(hbs `<SidebarTokens::TokenItem @item={{token}} />`);
 
     expect(find('.sidebar-item-title-upper')).to.contain.text(this.get('token.name'));
     expect(find('.sidebar-item-title-lower')).to.contain.text('expired');
@@ -85,7 +85,7 @@ describe('Integration | Component | sidebar-tokens/token-item', function () {
       revoked: true,
     });
 
-    await render(hbs `{{sidebar-tokens/token-item item=token}}`);
+    await render(hbs `<SidebarTokens::TokenItem @item={{token}} />`);
 
     expect(find('.sidebar-item-title-upper')).to.contain.text(this.get('token.name'));
     expect(find('.sidebar-item-title-lower')).to.contain.text('expired');
@@ -93,7 +93,7 @@ describe('Integration | Component | sidebar-tokens/token-item', function () {
   });
 
   it('does not add class "inactive-token" when token is active', async function () {
-    await render(hbs `{{sidebar-tokens/token-item item=token}}`);
+    await render(hbs `<SidebarTokens::TokenItem @item={{token}} />`);
 
     expect(find('.token-item')).not.to.have.class('inactive-token');
   });
@@ -101,13 +101,13 @@ describe('Integration | Component | sidebar-tokens/token-item', function () {
   it('adds class "inactive-token" when token is not active', async function () {
     set(this.get('token'), 'isActive', false);
 
-    await render(hbs `{{sidebar-tokens/token-item item=token}}`);
+    await render(hbs `<SidebarTokens::TokenItem @item={{token}} />`);
 
     expect(find('.token-item')).to.have.class('inactive-token');
   });
 
   it('renders actions in dots menu', async function () {
-    await render(hbs `{{sidebar-tokens/token-item item=token}}`);
+    await render(hbs `<SidebarTokens::TokenItem @item={{token}} />`);
     await click('.token-menu-trigger');
     const popoverContent = globals.document.querySelector('.webui-popover.in');
     [
@@ -122,7 +122,7 @@ describe('Integration | Component | sidebar-tokens/token-item', function () {
     const token = this.get('token');
     const saveStub = sinon.stub(token, 'save').resolves();
 
-    await render(hbs `{{sidebar-tokens/token-item item=token}}`);
+    await render(hbs `<SidebarTokens::TokenItem @item={{token}} />`);
 
     await click('.token-menu-trigger');
     const renameTrigger =
@@ -146,7 +146,7 @@ describe('Integration | Component | sidebar-tokens/token-item', function () {
     // to avoid redirecting after delete
     sinon.stub(navigationState, 'resourceCollectionContainsId').returns(true);
 
-    await render(hbs `{{sidebar-tokens/token-item item=token}}`);
+    await render(hbs `<SidebarTokens::TokenItem @item={{token}} />`);
     await click('.token-menu-trigger');
     const removeTrigger =
       globals.document.querySelector('.webui-popover.in .remove-token-action-trigger');
@@ -161,7 +161,7 @@ describe('Integration | Component | sidebar-tokens/token-item', function () {
     const tokenActions = lookupService(this, 'token-actions');
     const deleteTokenSpy = sinon.spy(tokenActions, 'deleteToken');
 
-    await render(hbs `{{sidebar-tokens/token-item item=token}}`);
+    await render(hbs `<SidebarTokens::TokenItem @item={{token}} />`);
     await click('.token-menu-trigger');
     const removeTrigger =
       globals.document.querySelector('.webui-popover.in .remove-token-action-trigger');

@@ -16,22 +16,22 @@ describe('Integration | Component | login-box/auth-icon-box-list/auth-icon-box',
         'iconPath',
         `${onezoneDefaultRootPath}/assets/images/auth-providers/example.svg`
       );
-      await render(hbs `{{login-box/auth-icon-box-list/auth-icon-box
-        authId="example"
-        iconPath=iconPath
-      }}
+      await render(hbs `<LoginBox::AuthIconBoxList::AuthIconBox
+        @authId="example"
+        @iconPath={{iconPath}}
+      />
       `);
       expect(find('.auth-icon-image').getAttribute('style'))
         .to.contain(iconPath);
     });
 
     it('renders spinner in active state', async function () {
-      await render(hbs `{{login-box/auth-icon-box-list/auth-icon-box active=true}}`);
+      await render(hbs `<LoginBox::AuthIconBoxList::AuthIconBox @active={{true}} />`);
       expect(find('.spin-spinner')).to.exist;
     });
 
     it('adds authorizer type as a class to box', async function () {
-      await render(hbs `{{login-box/auth-icon-box-list/auth-icon-box authId="example"}}`);
+      await render(hbs `<LoginBox::AuthIconBoxList::AuthIconBox @authId="example" />`);
       expect(find('.login-icon-box.example')).to.exist;
     });
 
@@ -42,9 +42,9 @@ describe('Integration | Component | login-box/auth-icon-box-list/auth-icon-box',
           location: undefined,
         });
         this.set('link', link);
-        await render(hbs `{{login-box/auth-icon-box-list/auth-icon-box
-          link="http://test.com"
-        }}`);
+        await render(hbs `<LoginBox::AuthIconBoxList::AuthIconBox
+          @link="http://test.com"
+        />`);
         await click('.login-icon-box');
         expect(globals.window.location).to.be.equal(link);
       }
@@ -54,8 +54,9 @@ describe('Integration | Component | login-box/auth-icon-box-list/auth-icon-box',
       const clickSpy = sinon.spy();
       this.set('clickSpy', clickSpy);
 
-      await render(hbs `{{login-box/auth-icon-box-list/auth-icon-box
-        action=(action clickSpy)}}`);
+      await render(hbs `<LoginBox::AuthIconBoxList::AuthIconBox
+        @action={{action clickSpy}}
+      />`);
       await click('.login-icon-box');
       expect(clickSpy).to.be.calledOnce;
     });

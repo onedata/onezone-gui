@@ -39,7 +39,7 @@ describe(
       });
 
       this.set('column', column);
-      await render(hbs `{{groups-hierarchy-visualiser/column column=column}}`);
+      await render(hbs `<GroupsHierarchyVisualiser::Column @column={{column}} />`);
       expect(find('.column .spinner')).to.exist;
     });
 
@@ -60,7 +60,7 @@ describe(
       });
 
       this.set('column', column);
-      await render(hbs `{{groups-hierarchy-visualiser/column column=column}}`);
+      await render(hbs `<GroupsHierarchyVisualiser::Column @column={{column}} />`);
       expect(find('.column-header')).to.contain.text('testname');
     });
 
@@ -74,7 +74,7 @@ describe(
       });
 
       this.set('column', column);
-      await render(hbs `{{groups-hierarchy-visualiser/column column=column}}`);
+      await render(hbs `<GroupsHierarchyVisualiser::Column @column={{column}} />`);
       expect(find('.column-header'))
         .to.have.trimmed.text('Children of testname');
     });
@@ -89,7 +89,7 @@ describe(
       });
 
       this.set('column', column);
-      await render(hbs `{{groups-hierarchy-visualiser/column column=column}}`);
+      await render(hbs `<GroupsHierarchyVisualiser::Column @column={{column}} />`);
       expect(find('.column-header'))
         .to.have.trimmed.text('Parents of testname');
     });
@@ -100,7 +100,7 @@ describe(
       });
 
       this.set('column', column);
-      await render(hbs `{{groups-hierarchy-visualiser/column column=column}}`);
+      await render(hbs `<GroupsHierarchyVisualiser::Column @column={{column}} />`);
       expect(find('.column-header')).to.have.trimmed.text('');
     });
 
@@ -112,7 +112,7 @@ describe(
       });
 
       this.set('column', column);
-      await render(hbs `{{groups-hierarchy-visualiser/column column=column}}`);
+      await render(hbs `<GroupsHierarchyVisualiser::Column @column={{column}} />`);
       const columnElem = find('.column');
       expect(columnElem.style.width).to.equal('100px');
       expect(columnElem.style.left).to.equal('50px');
