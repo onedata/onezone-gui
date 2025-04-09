@@ -11,13 +11,13 @@
   @searchEnabled={{true}}
   as |authorizer|
 >
-  {{login-box/auth-icon-box-list/auth-icon-box
-    active=(eq authorizer activeAuthorizer)
-    spinnerScale=0.15
-    authId=authorizer.id
-    iconPath=authorizer.iconPath
-    iconBackgroundColor=authorizer.iconBackgroundColor
-  }}
+  <LoginBox::AuthIconBoxList::AuthIconBox
+    @active={{eq authorizer activeAuthorizer}}
+    @spinnerScale={{0.15}}
+    @authId={{authorizer.id}}
+    @iconPath={{authorizer.iconPath}}
+    @iconBackgroundColor={{authorizer.iconBackgroundColor}}
+  />
   {{authorizer.displayName}}
 </OneDropdown>
 {{yield}}

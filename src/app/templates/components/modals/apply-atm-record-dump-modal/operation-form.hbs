@@ -1,11 +1,11 @@
 <h2>{{tt this "header"}}</h2>
-{{#one-way-radio-group
-  value=selectedOperation
-  options=operationsRadioOptions
-  update=(action "selectedOperationChange")
-  isReadOnly=isDisabled
+<OneWayRadioGroup
+  @value={{selectedOperation}}
+  @options={{operationsRadioOptions}}
+  @update={{action "selectedOperationChange"}}
+  @isReadOnly={{isDisabled}}
   as |option|
-}}
+>
   <div class="radio-option-subcontent">
     {{#if (eq option.value "merge")}}
       {{#if isMergeDisabled}}
@@ -13,7 +13,7 @@
           {{tt this (concat "operations.merge.noTargetAtmRecordWarning." dumpSourceType "." atmModelName)}}
         </div>
       {{else}}
-        {{form-component/field-renderer field=targetAtmRecordField}}
+        <FormComponent::FieldRenderer @field={{targetAtmRecordField}} />
         {{#if isRevisionConflictWarningVisible}}
           <div class="revision-conflict-warning alert alert-warning small">
             {{tt this
@@ -25,8 +25,8 @@
         {{/if}}
       {{/if}}
     {{else if (eq option.value "create")}}
-      {{form-component/field-renderer field=newAtmRecordNameField}}
+      <FormComponent::FieldRenderer @field={{newAtmRecordNameField}} />
     {{/if}}
   </div>
-{{/one-way-radio-group}}
+</OneWayRadioGroup>
 {{yield}}

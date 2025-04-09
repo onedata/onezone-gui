@@ -1,28 +1,31 @@
-{{#content-info
+<ContentInfo
   class="scroll-breakpoint-500"
-  header=(tt this "title")
-  text=(tt this "text")
-}}
+  @header={{tt this "title"}}
+  @text={{tt this "text"}}
+>
   <p class="lead">
     <ul class="info">
       <li>
-        {{#link-to "onedata.sidebar.content" "atm-inventories" "new"}}
+        <LinkTo
+          @route="onedata.sidebar.content"
+          @models={{array "atm-inventories" "new"}}
+        >
           {{tt this "aCreateAtmInventory"}}
-        {{/link-to}}
+        </LinkTo>
       </li>
       <li>
         {{tt this "pJoinAtmInventory"}}
-        {{#link-to "onedata.sidebar.content" "tokens" "join"}}
+        <LinkTo @route="onedata.sidebar.content" @models={{array "tokens" "join"}}>
           {{tt this "aJoinAtmInventory"}}
-        {{/link-to}}
+        </LinkTo>
       </li>
       <li>
         {{tt this "p1JoinGroup"}}
-        {{#link-to "onedata.sidebar.content" "tokens" "join"}}
+        <LinkTo @route="onedata.sidebar.content" @models={{array "tokens" "join"}}>
           {{tt this "aJoinGroup"}}
-        {{/link-to}}
+        </LinkTo>
         {{tt this "p2JoinGroup"}}
       </li>
     </ul>
   </p>
-{{/content-info}}
+</ContentInfo>

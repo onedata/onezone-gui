@@ -8,37 +8,35 @@
   </div>
 
   <div class="row content-row">
-    {{#bs-tab class="only-tab-bar bs-tab-onedata bs-tab-modern" as |tab|}}
-      {{#tab.pane title=(tt this "requestSupport.tabName")}}
-        {{content-spaces-support/request-support space=space}}
-      {{/tab.pane}}
-      {{#tab.pane title=(tt this "deployProvider.tabName")}}
-        {{content-spaces-support/deploy-provider space=space}}
-      {{/tab.pane}}
-      {{#tab.pane title=(tt this "exposeData.tabName")}}
-        {{content-spaces-support/expose-data space=space}}
-      {{/tab.pane}}
-    {{/bs-tab}}
+    <BsTab class="only-tab-bar bs-tab-onedata bs-tab-modern" as |tab|>
+      <tab.pane @title={{tt this "requestSupport.tabName"}}>
+        <ContentSpacesSupport::RequestSupport @space={{space}} />
+      </tab.pane>
+      <tab.pane @title={{tt this "deployProvider.tabName"}}>
+        <ContentSpacesSupport::DeployProvider @space={{space}} />
+      </tab.pane>
+      <tab.pane @title={{tt this "exposeData.tabName"}}>
+        <ContentSpacesSupport::ExposeData @space={{space}} />
+      </tab.pane>
+    </BsTab>
   </div>
 {{else}}
-  {{#content-info
+  <ContentInfo
     class="scroll-breakpoint-600"
-    header=(tt this "requireAddSupportHeader")
-    imagePath=(root-url "assets/images/no-view.svg")
-  }}
+    @header={{tt this "requireAddSupportHeader"}}
+    @imagePath={{root-url "assets/images/no-view.svg"}}
+  >
     <p class="lead insufficient-privileges">
       {{tt this "requireAddSupportText"}}
     </p>
     <p class="lead insufficient-privileges">
       {{tt this "navigateTo"}}
-      {{#link-to 
-        "onedata.sidebar.content.aspect" 
-        "spaces" 
-        (model-routable-id space) 
-        "members"
-      }}
+      <LinkTo
+        @route="onedata.sidebar.content.aspect"
+        @models={{array "spaces" (model-routable-id space) "members"}}
+      >
         {{tt this "privilegeManagement"}}
-      {{/link-to}}
+      </LinkTo>
     </p>
-  {{/content-info}}
+  </ContentInfo>
 {{/if}}

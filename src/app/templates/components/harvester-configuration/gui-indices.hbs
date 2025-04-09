@@ -1,33 +1,42 @@
 <h1>
   <span class="one-label">{{tt this "indicesHeader"}}</span>
-  {{one-label-tip title=(tt this "sectionHint")}}
+  <OneLabelTip @title={{tt this "sectionHint"}} />
   {{#if (and manifestProxy.manifest harvesterIndicesProxy.isFulfilled)}}
     <div class="pull-right header-buttons">
       {{#if (eq mode "view")}}
-        {{#one-button type="default" size="sm" onClick=(action "edit")}}{{tt this "edit"}}{{/one-button}}
+        <OneButton
+          @type="default"
+          @size="sm"
+          @onClick={{action "edit"}}
+        >{{tt this "edit"}}</OneButton>
       {{else}}
-        {{#one-button type="default" size="sm" onClick=(action "cancel") disabled=isSaving}}{{tt this "cancel"}}{{/one-button}}
-        {{#one-button
-          type="primary"
-          buttonType="submit"
-          size="sm"
-          disabled=(not isValid)
-          onClick=(action "save")
-        }}
+        <OneButton
+          @type="default"
+          @size="sm"
+          @onClick={{action "cancel"}}
+          @disabled={{isSaving}}
+        >{{tt this "cancel"}}</OneButton>
+        <OneButton
+          @type="primary"
+          @buttonType="submit"
+          @size="sm"
+          @disabled={{not isValid}}
+          @onClick={{action "save"}}
+        >
           {{tt this "save"}}
-        {{/one-button}}
+        </OneButton>
       {{/if}}
     </div>
   {{/if}}
 </h1>
-{{#promise-proxy-container proxy=manifestProxy}}
+<PromiseProxyContainer @proxy={{manifestProxy}}>
   {{#if isUploadingGui}}
     <p class="text-warning">{{tt this "waitingForUpload"}}</p>
   {{else if (eq manifestProxy.manifest null)}}
     <p>{{tt this "manifestUnavailable"}}</p>
   {{else}}
-    {{#promise-proxy-container proxy=harvesterIndicesProxy}}
-      {{#basic-table class="table table-striped indices-table dropdown-table-rows"}}
+    <PromiseProxyContainer @proxy={{harvesterIndicesProxy}}>
+      <BasicTable class="table table-striped indices-table dropdown-table-rows">
         <thead>
           <tr>
             <th>{{tt this "pluginIndex"}}</th>
@@ -41,7 +50,7 @@
               <td class="index-info">
                 <div>
                   {{#if (eq mode "edit")}}
-                    {{#bs-form class="row form-horizontal without-labels" as |bsForm|}}
+                    <BsForm class="row form-horizontal without-labels" as |bsForm|>
                       <OneDropdown
                         class="col-xs-12 col-sm-6"
                         @tagName="div"
@@ -54,9 +63,10 @@
                       >
                         {{tt this (concat "assignMethods." assignMethod)}}
                       </OneDropdown>
-                      {{#bsForm.group
-                        class=(concat-classes "col-xs-12 col-sm-6" (if (not-eq (get selectedAssignMethods guiPluginIndex.name) "create") "dropdown-input"))
-                        validation=(if (get guiIndicesErrors guiPluginIndex.name) "error" "success")}}
+                      <bsForm.group
+                        class={{concat-classes "col-xs-12 col-sm-6" (if (not-eq (get selectedAssignMethods guiPluginIndex.name) "create") "dropdown-input")}}
+                        @validation={{if (get guiIndicesErrors guiPluginIndex.name) "error" "success"}}
+                      >
                         {{#if (eq (get selectedAssignMethods guiPluginIndex.name) "create")}}
                           <input
                             value={{get createIndicesNames guiPluginIndex.name}}
@@ -77,11 +87,13 @@
                           </OneDropdown>
                         {{/if}}
                         <div class="form-message">{{get guiIndicesErrors guiPluginIndex.name}}</div>
-                      {{/bsForm.group}}
-                    {{/bs-form}}
+                      </bsForm.group>
+                    </BsForm>
                   {{else}}
                     {{#if (get indicesMapping guiPluginIndex.name)}}
-                      {{#truncated-string class="assigned-index-name"}}{{get (get indicesMapping guiPluginIndex.name) "name"}}{{/truncated-string}}
+                      <TruncatedString
+                        class="assigned-index-name"
+                      >{{get (get indicesMapping guiPluginIndex.name) "name"}}</TruncatedString>
                     {{else}}
                       <img class="warning-icon" src={{root-url "assets/images/sign-warning-large.svg"}}> <span class="unspecified">{{tt this "notAssigned"}}</span>
                     {{/if}}
@@ -91,7 +103,7 @@
             </tr>
           {{/each}}
         </tbody>
-      {{/basic-table}}
-    {{/promise-proxy-container}}
+      </BasicTable>
+    </PromiseProxyContainer>
   {{/if}}
-{{/promise-proxy-container}}
+</PromiseProxyContainer>

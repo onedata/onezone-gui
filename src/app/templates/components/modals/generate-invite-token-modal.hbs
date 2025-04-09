@@ -1,25 +1,21 @@
-{{#global-modal
-  classNames="generate-invite-token-modal"
-  modalId=modalId
-  as |modal|
-}}
+<GlobalModal @classNames="generate-invite-token-modal" @modalId={{modalId}} as |modal|>
 
-  {{#modal.header}}
+  <modal.header>
     <h1>{{tt this (concat "header." inviteType)}}</h1>
-  {{/modal.header}}
+  </modal.header>
 
-  {{#modal.body}}
-    {{invite-token-generator
-      inviteType=inviteType
-      targetRecord=targetRecord
-      onCustomTokenClick=modal.close
-    }}
-  {{/modal.body}}
+  <modal.body>
+    <InviteTokenGenerator
+      @inviteType={{inviteType}}
+      @targetRecord={{targetRecord}}
+      @onCustomTokenClick={{modal.close}}
+    />
+  </modal.body>
 
-  {{#modal.footer class="btn-toolbar"}}
-    {{#one-button type="default" class="modal-close" onClick=modal.close}}
+  <modal.footer class="btn-toolbar">
+    <OneButton @type="default" class="modal-close" @onClick={{modal.close}}>
       {{tt this "close"}}
-    {{/one-button}}
-  {{/modal.footer}}
+    </OneButton>
+  </modal.footer>
 
-{{/global-modal}}
+</GlobalModal>

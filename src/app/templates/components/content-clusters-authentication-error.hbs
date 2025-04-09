@@ -1,13 +1,13 @@
-{{#error-check-view
-  tryErrorCheckProxy=tryErrorCheckProxy
-  errorCheckProxy=errorCheckProxy
-}}
-  {{content-info
+<ErrorCheckView
+  @tryErrorCheckProxy={{tryErrorCheckProxy}}
+  @errorCheckProxy={{errorCheckProxy}}
+>
+  <ContentInfo
     class="scroll-breakpoint-600"
-    header=(tt this "header")
-    text=(tt this "text")
-    imagePath=(root-url "assets/images/no-connection.svg")
-    buttonLabel=(tt this "tryAgain")
-    buttonAction=(action "tryAgain")
-  }}
-{{/error-check-view}}
+    @header={{tt this "header"}}
+    @text={{tt this "text"}}
+    @imagePath={{root-url "assets/images/no-connection.svg"}}
+    @buttonLabel={{tt this "tryAgain"}}
+    @buttonAction={{action "tryAgain"}}
+  />
+</ErrorCheckView>

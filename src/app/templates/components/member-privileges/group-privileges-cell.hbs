@@ -1,17 +1,19 @@
 {{#if isDirect}}
-  {{#form.group}}
-    {{one-way-toggle
-      class=inputClass
-      inputId=inputId
-      checked=state
-      threeState=true
-      allowThreeStateToggle=true
-      showLockForReadOnly=false
-      isReadOnly=(or isPrivilegesToggleDisabled (not editionEnabled))
-      update=(action "inputChanged")
-      lockHint=(if isPrivilegesToggleDisabled insufficientPrivilegesTip)
-    }}
-  {{/form.group}}
+  {{#let (component form.group) as |FormGroup|}}
+    <FormGroup>
+      <OneWayToggle
+        class={{inputClass}}
+        @inputId={{inputId}}
+        @checked={{state}}
+        @threeState={{true}}
+        @allowThreeStateToggle={{true}}
+        @showLockForReadOnly={{false}}
+        @isReadOnly={{or isPrivilegesToggleDisabled (not editionEnabled)}}
+        @update={{action "inputChanged"}}
+        @lockHint={{if isPrivilegesToggleDisabled insufficientPrivilegesTip}}
+      />
+    </FormGroup>
+  {{/let}}
 {{else}}
   <span
     class={{concat-classes
@@ -24,6 +26,6 @@
     {{grantedText}}/{{privilegesCount}}
   </span>
   {{#if (not arePrivilegesUpToDate)}}
-    {{spin-spinner-block sizeClass="xxs"}}
+    <SpinSpinnerBlock @sizeClass="xxs" />
   {{/if}}
 {{/if}}

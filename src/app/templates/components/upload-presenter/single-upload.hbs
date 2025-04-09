@@ -1,13 +1,15 @@
-{{upload-presenter/upload-summary-header
-  uploadObject=uploadObject
-  onToggleExpand=(action "toggleExpand")
-  onCancel=(action "cancel" uploadObject)
-  onToggleMinimize=(action "toggleMinimize")
-  isMinimized=isMinimized}}
-{{#render-later triggerRender=(or triggerChildrenRender isExpanded)}}
-  {{#one-collapse collapsed=(not isExpanded)}}
-    {{upload-presenter/upload-object-root-list
-      uploadObjects=uploadObject.children
-      onCancel=(action "cancel")}}
-  {{/one-collapse}}
-{{/render-later}}
+<UploadPresenter::UploadSummaryHeader
+  @uploadObject={{uploadObject}}
+  @onToggleExpand={{action "toggleExpand"}}
+  @onCancel={{action "cancel" uploadObject}}
+  @onToggleMinimize={{action "toggleMinimize"}}
+  @isMinimized={{isMinimized}}
+/>
+<RenderLater @triggerRender={{or triggerChildrenRender isExpanded}}>
+  <OneCollapse @collapsed={{not isExpanded}}>
+    <UploadPresenter::UploadObjectRootList
+      @uploadObjects={{uploadObject.children}}
+      @onCancel={{action "cancel"}}
+    />
+  </OneCollapse>
+</RenderLater>

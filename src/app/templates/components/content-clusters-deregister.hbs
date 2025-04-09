@@ -1,9 +1,9 @@
-{{#content-info
+<ContentInfo
   class="scroll-breakpoint-700"
-  header=(tt this "header")
-  textComponent="content-clusters-deregister-text"
-  imagePath=(root-url "assets/images/cluster-deregister-provider.svg")
-}}
+  @header={{tt this "header"}}
+  @textComponent="content-clusters-deregister-text"
+  @imagePath={{root-url "assets/images/cluster-deregister-provider.svg"}}
+>
   {{#if statsProxy.isFulfilled}}
     <div class="row row-cluster-oneprovider-stats">
       <p class="text-center">
@@ -44,28 +44,28 @@
   {{/if}}
   <div class="row content-row no-border row-understand-notice">
     <div class="col-xs-9 col-centered">
-      {{one-checkbox
+      <OneCheckbox
         class="danger one-checkbox-danger one-checkbox-understand"
-        checked=understandChecked
-        update=(action (mut understandChecked))
-      }}
+        @checked={{understandChecked}}
+        @update={{action (mut understandChecked)}}
+      />
       <div class="text-understand" {{action (mut understandChecked) (not understandChecked)}}>
         {{tt this "textUnderstand"}}
       </div>
     </div>
   </div>
   <div class="btn-toolbar btn-toolbar-deregister">
-    {{#one-button class="btn" type="info" onClick=(action "cancel")}}
+    <OneButton class="btn" @type="info" @onClick={{action "cancel"}}>
       {{tt this "cancel"}}
-    {{/one-button}}
-    {{#one-button
-      type="danger"
-      buttonType="submit"
+    </OneButton>
+    <OneButton
+      @type="danger"
+      @buttonType="submit"
       class="btn-deregister"
-      onClick=(action "deregister")
-      disabled=(not understandChecked)
-    }}
+      @onClick={{action "deregister"}}
+      @disabled={{not understandChecked}}
+    >
       {{tt this "confirm"}}
-    {{/one-button}}
+    </OneButton>
   </div>
-{{/content-info}}
+</ContentInfo>

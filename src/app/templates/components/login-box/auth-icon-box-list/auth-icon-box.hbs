@@ -4,7 +4,7 @@
   style={{aStyle}}
 >
   {{#if active}}
-    {{spin-spinner scale=spinnerScale lines=12 length=20 width=10}}
+    <SpinSpinner @scale={{spinnerScale}} @lines={{12}} @length={{20}} @width={{10}} />
   {{else}}
     <div class="auth-icon-image" style={{authIconStyle}}>
       {{yield}}
@@ -12,5 +12,5 @@
   {{/if}}
 </a>
 {{#if tip}}
-  {{one-tooltip title=tip}}
+  <OneTooltip @title={{tip}} />
 {{/if}}

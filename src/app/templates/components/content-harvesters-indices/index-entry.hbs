@@ -1,85 +1,92 @@
-{{#listItem.header
-  disableToggleIcon=true
-  class=(concat-classes "index-entry" (if isIdPresenterVisible "popover-active"))
-}}
-  <span class="item-icon-container">
-    <OneIcon class="item-icon" @icon="index" />
-    <OneTooltip @title={{index.name}} @placement="top" @triggerEvents="hover" />
-  </span>
-  {{#if isRenaming}}
-    <OneInlineEditor
-      @value={{index.name}}
-      @isEditing={{true}}
-      @onEdit={{action (mut isRenaming) false}}
-      @onSave={{action "onNameChange"}}
-      class="index-name-editor"
-    />
-  {{else}}
-    <span class="one-label">{{index.name}}</span>
-  {{/if}}
-  {{#if (contains index.guiPluginName guiPluginIndicesNames)}}
-    <span class="index-labels-container">
-      <span class="label label-info">{{tt this "usedByGui"}}</span>
-    </span>
-  {{/if}}
-  <OneIcon @icon="circle-id" class="id-presenter-trigger" />
-  <OneWebuiPopover
-    class="index-id-info"
-    @triggerSelector={{concat "#" parentView.elementId " .id-presenter-trigger"}}
-    @onToggle={{action "idPresenterToggled"}}
-    as |popover|
+{{#let (component listItem.header) as |ListItemHeader|}}
+  <ListItemHeader
+    @disableToggleIcon={{true}}
+    class={{concat-classes "index-entry" (if isIdPresenterVisible "popover-active")}}
   >
-    <div class="form-group">
-      <label class="control-label">{{tt this "indexId"}}:
-        <OneLabelTip
-          @title={{tt
-            this
-            (if harvester.endpoint "indexIdTooltipHasEndpoint" "indexIdTooltipNoEndpoint")
-            endpoint=harvester.endpoint
-          }}
-        />
-      </label>
-      <OneClipboardLine
-        @size="sm"
-        @value={{index.aspectId}}
-        @showText={{false}}
-        @btnType="default"
+    <span class="item-icon-container">
+      <OneIcon class="item-icon" @icon="index" />
+      <OneTooltip @title={{index.name}} @placement="top" @triggerEvents="hover" />
+    </span>
+    {{#if isRenaming}}
+      <OneInlineEditor
+        @value={{index.name}}
+        @isEditing={{true}}
+        @onEdit={{action (mut isRenaming) false}}
+        @onSave={{action "onNameChange"}}
+        class="index-name-editor"
       />
-    </div>
-  </OneWebuiPopover>
-  <ActionsToolbar
-    @isMinimized={{true}}
-    @toolbarClasses=""
-    @toolbarToggleClasses="btn-menu-toggle"
-    @dropdownPlacement="auto"
-    @actionsArray={{indexActions}}
-    @actionsArg={{index}}
-  />
-{{/listItem.header}}
-{{#listItem.content}}
-  {{!-- fade=false to prevent scroll issues during tabs animation --}}
-  <BsTab class="bs-tab-onedata bs-tab-modern" @fade={{false}} as |tab|>
-    <tab.pane
-      @elementId={{concat parentView.elementId "-progress-tab"}}
-      @title={{tt this "harvestingProgress"}}
+    {{else}}
+      <span class="one-label">{{index.name}}</span>
+    {{/if}}
+    {{#if (contains index.guiPluginName guiPluginIndicesNames)}}
+      <span class="index-labels-container">
+        <span class="label label-info">{{tt this "usedByGui"}}</span>
+      </span>
+    {{/if}}
+    <OneIcon @icon="circle-id" class="id-presenter-trigger" />
+    <OneWebuiPopover
+      class="index-id-info"
+      @triggerSelector={{concat "#" parentView.elementId " .id-presenter-trigger"}}
+      @onToggle={{action "idPresenterToggled"}}
+      as |popover|
     >
-      {{!-- Hiding progress table when it is hidden by any parent. Fixes 0 size of the table
-      and incorrect calculation of labels positions. --}}
-      {{#if (and
-        (eq (concat parentView.elementId "-progress-tab") tab.activeId)
-        listItem.isActive
-      )}}
-        <ContentHarvestersIndices::ProgressTable
-          @index={{index}}
-          @harvester={{harvester}}
+      <div class="form-group">
+        <label class="control-label">{{tt this "indexId"}}:
+          <OneLabelTip
+            @title={{tt
+              this
+              (if harvester.endpoint
+                "indexIdTooltipHasEndpoint"
+                "indexIdTooltipNoEndpoint"
+              )
+              endpoint=harvester.endpoint
+            }}
+          />
+        </label>
+        <OneClipboardLine
+          @size="sm"
+          @value={{index.aspectId}}
+          @showText={{false}}
+          @btnType="default"
         />
-      {{/if}}
-    </tab.pane>
-    <tab.pane
-      @elementId={{concat parentView.elementId "-settings-tab"}}
-      @title={{tt this "settings"}}
-    >
-      <ContentHarvestersIndices::IndexForm @mode="view" @index={{index}} />
-    </tab.pane>
-  </BsTab>
-{{/listItem.content}}
+      </div>
+    </OneWebuiPopover>
+    <ActionsToolbar
+      @isMinimized={{true}}
+      @toolbarClasses=""
+      @toolbarToggleClasses="btn-menu-toggle"
+      @dropdownPlacement="auto"
+      @actionsArray={{indexActions}}
+      @actionsArg={{index}}
+    />
+  </ListItemHeader>
+{{/let}}
+{{#let (component listItem.content) as |ListItemContent|}}
+  <ListItemContent>
+    {{!-- fade=false to prevent scroll issues during tabs animation --}}
+    <BsTab class="bs-tab-onedata bs-tab-modern" @fade={{false}} as |tab|>
+      <tab.pane
+        @elementId={{concat parentView.elementId "-progress-tab"}}
+        @title={{tt this "harvestingProgress"}}
+      >
+        {{!-- Hiding progress table when it is hidden by any parent. Fixes 0 size of the table
+        and incorrect calculation of labels positions. --}}
+        {{#if (and
+          (eq (concat parentView.elementId "-progress-tab") tab.activeId)
+          listItem.isActive
+        )}}
+          <ContentHarvestersIndices::ProgressTable
+            @index={{index}}
+            @harvester={{harvester}}
+          />
+        {{/if}}
+      </tab.pane>
+      <tab.pane
+        @elementId={{concat parentView.elementId "-settings-tab"}}
+        @title={{tt this "settings"}}
+      >
+        <ContentHarvestersIndices::IndexForm @mode="view" @index={{index}} />
+      </tab.pane>
+    </BsTab>
+  </ListItemContent>
+{{/let}}

@@ -1,13 +1,19 @@
-{{#content-info
+<ContentInfo
   class="scroll-breakpoint-400"
-  header=(tt this "title")
-  text=(tt this "text")
-}}
+  @header={{tt this "title"}}
+  @text={{tt this "text"}}
+>
   <p class="lead">
     {{tt this "textStart"}}
-    {{#link-to "onedata.sidebar.content" "groups" "new"}}{{tt this "textCreate"}}{{/link-to}}
+    <LinkTo
+      @route="onedata.sidebar.content"
+      @models={{array "groups" "new"}}
+    >{{tt this "textCreate"}}</LinkTo>
     {{tt this "textOr"}}
-    {{#link-to "onedata.sidebar.content" "tokens" "join"}}{{tt this "textJoin"}}{{/link-to}}
+    <LinkTo
+      @route="onedata.sidebar.content"
+      @models={{array "tokens" "join"}}
+    >{{tt this "textJoin"}}</LinkTo>
     {{tt this "textEnd"}}
   </p>
-{{/content-info}}
+</ContentInfo>

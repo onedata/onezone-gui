@@ -1,10 +1,10 @@
 {{#if isMarketplaceEnabled}}
-  {{content-spaces-marketplace/header viewModel=viewModel}}
-  {{#promise-proxy-container proxy=viewModel.entriesInitialLoad}}
+  <ContentSpacesMarketplace::Header @viewModel={{viewModel}} />
+  <PromiseProxyContainer @proxy={{viewModel.entriesInitialLoad}}>
     {{#if viewModel.showEmptyListView}}
-      {{content-spaces-marketplace/empty viewModel=viewModel}}
+      <ContentSpacesMarketplace::Empty @viewModel={{viewModel}} />
     {{else}}
-      {{content-spaces-marketplace/list viewModel=viewModel}}
+      <ContentSpacesMarketplace::List @viewModel={{viewModel}} />
     {{/if}}
-  {{/promise-proxy-container}}
+  </PromiseProxyContainer>
 {{/if}}

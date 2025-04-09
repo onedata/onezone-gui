@@ -1,37 +1,40 @@
-{{#content-info
+<ContentInfo
   class="scroll-breakpoint-500"
-  header=(tt this "title")
-  text=(tt this "text")
-}}
+  @header={{tt this "title"}}
+  @text={{tt this "text"}}
+>
   <p class="lead">
     <ul class="info">
       <li>
-        {{#link-to "onedata.sidebar.content" "spaces" "new"}}
+        <LinkTo @route="onedata.sidebar.content" @models={{array "spaces" "new"}}>
           {{tt this "p1a"}}
-        {{/link-to}}
+        </LinkTo>
         {{tt this "p1t"}}
       </li>
       <li>
         {{tt this "p2t"}}
         {{!-- no line break because of dot on the end --}}
-        {{#link-to "onedata.sidebar.content" "tokens" "join"}}{{tt this "p2a"}}{{/link-to}}.
+        <LinkTo
+          @route="onedata.sidebar.content"
+          @models={{array "tokens" "join"}}
+        >{{tt this "p2a"}}</LinkTo>.
       </li>
       <li>
         {{tt this "p3t1"}}
-        {{#link-to "onedata.sidebar.content" "tokens" "join"}}
+        <LinkTo @route="onedata.sidebar.content" @models={{array "tokens" "join"}}>
           {{tt this "p3a"}}
-        {{/link-to}}
+        </LinkTo>
         {{tt this "p3t2"}}
       </li>
       {{#if isMarketplaceInfoShown}}
         <li>
           {{tt this "pMarketPrefix"}}
-          {{#link-to "onedata.sidebar.content" "spaces" "join"}}
+          <LinkTo @route="onedata.sidebar.content" @models={{array "spaces" "join"}}>
             {{tt this "pMarketAnchor"}}
-          {{/link-to}}
+          </LinkTo>
           {{tt this "pMarketSuffix"}}
         </li>
       {{/if}}
     </ul>
   </p>
-{{/content-info}}
+</ContentInfo>

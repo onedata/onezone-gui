@@ -1,36 +1,36 @@
 <RecordIcon class="sidebar-item-icon" @record={{item}} @useSubtypeIcon={{true}} />
 {{#if isRenaming}}
-  {{one-inline-editor
-    isEditing=true
-    value=item.name
-    showEmptyInfo=false
-    onSave=(action "rename")
-    editOnClick=false
-    onEdit=(action "toggleRename")
+  <OneInlineEditor
+    @isEditing={{true}}
+    @value={{item.name}}
+    @showEmptyInfo={{false}}
+    @onSave={{action "rename"}}
+    @editOnClick={{false}}
+    @onEdit={{action "toggleRename"}}
     class="one-label name-editor sidebar-item-title"
-    click=(action "editorClick")
-  }}
+    @click={{action "editorClick"}}
+  />
 {{else}}
-  {{#truncated-string class="sidebar-item-title"}}
-    {{name-conflict item=item tagName="span" class="one-label"}}
-  {{/truncated-string}}
+  <TruncatedString class="sidebar-item-title">
+    <NameConflict @item={{item}} @tagName="span" class="one-label" />
+  </TruncatedString>
 {{/if}}
 
 {{#unless inSidenav}}
-  {{actions-toolbar
-    isMinimized=true
-    dropdownPlacement="auto"
-    actionsArray=itemActions
-  }}
+  <ActionsToolbar
+    @isMinimized={{true}}
+    @dropdownPlacement="auto"
+    @actionsArray={{itemActions}}
+  />
 
-  {{#render-later triggerRender=isRemoveModalOpened as |renderLater|}}
-    {{harvester-remove-modal
-      opened=isRemoveModalOpened
-      close=(action "closeRemoveModal")
-      proceed=(action "remove")
-      processing=isRemoving
-      record=harvester
-      onHidden=renderLater.resetRenderTrigger
-    }}
-  {{/render-later}}
+  <RenderLater @triggerRender={{isRemoveModalOpened}} as |renderLater|>
+    <HarvesterRemoveModal
+      @opened={{isRemoveModalOpened}}
+      @close={{action "closeRemoveModal"}}
+      @proceed={{action "remove"}}
+      @processing={{isRemoving}}
+      @record={{harvester}}
+      @onHidden={{renderLater.resetRenderTrigger}}
+    />
+  </RenderLater>
 {{/unless}}

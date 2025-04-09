@@ -6,13 +6,13 @@
   </h1>
 </div>
 <div class="row content-row">
-  {{#promise-proxy-container proxy=user}}
+  <PromiseProxyContainer @proxy={{user}}>
     <div class="one-tile-container">
-      {{resource-info-tile record=group}}
+      <ResourceInfoTile @record={{group}} />
       {{#if group.hasViewPrivilege}}
-        {{resource-members-tile record=group}}
+        <ResourceMembersTile @record={{group}} />
       {{/if}}
-      {{resource-membership-tile record=group}}
+      <ResourceMembershipTile @record={{group}} />
     </div>
-  {{/promise-proxy-container}}
+  </PromiseProxyContainer>
 </div>
