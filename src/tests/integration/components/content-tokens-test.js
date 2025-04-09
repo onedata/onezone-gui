@@ -23,7 +23,7 @@ describe('Integration | Component | content-tokens', function () {
   });
 
   it('has class content-tokens', async function () {
-    await render(hbs `{{content-tokens}}`);
+    await render(hbs `<ContentTokens />`);
 
     expect(find('.content-tokens')).to.exist;
   });

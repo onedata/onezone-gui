@@ -48,7 +48,7 @@ describe('Integration | Component | user-account-button', function () {
         sinon.stub(lookupService(this, 'currentUser'), 'getCurrentUserRecord');
       getCurrentUserRecord.resolves(userRecord);
 
-      await render(hbs `{{user-account-button}}`);
+      await render(hbs `<UserAccountButton />`);
 
       const usernameElem = find('.user-account-button-username');
 

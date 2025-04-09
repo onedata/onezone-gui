@@ -97,13 +97,13 @@ describe('Integration | Component | content-tokens-new', function () {
   });
 
   it('has class "content-tokens-new', async function () {
-    await render(hbs `{{content-tokens-new}}`);
+    await render(hbs `<ContentTokensNew />`);
 
     expect(find('.content-tokens-new')).to.exist;
   });
 
   it('shows list of token templates at the beginning', async function () {
-    await render(hbs `{{content-tokens-new}}`);
+    await render(hbs `<ContentTokensNew />`);
 
     expect(isSlideActive('templates')).to.be.true;
   });
@@ -178,7 +178,7 @@ describe('Integration | Component | content-tokens-new', function () {
         })),
       });
 
-      await render(hbs `{{content-tokens-new}}`);
+      await render(hbs `<ContentTokensNew />`);
 
       checkShowsTemplate('Custom');
       expect(find('.type-field .option-invite input')).to.have.property('checked', true);
@@ -191,7 +191,7 @@ describe('Integration | Component | content-tokens-new', function () {
   it(
     'does not show selected template name on token template selector slide',
     async function () {
-      await render(hbs `{{content-tokens-new}}`);
+      await render(hbs `<ContentTokensNew />`);
 
       expect(getSlide('templates').querySelector('.header-row .template-name'))
         .to.not.exist;
@@ -311,7 +311,7 @@ describe('Integration | Component | content-tokens-new', function () {
 });
 
 async function renderAndSelectTemplate(templateName) {
-  await render(hbs `{{content-tokens-new}}`);
+  await render(hbs `<ContentTokensNew />`);
   await selectTemplate(templateName);
 }
 

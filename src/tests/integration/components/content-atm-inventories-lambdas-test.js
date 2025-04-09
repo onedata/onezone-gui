@@ -148,7 +148,7 @@ describe('Integration | Component | content-atm-inventories-lambdas (main)', fun
   });
 
   it('has class "content-atm-inventories-lambdas"', async function () {
-    await render(hbs `{{content-atm-inventories-lambdas}}`);
+    await render(hbs `<ContentAtmInventoriesLambdas />`);
 
     expect(this.element.children).to.have.length(1);
     expect(this.element.children[0]).to.have.class('content-atm-inventories-lambdas');

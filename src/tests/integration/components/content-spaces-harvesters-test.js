@@ -72,7 +72,7 @@ describe('Integration | Component | content-spaces-harvesters', function () {
   });
 
   it('has class "content-spaces-harvesters"', async function () {
-    await render(hbs `{{content-spaces-harvesters}}`);
+    await render(hbs `<ContentSpacesHarvesters />`);
 
     expect(find('.content-spaces-harvesters')).to.exist;
   });

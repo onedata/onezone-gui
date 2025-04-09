@@ -56,6 +56,6 @@ export class Helper extends BaseHelper {
     return this.element.querySelector('.spaces-marketplace-header');
   }
   async render() {
-    await render(hbs`{{content-spaces-marketplace}}`);
+    await render(hbs `<ContentSpacesMarketplace />`);
   }
 }

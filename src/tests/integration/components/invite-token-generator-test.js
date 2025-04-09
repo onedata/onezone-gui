@@ -37,7 +37,7 @@ describe('Integration | Component | invite-token-generator', function () {
   it('has class invite-token-generator', async function () {
     stubCreateToken(this, [undefined, undefined], resolve());
 
-    await render(hbs `{{invite-token-generator}}`);
+    await render(hbs `<InviteTokenGenerator />`);
 
     expect(find('.invite-token-generator')).to.exist;
   });

@@ -203,7 +203,7 @@ describe('Integration | Component | content-atm-inventories-workflows (main)', f
   });
 
   it('has class "content-atm-inventories-workflows"', async function () {
-    await render(hbs `{{content-atm-inventories-workflows}}`);
+    await render(hbs `<ContentAtmInventoriesWorkflows />`);
 
     expect(this.element.children).to.have.length(1);
     expect(this.element.children[0]).to.have.class('content-atm-inventories-workflows');

@@ -10,14 +10,14 @@ describe('Integration | Component | content-atm-inventories-new', function () {
   setupRenderingTest();
 
   it('has class "content-atm-inventories-new', async function () {
-    await render(hbs `{{content-atm-inventories-new}}`);
+    await render(hbs `<ContentAtmInventoriesNew />`);
 
     expect(this.element.children[0]).to.have.class('content-atm-inventories-new');
   });
 
   it('does not allow to create new automation inventory when name is empty',
     async function () {
-      await render(hbs `{{content-atm-inventories-new}}`);
+      await render(hbs `<ContentAtmInventoriesNew />`);
 
       await fillIn('.new-atm-inventory-name', '');
 
@@ -30,7 +30,7 @@ describe('Integration | Component | content-atm-inventories-new', function () {
       lookupService(this, 'workflow-actions'),
       'createCreateAtmInventoryAction'
     ).callsFake(() => ({ execute: executeStub }));
-    await render(hbs `{{content-atm-inventories-new}}`);
+    await render(hbs `<ContentAtmInventoriesNew />`);
 
     await fillIn('.new-atm-inventory-name', 'someName');
     await click('.btn-primary');

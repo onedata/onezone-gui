@@ -41,13 +41,13 @@ describe('Integration | Component | token-template-selector', function () {
   setupRenderingTest();
 
   it('has class "token-template-selector"', async function () {
-    await render(hbs `{{token-template-selector}}`);
+    await render(hbs `<TokenTemplateSelector />`);
 
     expect(findAll('.token-template-selector')).to.have.length(1);
   });
 
   it('shows list of templates in correct categories', async function () {
-    await render(hbs `{{token-template-selector}}`);
+    await render(hbs `<TokenTemplateSelector />`);
 
     const tiles = findAll('.one-tile');
     templates.forEach(({ name, category }, index) => {
@@ -59,7 +59,7 @@ describe('Integration | Component | token-template-selector', function () {
   });
 
   it('has only first category expanded', async function () {
-    await render(hbs `{{token-template-selector}}`);
+    await render(hbs `<TokenTemplateSelector />`);
 
     expect(findAll('.one-collapsible-list-item.active'))
       .to.have.length(1);

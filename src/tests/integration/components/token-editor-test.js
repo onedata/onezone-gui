@@ -294,7 +294,7 @@ describe('Integration | Component | token-editor', function () {
   });
 
   it('has class "token-editor"', async function () {
-    await render(hbs `{{token-editor}}`);
+    await render(hbs `<TokenEditor />`);
 
     expect(find('.token-editor')).to.exist;
   });
@@ -1943,7 +1943,7 @@ describe('Integration | Component | token-editor', function () {
   it(
     'is in mode "create" by default',
     async function () {
-      await render(hbs `{{token-editor}}`);
+      await render(hbs `<TokenEditor />`);
 
       expect(find('.token-editor')).to.have.class('create-mode');
     }
