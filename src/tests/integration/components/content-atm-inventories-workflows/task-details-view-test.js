@@ -169,7 +169,7 @@ async function renderComponent() {
     @atmLambda={{atmLambda}}
     @revisionNumber={{revisionNumber}}
     @definedStores={{definedStores}}
-    @task={{task}}
+    @task={{this.task}}
     @onBackSlide={{backSlideSpy}}
     @onCancel={{cancelSpy}}
     @onApplyChanges={{applyChangesSpy}}
