@@ -1,6 +1,6 @@
 {{#if isDirect}}
-  {{#let (component form.group) as |FormGroup|}}
-    <FormGroup>
+  {{#let (component form.group) as |formGroup|}}
+    <formGroup>
       <OneWayToggle
         class={{inputClass}}
         @inputId={{inputId}}
@@ -12,7 +12,7 @@
         @update={{action "inputChanged"}}
         @lockHint={{if isPrivilegesToggleDisabled insufficientPrivilegesTip}}
       />
-    </FormGroup>
+    </formGroup>
   {{/let}}
 {{else}}
   <span

@@ -1,5 +1,5 @@
-{{#let (component listItem.header) as |ListItemHeader|}}
-  <ListItemHeader
+{{#let (component listItem.header) as |listItemHeader|}}
+  <listItemHeader
     @disableToggleIcon={{true}}
     class={{concat-classes "index-entry" (if isIdPresenterVisible "popover-active")}}
   >
@@ -59,10 +59,10 @@
       @actionsArray={{indexActions}}
       @actionsArg={{index}}
     />
-  </ListItemHeader>
+  </listItemHeader>
 {{/let}}
-{{#let (component listItem.content) as |ListItemContent|}}
-  <ListItemContent>
+{{#let (component listItem.content) as |listItemContent|}}
+  <listItemContent>
     {{!-- fade=false to prevent scroll issues during tabs animation --}}
     <BsTab class="bs-tab-onedata bs-tab-modern" @fade={{false}} as |tab|>
       <tab.pane
@@ -88,5 +88,5 @@
         <ContentHarvestersIndices::IndexForm @mode="view" @index={{index}} />
       </tab.pane>
     </BsTab>
-  </ListItemContent>
+  </listItemContent>
 {{/let}}
