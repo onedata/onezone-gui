@@ -230,6 +230,8 @@
         @customPerPageText={{tt this "perPage" type=typeForPageControl}}
         @customFilteredText={{tt this "filteredResults"}}
         @isFiltered={{isFiltered}}
+        @perPageChange={{action "perPageChange"}}
+        @isPerPageControlDropdown={{true}}
       />
     {{/if}}
   {{/one-collapsible-list}}

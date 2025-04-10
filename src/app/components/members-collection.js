@@ -37,6 +37,7 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import joinStrings from 'onedata-gui-common/utils/i18n/join-strings';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import ArrayPaginator from 'onedata-gui-common/utils/array-paginator';
+import globals from 'onedata-gui-common/utils/globals';
 
 const fallbackActionsGenerator = () => [];
 
@@ -92,13 +93,6 @@ export default Component.extend(I18n, {
    * @type {string}
    */
   modelTypeTranslation: undefined,
-
-  /**
-   * If greater than 0, autocollapses list on init if number of records is over
-   * `collapseForNumber`. If equal to 0, list is never autocollapsed.
-   * @type {number}
-   */
-  collapseForNumber: 0,
 
   /**
    * Called when members are loaded and rendered
@@ -157,6 +151,12 @@ export default Component.extend(I18n, {
    * @virtual optional
    */
   pageSize: 10,
+
+  /**
+   * @virtual optional
+   * @type {number}
+   */
+  listCollapseScreenHeight: 0,
 
   /**
    * Is calculated by `membersObserver`
@@ -500,6 +500,8 @@ export default Component.extend(I18n, {
         membersProxyList,
         groupedPrivilegesFlags,
         currentUser,
+        isListCollapsed,
+        listCollapseScreenHeight,
         itemActionsGenerator,
         effectiveItemActionsGenerator,
         griAspect,
@@ -516,12 +518,20 @@ export default Component.extend(I18n, {
         'membersProxyList',
         'groupedPrivilegesFlags',
         'currentUser',
+        'isListCollapsed',
+        'listCollapseScreenHeight',
         'itemActionsGenerator',
         'effectiveItemActionsGenerator',
         'griAspect',
         'griGroupAspects',
         'searchQuery',
       );
+      if (
+        isListCollapsed === undefined &&
+        globals.window.innerHeight < this.listCollapseScreenHeight
+      ) {
+        this.set('isListCollapsed', true);
+      }
       // Create ordered list of members. Records should be sorted by name except
       // current user record and owners - they should be always at the top.
       const currentUserMember =
@@ -676,6 +686,10 @@ export default Component.extend(I18n, {
     this.membersObserver();
     this.groupsObserver();
     this.set('privilegesRecordProxyCache', []);
+    const pageSize = globals.localStorage.getItem(`${this.subjectType}PageSize`);
+    if (pageSize) {
+      this.set('pageSize', pageSize);
+    }
     this.set('paginator', ArrayPaginator.extend({
       array: computed('parent.membersProxyList', function array() {
         return this.parent.membersProxyList ?? [];
@@ -775,6 +789,13 @@ export default Component.extend(I18n, {
     },
     onInput(value) {
       this.set('searchQuery', value);
+    },
+    perPageChange(number) {
+      this.set('pageSize', number);
+      globals.localStorage.setItem(
+        `${this.subjectType}PageSize`,
+        number
+      );
     },
   },
 });
