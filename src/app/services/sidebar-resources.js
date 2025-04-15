@@ -17,8 +17,15 @@ import ChunkableListModel from 'onedata-gui-common/utils/chunkable-list-model';
 import TokensChunkableListModel from 'onezone-gui/utils/tokens-chunkable-list-model';
 import SharesChunksArray from 'onezone-gui/utils/shares-chunks-array';
 import { camelize } from '@ember/string';
+import SidebarModelLoader from 'onedata-gui-common/utils/sidebar-model-loader';
+import { defer } from 'rsvp';
 
-export default class OnezoneSidebarResources extends SidebarResources {
+/**
+ * Subset of OnedataResourceCategory whose list are obained from user record for sidebar.
+ * @typedef {'spaces'|'groups'|'providers'|'tokens'|'harvesters'|'atm-inventories'} OnezoneUserListResourceCategory
+ */
+
+export default class OnezoneSidebarResourcesService extends SidebarResources {
   @service providerManager;
   @service tokenManager;
   @service tokenActions;
@@ -35,6 +42,7 @@ export default class OnezoneSidebarResources extends SidebarResources {
   @service uploadManager;
   @service recordManager;
   @service workflowActions;
+  @service batchRequestRegistry;
 
   /**
    * @override
@@ -107,55 +115,6 @@ export default class OnezoneSidebarResources extends SidebarResources {
   }
 
   /**
-   * @param {string} type
-   * @returns {Promise<SidebarCollection>}
-   */
-  async getCollectionFor(type) {
-    switch (type) {
-      case 'shares': {
-        await this.sharesChunksArray.initialLoad;
-        return new ChunksArraySidebarCollection(this.sharesChunksArray);
-      }
-      case 'clusters':
-        return new ListModelSidebarCollection(
-          await this.clusterManager.getClusters()
-        );
-      case 'spaces':
-      case 'providers':
-      case 'groups':
-      case 'tokens':
-      case 'harvesters':
-      case 'atm-inventories':
-        return await this.createListChunksCollection(type);
-      case 'uploads': {
-        // TODO: VFS-12506 Maybe do it reactive with reads (but it was not earlier)
-        const sidebarOneproviders = this.uploadManager.sidebarOneproviders;
-        return {
-          get array() {
-            return sidebarOneproviders;
-          },
-          get ids() {
-            return sidebarOneproviders.map(record => record.id);
-          },
-        };
-      }
-      case 'users': {
-        const user = await this.currentUser.getCurrentUserRecord();
-        return {
-          get array() {
-            return [user];
-          },
-          get ids() {
-            return [user.id];
-          },
-        };
-      }
-      default:
-        throw new Error('No such collection: ' + type);
-    }
-  }
-
-  /**
    * @override
    */
   getButtonsFor(type, context) {
@@ -183,14 +142,30 @@ export default class OnezoneSidebarResources extends SidebarResources {
   }
 
   /**
-   * @param {'tokens'|'spaces'|'groups'|'harvesters'|'atm-inventories'} resourceType
-   * @returns {Promise<ChunkableListModelSidebarCollection>}
+   * @override
+   * @param {OnedataResourceCategory} resourceCategory
+   * @returns {SidebarModelLoader}
    */
-  async createListChunksCollection(resourceType) {
-    const camelizedResourceType = camelize(resourceType);
-    const chunkableListModel = await this[`${camelizedResourceType}ChunkableListModelProxy`];
-    await chunkableListModel.chunksArray.initialLoad;
-    return new ChunkableListModelSidebarCollection(chunkableListModel);
+  createSidebarModelLoader(resourceCategory) {
+    switch (resourceCategory) {
+      case 'spaces':
+      case 'providers':
+      case 'groups':
+      case 'tokens':
+      case 'harvesters':
+      case 'atm-inventories':
+        return this.createListSidebarModelLoader(resourceCategory);
+      case 'shares':
+        return this.createSharesSidebarModelLoader();
+      case 'clusters':
+        return this.createClustersSidebarModelLoader();
+      case 'uploads':
+        return this.createUploadsSidebarModelLoader();
+      case 'users':
+        return this.createUsersSidebarModelLoader();
+      default:
+        throw new Error(`SidebarResources: no such collection: ${resourceCategory}`);
+    }
   }
 
   /**
@@ -199,8 +174,11 @@ export default class OnezoneSidebarResources extends SidebarResources {
    * @returns {Promise<ChunkableListModel>}
    */
   async resolveUserVirtualList(listType, ChunkableListModelClass = ChunkableListModel) {
-    const listRecord = await (await this.currentUser.userProxy)[`${listType}List`];
-    return new ChunkableListModelClass(listRecord);
+    const listModel = await (await this.currentUser.userProxy)[`${listType}List`];
+    return new ChunkableListModelClass({
+      listModel,
+      batchRequestRegistry: this.batchRequestRegistry,
+    });
   }
 
   async reloadShareList() {
@@ -209,5 +187,88 @@ export default class OnezoneSidebarResources extends SidebarResources {
       await sharesChunksArray.scheduleReload();
       await sharesChunksArray.startChanged();
     }
+  }
+
+  /**
+   * @private
+   * @param {OnezoneUserListResourceCategory} resourceType
+   * @returns {SidebarModelLoader}
+   */
+  createListSidebarModelLoader(resourceType) {
+    const deferred = defer();
+    const sidebarModelLoader = new SidebarModelLoader(resourceType, deferred.promise);
+    // Code below resolves collection for SidebarModelLoader, but also initializes its
+    // progressTracker.
+    (async () => {
+      const camelizedResourceType = camelize(resourceType);
+      const chunkableListModel =
+        await this[`${camelizedResourceType}ChunkableListModelProxy`];
+      sidebarModelLoader.progressTracker = chunkableListModel.progressTracker;
+      await chunkableListModel.chunksArray.initialLoad;
+      deferred.resolve(new ChunkableListModelSidebarCollection(chunkableListModel));
+    })();
+    return sidebarModelLoader;
+  }
+
+  /**
+   * @private
+   * @returns {SidebarModelLoader}
+   */
+  createSharesSidebarModelLoader() {
+    const sidebarCollectionPromise = (async () => {
+      await this.sharesChunksArray.initialLoad;
+      return new ChunksArraySidebarCollection(this.sharesChunksArray);
+    })();
+    const sidebarModelLoader = new SidebarModelLoader('shares', sidebarCollectionPromise);
+    sidebarModelLoader.progressTracker = this.sharesChunksArray.progressTracker;
+    return sidebarModelLoader;
+  }
+
+  /**
+   * @private
+   * @returns {SidebarModelLoader}
+   */
+  createClustersSidebarModelLoader() {
+    const collectionResolver = async () => new ListModelSidebarCollection(
+      await this.clusterManager.getClusters()
+    );
+    return new SidebarModelLoader('clusters', collectionResolver());
+  }
+
+  /**
+   * @private
+   * @returns {SidebarModelLoader}
+   */
+  createUploadsSidebarModelLoader() {
+    // TODO: VFS-12506 Maybe do it reactive with reads (but it was not earlier)
+    const sidebarOneproviders = this.uploadManager.sidebarOneproviders;
+    const collectionResolver = async () => ({
+      get array() {
+        return sidebarOneproviders;
+      },
+      get ids() {
+        return sidebarOneproviders.map(record => record.id);
+      },
+    });
+    return new SidebarModelLoader('uploads', collectionResolver());
+  }
+
+  /**
+   * @private
+   * @returns {SidebarModelLoader}
+   */
+  createUsersSidebarModelLoader() {
+    const collectionResolver = async () => {
+      const user = await this.currentUser.getCurrentUserRecord();
+      return {
+        get array() {
+          return [user];
+        },
+        get ids() {
+          return [user.id];
+        },
+      };
+    };
+    return new SidebarModelLoader('users', collectionResolver());
   }
 }

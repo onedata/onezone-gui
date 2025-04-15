@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, click, find, findAll } from '@ember/test-helpers';
+import { render, click, find, findAll, settled } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import { selectChoose } from 'ember-power-select/test-support/helpers';
 import { lookupService } from '../../helpers/stub-service';
@@ -86,7 +86,11 @@ describe('Integration | Component | sidebar-tokens', function () {
       list: tokens,
     }).save();
 
-    const chunkableListModel = new TokensChunkableListModel(tokenList);
+    const batchRequestRegistry = lookupService(this, 'batchRequestRegistry');
+    const chunkableListModel = new TokensChunkableListModel({
+      listModel: tokenList,
+      batchRequestRegistry,
+    });
     const collection = new ChunkableListModelSidebarCollection(chunkableListModel);
     this.setProperties({
       chunkableListModel,
@@ -153,6 +157,7 @@ describe('Integration | Component | sidebar-tokens', function () {
       await renderComponent();
 
       await click(`.btn-${type}`);
+      await settled();
       const renderedTokens = findAll('.token-item');
       expect(renderedTokens).to.have.length(count);
       renderedTokens.forEach((element) => {
