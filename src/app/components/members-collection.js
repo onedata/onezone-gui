@@ -242,7 +242,7 @@ export default Component.extend(I18n, {
   /**
    * @type {string}
    */
-  typeForPageControl: computed('listHeader', function typeForPageControl() {
+  membersTypeText: computed('listHeader', function membersTypeText() {
     return this.listHeader.string.toLowerCase();
   }),
 
@@ -265,8 +265,7 @@ export default Component.extend(I18n, {
     'membersProxyList.length',
     function isFiltered() {
       const membersCount = this.members?.length ?? 0;
-      const membersProxyListCount = this.membersProxyList.length;
-      return membersCount !== membersProxyListCount;
+      return membersCount !== this.membersProxyList.length;
     }
   ),
 
@@ -787,10 +786,10 @@ export default Component.extend(I18n, {
     highlightMemberships(groups) {
       this.set('highlightedMembers', groups);
     },
-    onInput(value) {
+    onSearchInput(value) {
       this.set('searchQuery', value);
     },
-    perPageChange(number) {
+    changePerPage(number) {
       this.set('pageSize', number);
       globals.localStorage.setItem(
         `${this.subjectType}PageSize`,
