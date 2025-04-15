@@ -527,7 +527,7 @@ export default Component.extend(I18n, {
       );
       if (
         isListCollapsed === undefined &&
-        globals.window.innerHeight < this.listCollapseScreenHeight
+        globals.window.innerHeight < listCollapseScreenHeight
       ) {
         this.set('isListCollapsed', true);
       }
