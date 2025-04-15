@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@babel/runtime": "7.24.4",
+    "async-mutex": "0.5.0",
     "babel-plugin-ember-modules-api-polyfill": "3.5.0",
     "basictable": "git+https://github.com/kliput/basictable.git#b00a7e52512e43a526e8f5b0ae8b3063efbe0bf5",
     "color": "4.2.3",
@@ -80,7 +81,7 @@
     "autosize": "5.0.2",
     "bootstrap-sass": "3.4.3",
     "broccoli-asset-rev": "git+https://github.com/joankaradimov/broccoli-asset-rev.git#24c7816e2c95494d3e23ca9d757255b637aa0bd1",
-    "chai-as-promised": "7.1.1",
+    "chai-as-promised": "7.1.2",
     "chai-dom": "1.11.0",
     "chartist-plugin-legend": "0.6.2",
     "echarts": "5.4.1",

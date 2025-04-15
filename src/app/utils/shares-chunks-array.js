@@ -8,27 +8,46 @@
 
 import MergedChunksArray from 'onedata-gui-common/utils/merged-chunks-array';
 import { computed } from '@ember/object';
-import { reads } from '@ember/object/computed';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import { inject as service } from '@ember/service';
-import { SharesSidebarItem } from 'onezone-gui/utils/shares-sidebar-item';
+import _ from 'lodash';
+import ShareListMultiFetcher from './share-list-multi-fetcher';
+import ShareListFetcherToolkit from './share-list-fetcher-toolkit';
+import ProgressTracker from 'onedata-gui-common/utils/progress-tracker';
+import { Mutex } from 'async-mutex';
 
 export default class SharesChunksArray extends MergedChunksArray.extend(OwnerInjector) {
   @service currentUser;
   @service shareManager;
   @service spaceManager;
+  @service batchRequestRegistry;
 
   /**
-   * @type {Object<string, SharesSidebarItem>}
+   * How many spaces will be queried for share list in single batch.
+   * @type {number}
    */
-  shareItemsCacheByIndex = {};
+  spacesBatchSize = 100;
 
-  /**
-   * @type {Object<string, SharesSidebarItem>}
-   */
-  shareItemsCacheById = {};
+  //#region state
+
+  /** @type {ProgressTracker} */
+  #progressTracker = new ProgressTracker();
+
+  /** @type {boolean} */
+  isPrepareFetchersPending = false;
+
+  /** @type {Array<ShareListMultiFetcher>} */
+  multiFechers;
+
+  /** @type {Map<ShareListMultiFetcher, ShareListMultiFetcherStatus>} */
+  multiFetcherStates = undefined;
+
+  /** @type {ShareListFetcherToolkit} */
+  fetcherToolkit = undefined;
+
+  //#endregion
 
   @computed('currentUser.user.spaceList.list')
   get spacesIdsProxy() {
@@ -39,88 +58,97 @@ export default class SharesChunksArray extends MergedChunksArray.extend(OwnerInj
     })());
   }
 
-  /**
-   * Every function in this array is intended to fetch shares (in infinite-scoll way) for
-   * single space.
-   * @type {PromiseObject<Array<(index, limit, offset) => ShareDataListPage>>}
-   */
-  @computed('spacesIdsProxy')
-  get fetchersProxy() {
-    return promiseObject((async () => {
-      const spacesIds = await this.spacesIdsProxy;
-      return spacesIds.map(spaceId => {
-        return (index, limit, offset) => {
-          return this.getShareList(spaceId, {
-            index,
-            limit,
-            offset,
-          });
-        };
-      });
-    })());
+  get progressTracker() {
+    return this.#progressTracker;
   }
 
-  @reads('fetchersProxy.content') fetchers;
+  /** @override */
+  init() {
+    super.init(...arguments);
+    this.fetcherToolkit = new ShareListFetcherToolkit({
+      shareManager: this.shareManager,
+      spaceManager: this.spaceManager,
+    });
+  }
+
+  /**
+   * Use to handle `onStatusChange` callback of ShareListMultiFetcher.
+   * @param {StatusEnum} status
+   * @param {ShareListMultiFetcher} multiFetcher
+   */
+  handleMultiFetcherStateChange(status, multiFetcher) {
+    this.multiFetcherStates.set(multiFetcher, status);
+  }
+
+  /**
+   * Creates multi fetchers - objects that invokes mulitple share list fetches in single
+   * batch, for n-spaces, where `n` is controlled by `this.spacesBatchSize`.
+   * These multi fetchers can be used in main fetch method.
+   * @returns {Promise<Array<ShareListMultiFetcher>>}
+   */
+  async createMultiFetchers() {
+    if (this.isPrepareFetchersPending) {
+      throw new Error('SharesChunksArray: only single prepareFetchers can run at a time');
+    }
+    try {
+      this.isPrepareFetchersPending = true;
+      const spacesIds = await this.spacesIdsProxy;
+      const spacesIdsChunks = _.chunk(spacesIds, this.spacesBatchSize);
+
+      this.multiFetcherStates = new Map();
+
+      (status, currentMultiFetcher) => {
+        this.multiFetcherStates.set(currentMultiFetcher, status);
+      };
+      return spacesIdsChunks.map(spacesIdsChunk => {
+        const multiFetcher = new ShareListMultiFetcher(
+          this.batchRequestRegistry,
+          this.fetcherToolkit,
+          spacesIdsChunk
+        );
+        multiFetcher.onStatusChange = this.handleMultiFetcherStateChange.bind(this);
+        return multiFetcher;
+      });
+    } finally {
+      this.isPrepareFetchersPending = false;
+    }
+  }
 
   /**
    * @override
    */
   async fetch() {
-    while (!this.fetchersProxy.isSettled) {
-      await this.fetchersProxy;
+    const mutex = new Mutex();
+    await mutex.acquire();
+    try {
+      const multiFetchers = await this.createMultiFetchers();
+      this.set('multiFetchers', multiFetchers);
+      return await super.fetch(...arguments);
+    } finally {
+      mutex.release();
     }
-    return await super.fetch(...arguments);
   }
 
   /**
-   * @private
-   * @param {string} spaceId
-   * @param {InfiniteListQuery} listQuery
-   * @returns {ShareDataListPage}
+   * Invokes fetchers serially - waiting for each fetcher to complete before next fetcher
+   * is invoked (requests wait for response before next).
+   * @override
+   * @protected
+   * @param {InfiniteScrollIndex} index
+   * @param {InfiniteScrollSize} size
+   * @param {InfiniteScrollOffset} offset
+   * @returns {Promise<Array<InfiniteScrollPage>>}
    */
-  async getShareList(spaceId, listQuery) {
-    const { index, limit, offset } = listQuery;
-    const { array, isLast } = await this.shareManager.getSpaceShareList(spaceId, {
-      index,
-      limit,
-      offset,
-    });
-    const shareManager = this.shareManager;
-    const spaceManager = this.spaceManager;
-    return {
-      array: array.map(shareData => this.getShareItem(
-        shareData,
-        shareManager,
-        spaceManager,
-      )),
-      isLast,
-    };
-  }
-
-  getShareItem(shareData, shareManager, spaceManager) {
-    // When properties that are displayed and are variabled: name and handleId changes,
-    // then index changes, so the a unique share item should be made for each index.
-    const index = shareData.index;
-    const id = shareData.shareId;
-    let shareItem = this.shareItemsCacheByIndex[index];
-    if (shareItem) {
-      shareItem.shareData = shareData;
-    } else {
-      const shareItemById = this.shareItemsCacheById[id];
-      if (shareItemById) {
-        // index of existing item changed
-        shareItem = shareItemById;
-        shareItem.shareData = shareData;
-      } else {
-        shareItem = new SharesSidebarItem({
-          shareData,
-          shareManager,
-          spaceManager,
-        });
-        this.shareItemsCacheByIndex[index] = shareItem;
-        this.shareItemsCacheById[id] = shareItem;
-      }
+  async executeAllFetchers(index, size, offset) {
+    /** @type {Array<ShareListMultiFetcher>} */
+    const multiFetchers = this.multiFetchers;
+    const totalCount = _.sumBy(multiFetchers, 'spacesIds.length');
+    this.progressTracker.reset(totalCount);
+    const results = [];
+    for (const multiFetcher of multiFetchers) {
+      results.push(await multiFetcher.fetch(index, size, offset));
+      this.progressTracker.doneCount += multiFetcher.spacesIds.length;
     }
-    return shareItem;
+    return results;
   }
 }

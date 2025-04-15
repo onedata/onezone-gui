@@ -18,15 +18,18 @@ import { tracked } from '@glimmer/tracking';
  */
 export class ChunkableListModelSidebarCollection {
   /** @type {ChunkableListModel} */
-  @tracked chunkableListModel;
+  @tracked
+  chunkableListModel;
 
   constructor(chunkableListModel) {
     this.chunkableListModel = chunkableListModel;
   }
 
-  @reads('chunkableListModel.listModel') listModel;
+  @reads('chunkableListModel.listModel')
+  listModel;
 
-  @reads('chunkableListModel.chunksArray') chunksArray;
+  @reads('chunkableListModel.chunksArray')
+  chunksArray;
 
   /**
    * @implements {SidebarCollection}
@@ -60,6 +63,13 @@ export class ChunkableListModelSidebarCollection {
   )
   get filteredFullArray() {
     return this.chunkableListModel.chunkableListModelFetcher.filterItems(this.fullArray);
+  }
+
+  /**
+   * @type {ProgressTracker|null}
+   */
+  get progressTracker() {
+    return this.chunkableListModel.progressTracker;
   }
 
   setFilter({ expression, advanced }) {

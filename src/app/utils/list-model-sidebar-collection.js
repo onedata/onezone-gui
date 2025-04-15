@@ -16,7 +16,8 @@ import { tracked } from '@glimmer/tracking';
  * @implements {SidebarCollection}
  */
 export class ListModelSidebarCollection {
-  @tracked listModel;
+  @tracked
+  listModel;
 
   constructor(listModel) {
     this.listModel = listModel;

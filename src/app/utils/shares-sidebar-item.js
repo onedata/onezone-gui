@@ -13,7 +13,8 @@ import { entityType as shareEntityType } from 'onezone-gui/models/share';
 
 export class SharesSidebarItem {
   /** @type {ShareListItem} */
-  @tracked shareData = undefined;
+  @tracked
+  shareData = undefined;
 
   shareManager = undefined;
   spaceManager = undefined;
