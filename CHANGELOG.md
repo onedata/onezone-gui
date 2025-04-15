@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12705 Added page control on members page
 * VFS-12674 Added support for batch requests, fetching sidebar items using batches, showing sidebar loading progress
 * VFS-12622 Refactored OneIcon component to Glimmer
 * VFS-12543 Fixed possible infinite scroll list trimming after first item disappeared and list reload
