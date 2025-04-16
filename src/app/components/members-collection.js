@@ -41,6 +41,8 @@ import globals from 'onedata-gui-common/utils/globals';
 
 const fallbackActionsGenerator = () => [];
 
+const MIN_MEMBERS_PER_PAGE = 10;
+
 export default Component.extend(I18n, {
   tagName: '',
 
@@ -150,13 +152,18 @@ export default Component.extend(I18n, {
    * @type {number}
    * @virtual optional
    */
-  pageSize: 10,
+  fallbackPageSize: 10,
 
   /**
    * @virtual optional
    * @type {number}
    */
   listCollapseScreenHeight: 0,
+
+  /**
+   * @type {number}
+   */
+  pageSize: 10,
 
   /**
    * Is calculated by `membersObserver`
@@ -269,6 +276,14 @@ export default Component.extend(I18n, {
     }
   ),
 
+  isPagesControlShown: computed(
+    'isListCollapsed',
+    'membersProxyList.length',
+    function isPagesControlShown() {
+      return !this.isListCollapsed && this.membersProxyList.length > MIN_MEMBERS_PER_PAGE;
+    }
+  ),
+
   /**
    * @type {Ember.ComputedProperty<string>}
    */
@@ -343,6 +358,10 @@ export default Component.extend(I18n, {
     } else {
       return this.recordType;
     }
+  }),
+
+  persistedPageSizeKey: computed('subjectType', function persistedPageSizeKey() {
+    return `membersCollection.${this.subjectType}PageSize`;
   }),
 
   /**
@@ -506,25 +525,7 @@ export default Component.extend(I18n, {
         griAspect,
         griGroupAspects,
         searchQuery,
-      } = this.getProperties(
-        'owners',
-        'directMembers',
-        'directMembersProxy',
-        'effectiveMembersProxy',
-        'subjectType',
-        'members',
-        'membersProxy',
-        'membersProxyList',
-        'groupedPrivilegesFlags',
-        'currentUser',
-        'isListCollapsed',
-        'listCollapseScreenHeight',
-        'itemActionsGenerator',
-        'effectiveItemActionsGenerator',
-        'griAspect',
-        'griGroupAspects',
-        'searchQuery',
-      );
+      } = this;
       if (
         isListCollapsed === undefined &&
         globals.window.innerHeight < listCollapseScreenHeight
@@ -685,10 +686,9 @@ export default Component.extend(I18n, {
     this.membersObserver();
     this.groupsObserver();
     this.set('privilegesRecordProxyCache', []);
-    const pageSize = globals.localStorage.getItem(`${this.subjectType}PageSize`);
-    if (pageSize) {
-      this.set('pageSize', pageSize);
-    }
+    const pageSize = globals.localStorage.getItem(this.persistedPageSizeKey) ??
+      this.fallbackPageSize;
+    this.set('pageSize', pageSize);
     this.set('paginator', ArrayPaginator.extend({
       array: computed('parent.membersProxyList', function array() {
         return this.parent.membersProxyList ?? [];
@@ -791,10 +791,7 @@ export default Component.extend(I18n, {
     },
     changePerPage(number) {
       this.set('pageSize', number);
-      globals.localStorage.setItem(
-        `${this.subjectType}PageSize`,
-        number
-      );
+      globals.localStorage.setItem(this.persistedPageSizeKey, number);
     },
   },
 });

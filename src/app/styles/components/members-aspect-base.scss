@@ -198,9 +198,13 @@
       width: 100%;
 
       .record-name {
-        padding-left: 18px;
+        padding-left: 0.6em;
       }
     }
+  }
+
+  .one-collapsible-list .item-checkbox {
+    margin-right: 1em;
   }
 
   .pages-control {

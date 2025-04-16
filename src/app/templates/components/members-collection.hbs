@@ -223,7 +223,7 @@
     {{else}}
       {{yield list}}
     {{/each}}
-    {{#if (and (not isListCollapsed) (gt paginator.pagesCount 1))}}
+    {{#if isPagesControlShown}}
       <PagesControl
         @activePageNumber={{paginator.activePageNumber}}
         @pagesCount={{paginator.pagesCount}}
