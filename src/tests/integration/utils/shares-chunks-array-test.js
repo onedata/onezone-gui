@@ -135,7 +135,6 @@ describe('Integration | Utility | shares-chunks-array', function () {
     getSpaceShareListSpy.resetHistory();
     this.chunksArray.setIndices(2, 7);
     await settled();
-    const array = this.chunksArray.toArray();
 
     // --- then ---
     // Note, that call count is after fetch next after spy history reset,
@@ -143,6 +142,7 @@ describe('Integration | Utility | shares-chunks-array', function () {
     expect(getSpaceShareListSpy).to.have.callCount(0);
 
     // check if final array has proper elements
+    const array = this.chunksArray.toArray();
     const arrayShareNames = array.map(share => share.name);
     const allExpectedShareNames = helper.spaces.map(space =>
       _.times(sharesPerSpace).map(i => `${Helper.generateShareName(space, i)}`)
@@ -152,11 +152,71 @@ describe('Integration | Utility | shares-chunks-array', function () {
     );
   });
 
-  // FIXME: niesymetryczne tablice:
-  // space1: 0,1,2,3,4
-  // space2: 0,1,2,3,4,5,... 49
-  // pobieramy 10 elementów: wysycimy 1: 0-4, 2: 0-9; potem przesuwamy tablicę: 3-13; powinno pobrać dodatkowe elementy tylko z drugiej
-  // i to powinno pobrać od indeksu: 9 z size 3
+  it('does not fetch next from sources that have been run out', async function () {
+    // --- given ---
+    const spacesCount = 2;
+    const helper = new Helper(this);
+    await helper.givenUser();
+    await helper.givenSpaces({ spacesCount });
+    const spaceId1 = helper.spaces[0].entityId;
+    const spaceId2 = helper.spaces[1].entityId;
+    // speficies how many shares should be created for particular space
+    const perSpace = {
+      [spaceId1]: 5,
+      [spaceId2]: 50,
+    };
+    await helper.givenShares({
+      perSpace,
+    });
+    await helper.givenSimpleSpaceShareList();
+    const getSpaceShareListSpy = sinon.spy(
+      helper.getService('shareManager'),
+      'getSpaceShareList'
+    );
+
+    // --- when ---
+    this.chunksArray = SharesChunksArray.create({
+      ownerSource: this.owner,
+      chunkSize: 10,
+      startIndex: 0,
+      endIndex: 9,
+    });
+    await this.chunksArray.initialLoad;
+    getSpaceShareListSpy.resetHistory();
+    this.chunksArray.setIndices(3, 12);
+    await settled();
+
+    // --- then ---
+    // In the first fetch, we shoul use 5 shares from first space (all of them)
+    // and 5 shares from second space (5 shares were not used).
+    // So the next fetch should use 5 not-used spaces and fetch next chunk, but decreased
+    // by cached elements (10 - 5 = 5).
+
+    // Note, that call count is after fetch next after spy history reset,
+    // so we check only fetchNext calls.
+    expect(getSpaceShareListSpy).to.have.callCount(1);
+    expect(getSpaceShareListSpy).to.have.been.calledWith(
+      spaceId2,
+      sinon.match({
+        // share no. 9 - because in first fetch we got 10 shares (share-00..share-09)
+        index: Helper.generateShareName(helper.spaces[1], 9),
+        // the last request fetched already elements 0..9, we start from item 4, so now we need only 10..15
+        limit: 5,
+        // when using cache, the offset is increased by 1
+        offset: 1,
+      }),
+    );
+
+    // check if final array has proper elements
+    const array = this.chunksArray.toArray();
+    const arrayShareNames = array.map(share => share.name);
+    const allExpectedShareNames = helper.spaces.map(space =>
+      _.times(perSpace[space.entityId]).map(i => `${Helper.generateShareName(space, i)}`)
+    ).flat().slice(3, 12);
+    expect(arrayShareNames, arrayShareNames.join(',')).to.deep.equal(
+      _.sortBy(allExpectedShareNames)
+    );
+  });
 
   // FIXME: test działania zawartości back: initialJumpIndex, następnie idziemy do początku i badamy czy będą dobre wpisy
 
@@ -237,7 +297,16 @@ class Helper {
     }
 
     this.shareItems = this.spaces.map(space => {
-      return _.times(perSpace).map(i => this.createSpaceSidebarItem(space, i));
+      let sharesCount;
+      if (typeof perSpace === 'number') {
+        sharesCount = perSpace;
+      } else if (typeof perSpace === 'object') {
+        sharesCount = perSpace[space.entityId];
+      }
+      if (sharesCount === undefined) {
+        sharesCount = 1;
+      }
+      return _.times(sharesCount).map(i => this.createSpaceSidebarItem(space, i));
     }).flat();
 
     await allFulfilled(this.shareItems.map(shareItem => {
@@ -266,11 +335,12 @@ class Helper {
       );
       const itemsSorted = _.sortBy(shareItems, 'index');
       // FIXME: implementacja i przetestowanie obsługi indeksu, który nie istnieje, ale jest pomiędzy
-      const position = getIndexedListPosition(itemsSorted, index) + offset;
-      const itemsLimited = itemsSorted.slice(position, limit);
+      const startPosition = getIndexedListPosition(itemsSorted, index) + offset;
+      const endPosition = startPosition + limit;
+      const itemsLimited = itemsSorted.slice(startPosition, endPosition);
       return {
         array: itemsLimited,
-        isLast: true,
+        isLast: endPosition > itemsSorted.length,
       };
     }
     shareManager.getSpaceShareList = getSpaceShareList;

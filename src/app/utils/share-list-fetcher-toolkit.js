@@ -90,9 +90,9 @@ export default class ShareListFetcherToolkit {
     let backendIsLast;
     if (!cachedIsLast && effLimit) {
       const result = await this.shareManager.getSpaceShareList(spaceId, {
-        effIndex,
-        effLimit,
-        effOffset,
+        index: effIndex,
+        limit: effLimit,
+        offset: effOffset,
       });
       backendArray = result.array;
       backendIsLast = result.isLast;
