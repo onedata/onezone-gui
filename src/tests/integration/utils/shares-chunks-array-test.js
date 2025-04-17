@@ -15,6 +15,8 @@ import { entityType as shareEntityType } from 'onezone-gui/models/share';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { defer } from 'rsvp';
 import { settled } from '@ember/test-helpers';
+import sinon from 'sinon';
+import getIndexedListPosition from 'onedata-gui-common/utils/get-indexed-list-position';
 
 describe('Integration | Utility | shares-chunks-array', function () {
   const { afterEach } = setupRenderingTest();
@@ -30,11 +32,11 @@ describe('Integration | Utility | shares-chunks-array', function () {
   it('exposes shares collected from multiple spaces', async function () {
     // given
     const spacesCount = 3;
-    this.helper = new Helper(this);
-    await this.helper.givenUser();
-    await this.helper.givenSpaces({ spacesCount });
-    await this.helper.givenShares();
-    await this.helper.givenSimpleSpaceShareList();
+    const helper = new Helper(this);
+    await helper.givenUser();
+    await helper.givenSpaces({ spacesCount });
+    await helper.givenShares();
+    await helper.givenSimpleSpaceShareList();
 
     // when
     this.chunksArray = SharesChunksArray.create({ ownerSource: this.owner });
@@ -44,7 +46,10 @@ describe('Integration | Utility | shares-chunks-array', function () {
     // then
     const arrayShareNames = array.map(share => share.name);
     expect(arrayShareNames, arrayShareNames.join(',')).to.deep.equal(
-      _.times(spacesCount, i => `${Helper.generateSpaceName(i)}-share`)
+      _.sortBy(
+        helper.spaces.map(space => `${Helper.generateShareName(space, 0)}`),
+        'index'
+      )
     );
   });
 
@@ -95,17 +100,79 @@ describe('Integration | Utility | shares-chunks-array', function () {
     }
     await this.chunksArray.initialLoad;
 
-    // then 2 - check if spaces are properly sorted
+    // then 2 - check if shares are properly sorted
     const arrayShareNames = this.chunksArray.map(share => share.name);
     expect(arrayShareNames, arrayShareNames.join(',')).to.deep.equal(
-      _.times(spacesCount, i => `${Helper.generateSpaceName(i)}-share`)
+      _.sortBy(
+        helper.spaces.map(space => `${Helper.generateShareName(space, 0)}`),
+        'index'
+      )
     );
   });
+
+  it('does not fetch next lists which have been fetched before', async function () {
+    // --- given ---
+    const spacesCount = 2;
+    // should be lesser than chunk size, to fully fetch list of first space
+    const sharesPerSpace = 8;
+    const helper = new Helper(this);
+    await helper.givenUser();
+    await helper.givenSpaces({ spacesCount });
+    await helper.givenShares({ perSpace: sharesPerSpace });
+    await helper.givenSimpleSpaceShareList();
+    const getSpaceShareListSpy = sinon.spy(
+      helper.getService('shareManager'),
+      'getSpaceShareList'
+    );
+
+    // --- when ---
+    this.chunksArray = SharesChunksArray.create({
+      ownerSource: this.owner,
+      // first fetch size exceeds number of shares in single space
+      chunkSize: 10,
+    });
+    await this.chunksArray.initialLoad;
+    getSpaceShareListSpy.resetHistory();
+    this.chunksArray.setIndices(2, 7);
+    await settled();
+    const array = this.chunksArray.toArray();
+
+    // --- then ---
+    // Note, that call count is after fetch next after spy history reset,
+    // so we check only fetchNext calls.
+    expect(getSpaceShareListSpy).to.have.callCount(0);
+
+    // check if final array has proper elements
+    const arrayShareNames = array.map(share => share.name);
+    const allExpectedShareNames = helper.spaces.map(space =>
+      _.times(sharesPerSpace).map(i => `${Helper.generateShareName(space, i)}`)
+    ).flat().slice(2, 7);
+    expect(arrayShareNames, arrayShareNames.join(',')).to.deep.equal(
+      _.sortBy(allExpectedShareNames)
+    );
+  });
+
+  // FIXME: niesymetryczne tablice:
+  // space1: 0,1,2,3,4
+  // space2: 0,1,2,3,4,5,... 49
+  // pobieramy 10 elementów: wysycimy 1: 0-4, 2: 0-9; potem przesuwamy tablicę: 3-13; powinno pobrać dodatkowe elementy tylko z drugiej
+  // i to powinno pobrać od indeksu: 9 z size 3
+
+  // FIXME: test działania zawartości back: initialJumpIndex, następnie idziemy do początku i badamy czy będą dobre wpisy
+
+  // FIXME: test działania użycia cache back: initialJumpIndex, następnie do tyłu, pobierze coś, potem jescze raz do tyłu i powinno użyć samych cache (podobny s1-sh1, s1-sh2 itd. najpierw lista z jednego, potem drugiego)
+  // FIXME: jw. tylko niech będą naprzemienne shery
+
+  // FIXME: test działania reload: po reloadzie powinno pobierać wszystko o nowa
 });
 
 class Helper {
   static generateSpaceName(i) {
     return `space-${String(i).padStart(2, '0')}`;
+  }
+
+  static generateShareName(space, i) {
+    return `${space.name}-share-${String(i).padStart(3, '0')}`;
   }
 
   /**
@@ -160,16 +227,19 @@ class Helper {
     this.user.set('spaceList', spaceList);
   }
 
-  async givenShares() {
+  async givenShares({ perSpace } = { perSpace: 1 }) {
+    if (this.shareItems) {
+      throw new Error('mock: shareItems already initialized');
+    }
+
     if (!this.spaces) {
       throw new Error('mock: spaces not initialized');
     }
 
     this.shareItems = this.spaces.map(space => {
-      const index = `${space.name}-share`;
-      const spaceId = space.entityId;
-      return { shareId: `sh${spaceId}`, index, name: index, spaceId };
-    });
+      return _.times(perSpace).map(i => this.createSpaceSidebarItem(space, i));
+    }).flat();
+
     await allFulfilled(this.shareItems.map(shareItem => {
       const { index, name, spaceId, shareId } = shareItem;
       const space = this.spaces.find(space => space.entityId === spaceId);
@@ -184,17 +254,37 @@ class Helper {
   }
 
   async givenSimpleSpaceShareList() {
+    if (!this.shareItems) {
+      throw new Error('mock: shareItems not initialized');
+    }
+
     const shareManager = this.getService('shareManager');
     const helper = this;
-    async function getSpaceShareList(spaceId, /* { index, limit, offset } */ ) {
-      const shareItem = helper.shareItems.find(shareItem =>
+    async function getSpaceShareList(spaceId, { index, limit, offset }) {
+      const shareItems = helper.shareItems.filter(shareItem =>
         shareItem.spaceId === spaceId
       );
+      const itemsSorted = _.sortBy(shareItems, 'index');
+      // FIXME: implementacja i przetestowanie obsługi indeksu, który nie istnieje, ale jest pomiędzy
+      const position = getIndexedListPosition(itemsSorted, index) + offset;
+      const itemsLimited = itemsSorted.slice(position, limit);
       return {
-        array: [shareItem],
+        array: itemsLimited,
         isLast: true,
       };
     }
     shareManager.getSpaceShareList = getSpaceShareList;
+  }
+
+  /**
+   * @private
+   * @param {Models.Space} space
+   * @param {number} i
+   * @returns {Object}
+   */
+  createSpaceSidebarItem(space, i) {
+    const index = Helper.generateShareName(space, i);
+    const spaceId = space.entityId;
+    return { shareId: `sh-sp${spaceId}-i${i}`, index, name: index, spaceId };
   }
 }
