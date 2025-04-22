@@ -10,9 +10,22 @@
   >
     <list.header
       @title={{effListHeader}}
-      @searchVisible={{members.length}}
+      @searchVisible={{false}}
       @withPlaceForDots={{true}}
     >
+      {{#if members.length}}
+        <div class={{concat-classes
+          "form-group form-group-sm form-group-light search-group collapse-animation collapse-small"
+          (if _isListCollapsed "collapse-hidden")
+        }}>
+          <div class="input-group with-icon-addon">
+            <SearchBar @search={{action "onSearchInput"}} class="form-control" />
+            <div class="input-group-addon">
+              <OneIcon @icon="search" />
+            </div>
+          </div>
+        </div>
+      {{/if}}
       <ActionsToolbar
         @isMinimized={{true}}
         @toolbarClasses=""
@@ -21,7 +34,7 @@
         @actionsArray={{collectionActions}}
       />
     </list.header>
-    {{#each membersProxyList key="id" as |memberProxy|}}
+    {{#each paginator.activePageArray key="id" as |memberProxy|}}
       <list.item
         class={{concat-classes
           "member-item"
@@ -223,5 +236,19 @@
     {{else}}
       {{yield list}}
     {{/each}}
+    {{#if isPagesControlShown}}
+      <PagesControl
+        @activePageNumber={{paginator.activePageNumber}}
+        @pagesCount={{paginator.pagesCount}}
+        @pageSize={{paginator.pageSize}}
+        @hasPageNumberInput={{not (or (media "isTablet") (media "isMobile"))}}
+        @onPageChange={{paginator.changeActivePageNumber}}
+        @customPerPageText={{tt this "perPage" type=membersTypeText}}
+        @customFilteredText={{tt this "filteredResults"}}
+        @isFiltered={{isFiltered}}
+        @changePerPage={{action "changePerPage"}}
+        @isPerPageDropdownVisible={{true}}
+      />
+    {{/if}}
   </OneCollapsibleList>
 </PromiseProxyContainer>

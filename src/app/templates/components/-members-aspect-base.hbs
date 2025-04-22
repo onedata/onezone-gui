@@ -32,7 +32,8 @@
       @griAspect={{griAspects.group}}
       @onlyDirect={{onlyDirect}}
       @showMembershipDescription={{showMembershipDescription}}
-      @collapseForNumber={{10}}
+      @fallbackPageSize={{10}}
+      @listCollapseScreenHeight={{800}}
       @subjectType="group"
       @griGroupAspects={{griAspects.group}}
       @recordsSelected={{action "recordsSelected" "group"}}
@@ -83,6 +84,8 @@
       @recordsSelected={{action "recordsSelected" "user"}}
       @membersLoaded={{action "recordsLoaded"}}
       @listHeader={{tt this "users"}}
+      @fallbackPageSize={{50}}
+      @listCollapseScreenHeight={{800}}
       @modelTypeTranslation={{modelTypeTranslation}}
       @groupedPrivilegesFlags={{groupedPrivilegesFlags}}
       @privilegeGroupsTranslationsPath={{privilegeGroupsTranslationsPath}}

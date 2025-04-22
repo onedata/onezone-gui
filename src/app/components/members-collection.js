@@ -36,8 +36,12 @@ import { later, cancel } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import joinStrings from 'onedata-gui-common/utils/i18n/join-strings';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import ArrayPaginator from 'onedata-gui-common/utils/array-paginator';
+import globals from 'onedata-gui-common/utils/globals';
 
 const fallbackActionsGenerator = () => [];
+
+const minMembersPerPage = 10;
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -93,13 +97,6 @@ export default Component.extend(I18n, {
   modelTypeTranslation: undefined,
 
   /**
-   * If greater than 0, autocollapses list on init if number of records is over
-   * `collapseForNumber`. If equal to 0, list is never autocollapsed.
-   * @type {number}
-   */
-  collapseForNumber: 0,
-
-  /**
    * Called when members are loaded and rendered
    * @type {function}
    * @returns {any}
@@ -150,6 +147,26 @@ export default Component.extend(I18n, {
    * @virtual
    */
   onlyDirect: false,
+
+  /**
+   * If there's no valid value stored in localStorage,
+   * this fallback value will be used for the pageSize variable instead.
+   * @type {number}
+   * @virtual optional
+   */
+  fallbackPageSize: 10,
+
+  /**
+   * Used once on component init to decide if the list should start collapsed.
+   * @virtual optional
+   * @type {number}
+   */
+  listCollapseScreenHeight: 0,
+
+  /**
+   * @type {number}
+   */
+  pageSize: 10,
 
   /**
    * Is calculated by `membersObserver`
@@ -223,6 +240,23 @@ export default Component.extend(I18n, {
   privilegesRecordProxyCache: undefined,
 
   /**
+   * @type {Utils.ArrayPaginator}
+   */
+  paginator: undefined,
+
+  /**
+   * @type {string}
+   */
+  searchQuery: undefined,
+
+  /**
+   * @type {string}
+   */
+  membersTypeText: computed('listHeader', function membersTypeText() {
+    return this.listHeader.string.toLowerCase();
+  }),
+
+  /**
    * @type {SafeString | string}
    */
   effListHeader: computed('listHeader', 'members.length', function effListHeader() {
@@ -235,6 +269,23 @@ export default Component.extend(I18n, {
       `${typeof this.listHeader === 'string' ? _.escape(this.listHeader) : this.listHeader} (${membersCount})`
     );
   }),
+
+  isFiltered: computed(
+    'members.length',
+    'membersProxyList.length',
+    function isFiltered() {
+      const membersCount = this.members?.length ?? 0;
+      return membersCount !== this.membersProxyList.length;
+    }
+  ),
+
+  isPagesControlShown: computed(
+    'isListCollapsed',
+    'membersProxyList.length',
+    function isPagesControlShown() {
+      return !this.isListCollapsed && this.membersProxyList.length > minMembersPerPage;
+    }
+  ),
 
   /**
    * @type {Ember.ComputedProperty<string>}
@@ -310,6 +361,10 @@ export default Component.extend(I18n, {
     } else {
       return this.recordType;
     }
+  }),
+
+  persistedPageSizeKey: computed('subjectType', function persistedPageSizeKey() {
+    return `membersCollection.${this.subjectType}PageSize`;
   }),
 
   /**
@@ -453,6 +508,7 @@ export default Component.extend(I18n, {
     'members.@each.{entityId,name,username}',
     'onlyDirect',
     'directMembers.[]',
+    'searchQuery',
     function membersObserver() {
       const {
         owners,
@@ -465,34 +521,12 @@ export default Component.extend(I18n, {
         membersProxyList,
         groupedPrivilegesFlags,
         currentUser,
-        isListCollapsed,
-        collapseForNumber,
         itemActionsGenerator,
         effectiveItemActionsGenerator,
         griAspect,
         griGroupAspects,
-      } = this.getProperties(
-        'owners',
-        'directMembers',
-        'directMembersProxy',
-        'effectiveMembersProxy',
-        'subjectType',
-        'members',
-        'membersProxy',
-        'membersProxyList',
-        'groupedPrivilegesFlags',
-        'currentUser',
-        'isListCollapsed',
-        'collapseForNumber',
-        'itemActionsGenerator',
-        'effectiveItemActionsGenerator',
-        'griAspect',
-        'griGroupAspects',
-      );
-      if (isListCollapsed === undefined && collapseForNumber &&
-        members?.length > collapseForNumber) {
-        this.set('isListCollapsed', true);
-      }
+        searchQuery,
+      } = this;
       // Create ordered list of members. Records should be sorted by name except
       // current user record and owners - they should be always at the top.
       const currentUserMember =
@@ -504,15 +538,20 @@ export default Component.extend(I18n, {
           name,
           username,
         } = getProperties(member, 'entityId', 'name', 'username');
-        let key = member === currentUserMember ? '0\n' : '1\n';
-        key += (owners || []).includes(member) ? '0\n' : '1\n';
-        key += this.directMembers?.includes(member) ? '0\n' : '1\n';
-        key += `${name}\n`;
-        if (subjectType === 'user') {
-          key += `${username || '\n'}\n`;
+        if (
+          (searchQuery && name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          !searchQuery
+        ) {
+          let key = member === currentUserMember ? '0\n' : '1\n';
+          key += (owners || []).includes(member) ? '0\n' : '1\n';
+          key += this.directMembers?.includes(member) ? '0\n' : '1\n';
+          key += `${name}\n`;
+          if (subjectType === 'user') {
+            key += `${username || '\n'}\n`;
+          }
+          key += entityId;
+          membersSortKeys.set(key, member);
         }
-        key += entityId;
-        membersSortKeys.set(key, member);
       });
       const orderedMembers = [...membersSortKeys.keys()].sort()
         .map(key => membersSortKeys.get(key));
@@ -642,6 +681,23 @@ export default Component.extend(I18n, {
     this.membersObserver();
     this.groupsObserver();
     this.set('privilegesRecordProxyCache', []);
+    const pageSize = globals.localStorage.getItem(this.persistedPageSizeKey) ??
+      this.fallbackPageSize;
+    this.set('pageSize', pageSize);
+    this.set('paginator', ArrayPaginator.extend({
+      array: computed('parent.membersProxyList', function array() {
+        return this.parent.membersProxyList ?? [];
+      }),
+      pageSize: reads('parent.pageSize'),
+    }).create({
+      parent: this,
+    }));
+
+    this.set(
+      'isListCollapsed',
+      this.isListCollapsed === undefined &&
+      globals.window.innerHeight < this.listCollapseScreenHeight
+    );
   },
 
   /**
@@ -730,6 +786,13 @@ export default Component.extend(I18n, {
     },
     highlightMemberships(groups) {
       this.set('highlightedMembers', groups);
+    },
+    onSearchInput(value) {
+      this.set('searchQuery', value);
+    },
+    changePerPage(number) {
+      this.set('pageSize', number);
+      globals.localStorage.setItem(this.persistedPageSizeKey, number);
     },
   },
 });
