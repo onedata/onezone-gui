@@ -1,29 +1,29 @@
-{{#promise-proxy-container proxy=spaceProxy}}
-  {{#oneprovider-view-container
-    contentContainerClass="content-shares-index-content"
-    isTabBarCollapsed=true
-    space=spaceProxy.content
-    oneproviderId=oneproviderId
-    mapSelectorEnabled=false
-    resourceType="shares"
-    oneproviderIdChanged=(action "oneproviderIdChanged")
-    hasEmbeddedIframesChanged=(action "hasEmbeddedIframesChanged")
+<PromiseProxyContainer @proxy={{spaceProxy}}>
+  <OneproviderViewContainer
+    @contentContainerClass="content-shares-index-content"
+    @isTabBarCollapsed={{true}}
+    @space={{spaceProxy.content}}
+    @oneproviderId={{oneproviderId}}
+    @mapSelectorEnabled={{false}}
+    @resourceType="shares"
+    @oneproviderIdChanged={{action "oneproviderIdChanged"}}
+    @hasEmbeddedIframesChanged={{action "hasEmbeddedIframesChanged"}}
     as |container|
-  }}
-    {{#container.header class="content-shares-index-header"}}
+  >
+    <container.header class="content-shares-index-header">
       <h1 class="normal-case with-menu">
-        {{#truncated-string class="one-label share-name resource-name"}}
-          {{name-conflict item=share tagName="span" class="one-label"}}
-        {{/truncated-string}}
+        <TruncatedString class="one-label share-name resource-name">
+          <NameConflict @item={{share}} @tagName="span" class="one-label" />
+        </TruncatedString>
       </h1>
-    {{/container.header}}
-    {{#container.body}}
-      {{embedded-content-private-share
-        oneprovider=container.selectedProvider
-        shareId=share.entityId
-        spaceId=spaceProxy.entityId
-        baseUrl=container.selectedProvider.onezoneHostedBaseUrl
-      }}
-    {{/container.body}}
-  {{/oneprovider-view-container}}
-{{/promise-proxy-container}}
+    </container.header>
+    <container.body>
+      <EmbeddedContentPrivateShare
+        @oneprovider={{container.selectedProvider}}
+        @shareId={{share.entityId}}
+        @spaceId={{spaceProxy.entityId}}
+        @baseUrl={{container.selectedProvider.onezoneHostedBaseUrl}}
+      />
+    </container.body>
+  </OneproviderViewContainer>
+</PromiseProxyContainer>

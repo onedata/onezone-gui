@@ -65,7 +65,7 @@ describe(
     });
 
     it('has class "atm-lambda-form"', async function () {
-      await render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form}}`);
+      await render(hbs `<ContentAtmInventoriesLambdas::AtmLambdaForm />`);
 
       expect(this.element.children).to.have.length(1);
       expect(this.element.children[0]).to.have.class('atm-lambda-form');
@@ -1108,19 +1108,19 @@ describe(
 
 async function renderCreate(testCase) {
   testCase.set('submitStub', sinon.stub().resolves());
-  await render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form
-    mode="create"
-    revision=revision
-    onSubmit=submitStub
-    defaultAtmResourceSpec=defaultAtmResourceSpec
-  }}`);
+  await render(hbs `<ContentAtmInventoriesLambdas::AtmLambdaForm
+    @mode="create"
+    @revision={{this.revision}}
+    @onSubmit={{this.submitStub}}
+    @defaultAtmResourceSpec={{this.defaultAtmResourceSpec}}
+  />`);
 }
 
 async function renderView() {
-  await render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form
-    mode="view"
-    revision=revision
-  }}`);
+  await render(hbs `<ContentAtmInventoriesLambdas::AtmLambdaForm
+    @mode="view"
+    @revision={{this.revision}}
+  />`);
 }
 
 async function renderEdit(testCase) {
@@ -1128,12 +1128,12 @@ async function renderEdit(testCase) {
     submitStub: sinon.stub().resolves(),
     cancelSpy: sinon.spy(),
   });
-  await render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form
-    mode="edit"
-    revision=revision
-    onSubmit=submitStub
-    onCancel=cancelSpy
-  }}`);
+  await render(hbs `<ContentAtmInventoriesLambdas::AtmLambdaForm
+    @mode="edit"
+    @revision={{this.revision}}
+    @onSubmit={{this.submitStub}}
+    @onCancel={{this.cancelSpy}}
+  />`);
 }
 
 async function toggleMountSpace(toggleChecked) {

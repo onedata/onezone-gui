@@ -1,43 +1,43 @@
-{{#one-webui-popover
+<OneWebuiPopover
   class="tags-selector space-tags-selector"
-  open=true
-  triggerSelector=(concat "#" elementId)
-  arrow=false
-  registerApi=(action (mut popoverApi))
-  padding=false
-  placement="vertical"
-  popoverStyle="tags-selector"
+  @open={{true}}
+  @triggerSelector={{concat "#" elementId}}
+  @arrow={{false}}
+  @registerApi={{action (mut popoverApi)}}
+  @padding={{false}}
+  @placement="vertical"
+  @popoverStyle="tags-selector"
   as |popover|
-}}
-  {{#click-outside
+>
+  <ClickOutside
     class="selector-container"
-    onClickOutside=onEndTagCreation
-    exceptSelector=popoverClickOutsideIgnoreSelector
-  }}
+    @onClickOutside={{onEndTagCreation}}
+    @exceptSelector={{popoverClickOutsideIgnoreSelector}}
+  >
     {{#if noTagsInOnezone}}
       <p class="text-center no-tags-text">
         {{tt this "noTagsInOnezone"}}
       </p>
     {{else}}
-      {{#bs-button-group
-        value=selectedCategory
+      <BsButtonGroup
+        @value={{selectedCategory}}
         class="category-selector btn-group-justified"
-        type="radio"
-        onChange=(action (mut selectedCategory))
+        @type="radio"
+        @onChange={{action (mut selectedCategory)}}
         as |bg|
-      }}
+      >
         {{#each tagCategoriesItems as |categoryItem|}}
           <div class="btn-group" role="group">
-            {{#bg.button
-              type="default"
-              class=(concat "btn-sm btn-" categoryItem.id)
-              value=categoryItem.id
-            }}
+            <bg.button
+              @type="default"
+              class={{concat "btn-sm btn-" categoryItem.id}}
+              @value={{categoryItem.id}}
+            >
               {{categoryItem.name}}
-            {{/bg.button}}
+            </bg.button>
           </div>
         {{/each}}
-      {{/bs-button-group}}
+      </BsButtonGroup>
 
       <input
         class="input-sm form-control filter-tags-input"
@@ -47,7 +47,7 @@
         placeholder={{tt this "searchPlaceholder"}}
       >
 
-      {{#perfect-scrollbar-element class="tags-container"}}
+      <PerfectScrollbarElement class="tags-container">
         {{#if tagsToRender.length}}
           <ul class="selector-list">
             {{#each tagsToRender key="label" as |tag|}}
@@ -55,7 +55,7 @@
                 class="selector-item"
                 {{action "tagSelected" tag}}
               >
-                {{#truncated-string class="tag-label"}}{{tag.label}}{{/truncated-string}}
+                <TruncatedString class="tag-label">{{tag.label}}</TruncatedString>
               </li>
             {{/each}}
           </ul>
@@ -64,7 +64,7 @@
             {{tt this (if tagsFilterValue "noTagsForFilter" "allCategoryTagsUsed")}}
           </p>
         {{/if}}
-      {{/perfect-scrollbar-element}}
+      </PerfectScrollbarElement>
     {{/if}}
-  {{/click-outside}}
-{{/one-webui-popover}}
+  </ClickOutside>
+</OneWebuiPopover>

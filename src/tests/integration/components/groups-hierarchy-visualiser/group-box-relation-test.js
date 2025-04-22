@@ -34,8 +34,7 @@ describe(
 
       this.set('group', group);
       await render(hbs `
-        {{groups-hierarchy-visualiser/group-box-relation
-          group=group}}
+        <GroupsHierarchyVisualiser::GroupBoxRelation @group={{group}} />
       `);
       const relation = find('.group-box-relation');
       expect(relation).to.have.class('no-view');
@@ -52,9 +51,10 @@ describe(
 
       this.set('group', group);
       await render(hbs `
-        {{groups-hierarchy-visualiser/group-box-relation
-          relationType="children"
-          group=group}}
+        <GroupsHierarchyVisualiser::GroupBoxRelation
+          @relationType="children"
+          @group={{group}}
+        />
       `);
       const relation = find('.group-box-relation');
       expect(relation).to.have.class('loading');
@@ -71,9 +71,10 @@ describe(
 
       this.set('group', group);
       await render(hbs `
-        {{groups-hierarchy-visualiser/group-box-relation
-          relationType="children"
-          group=group}}
+        <GroupsHierarchyVisualiser::GroupBoxRelation
+          @relationType="children"
+          @group={{group}}
+        />
       `);
       const relation = find('.group-box-relation');
       expect(relation).to.have.class('error');
@@ -91,9 +92,10 @@ describe(
 
       this.set('group', group);
       await render(hbs `
-        {{groups-hierarchy-visualiser/group-box-relation
-          relationType="children"
-          group=group}}
+        <GroupsHierarchyVisualiser::GroupBoxRelation
+          @relationType="children"
+          @group={{group}}
+        />
       `);
       await triggerEvent('.group-box-relation', 'dblclick');
       const notifySpy = get(lookupService(this, 'global-notify'), 'spy');
@@ -112,9 +114,10 @@ describe(
 
       this.set('group', group);
       await render(hbs `
-        {{groups-hierarchy-visualiser/group-box-relation
-          relationType="children"
-          group=group}}
+        <GroupsHierarchyVisualiser::GroupBoxRelation
+          @relationType="children"
+          @group={{group}}
+        />
       `);
       const relation = find('.group-box-relation');
       expect(relation).to.have.class('loaded');
@@ -133,9 +136,10 @@ describe(
 
       this.set('group', group);
       await render(hbs `
-        {{groups-hierarchy-visualiser/group-box-relation
-          relationType="parents"
-          group=group}}
+        <GroupsHierarchyVisualiser::GroupBoxRelation
+          @relationType="parents"
+          @group={{group}}
+        />
       `);
       const relation = find('.group-box-relation');
       expect(relation).to.have.class('loaded');

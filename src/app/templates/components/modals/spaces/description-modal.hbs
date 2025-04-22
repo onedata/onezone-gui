@@ -1,38 +1,34 @@
-{{#global-modal
-  classNames="spaces-description-modal"
-  modalId=modalId
-  size="lg"
+<GlobalModal
+  @classNames="spaces-description-modal"
+  @modalId={{modalId}}
+  @size="lg"
   as |modal|
-}}
-  {{#modal.header}}
+>
+  <modal.header>
     <h1>
       <span class="one-label">{{tt this "header"}}</span>
     </h1>
     <h2 class="normal-case">
-      {{#truncated-string class="space-name"}}
+      <TruncatedString class="space-name">
         <div class="inline-icon-container">
           <RecordIcon @modalName="space" />
         </div>
-        {{name-conflict item=spaceData}}
-      {{/truncated-string}}
+        <NameConflict @item={{spaceData}} />
+      </TruncatedString>
     </h2>
-  {{/modal.header}}
+  </modal.header>
 
-  {{#modal.body}}
-    {{one-markdown-to-html
+  <modal.body>
+    <OneMarkdownToHtml
       class="description-markdown-view markdown-view"
-      markdown=spaceData.description
-    }}
-  {{/modal.body}}
+      @markdown={{spaceData.description}}
+    />
+  </modal.body>
 
-  {{#modal.footer class="btn-toolbar"}}
-    {{#one-button
-      type="default"
-      class="close-btn"
-      onClick=modal.close
-    }}
+  <modal.footer class="btn-toolbar">
+    <OneButton @type="default" class="close-btn" @onClick={{modal.close}}>
       {{tt this "close"}}
-    {{/one-button}}
-  {{/modal.footer}}
+    </OneButton>
+  </modal.footer>
 
-{{/global-modal}}
+</GlobalModal>

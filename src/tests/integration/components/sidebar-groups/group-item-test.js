@@ -24,7 +24,7 @@ describe('Integration | Component | sidebar-groups/group-item', function () {
   });
 
   it('renders group name, icon and menu trigger', async function () {
-    await render(hbs `{{sidebar-groups/group-item item=group}}`);
+    await render(hbs `<SidebarGroups::GroupItem @item={{group}} />`);
 
     expect(this.element).to.contain.text(this.get('group.name'));
     expect(find('.oneicon-group')).to.exist;
@@ -32,13 +32,13 @@ describe('Integration | Component | sidebar-groups/group-item', function () {
   });
 
   it('does not render actions menu if inSidenav is true', async function () {
-    await render(hbs `{{sidebar-groups/group-item item=group inSidenav=true}}`);
+    await render(hbs `<SidebarGroups::GroupItem @item={{group}} @inSidenav={{true}} />`);
 
     expect(find('.collapsible-toolbar-toggle')).to.not.exist;
   });
 
   it('allows to access name editor', async function () {
-    await render(hbs `{{sidebar-groups/group-item item=group}}`);
+    await render(hbs `<SidebarGroups::GroupItem @item={{group}} />`);
 
     await click('.collapsible-toolbar-toggle');
     await click(
@@ -56,8 +56,8 @@ describe('Integration | Component | sidebar-groups/group-item', function () {
   }].forEach(({ operation, modalClass }) => {
     it(`shows ${operation} acknowledgment modal`, async function () {
       await render(hbs`
-        {{global-modal-mounter}}
-        {{sidebar-groups/group-item item=group}}
+        <GlobalModalMounter />
+        <SidebarGroups::GroupItem @item={{group}} />
       `);
 
       await click('.collapsible-toolbar-toggle');

@@ -278,7 +278,7 @@ async function showModal(testCase, expandTokens = false) {
     modalOptions,
   } = testCase.getProperties('modalManager', 'modalOptions');
 
-  await render(hbs `{{global-modal-mounter}}`);
+  await render(hbs `<GlobalModalMounter />`);
 
   await modalManager
     .show('clean-obsolete-tokens-modal', modalOptions).shownPromise;

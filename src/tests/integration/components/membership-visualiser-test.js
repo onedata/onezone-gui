@@ -98,27 +98,30 @@ describe('Integration | Component | membership-visualiser', function () {
   });
 
   it('renders all possible paths', async function () {
-    await render(hbs `{{membership-visualiser
-      contextRecord=user
-      targetRecord=groups.[0]}}`);
+    await render(hbs `<MembershipVisualiser
+      @contextRecord={{user}}
+      @targetRecord={{groups.[0]}}
+    />`);
 
     expect(findAll('.membership')).to.have.length(4);
   });
 
   it('renders limited number of possible paths and limit info message', async function () {
-    await render(hbs `{{membership-visualiser
-      maxPathsNumber=3
-      contextRecord=user
-      targetRecord=groups.[0]}}`);
+    await render(hbs `<MembershipVisualiser
+      @maxPathsNumber={{3}}
+      @contextRecord={{user}}
+      @targetRecord={{groups.[0]}}
+    />`);
 
     expect(findAll('.membership')).to.have.length(3);
     expect(find('.limit-info')).to.exist;
   });
 
   it('renders paths in growing-length order', async function () {
-    await render(hbs `{{membership-visualiser
-      contextRecord=user
-      targetRecord=groups.[0]}}`);
+    await render(hbs `<MembershipVisualiser
+      @contextRecord={{user}}
+      @targetRecord={{groups.[0]}}
+    />`);
 
     let prevBlocksNumber = 2;
     findAll('.membership').forEach((membership) => {
@@ -129,10 +132,11 @@ describe('Integration | Component | membership-visualiser', function () {
   });
 
   it('renders all possible paths when visibleBlocks equals 2', async function () {
-    await render(hbs `{{membership-visualiser
-      contextRecord=user
-      visibleBlocks=2
-      targetRecord=groups.[0]}}`);
+    await render(hbs `<MembershipVisualiser
+      @contextRecord={{user}}
+      @visibleBlocks={{2}}
+      @targetRecord={{groups.[0]}}
+    />`);
 
     expect(findAll('.membership')).to.have.length(4);
   });

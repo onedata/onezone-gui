@@ -36,10 +36,10 @@ describe('Integration | Component | one-embedded-container', function () {
 
     await render(hbs `
       <div class="embedded-iframes-container"></div>
-      {{some-embedded-container
-        iframeId="testId"
-        iprop="world"
-      }}
+      <SomeEmbeddedContainer
+        @iframeId="testId"
+        @iprop="world"
+      />
     `);
     const iframe = find('iframe');
     await waitUntil(() => iframe.contentDocument.readyState === 'complete');

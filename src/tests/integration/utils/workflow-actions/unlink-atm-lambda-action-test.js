@@ -149,7 +149,7 @@ describe('Integration | Utility | workflow-actions/unlink-atm-lambda-action',
     });
 
     it('shows modal on execute', async function () {
-      await render(hbs `{{global-modal-mounter}}`);
+      await render(hbs `<GlobalModalMounter />`);
       this.get('action').execute();
       await settled();
 
@@ -160,7 +160,7 @@ describe('Integration | Utility | workflow-actions/unlink-atm-lambda-action',
 
     it('returns promise with cancelled ActionResult after execute() and modal close using "Cancel"',
       async function () {
-        await render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `<GlobalModalMounter />`);
 
         const resultPromise = this.get('action').execute();
         await settled();
@@ -189,7 +189,7 @@ describe('Integration | Utility | workflow-actions/unlink-atm-lambda-action',
           lookupService(this, 'global-notify'),
           'success'
         );
-        await render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `<GlobalModalMounter />`);
 
         const actionResultPromise = action.execute();
         await settled();
@@ -227,7 +227,7 @@ describe('Integration | Utility | workflow-actions/unlink-atm-lambda-action',
           lookupService(this, 'global-notify'),
           'success'
         );
-        await render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `<GlobalModalMounter />`);
 
         const actionResultPromise = action.execute();
         await settled();
@@ -262,7 +262,7 @@ describe('Integration | Utility | workflow-actions/unlink-atm-lambda-action',
           lookupService(this, 'global-notify'),
           'backendError'
         );
-        await render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `<GlobalModalMounter />`);
 
         const actionResultPromise = action.execute();
         await settled();
@@ -302,7 +302,7 @@ describe('Integration | Utility | workflow-actions/unlink-atm-lambda-action',
           lookupService(this, 'global-notify'),
           'backendError'
         );
-        await render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `<GlobalModalMounter />`);
 
         const actionResultPromise = action.execute();
         await settled();

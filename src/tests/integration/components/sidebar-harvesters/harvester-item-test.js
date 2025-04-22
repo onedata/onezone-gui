@@ -23,7 +23,7 @@ describe('Integration | Component | sidebar-harvesters/harvester-item', function
   });
 
   it('renders harvester name, icon and menu trigger', async function () {
-    await render(hbs `{{sidebar-harvesters/harvester-item item=harvester}}`);
+    await render(hbs `<SidebarHarvesters::HarvesterItem @item={{harvester}} />`);
 
     expect(this.element).to.contain.text(this.get('harvester.name'));
     expect(find('.oneicon-light-bulb')).to.exist;
@@ -31,13 +31,16 @@ describe('Integration | Component | sidebar-harvesters/harvester-item', function
   });
 
   it('does not render actions menu if inSidenav is true', async function () {
-    await render(hbs `{{sidebar-harvesters/harvester-item item=harvester inSidenav=true}}`);
+    await render(hbs `<SidebarHarvesters::HarvesterItem
+      @item={{harvester}}
+      @inSidenav={{true}}
+    />`);
 
     expect(find('.collapsible-toolbar-toggle')).to.not.exist;
   });
 
   it('allows to access name editor', async function () {
-    await render(hbs `{{sidebar-harvesters/harvester-item item=harvester}}`);
+    await render(hbs `<SidebarHarvesters::HarvesterItem @item={{harvester}} />`);
 
     await click('.collapsible-toolbar-toggle');
     await click(globals.document.querySelector('.webui-popover.in .rename-harvester-action'));
@@ -53,8 +56,8 @@ describe('Integration | Component | sidebar-harvesters/harvester-item', function
   }].forEach(({ operation, modalClass }) => {
     it(`shows ${operation} acknowledgment modal`, async function () {
       await render(hbs`
-        {{global-modal-mounter}}
-        {{sidebar-harvesters/harvester-item item=harvester}}
+        <GlobalModalMounter />
+        <SidebarHarvesters::HarvesterItem @item={{harvester}} />
       `);
 
       await click('.collapsible-toolbar-toggle');

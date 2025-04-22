@@ -76,7 +76,7 @@ describe('Integration | Component | providers-list', function () {
   });
 
   it('renders list of providers', async function () {
-    await render(hbs `{{providers-list providersData=providersData}}`);
+    await render(hbs `<ProvidersList @providersData={{providersData}} />`);
 
     const list = find('.one-collapsible-list');
     expect(list.children).to.have.length(4);
@@ -86,7 +86,7 @@ describe('Integration | Component | providers-list', function () {
   });
 
   it('sets icon colors according to provider object setting', async function () {
-    await render(hbs `{{providers-list providersData=providersData}}`);
+    await render(hbs `<ProvidersList @providersData={{providersData}} />`);
 
     const firstItemIcon =
       find('.one-collapsible-list-item:nth-child(2) .one-icon');
@@ -98,10 +98,10 @@ describe('Integration | Component | providers-list', function () {
     const providersFilterSpy = sinon.spy();
     this.set('providersFilter', providersFilterSpy);
 
-    await render(hbs `{{providers-list
-      providersData=providersData
-      providersFilterAction=(action providersFilter)
-    }}`);
+    await render(hbs `<ProvidersList
+      @providersData={{providersData}}
+      @providersFilterAction={{action providersFilter}}
+    />`);
     expect(providersFilterSpy).to.be.calledOnce;
     expect(providersFilterSpy).to.be.calledWith(
       sinon.match.array.deepEquals(
@@ -115,10 +115,10 @@ describe('Integration | Component | providers-list', function () {
       const providersFilterSpy = sinon.spy();
       this.set('providersFilter', providersFilterSpy);
 
-      await render(hbs `{{providers-list
-        providersData=providersData
-        providersFilterAction=(action providersFilter)
-      }}`);
+      await render(hbs `<ProvidersList
+        @providersData={{providersData}}
+        @providersFilterAction={{action providersFilter}}
+      />`);
 
       await fillIn('.search-bar', '1');
       expect(providersFilterSpy).to.be.calledTwice;
@@ -136,10 +136,10 @@ describe('Integration | Component | providers-list', function () {
       class: 'action-trigger',
     }]);
 
-    await render(hbs `{{providers-list
-      providersData=providersData
-      providerActions=actions
-    }}`);
+    await render(hbs `<ProvidersList
+      @providersData={{providersData}}
+      @providerActions={{actions}}
+    />`);
     await click('.one-collapsible-list-item:nth-child(2) .provider-menu-toggle');
     await click(globals.document.querySelector('.webui-popover.in .action-trigger'));
     expect(actionSpy).to.be.calledOnce;
@@ -147,10 +147,10 @@ describe('Integration | Component | providers-list', function () {
   });
 
   it('shows information about supported spaces', async function () {
-    await render(hbs `{{providers-list
-      providersData=providersData
-      selectedSpace=selectedSpace
-    }}`);
+    await render(hbs `<ProvidersList
+      @providersData={{providersData}}
+      @selectedSpace={{selectedSpace}}
+    />`);
 
     const firstProviderItem = find(
       '.one-collapsible-list-item:nth-child(2)'

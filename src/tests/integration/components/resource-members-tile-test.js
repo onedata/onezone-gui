@@ -16,7 +16,7 @@ describe('Integration | Component | resource-members-tile', function () {
       effGroupList: resolve({ length: 3 }),
       effUserList: resolve({ length: 4 }),
     }));
-    await render(hbs `{{resource-members-tile record=record}}`);
+    await render(hbs `<ResourceMembersTile @record={{record}} />`);
 
     expect(find('.direct-groups-counter')).to.contain.text('1');
     expect(find('.direct-users-counter')).to.contain.text('2');

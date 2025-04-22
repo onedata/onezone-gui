@@ -52,7 +52,7 @@ describe(
     });
 
     it('shows modal on execute', async function () {
-      await render(hbs `{{global-modal-mounter}}`);
+      await render(hbs `<GlobalModalMounter />`);
       this.get('action').execute();
       await settled();
 
@@ -70,7 +70,7 @@ describe(
     it(
       'returns promise with cancelled ActionResult after execute() and modal close using "Cancel"',
       async function () {
-        await render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `<GlobalModalMounter />`);
 
         const resultPromise = this.get('action').execute();
         await settled();
@@ -91,7 +91,7 @@ describe(
           lookupService(this, 'global-notify'),
           'success'
         );
-        await render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `<GlobalModalMounter />`);
 
         const actionResultPromise = this.get('action').execute();
         await settled();
@@ -118,7 +118,7 @@ describe(
           lookupService(this, 'global-notify'),
           'backendError'
         );
-        await render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `<GlobalModalMounter />`);
 
         const actionResultPromise = this.get('action').execute();
         await settled();

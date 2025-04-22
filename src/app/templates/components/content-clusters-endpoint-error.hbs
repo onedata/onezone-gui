@@ -1,24 +1,22 @@
-{{#error-check-view
-  tryErrorCheckProxy=tryErrorCheckProxy
-  errorCheckProxy=errorCheckProxy
-}}
-  {{#content-info
+<ErrorCheckView
+  @tryErrorCheckProxy={{tryErrorCheckProxy}}
+  @errorCheckProxy={{errorCheckProxy}}
+>
+  <ContentInfo
     class="scroll-breakpoint-700"
-    header=(tt this "header")
-    imagePath=(root-url "assets/images/no-connection.svg")
-  }}
+    @header={{tt this "header"}}
+    @imagePath={{root-url "assets/images/no-connection.svg"}}
+  >
     <p class="lead">
       <ul class="info">
         <li>
           {{tt this "liTryAgain1"}}
-          {{#link-to
-            "onedata.sidebar.content.aspect"
-            "clusters"
-            (model-routable-id cluster)
-            "overview"
-          }}
+          <LinkTo
+            @route="onedata.sidebar.content.aspect"
+            @models={{array "clusters" (model-routable-id cluster) "overview"}}
+          >
             {{tt this "liTryAgainLink"}}
-          {{/link-to}}
+          </LinkTo>
           {{tt this "liTryAgain2"}}.
         </li>
         <li>
@@ -32,16 +30,14 @@
         {{#if (eq cluster.type "oneprovider")}}
           <li>
             {{tt this "liDeregister1"}}
-            {{#link-to
-              "onedata.sidebar.content.aspect"
-              "clusters"
-              clusterEntityId
-              "deregister"
+            <LinkTo
+              @route="onedata.sidebar.content.aspect"
+              @models={{array "clusters" clusterEntityId "deregister"}}
               class="text-danger"
-            }}{{tt this "liDeregisterLink"}}{{/link-to}}.
+            >{{tt this "liDeregisterLink"}}</LinkTo>.
           </li>
         {{/if}}
       </ul>
     </p>
-  {{/content-info}}
-{{/error-check-view}}
+  </ContentInfo>
+</ErrorCheckView>

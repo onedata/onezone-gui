@@ -12,21 +12,17 @@
   </h1>
 </div>
 <div class="task-form-container">
-  {{!--
-    TODO: VFS-12694 For some unknown reason, turing this component invocation into
-    AngleBrackets cause SYNC_OBSERVER cleanup test to fail
-  --}}
-  {{workflow-visualiser/task-form
-    mode=mode
-    atmLambda=atmLambda
-    atmLambdaRevisionNumber=revisionNumber
-    definedStores=definedStores
-    task=task
-    isShown=isShown
-    isDisabled=isSubmittingData
-    actionsFactory=actionsFactory
-    onChange=(action "formDataChanged")
-  }}
+  <WorkflowVisualiser::TaskForm
+    @mode={{mode}}
+    @atmLambda={{atmLambda}}
+    @atmLambdaRevisionNumber={{revisionNumber}}
+    @definedStores={{definedStores}}
+    @task={{this.task}}
+    @isShown={{isShown}}
+    @isDisabled={{isSubmittingData}}
+    @actionsFactory={{actionsFactory}}
+    @onChange={{action "formDataChanged"}}
+  />
   <div class="btn-toolbar">
     <OneButton
       @type="primary"

@@ -3,7 +3,7 @@
     {{subjectDescription}}
   </p>
 {{/if}}
-{{#promise-proxy-container proxy=dataLoadingProxy sizeClass="sm"}}
+<PromiseProxyContainer @proxy={{dataLoadingProxy}} @sizeClass="sm">
   <p class="limitations-description">
     <span class="limitations-text"><strong>{{limitationsDescription}}</strong></span>
     {{#if showCustomTokenLink}}
@@ -17,19 +17,19 @@
       {{tt this "postCustomTokenLabel"}}
     {{/if}}
   </p>
-  {{one-clipboard-line
-    value=generatedTokenProxy.content
-    type="textarea"
-    inputClass="token-textarea"
-    textareaRows=7
-  }}
+  <OneClipboardLine
+    @value={{generatedTokenProxy.content}}
+    @type="textarea"
+    @inputClass="token-textarea"
+    @textareaRows={{7}}
+  />
   {{#if variablesDescription}}
     <p class="variables-description">
       {{variablesDescription.content}}
       {{#if variablesDescription.tip}}
-        {{one-label-tip title=variablesDescription.tip}}
+        <OneLabelTip @title={{variablesDescription.tip}} />
       {{/if}}
     </p>
   {{/if}}
-{{/promise-proxy-container}}
+</PromiseProxyContainer>
 {{yield}}

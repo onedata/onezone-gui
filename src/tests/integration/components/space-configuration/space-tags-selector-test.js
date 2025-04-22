@@ -18,7 +18,7 @@ describe('Integration | Component | space-configuration/space-tags-selector', fu
       world: ['three', 'four', 'five'],
     });
 
-    await render(hbs `{{space-configuration/space-tags-selector}}`);
+    await render(hbs `<SpaceConfiguration::SpaceTagsSelector />`);
 
     const selector = getSelector();
     expect(selector).to.exist;
@@ -34,7 +34,7 @@ describe('Integration | Component | space-configuration/space-tags-selector', fu
       second: ['hello3', 'world2'],
     });
 
-    await render(hbs `{{space-configuration/space-tags-selector}}`);
+    await render(hbs `<SpaceConfiguration::SpaceTagsSelector />`);
 
     const selector = getSelector();
     const filterTagsInput = find('.filter-tags-input');

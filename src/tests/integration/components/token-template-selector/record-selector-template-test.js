@@ -31,19 +31,19 @@ describe(
     });
 
     it('renders template-tile dedicated for specified template', async function () {
-      await render(hbs `{{token-template-selector/record-selector-template
-        templateName="custom"
-      }}`);
+      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
+        @templateName="custom"
+      />`);
 
       expect(find('.template-custom')).to.exist;
       expect(find('.tile-title')).to.have.trimmed.text('Custom');
     });
 
     it('renders first slide with template image, which is active on init', async function () {
-      await render(hbs `{{token-template-selector/record-selector-template
-        templateName="custom"
-        imagePath="some-path.svg"
-      }}`);
+      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
+        @templateName="custom"
+        @imagePath="some-path.svg"
+      />`);
 
       expect(isSlideActive('intro')).to.be.true;
       expect(getSlide('intro').querySelector('.main-image').getAttribute('src'))
@@ -51,14 +51,14 @@ describe(
     });
 
     it('shows selector slide on click', async function () {
-      await render(hbs `{{token-template-selector/record-selector-template}}`);
+      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate />`);
       await click('.one-tile');
 
       expect(isSlideActive('selector')).to.be.true;
     });
 
     it('does not change slide on click when selector slide is active', async function () {
-      await render(hbs `{{token-template-selector/record-selector-template}}`);
+      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate />`);
       await click('.one-tile');
       await click('.one-tile');
 
@@ -66,7 +66,7 @@ describe(
     });
 
     it('allows to come back to the intro slide using "Back" link', async function () {
-      await render(hbs `{{token-template-selector/record-selector-template}}`);
+      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate />`);
       await click('.one-tile');
 
       const link = getSlide('selector').querySelector('.template-back');
@@ -79,9 +79,9 @@ describe(
     it('does not render list of records, when the intro slide is active', async function () {
       const fetchRecordsSpy = this.set('fetchRecordsSpy', sinon.spy());
 
-      await render(hbs `{{token-template-selector/record-selector-template
-        fetchRecords=fetchRecordsSpy
-      }}`);
+      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
+        @fetchRecords={{fetchRecordsSpy}}
+      />`);
 
       expect(fetchRecordsSpy).to.be.not.called;
       expect(getSlide('selector').querySelector('.records-container')).to.not.exist;
@@ -93,9 +93,9 @@ describe(
         sinon.stub().returns(new Promise(() => {}))
       );
 
-      await render(hbs `{{token-template-selector/record-selector-template
-        fetchRecords=fetchRecordsSpy
-      }}`);
+      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
+        @fetchRecords={{fetchRecordsSpy}}
+      />`);
       await click('.one-tile');
 
       expect(fetchRecordsSpy).to.be.calledOnce;
@@ -110,9 +110,9 @@ describe(
           sinon.stub().returns(new Promise(() => {}))
         );
 
-        await render(hbs `{{token-template-selector/record-selector-template
-          fetchRecords=fetchRecordsSpy
-        }}`);
+        await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
+          @fetchRecords={{fetchRecordsSpy}}
+        />`);
         await click('.one-tile');
         await click('.template-back');
         await click('.one-tile');
@@ -129,9 +129,9 @@ describe(
           sinon.stub().resolves([])
         );
 
-        await render(hbs `{{token-template-selector/record-selector-template
-          fetchRecords=fetchRecordsSpy
-        }}`);
+        await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
+          @fetchRecords={{fetchRecordsSpy}}
+        />`);
         await click('.one-tile');
         await click('.template-back');
         await click('.one-tile');
@@ -153,9 +153,9 @@ describe(
         name: 'p2',
       }]));
 
-      await render(hbs `{{token-template-selector/record-selector-template
-        fetchRecords=fetchRecords
-      }}`);
+      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
+        @fetchRecords={{fetchRecords}}
+      />`);
       await click('.one-tile');
 
       const selectorSlide = getSlide('selector');
@@ -171,10 +171,10 @@ describe(
     it('shows information about no records available', async function () {
       this.set('fetchRecords', () => resolve([]));
 
-      await render(hbs `{{token-template-selector/record-selector-template
-        templateName="custom"
-        fetchRecords=fetchRecords
-      }}`);
+      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
+        @templateName="custom"
+        @fetchRecords={{fetchRecords}}
+      />`);
       await click('.one-tile');
       const selectorSlide = getSlide('selector');
 
@@ -190,11 +190,11 @@ describe(
         selectedSpy: sinon.spy(),
       });
 
-      await render(hbs `{{token-template-selector/record-selector-template
-        templateName="custom"
-        fetchRecords=fetchRecords
-        onSelected=selectedSpy
-      }}`);
+      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
+        @templateName="custom"
+        @fetchRecords={{fetchRecords}}
+        @onSelected={{selectedSpy}}
+      />`);
       await click('.one-tile');
       await click('.record-item');
 
@@ -205,9 +205,9 @@ describe(
     it('comes back to intro slide after record selection', async function () {
       this.set('fetchRecords', () => resolve([{ name: 'p1' }]));
 
-      await render(hbs `{{token-template-selector/record-selector-template
-        fetchRecords=fetchRecords
-      }}`);
+      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
+        @fetchRecords={{fetchRecords}}
+      />`);
       await click('.one-tile');
       await click('.record-item');
 
@@ -221,9 +221,9 @@ describe(
         name: 'p2',
       }]));
 
-      await render(hbs `{{token-template-selector/record-selector-template
-        fetchRecords=fetchRecords
-      }}`);
+      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
+        @fetchRecords={{fetchRecords}}
+      />`);
       await click('.one-tile');
       const selectorSlide = getSlide('selector');
       await fillIn(selectorSlide.querySelector('.search-bar'), '2');
@@ -246,10 +246,10 @@ describe(
         filterMatcher: ({ otherName }, filter) => otherName.includes(filter),
       });
 
-      await render(hbs `{{token-template-selector/record-selector-template
-        filterMatcher=filterMatcher
-        fetchRecords=fetchRecords
-      }}`);
+      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
+        @filterMatcher={{filterMatcher}}
+        @fetchRecords={{fetchRecords}}
+      />`);
       await click('.one-tile');
       const selectorSlide = getSlide('selector');
       await fillIn(selectorSlide.querySelector('.search-bar'), '2');
@@ -266,9 +266,9 @@ describe(
         name: 'p2',
       }]));
 
-      await render(hbs `{{token-template-selector/record-selector-template
-        fetchRecords=fetchRecords
-      }}`);
+      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
+        @fetchRecords={{fetchRecords}}
+      />`);
       await click('.one-tile');
       const selectorSlide = getSlide('selector');
       await fillIn(selectorSlide.querySelector('.search-bar'), '3');
@@ -292,11 +292,11 @@ describe(
         filterMatcher: ({ otherName }, filter) => otherName.includes(filter),
       });
 
-      await render(hbs `{{token-template-selector/record-selector-template
-        filterDependentKeys=(array "otherName")
-        filterMatcher=filterMatcher
-        fetchRecords=fetchRecords
-      }}`);
+      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
+        @filterDependentKeys={{array "otherName"}}
+        @filterMatcher={{filterMatcher}}
+        @fetchRecords={{fetchRecords}}
+      />`);
       await click('.one-tile');
       const selectorSlide = getSlide('selector');
       await fillIn(selectorSlide.querySelector('.search-bar'), '3');
@@ -316,9 +316,9 @@ describe(
         sinon.stub().returns(new Promise((resolve, reject) => rejectPromise = reject))
       );
 
-      await render(hbs `{{token-template-selector/record-selector-template
-        fetchRecords=fetchRecordsSpy
-      }}`);
+      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
+        @fetchRecords={{fetchRecordsSpy}}
+      />`);
       await click('.one-tile');
       rejectPromise('recordserror');
       await settled();
@@ -339,9 +339,9 @@ describe(
           sinon.stub().returns(new Promise((resolve, reject) => rejectPromise = reject))
         );
 
-        await render(hbs `{{token-template-selector/record-selector-template
-          fetchRecords=fetchRecordsSpy
-        }}`);
+        await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
+          @fetchRecords={{fetchRecordsSpy}}
+        />`);
         await click('.one-tile');
         rejectPromise('recordserror');
         await settled();

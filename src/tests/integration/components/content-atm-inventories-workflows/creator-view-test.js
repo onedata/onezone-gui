@@ -25,7 +25,7 @@ describe('Integration | Component | content-atm-inventories-workflows/creator-vi
     });
 
     it('has class "content-atm-inventories-workflows-creator-view"', async function () {
-      await render(hbs `{{content-atm-inventories-workflows/creator-view}}`);
+      await render(hbs `<ContentAtmInventoriesWorkflows::CreatorView />`);
 
       expect(this.element.children).to.have.length(1);
       expect(this.element.children[0])
@@ -113,9 +113,9 @@ describe('Integration | Component | content-atm-inventories-workflows/creator-vi
   });
 
 async function renderComponent() {
-  await render(hbs `{{content-atm-inventories-workflows/creator-view
-    atmInventory=atmInventory
-    onBackSlide=backSlideSpy
-    onAtmWorkflowSchemaAdded=atmWorkflowSchemaAddedSpy
-  }}`);
+  await render(hbs `<ContentAtmInventoriesWorkflows::CreatorView
+    @atmInventory={{atmInventory}}
+    @onBackSlide={{backSlideSpy}}
+    @onAtmWorkflowSchemaAdded={{atmWorkflowSchemaAddedSpy}}
+  />`);
 }

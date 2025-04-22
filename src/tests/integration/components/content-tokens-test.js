@@ -23,20 +23,20 @@ describe('Integration | Component | content-tokens', function () {
   });
 
   it('has class content-tokens', async function () {
-    await render(hbs `{{content-tokens}}`);
+    await render(hbs `<ContentTokens />`);
 
     expect(find('.content-tokens')).to.exist;
   });
 
   it('shows token name in header', async function () {
-    await render(hbs `{{content-tokens token=token}}`);
+    await render(hbs `<ContentTokens @token={{token}} />`);
 
     expect(find('h1 .token-name'))
       .to.have.trimmed.text(this.get('token.name'));
   });
 
   it('shows modify action trigger', async function () {
-    await render(hbs `{{content-tokens token=token}}`);
+    await render(hbs `<ContentTokens @token={{token}} />`);
 
     const trigger = find('.edit-token-action-btn');
     expect(trigger).to.exist;
@@ -46,7 +46,7 @@ describe('Integration | Component | content-tokens', function () {
   });
 
   it('shows token editor component in view mode with token data', async function () {
-    await render(hbs `{{content-tokens token=token}}`);
+    await render(hbs `<ContentTokens @token={{token}} />`);
 
     expect(find('.token-editor')).to.have.class('view-mode');
     // Not have to test other fields - we only need to check if token is passed to
@@ -55,7 +55,7 @@ describe('Integration | Component | content-tokens', function () {
   });
 
   it('changes mode to "edit" after clicking "Modify" button', async function () {
-    await render(hbs `{{content-tokens token=token}}`);
+    await render(hbs `<ContentTokens @token={{token}} />`);
 
     await click('.edit-token-action-btn');
     expect(find('.token-editor')).to.have.class('edit-mode');
@@ -74,7 +74,7 @@ describe('Integration | Component | content-tokens', function () {
         sinon.stub(tokenActions, 'createModifyTokenAction')
         .returns(modifyTokenAction);
 
-      await render(hbs `{{content-tokens token=token}}`);
+      await render(hbs `<ContentTokens @token={{token}} />`);
 
       await click('.edit-token-action-btn');
       await fillIn('.name-field input', 'token2');
@@ -104,7 +104,7 @@ describe('Integration | Component | content-tokens', function () {
       sinon.stub(tokenActions, 'createModifyTokenAction')
         .returns(modifyTokenAction);
 
-      await render(hbs `{{content-tokens token=token}}`);
+      await render(hbs `<ContentTokens @token={{token}} />`);
 
       await click('.edit-token-action-btn');
       await click('.submit-token');
@@ -125,7 +125,7 @@ describe('Integration | Component | content-tokens', function () {
       sinon.stub(tokenActions, 'createModifyTokenAction')
         .returns(modifyTokenAction);
 
-      await render(hbs `{{content-tokens token=token}}`);
+      await render(hbs `<ContentTokens @token={{token}} />`);
 
       await click('.edit-token-action-btn');
       await click('.submit-token');
@@ -143,7 +143,7 @@ describe('Integration | Component | content-tokens', function () {
       sinon.stub(tokenActions, 'createModifyTokenAction')
         .returns(modifyTokenAction);
 
-      await render(hbs `{{content-tokens token=token}}`);
+      await render(hbs `<ContentTokens @token={{token}} />`);
 
       await click('.edit-token-action-btn');
       await click('.submit-token');
@@ -154,7 +154,7 @@ describe('Integration | Component | content-tokens', function () {
   it(
     'comes back to view mode after clicking "cancel" and rollbacks all changes',
     async function () {
-      await render(hbs `{{content-tokens token=token}}`);
+      await render(hbs `<ContentTokens @token={{token}} />`);
 
       await click('.edit-token-action-btn');
       await fillIn('.name-field input', 'test');
@@ -169,7 +169,7 @@ describe('Integration | Component | content-tokens', function () {
   it(
     'comes back to view mode when is in edit mode and token instance has changed',
     async function () {
-      await render(hbs `{{content-tokens token=token}}`);
+      await render(hbs `<ContentTokens @token={{token}} />`);
 
       await click('.edit-token-action-btn');
       this.set('token', {

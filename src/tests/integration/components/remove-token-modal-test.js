@@ -15,7 +15,7 @@ describe('Integration | Component | remove-token-modal', function () {
   });
 
   it('renders token name inside message', async function () {
-    await render(hbs `{{remove-token-modal opened=true token=token}}`);
+    await render(hbs `<RemoveTokenModal @opened={{true}} @token={{token}} />`);
 
     expect(globals.document.querySelector('.remove-token-modal.in'))
       .to.contain.text(this.get('token.name'));

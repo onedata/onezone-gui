@@ -24,19 +24,19 @@ describe(
     });
 
     it('renders template-tile dedicated for specified template', async function () {
-      await render(hbs `{{token-template-selector/single-step-template
-        templateName="custom"
-      }}`);
+      await render(hbs `<TokenTemplateSelector::SingleStepTemplate
+        @templateName="custom"
+      />`);
 
       expect(find('.template-custom')).to.exist;
       expect(find('.tile-title')).to.have.trimmed.text('Custom');
     });
 
     it('renders template image', async function () {
-      await render(hbs `{{token-template-selector/single-step-template
-        templateName="custom"
-        imagePath="some-path.svg"
-      }}`);
+      await render(hbs `<TokenTemplateSelector::SingleStepTemplate
+        @templateName="custom"
+        @imagePath="some-path.svg"
+      />`);
 
       expect(find('.main-image')).to.have.attr('src', 'some-path.svg');
     });
@@ -44,10 +44,10 @@ describe(
     it('notifies about selection', async function () {
       const selectedSpy = this.set('selectedSpy', sinon.spy());
 
-      await render(hbs `{{token-template-selector/single-step-template
-        templateName="custom"
-        onSelected=selectedSpy
-      }}`);
+      await render(hbs `<TokenTemplateSelector::SingleStepTemplate
+        @templateName="custom"
+        @onSelected={{selectedSpy}}
+      />`);
 
       await click('.one-tile');
       expect(selectedSpy).to.be.calledOnce;

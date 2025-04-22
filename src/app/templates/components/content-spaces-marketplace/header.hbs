@@ -1,5 +1,5 @@
-{{content-spaces-marketplace/content-header viewModel=viewModel}}
+<ContentSpacesMarketplace::ContentHeader @viewModel={{viewModel}} />
 {{#if isFilterHeaderShown}}
-  {{content-spaces-marketplace/filter-header viewModel=viewModel}}
+  <ContentSpacesMarketplace::FilterHeader @viewModel={{viewModel}} />
 {{/if}}
 {{yield}}

@@ -40,7 +40,7 @@ describe(
     it(
       'renders tile with "template-restrictedData" class, correct title and image',
       async function () {
-        await render(hbs `{{token-template-selector/restricted-data-template}}`);
+        await render(hbs `<TokenTemplateSelector::RestrictedDataTemplate />`);
 
         const tile = find('.one-tile');
         expect(tile).to.have.class('template-restrictedData');
@@ -52,7 +52,7 @@ describe(
     );
 
     it('shows list of spaces', async function () {
-      await render(hbs `{{token-template-selector/restricted-data-template}}`);
+      await render(hbs `<TokenTemplateSelector::RestrictedDataTemplate />`);
 
       await click('.one-tile');
       const records = findAll('.record-item');
@@ -65,7 +65,7 @@ describe(
     it('shows information about no spaces to choose', async function () {
       this.get('spaces').clear();
 
-      await render(hbs `{{token-template-selector/restricted-data-template}}`);
+      await render(hbs `<TokenTemplateSelector::RestrictedDataTemplate />`);
 
       await click('.one-tile');
       expect(find('.no-records-info')).to.have.trimmed.text('You have no spaces.');
@@ -74,9 +74,9 @@ describe(
     it('passes template name and template via selection handler', async function () {
       const selectedSpy = this.set('selectedSpy', sinon.spy());
 
-      await render(hbs `{{token-template-selector/restricted-data-template
-        onSelected=selectedSpy
-      }}`);
+      await render(hbs `<TokenTemplateSelector::RestrictedDataTemplate
+        @onSelected={{selectedSpy}}
+      />`);
 
       await click('.one-tile');
       await click('.record-item:first-child');

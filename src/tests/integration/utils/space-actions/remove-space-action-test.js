@@ -55,7 +55,7 @@ describe(
         context: this.get('context'),
       });
 
-      await render(hbs `{{global-modal-mounter}}`);
+      await render(hbs `<GlobalModalMounter />`);
       this.action.execute();
       await settled();
 
@@ -80,7 +80,7 @@ describe(
           context: this.get('context'),
         });
 
-        await render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `<GlobalModalMounter />`);
         const resultPromise = this.action.execute();
         await settled();
 
@@ -109,7 +109,7 @@ describe(
           'redirectToCollectionIfResourceNotExist'
         );
 
-        await render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `<GlobalModalMounter />`);
         const actionResultPromise = this.action.execute();
         await settled();
 
@@ -142,7 +142,7 @@ describe(
           'backendError'
         );
 
-        await render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `<GlobalModalMounter />`);
         const actionResultPromise = this.action.execute();
         await settled();
 

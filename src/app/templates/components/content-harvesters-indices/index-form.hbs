@@ -1,22 +1,18 @@
 <form class="form form-horizontal form-component clearfix">
-  {{form-component/field-renderer field=fields}}
+  <FormComponent::FieldRenderer @field={{fields}} />
   {{#if (eq mode "create")}}
     <div class="btn-toolbar">
-      {{#one-button
-        class="cancel-btn"
-        disabled=isCreating
-        onClick=onCancel
-      }}
+      <OneButton class="cancel-btn" @disabled={{isCreating}} @onClick={{onCancel}}>
         {{tt this "cancelBtnText"}}
-      {{/one-button}}
-      {{#one-button
-        type="primary"
+      </OneButton>
+      <OneButton
+        @type="primary"
         class="create-btn"
-        disabled=(not fields.isValid)
-        onClick=(action "create")
-      }}
+        @disabled={{not fields.isValid}}
+        @onClick={{action "create"}}
+      >
         {{tt this "createBtnText"}}
-      {{/one-button}}
+      </OneButton>
     </div>
   {{/if}}
 </form>

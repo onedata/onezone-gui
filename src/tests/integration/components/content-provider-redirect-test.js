@@ -69,10 +69,10 @@ describe('Integration | Component | content-provider-redirect', function () {
 
       this.setProperties({ provider, checkIsProviderAvailable });
 
-      await render(hbs `{{content-provider-redirect
-        checkIsProviderAvailable=checkIsProviderAvailable
-        provider=provider
-      }}`);
+      await render(hbs `<ContentProviderRedirect
+        @checkIsProviderAvailable={{checkIsProviderAvailable}}
+        @provider={{provider}}
+      />`);
 
       const contentProviderRedirect = find('.content-provider-redirect');
       expect(contentProviderRedirect).to.exist;
@@ -113,13 +113,13 @@ describe('Integration | Component | content-provider-redirect', function () {
         throwEndpointError,
       });
 
-      await render(hbs `{{content-provider-redirect
-        checkIsProviderAvailable=checkIsProviderAvailable
-        showEndpointErrorModal=showEndpointErrorModal
-        transitionToProviderOnMap=transitionToProviderOnMap
-        throwEndpointError=throwEndpointError
-        provider=provider
-      }}`);
+      await render(hbs `<ContentProviderRedirect
+        @checkIsProviderAvailable={{checkIsProviderAvailable}}
+        @showEndpointErrorModal={{showEndpointErrorModal}}
+        @transitionToProviderOnMap={{transitionToProviderOnMap}}
+        @throwEndpointError={{throwEndpointError}}
+        @provider={{provider}}
+      />`);
 
       expect(checkIsProviderAvailable).to.be.calledOnce;
       expect(showEndpointErrorModal).to.be.calledOnce;

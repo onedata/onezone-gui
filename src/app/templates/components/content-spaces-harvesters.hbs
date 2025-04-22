@@ -4,43 +4,40 @@
       <span class="one-label">
         {{tt this "header"}}
       </span>
-      {{actions-toolbar isMinimized=true actionsArray=globalActions}}
+      <ActionsToolbar @isMinimized={{true}} @actionsArray={{globalActions}} />
     </h1>
   </div>
 {{/if}}
-{{#promise-proxy-container proxy=spaceHarvestersProxy}}
+<PromiseProxyContainer @proxy={{spaceHarvestersProxy}}>
   {{#if (eq spaceHarvestersProxy.length 0)}}
-    {{#content-info
-      imagePath=(root-url "assets/images/harvester-space-new.svg")
+    <ContentInfo
+      @imagePath={{root-url "assets/images/harvester-space-new.svg"}}
       class="scroll-breakpoint-700"
-      header=(tt this "empty.header")
-      text=(tt this "empty.description")
-    }}
+      @header={{tt this "empty.header"}}
+      @text={{tt this "empty.description"}}
+    >
       <div class="action-buttons">
-        {{#one-button
-          type="primary"
-          class=(concat-classes "btn-content-info" addHarvesterAction.className)
-          onClick=addHarvesterAction.executeCallback
-        }}
+        <OneButton
+          @type="primary"
+          class={{concat-classes "btn-content-info" addHarvesterAction.className}}
+          @onClick={{addHarvesterAction.executeCallback}}
+        >
           {{addHarvesterAction.title}}
-        {{/one-button}}
-        {{#one-button
-          type="primary"
-          class=(concat-classes
+        </OneButton>
+        <OneButton
+          @type="primary"
+          class={{concat-classes
             "btn-content-info"
             inviteHarvesterUsingTokenAction.className
-          )
-          onClick=inviteHarvesterUsingTokenAction.executeCallback
-        }}
+          }}
+          @onClick={{inviteHarvesterUsingTokenAction.executeCallback}}
+        >
           {{inviteHarvesterUsingTokenAction.title}}
-        {{/one-button}}
+        </OneButton>
       </div>
-    {{/content-info}}
+    </ContentInfo>
   {{else}}
-    {{resources-list
-      items=harvesterItems
-      isResourceWithAdditionalInfo=true
-    }}
+    <ResourcesList @items={{harvesterItems}} @isResourceWithAdditionalInfo={{true}} />
   {{/if}}
-{{/promise-proxy-container}}
+</PromiseProxyContainer>
 {{yield}}

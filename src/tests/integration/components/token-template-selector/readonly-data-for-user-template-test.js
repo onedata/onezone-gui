@@ -56,7 +56,7 @@ describe(
     it(
       'renders tile with "template-readonlyDataForUser" class, correct title and image',
       async function () {
-        await render(hbs `{{token-template-selector/readonly-data-for-user-template}}`);
+        await render(hbs `<TokenTemplateSelector::ReadonlyDataForUserTemplate />`);
 
         const tile = find('.one-tile');
         expect(tile).to.have.class('template-readonlyDataForUser');
@@ -68,7 +68,7 @@ describe(
     );
 
     it('shows list of users', async function () {
-      await render(hbs `{{token-template-selector/readonly-data-for-user-template}}`);
+      await render(hbs `<TokenTemplateSelector::ReadonlyDataForUserTemplate />`);
 
       await click('.one-tile');
       const records = findAll('.record-item');
@@ -82,9 +82,9 @@ describe(
     it('passes template name and template via selection handler', async function () {
       const selectedSpy = this.set('selectedSpy', sinon.spy());
 
-      await render(hbs `{{token-template-selector/readonly-data-for-user-template
-        onSelected=selectedSpy
-      }}`);
+      await render(hbs `<TokenTemplateSelector::ReadonlyDataForUserTemplate
+        @onSelected={{selectedSpy}}
+      />`);
 
       await click('.one-tile');
       await click('.record-item:first-child');

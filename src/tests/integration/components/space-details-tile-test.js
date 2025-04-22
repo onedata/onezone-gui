@@ -195,8 +195,6 @@ class Helper {
   }
   async render() {
     await this.beforeRender();
-    await render(hbs `{{space-details-tile
-      space=space
-    }}`);
+    await render(hbs `<SpaceDetailsTile @space={{space}} />`);
   }
 }

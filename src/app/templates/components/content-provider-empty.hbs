@@ -1,36 +1,36 @@
-{{#content-info
+<ContentInfo
   class="scroll-breakpoint-600"
-  header=(tt this "addSupportHeader")
-  text=(tt this "leadText")
-}}
+  @header={{tt this "addSupportHeader"}}
+  @text={{tt this "leadText"}}
+>
   <p class="lead">
     <ul class="info">
       <li>
         {{tt this "p1_1"}}
-        {{#link-to "onedata.sidebar" "spaces"}}
+        <LinkTo @route="onedata.sidebar" @model="spaces">
           {{tt this "manageSpacesHead"}}
-        {{/link-to}}
+        </LinkTo>
         {{tt this "p1_2"}}
-        {{#link-to "onedata.sidebar.content" "spaces" "new"}}
+        <LinkTo @route="onedata.sidebar.content" @models={{array "spaces" "new"}}>
           {{tt this "create"}}
-        {{/link-to}}
+        </LinkTo>
         {{tt this "p1_3"}}
       </li>
       <li>
         {{tt this "pIfYouHave"}}
         <strong>{{tt this "space"}} {{tt this "invitationToken"}}</strong>,
-        {{#link-to "onedata.sidebar.content" "tokens" "join"}}
+        <LinkTo @route="onedata.sidebar.content" @models={{array "tokens" "join"}}>
           {{tt this "joinSpace"}}
-        {{/link-to}}
+        </LinkTo>
       </li>
       <li>
         {{tt this "pIfYouHave"}}
         <strong>{{tt this "group"}} {{tt this "invitationToken"}}</strong>,
-        {{#link-to "onedata.sidebar.content" "tokens" "join"}}
+        <LinkTo @route="onedata.sidebar.content" @models={{array "tokens" "join"}}>
           {{tt this "joinGroup"}}
-        {{/link-to}}
+        </LinkTo>
         {{tt this "p3_1"}}
       </li>
     </ul>  
   </p>
-{{/content-info}}
+</ContentInfo>

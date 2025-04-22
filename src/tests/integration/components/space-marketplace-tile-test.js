@@ -149,8 +149,6 @@ class Helper {
   }
   async render() {
     await this.beforeRender();
-    await render(hbs `{{space-marketplace-tile
-      space=space
-    }}`);
+    await render(hbs `<SpaceMarketplaceTile @space={{space}} />`);
   }
 }

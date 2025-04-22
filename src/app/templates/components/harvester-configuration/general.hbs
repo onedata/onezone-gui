@@ -1,40 +1,36 @@
-{{#promise-proxy-container proxy=backendTypesListProxy}}
+<PromiseProxyContainer @proxy={{backendTypesListProxy}}>
   <div class="form form-horizontal form-component">
-    {{form-component/field-renderer field=fields}}
+    <FormComponent::FieldRenderer @field={{fields}} />
     <div class="text-center">
     {{#if (eq mode "view")}}
       <div class="form-group edit-btn-form-group">
         <div class="control-label"></div>
-        {{#one-button
-          type="default"
-          onClick=(action "edit")
-          class="edit-btn"
-        }}
+        <OneButton @type="default" @onClick={{action "edit"}} class="edit-btn">
           {{tt this "edit"}}
-        {{/one-button}}
+        </OneButton>
       </div>
     {{else}}
-      {{#one-button
-        type="primary"
-        buttonType="submit"
+      <OneButton
+        @type="primary"
+        @buttonType="submit"
         class="submit-btn"
-        disabled=(not fields.isValid)
-        onClick=(action "submit")
-      }}
+        @disabled={{not fields.isValid}}
+        @onClick={{action "submit"}}
+      >
         {{tt this (if (eq mode "create") "create" "save")}}
-      {{/one-button}}
+      </OneButton>
 
       {{#if (eq mode "edit")}}
-        {{#one-button
-          type="default"
-          onClick=(action "cancel")
-          disabled=disabled
+        <OneButton
+          @type="default"
+          @onClick={{action "cancel"}}
+          @disabled={{disabled}}
           class="cancel-btn"
-        }}
+        >
           {{tt this "cancel"}}
-        {{/one-button}}
+        </OneButton>
       {{/if}}
     {{/if}}
     </div>
   </div>
-{{/promise-proxy-container}}
+</PromiseProxyContainer>

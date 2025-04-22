@@ -54,7 +54,7 @@ describe(
     });
 
     it('has class "content-atm-inventories-lambdas-editor-view"', async function () {
-      await render(hbs `{{content-atm-inventories-lambdas/editor-view}}`);
+      await render(hbs `<ContentAtmInventoriesLambdas::EditorView />`);
 
       expect(this.element.children).to.have.length(1);
       expect(this.element.children[0])
@@ -211,14 +211,14 @@ describe(
 );
 
 async function renderComponent() {
-  await render(hbs `{{content-atm-inventories-lambdas/editor-view
-    viewType=viewType
-    atmInventory=atmInventory
-    atmLambda=atmLambda
-    atmLambdaRevisionNumber=atmLambdaRevisionNumber
-    onBackSlide=onBackSlide
-    onAtmLambdaRevisionSaved=onAtmLambdaRevisionSaved
-  }}`);
+  await render(hbs `<ContentAtmInventoriesLambdas::EditorView
+    @viewType={{viewType}}
+    @atmInventory={{atmInventory}}
+    @atmLambda={{atmLambda}}
+    @atmLambdaRevisionNumber={{atmLambdaRevisionNumber}}
+    @onBackSlide={{onBackSlide}}
+    @onAtmLambdaRevisionSaved={{onAtmLambdaRevisionSaved}}
+  />`);
 }
 
 function itShowsFormInMode(mode) {

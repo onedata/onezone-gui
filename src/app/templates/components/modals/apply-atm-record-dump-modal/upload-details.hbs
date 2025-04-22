@@ -1,15 +1,15 @@
 <h2>{{tt this "header"}}</h2>
 <div class="detail">
   <span class="detail-label filename-label">{{tt this "filename"}}:</span>
-  {{#truncated-string class="detail-value filename"}}{{filename}}{{/truncated-string}}
+  <TruncatedString class="detail-value filename">{{filename}}</TruncatedString>
 </div>
-{{#one-button
+<OneButton
   class="upload-btn"
-  type="default"
-  size="sm"
-  disabled=isDisabled
-  onClick=(action "reupload")
-}}
+  @type="default"
+  @size="sm"
+  @disabled={{isDisabled}}
+  @onClick={{action "reupload"}}
+>
   {{tt this "uploadButton"}}
-{{/one-button}}
+</OneButton>
 {{yield}}

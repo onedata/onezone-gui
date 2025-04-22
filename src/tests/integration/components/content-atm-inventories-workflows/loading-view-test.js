@@ -13,7 +13,7 @@ describe('Integration | Component | content-atm-inventories-workflows/loading-vi
     setupRenderingTest();
 
     it('has class "content-atm-inventories-workflows-loading-view"', async function () {
-      await render(hbs `{{content-atm-inventories-workflows/loading-view}}`);
+      await render(hbs `<ContentAtmInventoriesWorkflows::LoadingView />`);
 
       expect(this.element.children).to.have.length(1);
       expect(this.element.children[0])
@@ -109,10 +109,10 @@ describe('Integration | Component | content-atm-inventories-workflows/loading-vi
   });
 
 async function renderComponent() {
-  await render(hbs `{{content-atm-inventories-workflows/loading-view
-    loadingProxy=loadingProxy
-    onBackSlide=backSlideSpy
-  }}`);
+  await render(hbs `<ContentAtmInventoriesWorkflows::LoadingView
+    @loadingProxy={{loadingProxy}}
+    @onBackSlide={{backSlideSpy}}
+  />`);
 }
 
 function expectHeaderText(headerText) {

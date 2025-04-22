@@ -2,42 +2,42 @@
   <RecordIcon @record={{atmWorkflowSchema}} />
 </div>
 <div class="content-section">
-  {{#content-atm-inventories-workflows/atm-workflow-schema-details-form
-    atmWorkflowSchema=atmWorkflowSchema
-    mode=(if isEditing "edit" "view")
-    isDisabled=isSavingChanges
-    onChange=(action "detailsChanged")
-  }}
+  <ContentAtmInventoriesWorkflows::AtmWorkflowSchemaDetailsForm
+    @atmWorkflowSchema={{atmWorkflowSchema}}
+    @mode={{if isEditing "edit" "view"}}
+    @isDisabled={{isSavingChanges}}
+    @onChange={{action "detailsChanged"}}
+  >
     {{#if isEditing}}
       <div class="btn-toolbar footer-buttons">
-        {{#one-button
-          type="primary"
-          buttonType="submit"
-          size="sm"
+        <OneButton
+          @type="primary"
+          @buttonType="submit"
+          @size="sm"
           class="btn-save clickable"
-          onClick=(action "saveChanges")
-          disabled=(not areChangesValid)
-        }}
+          @onClick={{action "saveChanges"}}
+          @disabled={{not areChangesValid}}
+        >
           {{tt this "saveBtn"}}
-        {{/one-button}}
-        {{#one-button
-          size="sm"
-          type="default"
+        </OneButton>
+        <OneButton
+          @size="sm"
+          @type="default"
           class="btn-cancel clickable"
-          onClick=(action "cancelChanges")
-        }}
+          @onClick={{action "cancelChanges"}}
+        >
           {{tt this "cancelBtn"}}
-        {{/one-button}}
+        </OneButton>
       </div>
     {{/if}}
-  {{/content-atm-inventories-workflows/atm-workflow-schema-details-form}}
-  {{#revisions-table
-    revisionRegistry=atmWorkflowSchema.revisionRegistry
-    revisionActionsFactory=revisionActionsFactory
-    customColumnsCount=1
-    onRevisionClick=(action "clickRevision")
+  </ContentAtmInventoriesWorkflows::AtmWorkflowSchemaDetailsForm>
+  <RevisionsTable
+    @revisionRegistry={{atmWorkflowSchema.revisionRegistry}}
+    @revisionActionsFactory={{revisionActionsFactory}}
+    @customColumnsCount={{1}}
+    @onRevisionClick={{action "clickRevision"}}
     as |section data|
-  }}
+  >
     {{#if (eq section "header")}}
       <th class="revisions-table-header-cell description-column filling-column">
         {{tt this "columns.description.title"}}
@@ -47,35 +47,35 @@
         {{or data.revision.description (tt this "columns.description.fallback")}}
       </td>
     {{/if}}
-  {{/revisions-table}}
-  {{one-menu-toggle
-    class=(concat-classes
+  </RevisionsTable>
+  <OneMenuToggle
+    class={{concat-classes
       "workflow-actions-trigger clickable"
       (concat "actions-trigger-" elementId)
       (if areActionsOpened "active")
-    )
-    click=(action "toggleActionsOpen" (not areActionsOpened))
-  }}
-  {{#render-later triggerRender=areActionsOpened}}
-    {{#one-webui-popover
-      class="workflow-actions"
-      padding=false
-      popoverStyle="with-dropdown"
-      triggerSelector=(concat ".actions-trigger-" elementId)
-      open=areActionsOpened
-      onToggle=(action "toggleActionsOpen")
-      as |popover|
     }}
-      {{#click-outside
-        onClickOutside=(action "toggleActionsOpen" false)
-        exceptSelector=(concat ".actions-trigger-" elementId)
-      }}
-        {{actions-popover-content
-          actionsArray=workflowActionsArray
-          actionClicked=(action "toggleActionsOpen" false)
-        }}
-      {{/click-outside}}
-    {{/one-webui-popover}}
-  {{/render-later}}
+    @click={{action "toggleActionsOpen" (not areActionsOpened)}}
+  />
+  <RenderLater @triggerRender={{areActionsOpened}}>
+    <OneWebuiPopover
+      class="workflow-actions"
+      @padding={{false}}
+      @popoverStyle="with-dropdown"
+      @triggerSelector={{concat ".actions-trigger-" elementId}}
+      @open={{areActionsOpened}}
+      @onToggle={{action "toggleActionsOpen"}}
+      as |popover|
+    >
+      <ClickOutside
+        @onClickOutside={{action "toggleActionsOpen" false}}
+        @exceptSelector={{concat ".actions-trigger-" elementId}}
+      >
+        <ActionsPopoverContent
+          @actionsArray={{workflowActionsArray}}
+          @actionClicked={{action "toggleActionsOpen" false}}
+        />
+      </ClickOutside>
+    </OneWebuiPopover>
+  </RenderLater>
 </div>
 {{yield}}

@@ -27,7 +27,7 @@ describe('Integration | Component | cookies-consent', function () {
   });
 
   it('renders cookie consent notification', async function () {
-    await render(hbs `{{cookies-consent}}`);
+    await render(hbs `<CookiesConsent />`);
 
     expect(find('.cookies-consent')).to.contain.text('consent content');
   });
@@ -36,14 +36,14 @@ describe('Integration | Component | cookies-consent', function () {
     'does not render cookie consent notification when cookies are accepted',
     async function () {
       set(lookupService(this, 'guiMessageManager'), 'areCookiesAccepted', true);
-      await render(hbs `{{cookies-consent}}`);
+      await render(hbs `<CookiesConsent />`);
 
       expect(find('.cookies-consent')).to.not.exist;
     }
   );
 
   it('allows to accepts cookies', async function () {
-    await render(hbs `{{cookies-consent}}`);
+    await render(hbs `<CookiesConsent />`);
 
     return click('.accept-cookies').then(() => {
       expect(find('.cookies-consent')).to.not.exist;

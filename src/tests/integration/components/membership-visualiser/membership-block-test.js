@@ -28,7 +28,7 @@ describe(
         },
         name: testName,
       }));
-      await render(hbs `{{membership-visualiser/membership-block record=record}}`);
+      await render(hbs `<MembershipVisualiser::MembershipBlock @record={{record}} />`);
       expect(find('.record-name')).to.have.trimmed.text(testName);
     });
 
@@ -41,7 +41,7 @@ describe(
           type: 'team',
         }));
         await render(hbs `
-          {{membership-visualiser/membership-block record=record}}
+          <MembershipVisualiser::MembershipBlock @record={{record}} />
         `);
         expect(find(`.oneicon-${icons[modelType]}`)).to.exist;
       });

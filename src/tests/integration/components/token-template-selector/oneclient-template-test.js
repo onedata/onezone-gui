@@ -13,7 +13,7 @@ describe(
     it(
       'renders tile with "template-oneclient" class, correct title and image',
       async function () {
-        await render(hbs `{{token-template-selector/oneclient-template}}`);
+        await render(hbs `<TokenTemplateSelector::OneclientTemplate />`);
 
         const tile = find('.one-tile');
         expect(tile).to.have.class('template-oneclient');
@@ -27,9 +27,9 @@ describe(
     it('passes template name and template via selection handler', async function () {
       const selectedSpy = this.set('selectedSpy', sinon.spy());
 
-      await render(hbs `{{token-template-selector/oneclient-template
-        onSelected=selectedSpy
-      }}`);
+      await render(hbs `<TokenTemplateSelector::OneclientTemplate
+        @onSelected={{selectedSpy}}
+      />`);
 
       await click('.one-tile');
       expect(selectedSpy).to.be.calledOnce.and.to.be.calledWith(

@@ -41,7 +41,7 @@ describe(
     it(
       'renders tile with "template-onepanelRest" class, correct title and image',
       async function () {
-        await render(hbs `{{token-template-selector/onepanel-rest-template}}`);
+        await render(hbs `<TokenTemplateSelector::OnepanelRestTemplate />`);
 
         const tile = find('.one-tile');
         expect(tile).to.have.class('template-onepanelRest');
@@ -53,7 +53,7 @@ describe(
     );
 
     it('shows list of clusters', async function () {
-      await render(hbs `{{token-template-selector/onepanel-rest-template}}`);
+      await render(hbs `<TokenTemplateSelector::OnepanelRestTemplate />`);
 
       await click('.one-tile');
       const records = findAll('.record-item');
@@ -67,7 +67,7 @@ describe(
     it('shows information about no clusters to choose', async function () {
       this.clusters.splice(0, this.clusters.length);
 
-      await render(hbs `{{token-template-selector/onepanel-rest-template}}`);
+      await render(hbs `<TokenTemplateSelector::OnepanelRestTemplate />`);
 
       await click('.one-tile');
       expect(find('.no-records-info')).to.have.trimmed.text('You have no clusters.');
@@ -77,9 +77,9 @@ describe(
       async function () {
         const selectedSpy = this.set('selectedSpy', sinon.spy());
 
-        await render(hbs `{{token-template-selector/onepanel-rest-template
-          onSelected=selectedSpy
-        }}`);
+        await render(hbs `<TokenTemplateSelector::OnepanelRestTemplate
+          @onSelected={{selectedSpy}}
+        />`);
 
         await click('.one-tile');
         await click('.record-item:last-child');
@@ -99,9 +99,9 @@ describe(
       async function () {
         const selectedSpy = this.set('selectedSpy', sinon.spy());
 
-        await render(hbs `{{token-template-selector/onepanel-rest-template
-          onSelected=selectedSpy
-        }}`);
+        await render(hbs `<TokenTemplateSelector::OnepanelRestTemplate
+          @onSelected={{selectedSpy}}
+        />`);
 
         await click('.one-tile');
         await click('.record-item:first-child');

@@ -1,8 +1,10 @@
 <div class="row content-row header-row hidden-xs">
   <h1 class={{unless oneprovider.isAllOneproviders "normal-case"}}>
-    {{#truncated-string class="one-label"}}{{oneprovider.name}}{{/truncated-string}}
+    <TruncatedString class="one-label">{{oneprovider.name}}</TruncatedString>
   </h1>
 </div>
 <div class="row content-row">
-  {{upload-presenter oneprovider=(if oneprovider.isAllOneproviders undefined oneprovider)}}  
+  <UploadPresenter
+    @oneprovider={{if oneprovider.isAllOneproviders undefined oneprovider}}
+  />  
 </div>

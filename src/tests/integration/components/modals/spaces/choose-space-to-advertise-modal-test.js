@@ -164,7 +164,7 @@ class Helper {
   }
 
   async showModal() {
-    await render(hbs`{{global-modal-mounter}}`);
+    await render(hbs`<GlobalModalMounter />`);
     return await this.modalManager
       .show('spaces/choose-space-to-advertise-modal', this.modalOptions)
       .shownPromise;
