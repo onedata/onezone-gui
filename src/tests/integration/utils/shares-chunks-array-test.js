@@ -218,21 +218,72 @@ describe('Integration | Utility | shares-chunks-array', function () {
     );
   });
 
+  it('fetches lists which have been fetched before after using reload', async function () {
+    // --- given ---
+    const spacesCount = 2;
+    // should be lesser than chunk size, to fully fetch list of first space
+    const sharesPerSpace = 12;
+    const helper = new Helper(this);
+    await helper.givenUser();
+    await helper.givenSpaces({ spacesCount });
+    await helper.givenShares({ perSpace: sharesPerSpace });
+    await helper.givenSimpleSpaceShareList();
+    const getSpaceShareListSpy = sinon.spy(
+      helper.getService('shareManager'),
+      'getSpaceShareList'
+    );
+
+    // --- when ---
+    this.chunksArray = SharesChunksArray.create({
+      ownerSource: this.owner,
+      chunkSize: 10,
+      startIndex: 0,
+      endIndex: 10,
+    });
+    await this.chunksArray.initialLoad;
+    // invoke second fetch
+    this.chunksArray.setIndices(10, 20);
+    await settled();
+    // before reload, go back to the position, which needs only one fetch
+    this.chunksArray.setIndices(0, 10);
+    await settled();
+    await this.chunksArray.scheduleReload();
+    getSpaceShareListSpy.resetHistory();
+    this.chunksArray.setIndices(10, 20);
+    await settled();
+
+    // --- then ---
+    // Note, that call count is after fetch next after spy history reset,
+    // so we check only fetchNext calls.
+    expect(getSpaceShareListSpy).to.have.callCount(2);
+
+    // check if final array has proper elements
+    const array = this.chunksArray.toArray();
+    const arrayShareNames = array.map(share => share.name);
+    const allExpectedShareNames = helper.spaces.map(space =>
+      _.times(sharesPerSpace).map(i => `${Helper.generateShareName(space, i)}`)
+    ).flat().slice(10, 20);
+    expect(arrayShareNames, arrayShareNames.join(',')).to.deep.equal(
+      _.sortBy(allExpectedShareNames)
+    );
+  });
+
+  // FIXME: test działania reload: po reloadzie powinno pobierać wszystko o nowa
+
   // FIXME: test działania zawartości back: initialJumpIndex, następnie idziemy do początku i badamy czy będą dobre wpisy
 
   // FIXME: test działania użycia cache back: initialJumpIndex, następnie do tyłu, pobierze coś, potem jescze raz do tyłu i powinno użyć samych cache (podobny s1-sh1, s1-sh2 itd. najpierw lista z jednego, potem drugiego)
   // FIXME: jw. tylko niech będą naprzemienne shery
 
-  // FIXME: test działania reload: po reloadzie powinno pobierać wszystko o nowa
 });
 
 class Helper {
   static generateSpaceName(i) {
-    return `space-${String(i).padStart(2, '0')}`;
+    return `space${String(i).padStart(2, '0')}`;
   }
 
   static generateShareName(space, i) {
-    return `${space.name}-share-${String(i).padStart(3, '0')}`;
+    return `${space.name}-share${String(i).padStart(3, '0')}`;
   }
 
   /**
