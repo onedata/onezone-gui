@@ -41,7 +41,7 @@ import globals from 'onedata-gui-common/utils/globals';
 
 const fallbackActionsGenerator = () => [];
 
-const MIN_MEMBERS_PER_PAGE = 10;
+const minMembersPerPage = 10;
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -149,12 +149,15 @@ export default Component.extend(I18n, {
   onlyDirect: false,
 
   /**
+   * If there's no valid value stored in localStorage,
+   * this fallback value will be used for the pageSize variable instead.
    * @type {number}
    * @virtual optional
    */
   fallbackPageSize: 10,
 
   /**
+   * Used once on component init to decide if the list should start collapsed.
    * @virtual optional
    * @type {number}
    */
@@ -280,7 +283,7 @@ export default Component.extend(I18n, {
     'isListCollapsed',
     'membersProxyList.length',
     function isPagesControlShown() {
-      return !this.isListCollapsed && this.membersProxyList.length > MIN_MEMBERS_PER_PAGE;
+      return !this.isListCollapsed && this.membersProxyList.length > minMembersPerPage;
     }
   ),
 
@@ -518,20 +521,12 @@ export default Component.extend(I18n, {
         membersProxyList,
         groupedPrivilegesFlags,
         currentUser,
-        isListCollapsed,
-        listCollapseScreenHeight,
         itemActionsGenerator,
         effectiveItemActionsGenerator,
         griAspect,
         griGroupAspects,
         searchQuery,
       } = this;
-      if (
-        isListCollapsed === undefined &&
-        globals.window.innerHeight < listCollapseScreenHeight
-      ) {
-        this.set('isListCollapsed', true);
-      }
       // Create ordered list of members. Records should be sorted by name except
       // current user record and owners - they should be always at the top.
       const currentUserMember =
@@ -697,6 +692,12 @@ export default Component.extend(I18n, {
     }).create({
       parent: this,
     }));
+
+    this.set(
+      'isListCollapsed',
+      this.isListCollapsed === undefined &&
+      globals.window.innerHeight < this.listCollapseScreenHeight
+    );
   },
 
   /**
