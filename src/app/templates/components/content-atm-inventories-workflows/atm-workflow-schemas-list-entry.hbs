@@ -49,7 +49,11 @@
     {{/if}}
   </RevisionsTable>
   <OneMenuToggle
-    class={{concat-classes "workflow-actions-trigger clickable" (concat "actions-trigger-" elementId) (if areActionsOpened "active")}}
+    class={{concat-classes
+      "workflow-actions-trigger clickable"
+      (concat "actions-trigger-" elementId)
+      (if areActionsOpened "active")
+    }}
     @click={{action "toggleActionsOpen" (not areActionsOpened)}}
   />
   <RenderLater @triggerRender={{areActionsOpened}}>

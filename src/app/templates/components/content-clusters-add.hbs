@@ -1,10 +1,15 @@
-<ContentInfo class="scroll-breakpoint-800" @header={{tt this "header"}} @imagePath={{root-url "assets/images/cluster-register-provider.svg"}} @textComponent={{component "content-clusters-add-lead"
+<ContentInfo
+  class="scroll-breakpoint-800"
+  @header={{tt this "header"}}
+  @imagePath={{root-url "assets/images/cluster-register-provider.svg"}}
+  @textComponent={{component "content-clusters-add-lead"
     description=(tt this (if canCurrentUserInviteProviders
       "descriptionStartWithToken"
       "descriptionStartWithoutToken"
     ))
     linkName=(tt this "onedatify")
-  }}>
+  }}
+>
   {{#if canCurrentUserInviteProviders}}
     <InviteTokenGenerator @inviteType="registerOneprovider" />
   {{else}}
