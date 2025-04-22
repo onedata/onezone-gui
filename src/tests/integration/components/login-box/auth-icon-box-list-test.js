@@ -11,23 +11,24 @@ describe('Integration | Component | login-box/auth-icon-box-list', function () {
   setupRenderingTest();
 
   it('shows spinner when loading', async function () {
-    await render(hbs `{{login-box/auth-icon-box-list isLoading=true}}`);
+    await render(hbs `<LoginBox::AuthIconBoxList @isLoading={{true}} />`);
     expect(find('.spin-spinner')).to.exist;
   });
 
   it('shows error message if occurred', async function () {
     const errorMsg = 'some really bad error';
     this.set('errorMsg', errorMsg);
-    await render(hbs `{{login-box/auth-icon-box-list errorMessage=errorMsg}}`);
+    await render(hbs `<LoginBox::AuthIconBoxList @errorMessage={{errorMsg}} />`);
     expect(this.element).to.contain.text(errorMsg);
   });
 
   it('shows clickable "show more" button', async function () {
     const showMoreSpy = sinon.spy();
     this.set('showMoreSpy', showMoreSpy);
-    await render(hbs `{{login-box/auth-icon-box-list
-      showMoreButton=true
-      showMoreClick=(action showMoreSpy)}}
+    await render(hbs `<LoginBox::AuthIconBoxList
+      @showMoreButton={{true}}
+      @showMoreClick={{action showMoreSpy}}
+    />
     `);
     expect(find('.login-icon-box.more')).to.exist;
     await click('.login-icon-box.more');
@@ -41,9 +42,10 @@ describe('Integration | Component | login-box/auth-icon-box-list', function () {
       id: 'basicAuth',
       iconPath: '/custom/basicauth.svg',
     }]);
-    await render(hbs `{{login-box/auth-icon-box-list
-      supportedAuthorizers=supportedAuthorizers
-      usernameLoginClick=(action basicAuthSpy)}}
+    await render(hbs `<LoginBox::AuthIconBoxList
+      @supportedAuthorizers={{supportedAuthorizers}}
+      @usernameLoginClick={{action basicAuthSpy}}
+    />
     `);
     expect(find('.login-icon-box.basicAuth')).to.exist;
     await click('.login-icon-box.basicAuth');
@@ -58,9 +60,10 @@ describe('Integration | Component | login-box/auth-icon-box-list', function () {
     }, {
       id: 'provider2',
     }]);
-    await render(hbs `{{login-box/auth-icon-box-list
-      supportedAuthorizers=supportedAuthorizers
-      authenticate=(action authenticateSpy)}}
+    await render(hbs `<LoginBox::AuthIconBoxList
+      @supportedAuthorizers={{supportedAuthorizers}}
+      @authenticate={{action authenticateSpy}}
+    />
     `);
     expect(find('.login-icon-box.provider1')).to.exist;
     expect(find('.login-icon-box.provider2')).to.exist;

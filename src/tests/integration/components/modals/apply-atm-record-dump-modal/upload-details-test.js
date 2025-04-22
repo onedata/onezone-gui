@@ -61,9 +61,9 @@ describe('Integration | Component | modals/apply-atm-record-dump-modal/upload-de
   });
 
 async function renderComponent() {
-  await render(hbs `{{modals/apply-atm-record-dump-modal/upload-details
-    dumpSource=dumpSource
-    onReupload=onReupload
-    isDisabled=isDisabled
-  }}`);
+  await render(hbs `<Modals::ApplyAtmRecordDumpModal::UploadDetails
+    @dumpSource={{dumpSource}}
+    @onReupload={{onReupload}}
+    @isDisabled={{isDisabled}}
+  />`);
 }

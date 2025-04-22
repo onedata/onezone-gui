@@ -52,20 +52,20 @@ describe('Integration | Component | oneprovider-view-container', function () {
 
     it('renders container header and body content', async function () {
       await render(hbs `
-        {{#oneprovider-view-container
-          space=space
-          oneproviderId=oneproviderId
-          mapSelectorEnabled=false
-          oneproviderIdChanged=(action (mut oneproviderId))
+        <OneproviderViewContainer
+          @space={{space}}
+          @oneproviderId={{oneproviderId}}
+          @mapSelectorEnabled={{false}}
+          @oneproviderIdChanged={{action (mut oneproviderId)}}
           as |container|
-        }}
-          {{#container.header}}
+        >
+          <container.header>
             hello header
-          {{/container.header}}
-          {{#container.body}}
+          </container.header>
+          <container.body>
             hello body
-          {{/container.body}}
-        {{/oneprovider-view-container}}
+          </container.body>
+        </OneproviderViewContainer>
       `);
 
       expect(find('.content-header-section')).to.contain.text('hello header');
@@ -74,14 +74,14 @@ describe('Integration | Component | oneprovider-view-container', function () {
 
     it('renders name of selected Oneprovider in tab bar mode', async function () {
       await render(hbs `
-        {{#oneprovider-view-container
-          space=space
-          oneproviderId=oneproviderId
-          mapSelectorEnabled=false
-          isTabBarCollapsed=true
-          oneproviderIdChanged=(action (mut oneproviderId))
-        }}
-        {{/oneprovider-view-container}}
+        <OneproviderViewContainer
+          @space={{space}}
+          @oneproviderId={{oneproviderId}}
+          @mapSelectorEnabled={{false}}
+          @isTabBarCollapsed={{true}}
+          @oneproviderIdChanged={{action (mut oneproviderId)}}
+        >
+        </OneproviderViewContainer>
       `);
 
       expect(find('.record-name-general'), 'current oneprovider name')
@@ -93,20 +93,20 @@ describe('Integration | Component | oneprovider-view-container', function () {
         this.set('provider.online', false);
 
         await render(hbs `
-          {{#oneprovider-view-container
-            space=space
-            oneproviderId=undefined
-            mapSelectorEnabled=false
-            oneproviderIdChanged=(action (mut oneproviderId))
+          <OneproviderViewContainer
+            @space={{space}}
+            @oneproviderId={{undefined}}
+            @mapSelectorEnabled={{false}}
+            @oneproviderIdChanged={{action (mut oneproviderId)}}
             as |container|
-          }}
-            {{#container.header}}
+          >
+            <container.header>
               hello header
-            {{/container.header}}
-            {{#container.body}}
+            </container.header>
+            <container.body>
               hello body
-            {{/container.body}}
-          {{/oneprovider-view-container}}
+            </container.body>
+          </OneproviderViewContainer>
         `);
 
         expect(find('.content-header-section'), 'header')
@@ -120,20 +120,20 @@ describe('Integration | Component | oneprovider-view-container', function () {
       this.set('provider.online', false);
 
       await render(hbs `
-        {{#oneprovider-view-container
-          space=space
-          oneproviderId=undefined
-          mapSelectorEnabled=false
-          oneproviderIdChanged=(action (mut oneproviderId))
+        <OneproviderViewContainer
+          @space={{space}}
+          @oneproviderId={{undefined}}
+          @mapSelectorEnabled={{false}}
+          @oneproviderIdChanged={{action (mut oneproviderId)}}
           as |container|
-        }}
-          {{#container.header}}
+        >
+          <container.header>
             hello header
-          {{/container.header}}
-          {{#container.body}}
+          </container.header>
+          <container.body>
             hello body
-          {{/container.body}}
-        {{/oneprovider-view-container}}
+          </container.body>
+        </OneproviderViewContainer>
       `);
 
       expect(find('.space-providers-tab-bar'), 'space-providers-tab-bar')
@@ -198,23 +198,23 @@ describe('Integration | Component | oneprovider-view-container', function () {
       } = this.getProperties('provider1', 'provider2', 'changeOneproviderId');
 
       await render(hbs `
-        {{#oneprovider-view-container
-          space=space
-          oneproviderId=oneproviderId
-          mapSelectorEnabled=false
-          isTabBarCollapsed=false
-          oneproviderIdChanged=(action changeOneproviderId)
+        <OneproviderViewContainer
+          @space={{space}}
+          @oneproviderId={{oneproviderId}}
+          @mapSelectorEnabled={{false}}
+          @isTabBarCollapsed={{false}}
+          @oneproviderIdChanged={{action changeOneproviderId}}
           as |container|
-        }}
-          {{#container.body}}
+        >
+          <container.body>
             <span class="selected-provider-entity-id">
               {{container.selectedProvider.entityId}}
             </span>
             <span class="content-iframe-base-url">
               {{container.contentIframeBaseUrl}}
             </span>
-          {{/container.body}}
-        {{/oneprovider-view-container}}
+          </container.body>
+        </OneproviderViewContainer>
       `);
 
       expect(find('.selected-provider-entity-id'), 'selected op id before change')
@@ -253,23 +253,23 @@ describe('Integration | Component | oneprovider-view-container', function () {
       });
       this.setProperties('space', space);
       await render(hbs `
-        {{#oneprovider-view-container
-          space=space
-          oneproviderId=undefined
-          mapSelectorEnabled=false
-          isTabBarCollapsed=false
-          oneproviderIdChanged=(action (mut oneproviderId))
+        <OneproviderViewContainer
+          @space={{space}}
+          @oneproviderId={{undefined}}
+          @mapSelectorEnabled={{false}}
+          @isTabBarCollapsed={{false}}
+          @oneproviderIdChanged={{action (mut oneproviderId)}}
           as |container|
-        }}
-          {{#container.body}}
+        >
+          <container.body>
             <span class="selected-provider-entity-id">
               {{container.selectedProvider.entityId}}
             </span>
             <span class="content-iframe-base-url">
               {{container.contentIframeBaseUrl}}
             </span>
-          {{/container.body}}
-        {{/oneprovider-view-container}}
+          </container.body>
+        </OneproviderViewContainer>
       `);
 
       expect(globals.localStorage.getItem(storageKey), 'initial storage oneproviderId')

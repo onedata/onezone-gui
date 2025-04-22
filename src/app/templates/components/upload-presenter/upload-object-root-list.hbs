@@ -1,9 +1,10 @@
-{{#perfect-scrollbar-element}}
+<PerfectScrollbarElement>
   {{#each uploadObjects as |uploadObject|}}
-    {{upload-presenter/upload-object
-      nestingStyle=nestingStyle
-      uploadObject=uploadObject
-      onCancel=(action onCancel)
-      onExpand=(action "childrenExpanded" uploadObject)}}
+    <UploadPresenter::UploadObject
+      @nestingStyle={{nestingStyle}}
+      @uploadObject={{uploadObject}}
+      @onCancel={{action onCancel}}
+      @onExpand={{action "childrenExpanded" uploadObject}}
+    />
   {{/each}}
-{{/perfect-scrollbar-element}}
+</PerfectScrollbarElement>

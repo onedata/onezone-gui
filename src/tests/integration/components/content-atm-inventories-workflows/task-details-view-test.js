@@ -164,16 +164,16 @@ describe('Integration | Component | content-atm-inventories-workflows/task-detai
   });
 
 async function renderComponent() {
-  await render(hbs `{{content-atm-inventories-workflows/task-details-view
-    mode=mode
-    atmLambda=atmLambda
-    revisionNumber=revisionNumber
-    definedStores=definedStores
-    task=task
-    onBackSlide=backSlideSpy
-    onCancel=cancelSpy
-    onApplyChanges=applyChangesSpy
-  }}`);
+  await render(hbs `<ContentAtmInventoriesWorkflows::TaskDetailsView
+    @mode={{mode}}
+    @atmLambda={{atmLambda}}
+    @revisionNumber={{revisionNumber}}
+    @definedStores={{definedStores}}
+    @task={{this.task}}
+    @onBackSlide={{backSlideSpy}}
+    @onCancel={{cancelSpy}}
+    @onApplyChanges={{applyChangesSpy}}
+  />`);
 }
 
 function itHasHeader(headerText) {

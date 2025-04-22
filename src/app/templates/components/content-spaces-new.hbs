@@ -1,13 +1,13 @@
-{{#content-info
+<ContentInfo
   class="scroll-breakpoint-700"
-  header=(tt this "title")
-  imagePath=(root-url "assets/images/space-new.svg")
-  text=(tt this "text")
-  buttonLabel=(tt this "createButton")
-  buttonAction=(action "createSpace" spaceName)
-  buttonDisabled=(not spaceName)
+  @header={{tt this "title"}}
+  @imagePath={{root-url "assets/images/space-new.svg"}}
+  @text={{tt this "text"}}
+  @buttonLabel={{tt this "createButton"}}
+  @buttonAction={{action "createSpace" spaceName}}
+  @buttonDisabled={{not spaceName}}
   as |contentInfo|
-}}
+>
   <div class="row">
     <div class="col-xs-12">
       <input
@@ -21,4 +21,4 @@
       >
     </div>
   </div>
-{{/content-info}}
+</ContentInfo>

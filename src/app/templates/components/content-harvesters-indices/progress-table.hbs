@@ -1,4 +1,4 @@
-{{#promise-proxy-container proxy=dataLoadingProxy}}
+<PromiseProxyContainer @proxy={{dataLoadingProxy}}>
   <div class="clearfix">
     {{#if (if showOnlyActive activeProgressData.length progressData.length)}}
       <div class="pull-left last-update-info">
@@ -13,10 +13,14 @@
       </div>
     {{/if}}
     <div class="pull-right">
-      {{one-way-toggle inputId=(concat elementId "-visible-stats") checked=(not showOnlyActive) update=(action "showArchivalChanged")}}
+      <OneWayToggle
+        @inputId={{concat elementId "-visible-stats"}}
+        @checked={{not showOnlyActive}}
+        @update={{action "showArchivalChanged"}}
+      />
       <label for={{concat elementId "-visible-stats"}} class="inline-label visible-stats-label">
         {{tt this "showArchival"}}
-        {{one-label-tip title=(tt this "showArchivalTooltip")}}
+        <OneLabelTip @title={{tt this "showArchivalTooltip"}} />
       </label>
     </div>
   </div>
@@ -32,10 +36,10 @@
           (if edgeScrollState.right "scroll-on-right")
           "progress-table-inner-container"}}
         >
-          {{#perfect-scrollbar-element
-            onScroll=(action "scroll")
-            onEdgeScroll=(action "edgeScroll")
-          }}
+          <PerfectScrollbarElement
+            @onScroll={{action "scroll"}}
+            @onEdgeScroll={{action "edgeScroll"}}
+          >
             <table>
               <tr class="table-row constant-column-labels">
                 <td class="table-cell"></td>
@@ -45,7 +49,11 @@
                   as |oneprovider|
                 }}
                   <td class="table-cell column-label constant-column-label">
-                    {{name-conflict tagName="div" class="one-label" item=oneprovider}}
+                    <NameConflict
+                      @tagName="div"
+                      class="one-label"
+                      @item={{oneprovider}}
+                    />
                   </td>
                 {{/each}}
               </tr>
@@ -57,10 +65,14 @@
                   as |oneprovider|
                 }}
                   <td class="table-cell column-label floating-column-label">
-                    {{name-conflict tagName="div" class="one-label" item=oneprovider}}
-                    {{#one-tooltip placement="bottom"}}
-                      {{name-conflict item=oneprovider}}
-                    {{/one-tooltip}}
+                    <NameConflict
+                      @tagName="div"
+                      class="one-label"
+                      @item={{oneprovider}}
+                    />
+                    <OneTooltip @placement="bottom">
+                      <NameConflict @item={{oneprovider}} />
+                    </OneTooltip>
                   </td>
                 {{/each}}
               </tr>
@@ -70,28 +82,28 @@
               }}
                 <tr class="table-row">
                   <td class="table-cell row-label constant-row-label">
-                    {{name-conflict
-                      item=spaceProgress.space
-                      tagName="div"
+                    <NameConflict
+                      @item={{spaceProgress.space}}
+                      @tagName="div"
                       class="one-label"
-                    }}
+                    />
                   </td>
                   <td class="table-cell row-label floating-row-label">
-                    {{name-conflict
-                      item=spaceProgress.space
-                      tagName="div"
+                    <NameConflict
+                      @item={{spaceProgress.space}}
+                      @tagName="div"
                       class="one-label"
-                    }}
+                    />
                   </td>
                   {{#each spaceProgress.progress as |providerProgress|}}
-                    {{content-harvesters-indices/progress-table-cell
-                      progress=providerProgress
-                    }}
+                    <ContentHarvestersIndices::ProgressTableCell
+                      @progress={{providerProgress}}
+                    />
                   {{/each}}
                 </tr>
               {{/each}}
             </table>
-          {{/perfect-scrollbar-element}}
+          </PerfectScrollbarElement>
           <div class="right-shadow-overlay"></div>
         </div>
       {{else}}
@@ -102,13 +114,13 @@
               (not progress.isSupported)
             )}}
               <div class="row content-row progress-row">
-                {{#truncated-string}}
+                <TruncatedString>
                   {{progress.space.name}} – {{progress.provider.name}}
-                {{/truncated-string}}
-                {{content-harvesters-indices/progress-table-cell
-                  tagName="div"
-                  progress=progress
-                }}
+                </TruncatedString>
+                <ContentHarvestersIndices::ProgressTableCell
+                  @tagName="div"
+                  @progress={{progress}}
+                />
               </div>
             {{/unless}}
           {{/each}}
@@ -120,4 +132,4 @@
       {{tt this "nothingToHarvest"}}
     </p>
   {{/if}}
-{{/promise-proxy-container}}
+</PromiseProxyContainer>

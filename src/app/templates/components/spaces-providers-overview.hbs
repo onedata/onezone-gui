@@ -1,15 +1,15 @@
-{{#promise-proxy-container proxy=providersProxy}}
+<PromiseProxyContainer @proxy={{providersProxy}}>
   <div class="row">
     <div class="col-xs-12 col-md-5 col-lg-4 col-space-provider-list">
       <div class="row content-row loadable-row">
-        {{providers-list
+        <ProvidersList
           class="space-providers-list"
-          providersData=providersData
-          selectedSpace=space
-          showSelectedSpaceSupportSize=true
-          showSupportedSpacesCount=false
-          providerActions=providerActions
-        }}
+          @providersData={{providersData}}
+          @selectedSpace={{space}}
+          @showSelectedSpaceSupportSize={{true}}
+          @showSupportedSpacesCount={{false}}
+          @providerActions={{providerActions}}
+        />
       </div>
     </div>
     <div class="col-xs-12 col-md-7 col-lg-8 col-space-provider-atlas-chart">
@@ -18,36 +18,32 @@
           <div class="row content-row loadable-row">
             <h1>{{tt this "providersMap"}}</h1>
             <div class="row" style="height: 500px;">
-              {{#one-atlas class="space-providers-atlas" as |atlas|}}
+              <OneAtlas class="space-providers-atlas" as |atlas|>
                 {{#each providers as |provider|}}
-                  {{#atlas.position
-                    latitude=provider.latitude
-                    longitude=provider.longitude
+                  <atlas.position
+                    @latitude={{provider.latitude}}
+                    @longitude={{provider.longitude}}
                     as |position|
-                  }}
-                    {{#position.point}}
-                      {{#link-to
-                        "onedata.sidebar.content.aspect"
-                        "spaces"
-                        (model-routable-id space)
-                        "data"
-                        (query-params
-                          options=(concat "oneproviderId." provider.entityId)
-                        )
-                      }}
-                        {{provider-place
-                          provider=provider
-                          atlasWidth=atlas.width
-                          circleSizeScale=3
-                          active=(eq provider selectedProvider)
-                          renderDrop=(eq provider selectedProvider)
-                          circleColor=(get providersColors provider.entityId)
-                        }}
-                      {{/link-to}}
-                    {{/position.point}}
-                  {{/atlas.position}}
+                  >
+                    <position.point>
+                      <LinkTo
+                        @route="onedata.sidebar.content.aspect"
+                        @models={{array "spaces" (model-routable-id space) "data"}}
+                        @query={{hash options=(concat "oneproviderId." provider.entityId)}}
+                      >
+                        <ProviderPlace
+                          @provider={{provider}}
+                          @atlasWidth={{atlas.width}}
+                          @circleSizeScale={{3}}
+                          @active={{eq provider selectedProvider}}
+                          @renderDrop={{eq provider selectedProvider}}
+                          @circleColor={{get providersColors provider.entityId}}
+                        />
+                      </LinkTo>
+                    </position.point>
+                  </atlas.position>
                 {{/each}}
-              {{/one-atlas}}
+              </OneAtlas>
             </div>
           </div>
         </div>
@@ -56,19 +52,19 @@
       <div class="row content-row row-space-providers-support-chart">
         <h1>{{tt this "supportByProviders"}}</h1>
         <div class="inner-row-content">
-          {{space-providers-support-chart
+          <SpaceProvidersSupportChart
             class="space-providers-support-chart"
-            space=space
-            providersColors=providersColors
-          }}
+            @space={{space}}
+            @providersColors={{providersColors}}
+          />
         </div>
       </div>
     </div>
   </div>
 
-  {{cease-oneprovider-support-modal
-    opened=ceaseModalOpened
-    removeSpaceClick=(action "openRemoveSpace")
-    close=(action (mut ceaseModalOpened) false)
-  }}
-{{/promise-proxy-container}}
+  <CeaseOneproviderSupportModal
+    @opened={{ceaseModalOpened}}
+    @removeSpaceClick={{action "openRemoveSpace"}}
+    @close={{action (mut ceaseModalOpened) false}}
+  />
+</PromiseProxyContainer>

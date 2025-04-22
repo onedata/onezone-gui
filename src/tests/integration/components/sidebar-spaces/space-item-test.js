@@ -17,7 +17,7 @@ describe('Integration | Component | sidebar-spaces/space-item', function () {
   });
 
   it('renders space name and icon', async function () {
-    await render(hbs `{{sidebar-spaces/space-item item=space}}`);
+    await render(hbs `<SidebarSpaces::SpaceItem @item={{space}} />`);
 
     expect(this.element).to.contain.text(this.get('space.name'));
     expect(find('.oneicon-space')).to.exist;

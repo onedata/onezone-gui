@@ -3,44 +3,44 @@
     <span class="one-label">
       {{tt this "header"}}
     </span>
-    {{actions-toolbar isMinimized=true actionsArray=globalActions}}
+    <ActionsToolbar @isMinimized={{true}} @actionsArray={{globalActions}} />
   </h1>
 </div>
 <div class="row content-row row-small {{unless isCreateIndexFormVisible "row-hidden"}}">
   <h1 class="form-title">{{tt this "createNewIndex"}}</h1>
-  {{content-harvesters-indices/index-form
-    mode="create"
-    onCreate=(action "createIndex")
-    onCancel=(action (mut isCreateIndexFormVisible) false)
-  }}
+  <ContentHarvestersIndices::IndexForm
+    @mode="create"
+    @onCreate={{action "createIndex"}}
+    @onCancel={{action (mut isCreateIndexFormVisible) false}}
+  />
 </div>
 <div class="row">
-  {{#promise-proxy-container proxy=dataProxy}}
-    {{#one-collapsible-list as |list|}}
+  <PromiseProxyContainer @proxy={{dataProxy}}>
+    <OneCollapsibleList as |list|>
       {{#each indicesProxy key="id" as |index|}}
-        {{#list.item as |listItem|}}
-          {{content-harvesters-indices/index-entry
-            listItem=listItem
-            index=index
-            harvester=harvester
-            guiPluginIndicesNames=guiPluginIndicesNamesProxy.content
-            onRemove=(action (mut indexToRemove) index)}}
-        {{/list.item}}
+        <list.item as |listItem|>
+          <ContentHarvestersIndices::IndexEntry
+            @listItem={{listItem}}
+            @index={{index}}
+            @harvester={{harvester}}
+            @guiPluginIndicesNames={{guiPluginIndicesNamesProxy.content}}
+            @onRemove={{action (mut indexToRemove) index}}
+          />
+        </list.item>
       {{else}}
-        {{#list.item as |listItem|}}
-          {{#listItem.header
-            isCollapsible=false
-            class="text-center no-indices"}}
+        <list.item as |listItem|>
+          <listItem.header @isCollapsible={{false}} class="text-center no-indices">
             <span class="one-label">{{tt this "noIndices"}}</span>
-          {{/listItem.header}}
-        {{/list.item}}
+          </listItem.header>
+        </list.item>
       {{/each}}
-    {{/one-collapsible-list}}
-  {{/promise-proxy-container}}
+    </OneCollapsibleList>
+  </PromiseProxyContainer>
 </div>
-{{content-harvesters-indices/remove-index-modal
-  opened=(and indexToRemove (not indexToRemove.isDeleted))
-  close=(action (mut indexToRemove) null)
-  proceed=(action "removeIndex")
-  processing=isRemovingIndex
-  index=indexToRemove}}
+<ContentHarvestersIndices::RemoveIndexModal
+  @opened={{and indexToRemove (not indexToRemove.isDeleted)}}
+  @close={{action (mut indexToRemove) null}}
+  @proceed={{action "removeIndex"}}
+  @processing={{isRemovingIndex}}
+  @index={{indexToRemove}}
+/>

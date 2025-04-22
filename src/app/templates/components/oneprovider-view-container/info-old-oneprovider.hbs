@@ -1,10 +1,10 @@
-{{#content-info
+<ContentInfo
   class="preserve-header scroll-breakpoint-900"
-  imagePath=(root-url "assets/images/provider-warning.svg")
-  header=(tt this "header")
-  text=(tt this "text" requiredVersion=requiredVersion)
-}}
+  @imagePath={{root-url "assets/images/provider-warning.svg"}}
+  @header={{tt this "header"}}
+  @text={{tt this "text" requiredVersion=requiredVersion}}
+>
   <p class="lead text-center">
     {{tt this (concat "info." infoType) selectedProviderVersion=selectedProviderVersion}}
   </p>
-{{/content-info}}
+</ContentInfo>

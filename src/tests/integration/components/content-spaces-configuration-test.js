@@ -66,6 +66,6 @@ class Helper {
     this.mochaContext.setProperties({
       space: this.space,
     });
-    await render(hbs`{{content-spaces-configuration space=space}}`);
+    await render(hbs`<ContentSpacesConfiguration @space={{space}} />`);
   }
 }

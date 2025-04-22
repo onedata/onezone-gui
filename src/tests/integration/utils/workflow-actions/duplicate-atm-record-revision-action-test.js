@@ -161,7 +161,7 @@ function itHasCorrectBasicProperties() {
 
 function itShowsModalOnExecute() {
   it('shows modal on execute', async function () {
-    await render(hbs`{{global-modal-mounter}}`);
+    await render(hbs`<GlobalModalMounter />`);
     this.get('action').execute();
     await settled();
 
@@ -192,7 +192,7 @@ function itExecutesMergingOnSubmitWithSuccess() {
         lookupService(this, 'global-notify'),
         'success'
       );
-      await render(hbs`{{global-modal-mounter}}`);
+      await render(hbs`<GlobalModalMounter />`);
 
       const actionResultPromise = action.execute();
       await settled();
@@ -235,7 +235,7 @@ function itExecutesCreatingOnSubmitWithSuccess() {
       } else {
         expectedRecordContent.name = 'abcd';
       }
-      await render(hbs`{{global-modal-mounter}}`);
+      await render(hbs`<GlobalModalMounter />`);
 
       const actionResultPromise = action.execute();
       await settled();
@@ -273,7 +273,7 @@ function itExecutesMergingOnSubmitWithFailure() {
         lookupService(this, 'global-notify'),
         'backendError'
       );
-      await render(hbs `{{global-modal-mounter}}`);
+      await render(hbs `<GlobalModalMounter />`);
 
       const actionResultPromise = action.execute();
       await settled();
@@ -304,7 +304,7 @@ function itExecutesCreatingOnSubmitWithFailure() {
         lookupService(this, 'global-notify'),
         'backendError'
       );
-      await render(hbs `{{global-modal-mounter}}`);
+      await render(hbs `<GlobalModalMounter />`);
 
       const actionResultPromise = action.execute();
       await settled();

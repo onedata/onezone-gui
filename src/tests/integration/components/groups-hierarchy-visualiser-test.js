@@ -214,7 +214,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
     async function () {
       await render(hbs `
         <div style={{containerStyle}}>
-          {{groups-hierarchy-visualiser group=group workspace=workspace}}
+          <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
         </div>
       `);
 
@@ -229,7 +229,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
   it('allows to expand and hide children relation', async function () {
     await render(hbs `
       <div style={{containerStyle}}>
-        {{groups-hierarchy-visualiser group=group workspace=workspace}}
+        <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
       </div>
     `);
 
@@ -245,7 +245,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
     this.set('containerStyle', getContainerStyle(this.get('containerSize')));
     await render(hbs `
       <div style={{containerStyle}}>
-        {{groups-hierarchy-visualiser group=group workspace=workspace}}
+        <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
       </div>
     `);
 
@@ -259,7 +259,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
   it('renders startPoint column properly', async function () {
     await render(hbs `
       <div style={{containerStyle}}>
-        {{groups-hierarchy-visualiser group=group workspace=workspace}}
+        <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
       </div>
     `);
 
@@ -273,7 +273,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
   it('renders children groups and title in children column', async function () {
     await render(hbs `
       <div style={{containerStyle}}>
-        {{groups-hierarchy-visualiser group=group workspace=workspace}}
+        <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
       </div>
     `);
 
@@ -292,7 +292,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
   it('renders parents groups and title in parents column', async function () {
     await render(hbs `
       <div style={{containerStyle}}>
-        {{groups-hierarchy-visualiser group=group workspace=workspace}}
+        <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
       </div>
     `);
 
@@ -311,7 +311,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
   it('renders no groups in empty column', async function () {
     await render(hbs `
       <div style={{containerStyle}}>
-        {{groups-hierarchy-visualiser group=group workspace=workspace}}
+        <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
       </div>
     `);
 
@@ -322,7 +322,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
   it('removes columns that are outside screen', async function () {
     await render(hbs `
       <div style={{containerStyle}}>
-        {{groups-hierarchy-visualiser group=group workspace=workspace}}
+        <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
       </div>
     `);
 
@@ -334,7 +334,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
   it('sorts groups by name', async function () {
     await render(hbs `
       <div style={{containerStyle}}>
-        {{groups-hierarchy-visualiser group=group workspace=workspace}}
+        <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
       </div>
     `);
 
@@ -356,7 +356,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
   it('filters groups by name', async function () {
     await render(hbs `
       <div style={{containerStyle}}>
-        {{groups-hierarchy-visualiser group=group workspace=workspace}}
+        <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
       </div>
     `);
 
@@ -385,7 +385,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
 
     await render(hbs `
       <div style={{containerStyle}}>
-        {{groups-hierarchy-visualiser group=group workspace=workspace}}
+        <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
       </div>
     `);
 
@@ -409,7 +409,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
 
     await render(hbs `
       <div style={{containerStyle}}>
-        {{groups-hierarchy-visualiser group=group workspace=workspace}}
+        <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
       </div>
     `);
 
@@ -442,7 +442,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
 
     await render(hbs `
       <div style={{containerStyle}}>
-        {{groups-hierarchy-visualiser group=group workspace=workspace}}
+        <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
       </div>
     `);
 
@@ -474,7 +474,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
 
     await render(hbs `
       <div style={{containerStyle}}>
-        {{groups-hierarchy-visualiser group=group workspace=workspace}}
+        <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
       </div>
     `);
 
@@ -497,7 +497,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
 
     await render(hbs `
       <div style={{containerStyle}}>
-        {{groups-hierarchy-visualiser group=group workspace=workspace}}
+        <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
       </div>
     `);
 
@@ -525,7 +525,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
 
     await render(hbs `
       <div style={{containerStyle}}>
-        {{groups-hierarchy-visualiser group=group workspace=workspace}}
+        <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
       </div>
     `);
 
@@ -540,9 +540,9 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
 
   it('generates invitation token for group', async function () {
     await render(hbs `
-      {{global-modal-mounter}}
+      <GlobalModalMounter />
       <div style={{containerStyle}}>
-        {{groups-hierarchy-visualiser group=group workspace=workspace}}
+        <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
       </div>
     `);
 
@@ -594,7 +594,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
 
     await render(hbs `
       <div style={{containerStyle}}>
-        {{groups-hierarchy-visualiser group=group workspace=workspace}}
+        <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
       </div>
     `);
 
@@ -618,10 +618,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
   it('removes columns, that are outside screen after resize', async function () {
     await render(hbs `
       <div style={{containerStyle}}>
-        {{groups-hierarchy-visualiser
-          group=group
-          workspace=workspace
-        }}
+        <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
       </div>
     `);
 
@@ -644,10 +641,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
     }));
     await render(hbs `
       <div style={{containerStyle}}>
-        {{groups-hierarchy-visualiser
-          group=group
-          workspace=workspace
-        }}
+        <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
       </div>
     `);
 
@@ -676,10 +670,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
     async function () {
       await render(hbs `
         <div style={{containerStyle}}>
-          {{groups-hierarchy-visualiser
-            group=group
-            workspace=workspace
-          }}
+          <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
         </div>
       `);
 
@@ -705,7 +696,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
   it('removes columns related to removed group', async function () {
     await render(hbs `
       <div style={{containerStyle}}>
-        {{groups-hierarchy-visualiser group=group workspace=workspace}}
+        <GroupsHierarchyVisualiser @group={{group}} @workspace={{workspace}} />
       </div>
     `);
 

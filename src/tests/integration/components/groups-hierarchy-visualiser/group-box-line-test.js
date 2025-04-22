@@ -25,7 +25,7 @@ describe(
       });
 
       this.set('line', line);
-      await render(hbs `{{groups-hierarchy-visualiser/group-box-line line=line}}`);
+      await render(hbs `<GroupsHierarchyVisualiser::GroupBoxLine @line={{line}} />`);
 
       const lineElem = find('.group-box-line');
       expect(lineElem.style.top).to.be.equal('200px');
@@ -48,7 +48,7 @@ describe(
       });
 
       this.set('line', line);
-      await render(hbs `{{groups-hierarchy-visualiser/group-box-line line=line}}`);
+      await render(hbs `<GroupsHierarchyVisualiser::GroupBoxLine @line={{line}} />`);
       const lineElem = find('.group-box-line');
       expect(lineElem.querySelector('.actions-trigger')).to.not.exist;
       set(line, 'hovered', true);
@@ -70,7 +70,7 @@ describe(
       });
 
       this.set('line', line);
-      await render(hbs `{{groups-hierarchy-visualiser/group-box-line line=line}}`);
+      await render(hbs `<GroupsHierarchyVisualiser::GroupBoxLine @line={{line}} />`);
       expect(find('.group-box-line .actions-trigger')).to.not.exist;
     });
 
@@ -91,7 +91,7 @@ describe(
         });
 
         this.set('line', line);
-        await render(hbs `{{groups-hierarchy-visualiser/group-box-line line=line}}`);
+        await render(hbs `<GroupsHierarchyVisualiser::GroupBoxLine @line={{line}} />`);
         await click(find('.group-box-line .actions-trigger'));
         const popover = globals.document.querySelector('.webui-popover.in');
         expect(popover.querySelector('.disabled > .modify-privileges-action')).to.exist;
@@ -115,9 +115,10 @@ describe(
       this.set('line', line);
       this.set('dummyCallback', () => {});
       await render(hbs `
-        {{groups-hierarchy-visualiser/group-box-line
-          line=line
-          modifyPrivileges=dummyCallback}}
+        <GroupsHierarchyVisualiser::GroupBoxLine
+          @line={{line}}
+          @modifyPrivileges={{dummyCallback}}
+        />
       `);
       await click(find('.group-box-line .actions-trigger'));
       const popover = globals.document.querySelector('.webui-popover.in');

@@ -100,17 +100,17 @@ describe('Integration | Component | modals/apply-atm-record-dump-modal/operation
   });
 
 async function renderComponent() {
-  await render(hbs `{{modals/apply-atm-record-dump-modal/operation-form
-    atmModelName=atmModelName
-    dumpSourceType=dumpSourceType
-    selectedOperation=selectedOperation
-    targetAtmRecords=targetAtmRecords
-    selectedTargetAtmRecord=selectedTargetAtmRecord
-    newAtmRecordName=newAtmRecordName
-    dump=dump
-    onValueChange=onValueChange
-    isDisabled=isDisabled
-  }}`);
+  await render(hbs`<Modals::ApplyAtmRecordDumpModal::OperationForm
+    @atmModelName={{this.atmModelName}}
+    @dumpSourceType={{this.dumpSourceType}}
+    @selectedOperation={{this.selectedOperation}}
+    @targetAtmRecords={{this.targetAtmRecords}}
+    @selectedTargetAtmRecord={{this.selectedTargetAtmRecord}}
+    @newAtmRecordName={{this.newAtmRecordName}}
+    @dump={{this.dump}}
+    @onValueChange={{this.onValueChange}}
+    @isDisabled={{this.isDisabled}}
+  />`);
 }
 
 function generateTargetAtmRecords(atmModelName, count, reversedOrder) {

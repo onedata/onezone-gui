@@ -1,39 +1,39 @@
 {{#if isCarouselVisible}}
-  {{#one-carousel activeSlideId=effectiveActiveSlide as |carousel|}}
-    {{#carousel.slide slideId="list"}}
-      {{content-atm-inventories-lambdas/list-view
-        atmInventory=atmInventory
-        onAddAtmLambda=(action "showCreatorView")
-        onRevisionClick=(action "showEditorView")
-        onRevisionCreate=(action "showRevisionCreatorView")
-        onRevisionCreated=(action "showEditorView")
-        onRegisterViewActions=(action "registerViewActions" "list")
-      }}
-    {{/carousel.slide}}
-    {{#carousel.slide slideId="editor"}}
-      {{#render-later triggerRender=(eq effectiveActiveSlide "editor")}}
+  <OneCarousel @activeSlideId={{effectiveActiveSlide}} as |carousel|>
+    <carousel.slide @slideId="list">
+      <ContentAtmInventoriesLambdas::ListView
+        @atmInventory={{atmInventory}}
+        @onAddAtmLambda={{action "showCreatorView"}}
+        @onRevisionClick={{action "showEditorView"}}
+        @onRevisionCreate={{action "showRevisionCreatorView"}}
+        @onRevisionCreated={{action "showEditorView"}}
+        @onRegisterViewActions={{action "registerViewActions" "list"}}
+      />
+    </carousel.slide>
+    <carousel.slide @slideId="editor">
+      <RenderLater @triggerRender={{eq effectiveActiveSlide "editor"}}>
         {{#if (or
           (and (eq activeEditorType "creator") (not activeAtmLambdaId))
           activeAtmLambdaRevisionProxy.isFulfilled
         )}}
-          {{content-atm-inventories-lambdas/editor-view
-            atmInventory=atmInventory
-            atmLambda=activeAtmLambdaProxy.content
-            atmLambdaRevisionNumber=activeRevisionNumber
-            viewType=activeEditorType
-            visible=(eq effectiveActiveSlide "editor")
-            onBackSlide=(action "showListView")
-            onAtmLambdaRevisionSaved=(action "showListView")
-            onRegisterViewActions=(action "registerViewActions" "editor")
-          }}
+          <ContentAtmInventoriesLambdas::EditorView
+            @atmInventory={{atmInventory}}
+            @atmLambda={{activeAtmLambdaProxy.content}}
+            @atmLambdaRevisionNumber={{activeRevisionNumber}}
+            @viewType={{activeEditorType}}
+            @visible={{eq effectiveActiveSlide "editor"}}
+            @onBackSlide={{action "showListView"}}
+            @onAtmLambdaRevisionSaved={{action "showListView"}}
+            @onRegisterViewActions={{action "registerViewActions" "editor"}}
+          />
         {{else}}
-          {{content-atm-inventories-lambdas/loading-view
-            loadingProxy=activeAtmLambdaRevisionProxy
-            onBackSlide=(action "showListView")
-          }}
+          <ContentAtmInventoriesLambdas::LoadingView
+            @loadingProxy={{activeAtmLambdaRevisionProxy}}
+            @onBackSlide={{action "showListView"}}
+          />
         {{/if}}
-      {{/render-later}}
-    {{/carousel.slide}}
-  {{/one-carousel}}
+      </RenderLater>
+    </carousel.slide>
+  </OneCarousel>
 {{/if}}
 {{yield}}

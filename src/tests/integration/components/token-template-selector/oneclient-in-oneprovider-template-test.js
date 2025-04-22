@@ -40,7 +40,7 @@ describe(
     it(
       'renders tile with "template-oneclientInOneprovider" class, correct title and image',
       async function () {
-        await render(hbs `{{token-template-selector/oneclient-in-oneprovider-template}}`);
+        await render(hbs `<TokenTemplateSelector::OneclientInOneproviderTemplate />`);
 
         const tile = find('.one-tile');
         expect(tile).to.have.class('template-oneclientInOneprovider');
@@ -52,7 +52,7 @@ describe(
     );
 
     it('shows list of oneproviders', async function () {
-      await render(hbs `{{token-template-selector/oneclient-in-oneprovider-template}}`);
+      await render(hbs `<TokenTemplateSelector::OneclientInOneproviderTemplate />`);
 
       await click('.one-tile');
       const records = findAll('.record-item');
@@ -65,7 +65,7 @@ describe(
     it('shows information about no oneproviders to choose', async function () {
       this.get('oneproviders').clear();
 
-      await render(hbs `{{token-template-selector/oneclient-in-oneprovider-template}}`);
+      await render(hbs `<TokenTemplateSelector::OneclientInOneproviderTemplate />`);
 
       await click('.one-tile');
       expect(find('.no-records-info')).to.have.trimmed.text('You have no providers.');
@@ -74,9 +74,9 @@ describe(
     it('passes template name and template via selection handler', async function () {
       const selectedSpy = this.set('selectedSpy', sinon.spy());
 
-      await render(hbs `{{token-template-selector/oneclient-in-oneprovider-template
-        onSelected=selectedSpy
-      }}`);
+      await render(hbs `<TokenTemplateSelector::OneclientInOneproviderTemplate
+        @onSelected={{selectedSpy}}
+      />`);
 
       await click('.one-tile');
       await click('.record-item:first-child');

@@ -72,7 +72,7 @@ describe(
         context: this.get('context'),
       });
 
-      await render(hbs `{{global-modal-mounter}}`);
+      await render(hbs `<GlobalModalMounter />`);
       this.action.execute();
       await settled();
       expect(getModal()).to.have.class('record-selector-modal');
@@ -107,7 +107,7 @@ describe(
           'success'
         );
 
-        await render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `<GlobalModalMounter />`);
         const actionResultPromise = this.action.execute();
         await settled();
 
@@ -140,7 +140,7 @@ describe(
           'backendError'
         );
 
-        await render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `<GlobalModalMounter />`);
         const actionResultPromise = this.action.execute();
         await settled();
 

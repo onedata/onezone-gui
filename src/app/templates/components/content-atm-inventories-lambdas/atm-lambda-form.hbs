@@ -1,23 +1,23 @@
 <form class="form form-horizontal form-component">
-  {{form-component/field-renderer field=fields}}
+  <FormComponent::FieldRenderer @field={{fields}} />
   {{#if (or (eq mode "create") (eq mode "edit"))}}
     <div class="btn-toolbar footer-buttons">
-      {{#one-button
-        type="primary"
-        buttonType="submit"
+      <OneButton
+        @type="primary"
+        @buttonType="submit"
         class="btn-submit"
-        onClick=(action "submit")
-        disabled=(not fields.isValid)
-      }}
+        @onClick={{action "submit"}}
+        @disabled={{not fields.isValid}}
+      >
         {{tt this (concat "submit." mode)}}
-      {{/one-button}}
-      {{#one-button
+      </OneButton>
+      <OneButton
         class="btn-cancel"
-        disabled=isSubmitting
-        onClick=(action "cancel")
-      }}
+        @disabled={{isSubmitting}}
+        @onClick={{action "cancel"}}
+      >
         {{tt this "cancel"}}
-      {{/one-button}}
+      </OneButton>
     </div>
   {{/if}}
 </form>

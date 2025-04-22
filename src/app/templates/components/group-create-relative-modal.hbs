@@ -1,14 +1,15 @@
-{{#proceed-process-modal
-  opened=opened
-  close=close
-  proceed=(action "create")
-  processing=processing
-  modalClass="group-create-relative-modal"
-  headerText=(tt this "createRelativeGroup" relation=(tt this relation))
-  proceedButtonClass="btn btn-primary proceed"
-  proceedButtonText=(tt this "create")
-  proceedDisabled=proceedDisabled
-  onShown=(action "onShown")}}
+<ProceedProcessModal
+  @opened={{opened}}
+  @close={{close}}
+  @proceed={{action "create"}}
+  @processing={{processing}}
+  @modalClass="group-create-relative-modal"
+  @headerText={{tt this "createRelativeGroup" relation=(tt this relation)}}
+  @proceedButtonClass="btn btn-primary proceed"
+  @proceedButtonText={{tt this "create"}}
+  @proceedDisabled={{proceedDisabled}}
+  @onShown={{action "onShown"}}
+>
   <p class="input-top-description">
     {{tt this "enterRelativeGroupName"
       relation=(tt this relation)
@@ -21,4 +22,4 @@
     placeholder={{tt this "newGroupNamePlaceholder" relation=relation}}
     disabled={{processing}}
     class="form-control modal-input create-relative-group-name">
-{{/proceed-process-modal}}
+</ProceedProcessModal>

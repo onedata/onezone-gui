@@ -1,24 +1,25 @@
-{{#proceed-process-modal
-  opened=opened
-  close=close
-  proceed=save
-  processing=processing
-  modalClass="privileges-editor-modal"
-  headerText=(tt this "header")
-  proceedButtonClass="btn btn-primary proceed"
-  proceedButtonText=(tt this "save")
-  proceedDisabled=(not recordProxy.isLoaded)
-  textCenter=false}}
+<ProceedProcessModal
+  @opened={{opened}}
+  @close={{close}}
+  @proceed={{save}}
+  @processing={{processing}}
+  @modalClass="privileges-editor-modal"
+  @headerText={{tt this "header"}}
+  @proceedButtonClass="btn btn-primary proceed"
+  @proceedButtonText={{tt this "save"}}
+  @proceedDisabled={{not recordProxy.isLoaded}}
+  @textCenter={{false}}
+>
   {{tt this "description"}}
   <div class="bulk-edit-privileges-table-container">
-    {{member-privileges/member-privileges-table
-      privilegesGroups=privilegesGroups
-      privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
-      privilegesTranslationsPath=privilegesTranslationsPath
-      recordDirectProxy=recordProxy
-      recordEffectiveProxy=recordProxy
-      isDirect=true
-      isBulkEdit=true
-    }}
+    <MemberPrivileges::MemberPrivilegesTable
+      @privilegesGroups={{privilegesGroups}}
+      @privilegeGroupsTranslationsPath={{privilegeGroupsTranslationsPath}}
+      @privilegesTranslationsPath={{privilegesTranslationsPath}}
+      @recordDirectProxy={{recordProxy}}
+      @recordEffectiveProxy={{recordProxy}}
+      @isDirect={{true}}
+      @isBulkEdit={{true}}
+    />
   </div>
-{{/proceed-process-modal}}
+</ProceedProcessModal>

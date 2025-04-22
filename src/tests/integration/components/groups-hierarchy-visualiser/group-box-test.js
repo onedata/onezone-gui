@@ -27,7 +27,7 @@ describe(
 
       this.set('groupBox', groupBox);
       await render(hbs `
-        {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
+        <GroupsHierarchyVisualiser::GroupBox @groupBox={{groupBox}} />
       `);
       expect(find('.group-box .group-name')).to.have.trimmed.text('testname');
     });
@@ -46,9 +46,10 @@ describe(
         return resolve();
       });
       await render(hbs `
-        {{groups-hierarchy-visualiser/group-box
-          groupBox=groupBox
-          renameGroup=(action renameGroup)}}
+        <GroupsHierarchyVisualiser::GroupBox
+          @groupBox={{groupBox}}
+          @renameGroup={{action renameGroup}}
+        />
       `);
 
       const groupBoxElem = find('.group-box');
@@ -76,7 +77,7 @@ describe(
 
       this.set('groupBox', groupBox);
       await render(hbs `
-        {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
+        <GroupsHierarchyVisualiser::GroupBox @groupBox={{groupBox}} />
       `);
       expect(findAll('.group-box-line')).to.have.length(2);
     });
@@ -96,7 +97,7 @@ describe(
 
       this.set('groupBox', groupBox);
       await render(hbs `
-        {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
+        <GroupsHierarchyVisualiser::GroupBox @groupBox={{groupBox}} />
       `);
       expect(find('.group-box-line')).to.not.exist;
     });
@@ -119,7 +120,7 @@ describe(
 
       this.set('groupBox', groupBox);
       await render(hbs `
-        {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
+        <GroupsHierarchyVisualiser::GroupBox @groupBox={{groupBox}} />
       `);
       expect(find('.group-box-relation.children .relations-number'))
         .to.have.trimmed.text('2');
@@ -137,7 +138,7 @@ describe(
 
       this.set('groupBox', groupBox);
       await render(hbs `
-        {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
+        <GroupsHierarchyVisualiser::GroupBox @groupBox={{groupBox}} />
       `);
       expect(find('.direct-membership-icon')).to.exist;
     });
@@ -152,7 +153,7 @@ describe(
 
       this.set('groupBox', groupBox);
       await render(hbs `
-        {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
+        <GroupsHierarchyVisualiser::GroupBox @groupBox={{groupBox}} />
       `);
       expect(find('.direct-membership-icon')).to.not.exist;
     });
@@ -170,7 +171,7 @@ describe(
 
         this.set('groupBox', groupBox);
         await render(hbs `
-          {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
+          <GroupsHierarchyVisualiser::GroupBox @groupBox={{groupBox}} />
         `);
 
         const groupBoxElem = find('.group-box');
@@ -195,7 +196,7 @@ describe(
 
         this.set('groupBox', groupBox);
         await render(hbs `
-          {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
+          <GroupsHierarchyVisualiser::GroupBox @groupBox={{groupBox}} />
         `);
 
         const groupBoxElem = find('.group-box');
@@ -219,7 +220,7 @@ describe(
 
         this.set('groupBox', groupBox);
         await render(hbs `
-          {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
+          <GroupsHierarchyVisualiser::GroupBox @groupBox={{groupBox}} />
         `);
         expect(find('.group-box .group-actions-trigger')).to.not.exist;
       }
@@ -237,9 +238,10 @@ describe(
       this.set('groupBox', groupBox);
       this.set('leaveGroup', () => {});
       await render(hbs `
-        {{groups-hierarchy-visualiser/group-box
-          groupBox=groupBox
-          leaveGroup=(action leaveGroup)}}
+        <GroupsHierarchyVisualiser::GroupBox
+          @groupBox={{groupBox}}
+          @leaveGroup={{action leaveGroup}}
+        />
       `);
       await click(find('.group-box .group-actions-trigger'));
       const popover = globals.document.querySelector('.webui-popover.in');
@@ -260,7 +262,7 @@ describe(
 
       this.set('groupBox', groupBox);
       await render(hbs `
-        {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
+        <GroupsHierarchyVisualiser::GroupBox @groupBox={{groupBox}} />
       `);
 
       const groupBoxElem = find('.group-box');

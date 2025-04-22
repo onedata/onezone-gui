@@ -191,11 +191,11 @@ describe('Integration | Component | content-atm-inventories-workflows/revision-d
   });
 
 async function renderComponent() {
-  await render(hbs `{{content-atm-inventories-workflows/revision-details-form
-    atmWorkflowSchema=atmWorkflowSchema
-    revisionNumber=revisionNumber
-    onChange=changeSpy
-  }}`);
+  await render(hbs `<ContentAtmInventoriesWorkflows::RevisionDetailsForm
+    @atmWorkflowSchema={{atmWorkflowSchema}}
+    @revisionNumber={{revisionNumber}}
+    @onChange={{changeSpy}}
+  />`);
 }
 
 function expectValues({ state, description }) {

@@ -1,53 +1,53 @@
-{{#oneprovider-view-container
-  contentContainerClass="content-spaces-providers-content"
-  space=space
-  oneproviderId=oneproviderId
-  resourceType="data"
-  isTabBarCollapsed=false
-  isOverviewEnabled=true
-  isOneproviderViewLocal=true
-  shouldOfflineOneprovidersBeEnabled=true
-  mapSelectorEnabled=true
-  minOneproviderRequiredVersion=minOneproviderRequiredVersion
-  oneproviderIdChanged=(action "oneproviderIdChanged")
-  hasEmbeddedIframesChanged=(action "hasEmbeddedIframesChanged")
+<OneproviderViewContainer
+  @contentContainerClass="content-spaces-providers-content"
+  @space={{space}}
+  @oneproviderId={{oneproviderId}}
+  @resourceType="data"
+  @isTabBarCollapsed={{false}}
+  @isOverviewEnabled={{true}}
+  @isOneproviderViewLocal={{true}}
+  @shouldOfflineOneprovidersBeEnabled={{true}}
+  @mapSelectorEnabled={{true}}
+  @minOneproviderRequiredVersion={{minOneproviderRequiredVersion}}
+  @oneproviderIdChanged={{action "oneproviderIdChanged"}}
+  @hasEmbeddedIframesChanged={{action "hasEmbeddedIframesChanged"}}
   as |container|
-}}
-  {{#container.header class="content-spaces-providers-header"}}
+>
+  <container.header class="content-spaces-providers-header">
     <div class="row content-row header-row hidden-xs">
       <h1 class="with-menu with-visible-collapsible-menu">
         <span class="one-label">
           {{tt this "header"}}
         </span>
-        {{actions-toolbar actionsArray=globalActions}}
+        <ActionsToolbar @actionsArray={{globalActions}} />
       </h1>
     </div>
-  {{/container.header}}
-  {{#container.body}}
+  </container.header>
+  <container.body>
     {{#if (not container.selectedProvider)}}
       {{!-- display nothing while providers are loading --}}
     {{else if (eq container.selectedProvider "overview")}}
-      {{spaces-providers-overview
-        space=space
-        oneproviderIdChanged=(action "oneproviderIdChanged")
-        providersProxy=providersProxy
-      }}
+      <SpacesProvidersOverview
+        @space={{space}}
+        @oneproviderIdChanged={{action "oneproviderIdChanged"}}
+        @providersProxy={{providersProxy}}
+      />
     {{else}}
       {{#if (evaluate-function
         (action "checkIsOneproviderVersionTooLow")
         container.selectedProvider
       )}}
-        {{oneprovider-view-container/info-old-oneprovider
-          requiredVersion=minOneproviderRequiredVersion
-          infoType="selectedOld"
-          selectedProviderVersion=container.selectedProvider.version
-        }}
+        <OneproviderViewContainer::InfoOldOneprovider
+          @requiredVersion={{minOneproviderRequiredVersion}}
+          @infoType="selectedOld"
+          @selectedProviderVersion={{container.selectedProvider.version}}
+        />
       {{else}}
-        {{content-spaces-providers/provider-config
-          space=space
-          provider=container.selectedProvider
-        }}
+        <ContentSpacesProviders::ProviderConfig
+          @space={{space}}
+          @provider={{container.selectedProvider}}
+        />
       {{/if}}
     {{/if}}
-  {{/container.body}}
-{{/oneprovider-view-container}}
+  </container.body>
+</OneproviderViewContainer>

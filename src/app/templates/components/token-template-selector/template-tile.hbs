@@ -1,8 +1,8 @@
-{{#one-tile
-  title=(tt this "title")
-  class=templateTileClasses
-  isLink=onClick
-  click=onClick
-}}
+<OneTile
+  @title={{tt this "title"}}
+  class={{templateTileClasses}}
+  @isLink={{onClick}}
+  @click={{onClick}}
+>
   {{yield}}
-{{/one-tile}}
+</OneTile>

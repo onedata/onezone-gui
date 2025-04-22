@@ -13,7 +13,7 @@ describe(
     it(
       'renders tile with "template-onezoneRest" class, correct title and image',
       async function () {
-        await render(hbs `{{token-template-selector/onezone-rest-template}}`);
+        await render(hbs `<TokenTemplateSelector::OnezoneRestTemplate />`);
 
         const tile = find('.one-tile');
         expect(tile).to.have.class('template-onezoneRest');
@@ -27,9 +27,9 @@ describe(
     it('passes template name and template via selection handler', async function () {
       const selectedSpy = this.set('selectedSpy', sinon.spy());
 
-      await render(hbs `{{token-template-selector/onezone-rest-template
-        onSelected=selectedSpy
-      }}`);
+      await render(hbs `<TokenTemplateSelector::OnezoneRestTemplate
+        @onSelected={{selectedSpy}}
+      />`);
 
       await click('.one-tile');
       expect(selectedSpy).to.be.calledOnce.and.to.be.calledWith(

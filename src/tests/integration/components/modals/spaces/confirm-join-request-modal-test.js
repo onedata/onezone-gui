@@ -404,7 +404,7 @@ class Helper {
   }
 
   async showModal() {
-    await render(hbs`{{alert-global}}{{global-modal-mounter}}`);
+    await render(hbs`<AlertGlobal /><GlobalModalMounter />`);
     return await this.modalManager
       .show('spaces/confirm-join-request-modal', this.modalOptions)
       .shownPromise;

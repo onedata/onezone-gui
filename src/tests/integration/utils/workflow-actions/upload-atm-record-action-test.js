@@ -212,7 +212,7 @@ function itHasCorrectBasicProperties() {
 function itShowsModalOnFileUpload() {
   it('shows modal on file upload', async function () {
     const filename = 'file.json';
-    await render(hbs`{{global-modal-mounter}}`);
+    await render(hbs`<GlobalModalMounter />`);
     const dump = generateDump(this.get('atmModelName'));
     await triggerUploadInputChange(filename, JSON.stringify(dump));
 
@@ -224,7 +224,7 @@ function itShowsModalOnFileUpload() {
 
 function itAllowsToReuploadAnotherFile() {
   it('allows to reupload another file', async function () {
-    await render(hbs`{{global-modal-mounter}}`);
+    await render(hbs`<GlobalModalMounter />`);
     const dump = generateDump(this.get('atmModelName'));
     await triggerUploadInputChange('file.json', JSON.stringify(dump));
     await triggerUploadInputChange('file2.json', JSON.stringify(dump));
@@ -239,7 +239,7 @@ function itShowsInfoAboutInvalidUploadedFile() {
       async function () {
         const atmModelName = this.get('atmModelName');
         const filename = 'file.json';
-        await render(hbs`{{global-modal-mounter}}`);
+        await render(hbs`<GlobalModalMounter />`);
 
         const dump = generateDump(atmModelName);
         if (atmModelName === 'atmLambda' && fieldName === 'name') {
@@ -258,7 +258,7 @@ function itShowsInfoAboutInvalidUploadedFile() {
   it('shows info about invalid uploaded file (non-json content)',
     async function () {
       const filename = 'file.json';
-      await render(hbs`{{global-modal-mounter}}`);
+      await render(hbs`<GlobalModalMounter />`);
 
       await triggerUploadInputChange(filename, 'random content');
 
@@ -281,7 +281,7 @@ function itExecutesMergingOnSubmitWithSuccess() {
         'success'
       );
       const dump = generateDump(atmModelName);
-      await render(hbs`{{global-modal-mounter}}`);
+      await render(hbs`<GlobalModalMounter />`);
 
       await triggerUploadInputChange('file.json', JSON.stringify(dump));
       await click('.submit-btn');
@@ -316,7 +316,7 @@ function itExecutesCreatingOnSubmitWithSuccess() {
       } else {
         expectedRecordContent.name = 'abcd';
       }
-      await render(hbs`{{global-modal-mounter}}`);
+      await render(hbs`<GlobalModalMounter />`);
 
       await triggerUploadInputChange('file.json', JSON.stringify(dump));
       await click('.option-create');
@@ -347,7 +347,7 @@ function itExecutesMergingOnSubmitWithFailure() {
         'backendError'
       );
       const dump = generateDump(atmModelName);
-      await render(hbs`{{global-modal-mounter}}`);
+      await render(hbs`<GlobalModalMounter />`);
 
       await triggerUploadInputChange('file.json', JSON.stringify(dump));
       await click('.submit-btn');
@@ -374,7 +374,7 @@ function itExecutesCreatingOnSubmitWithFailure() {
         'backendError'
       );
       const dump = generateDump(atmModelName);
-      await render(hbs`{{global-modal-mounter}}`);
+      await render(hbs`<GlobalModalMounter />`);
 
       await triggerUploadInputChange('file.json', JSON.stringify(dump));
       await click('.option-create');

@@ -238,7 +238,7 @@ class Helper {
 
   async showModal() {
     await this.currentUser.ensureStub();
-    await render(hbs`{{global-modal-mounter}}`);
+    await render(hbs`<GlobalModalMounter />`);
     return await this.modalManager
       .show('spaces/request-space-access-modal', this.modalOptions)
       .shownPromise;

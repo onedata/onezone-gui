@@ -1,44 +1,43 @@
 <div class="row content-row header-row hidden-xs">
   <h1>
     <span class="one-label">{{tt this "header"}}</span>
-    {{actions-toolbar isMinimized=false actionsArray=globalActions}}
+    <ActionsToolbar @isMinimized={{false}} @actionsArray={{globalActions}} />
   </h1>
 </div>
-{{#promise-proxy-container proxy=atmWorkflowSchemasProxy}}
+<PromiseProxyContainer @proxy={{atmWorkflowSchemasProxy}}>
   {{#if atmWorkflowSchemasProxy.content.length}}
     <div class="row content-row">
-      {{content-atm-inventories-workflows/atm-workflow-schemas-list
-        atmInventory=atmInventory
-        collection=atmWorkflowSchemasProxy.content
-        onRevisionClick=onOpenAtmWorkflowSchemaRevision
-        onRevisionCreated=onCreatedAtmWorkflowSchemaRevision
-      }}
+      <ContentAtmInventoriesWorkflows::AtmWorkflowSchemasList
+        @atmInventory={{atmInventory}}
+        @collection={{atmWorkflowSchemasProxy.content}}
+        @onRevisionClick={{onOpenAtmWorkflowSchemaRevision}}
+        @onRevisionCreated={{onCreatedAtmWorkflowSchemaRevision}}
+      />
     </div>
   {{else}}
-    {{#content-info
+    <ContentInfo
       class="scroll-breakpoint-500"
-      header=(tt this "noWorkflowsHeader")
-      text=(tt this "noWorkflowsText")
-    }}
-      {{#one-button
-        type="primary"
-        size="lg"
-        class=(concat-classes
+      @header={{tt this "noWorkflowsHeader"}}
+      @text={{tt this "noWorkflowsText"}}
+    >
+      <OneButton
+        @type="primary"
+        @size="lg"
+        class={{concat-classes
           addNewAtmWorkflowSchemaAction.class
           (if addNewAtmWorkflowSchemaAction.disabled "disabled")
-        )
-        onClick=(if
-          addNewAtmWorkflowSchemaAction.disabled
-          (no-action)
+        }}
+        @onClick={{if addNewAtmWorkflowSchemaAction.disabled
+          (no-action )
           addNewAtmWorkflowSchemaAction.action
-        )
-      }}
+        }}
+      >
         {{addNewAtmWorkflowSchemaAction.title}}
         {{#if addNewAtmWorkflowSchemaAction.tip}}
-          {{one-tooltip title=addNewAtmWorkflowSchemaAction.tip}}
+          <OneTooltip @title={{addNewAtmWorkflowSchemaAction.tip}} />
         {{/if}}
-      {{/one-button}}
-    {{/content-info}}
+      </OneButton>
+    </ContentInfo>
   {{/if}}
-{{/promise-proxy-container}}
+</PromiseProxyContainer>
 {{yield}}

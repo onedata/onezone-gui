@@ -13,7 +13,7 @@ describe(
     it(
       'renders tile with "template-identity" class, correct title and image',
       async function () {
-        await render(hbs `{{token-template-selector/identity-template}}`);
+        await render(hbs `<TokenTemplateSelector::IdentityTemplate />`);
 
         const tile = find('.one-tile');
         expect(tile).to.have.class('template-identity');
@@ -26,9 +26,9 @@ describe(
     it('passes template name and template via selection handler', async function () {
       const selectedSpy = this.set('selectedSpy', sinon.spy());
 
-      await render(hbs `{{token-template-selector/identity-template
-        onSelected=selectedSpy
-      }}`);
+      await render(hbs `<TokenTemplateSelector::IdentityTemplate
+        @onSelected={{selectedSpy}}
+      />`);
 
       await click('.one-tile');
       expect(selectedSpy)

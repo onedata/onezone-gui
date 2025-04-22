@@ -43,7 +43,7 @@ describe('Integration | Component | resource-info-tile', function () {
       },
     });
     this.set('record', record);
-    await render(hbs `{{resource-info-tile record=record}}`);
+    await render(hbs `<ResourceInfoTile @record={{record}} />`);
 
     expect(find('.resource-name')).to.contain.text(get(record, 'name'));
     expect(find('.id input')).to.have.value(get(record, 'entityId'));

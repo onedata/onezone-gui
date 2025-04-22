@@ -1,29 +1,29 @@
-{{#oneprovider-view-container
-  contentContainerClass="content-spaces-automation-content"
-  space=space
-  oneproviderId=oneproviderId
-  minOneproviderRequiredVersion="21.02.1"
-  mapSelectorEnabled=false
-  resourceType="automation"
-  oneproviderIdChanged=(action "oneproviderIdChanged")
-  hasEmbeddedIframesChanged=(action "hasEmbeddedIframesChanged")
+<OneproviderViewContainer
+  @contentContainerClass="content-spaces-automation-content"
+  @space={{space}}
+  @oneproviderId={{oneproviderId}}
+  @minOneproviderRequiredVersion="21.02.1"
+  @mapSelectorEnabled={{false}}
+  @resourceType="automation"
+  @oneproviderIdChanged={{action "oneproviderIdChanged"}}
+  @hasEmbeddedIframesChanged={{action "hasEmbeddedIframesChanged"}}
   as |container|
-}}
-  {{#container.header class="content-spaces-automation-header"}}
+>
+  <container.header class="content-spaces-automation-header">
     <h1>
       <span class="one-label">{{tt this "header"}}</span>
     </h1>
-  {{/container.header}}
-  {{#container.body}}
-    {{embedded-content-space-automation
-      oneprovider=container.selectedProvider
-      baseUrl=container.contentIframeBaseUrl
-      spaceEntityId=space.entityId
-      tab=tab
-      workflowExecutionId=workflowExecutionId
-      workflowSchemaId=workflowSchemaId
-      workflowSchemaRevision=workflowSchemaRevision
-      fillInputStores=fillInputStores
-    }}
-  {{/container.body}}
-{{/oneprovider-view-container}}
+  </container.header>
+  <container.body>
+    <EmbeddedContentSpaceAutomation
+      @oneprovider={{container.selectedProvider}}
+      @baseUrl={{container.contentIframeBaseUrl}}
+      @spaceEntityId={{space.entityId}}
+      @tab={{tab}}
+      @workflowExecutionId={{workflowExecutionId}}
+      @workflowSchemaId={{workflowSchemaId}}
+      @workflowSchemaRevision={{workflowSchemaRevision}}
+      @fillInputStores={{fillInputStores}}
+    />
+  </container.body>
+</OneproviderViewContainer>

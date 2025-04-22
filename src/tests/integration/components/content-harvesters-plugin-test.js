@@ -29,7 +29,7 @@ describe('Integration | Component | content-harvesters-plugin', function () {
     sinon.stub(dataDiscoveryResources, 'createAppProxyObject')
       .returns(injectedData);
     this.set('resolvingAjax', resolvingAjax);
-    await render(hbs `{{content-harvesters-plugin _ajax=resolvingAjax}}`);
+    await render(hbs `<ContentHarvestersPlugin @_ajax={{resolvingAjax}} />`);
 
     const iframe = find('iframe');
     const loadEvent = new Event('load');

@@ -130,7 +130,7 @@ describe('Integration | Utility | token-actions/generate-invite-token-action', f
       context: this.get('context'),
     });
 
-    await render(hbs `{{global-modal-mounter}}`);
+    await render(hbs `<GlobalModalMounter />`);
     this.action.execute();
     await settled();
 
@@ -144,7 +144,7 @@ describe('Integration | Utility | token-actions/generate-invite-token-action', f
       context: this.get('context'),
     });
 
-    await render(hbs `{{global-modal-mounter}}`);
+    await render(hbs `<GlobalModalMounter />`);
     this.action.execute();
     await settled();
 
@@ -161,7 +161,7 @@ describe('Integration | Utility | token-actions/generate-invite-token-action', f
     });
     let promiseIsResolved = false;
 
-    await render(hbs `{{global-modal-mounter}}`);
+    await render(hbs `<GlobalModalMounter />`);
     this.action.execute().then(() => promiseIsResolved = true);
 
     await settled();

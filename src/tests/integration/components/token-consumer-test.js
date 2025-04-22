@@ -58,13 +58,13 @@ describe('Integration | Component | token-consumer', function () {
   });
 
   it('has class "token-consumer"', async function () {
-    await render(hbs `{{token-consumer}}`);
+    await render(hbs `<TokenConsumer />`);
 
     expect(find('.token-consumer')).to.exist;
   });
 
   it('has token input', async function () {
-    await render(hbs `{{token-consumer}}`);
+    await render(hbs `<TokenConsumer />`);
 
     const input = find('input[type="text"].token-string');
     expect(input).to.exist;
@@ -72,13 +72,13 @@ describe('Integration | Component | token-consumer', function () {
   });
 
   it('does not invoke examine on init', async function () {
-    await render(hbs `{{token-consumer}}`);
+    await render(hbs `<TokenConsumer />`);
 
     expect(this.get('examineStub')).to.not.be.called;
   });
 
   it('invokes examine on token input', async function () {
-    await render(hbs `{{token-consumer}}`);
+    await render(hbs `<TokenConsumer />`);
 
     await fillIn('.token-string', 'token');
     const examineStub = this.get('examineStub');
@@ -87,7 +87,7 @@ describe('Integration | Component | token-consumer', function () {
   });
 
   it('invokes examine many times on subsequent token input', async function () {
-    await render(hbs `{{token-consumer}}`);
+    await render(hbs `<TokenConsumer />`);
 
     await fillIn('.token-string', 'token');
     await fillIn('.token-string', 'token1');
@@ -111,7 +111,7 @@ describe('Integration | Component | token-consumer', function () {
     it(`shows type information for ${name} token`, async function () {
       stubExamine(this, 'token', resolve({ type }));
 
-      await render(hbs `{{token-consumer}}`);
+      await render(hbs `<TokenConsumer />`);
 
       await fillIn('.token-string', 'token');
       expect(find('.token-type')).to.have.trimmed.text(typeText);
@@ -120,7 +120,7 @@ describe('Integration | Component | token-consumer', function () {
     it(`does not show "Join" button for ${name} token`, async function () {
       stubExamine(this, 'token', resolve({ type }));
 
-      await render(hbs `{{token-consumer}}`);
+      await render(hbs `<TokenConsumer />`);
 
       await fillIn('.token-string', 'token');
       expect(find('.no-join-message')).to.have.trimmed.text(
@@ -273,7 +273,7 @@ describe('Integration | Component | token-consumer', function () {
           },
         }));
 
-        await render(hbs `{{token-consumer}}`);
+        await render(hbs `<TokenConsumer />`);
 
         await fillIn('.token-string', 'token');
         expect(find('.no-join-message')).to.have.trimmed.text(noJoinMessage);
@@ -287,7 +287,7 @@ describe('Integration | Component | token-consumer', function () {
           },
         }));
 
-        await render(hbs `{{token-consumer}}`);
+        await render(hbs `<TokenConsumer />`);
 
         await fillIn('.token-string', 'token');
         expect(find('.no-join-message')).to.not.exist;
@@ -302,7 +302,7 @@ describe('Integration | Component | token-consumer', function () {
         },
       }));
 
-      await render(hbs `{{token-consumer}}`);
+      await render(hbs `<TokenConsumer />`);
 
       await fillIn('.token-string', 'token');
       expect(find('.token-type')).to.have.trimmed.text(typeText);
@@ -320,7 +320,7 @@ describe('Integration | Component | token-consumer', function () {
             targetName: 'someRecord',
           }));
 
-          await render(hbs `{{token-consumer}}`);
+          await render(hbs `<TokenConsumer />`);
 
           await fillIn('.token-string', 'token');
           const recordSelector = find('.joining-record-selector');
@@ -348,7 +348,7 @@ describe('Integration | Component | token-consumer', function () {
             },
           }));
 
-          await render(hbs `{{token-consumer}}`);
+          await render(hbs `<TokenConsumer />`);
 
           await fillIn('.token-string', 'token');
           expect(find('.confirm-btn')).to.have.attr('disabled');
@@ -364,7 +364,7 @@ describe('Integration | Component | token-consumer', function () {
             },
           }));
 
-          await render(hbs `{{token-consumer}}`);
+          await render(hbs `<TokenConsumer />`);
 
           await fillIn('.token-string', 'token');
           await selectChoose('.joining-record-selector', `${modelToSelect}0`);
@@ -382,7 +382,7 @@ describe('Integration | Component | token-consumer', function () {
             targetName: 'someRecord',
           }));
 
-          await render(hbs `{{token-consumer}}`);
+          await render(hbs `<TokenConsumer />`);
 
           await fillIn('.token-string', 'token');
           expect(find('.joining-record-selector')).to.not.exist;
@@ -399,7 +399,7 @@ describe('Integration | Component | token-consumer', function () {
               },
             }));
 
-            await render(hbs `{{token-consumer}}`);
+            await render(hbs `<TokenConsumer />`);
 
             await fillIn('.token-string', 'token');
             expect(find('.confirm-btn')).to.not.have.attr('disabled');
@@ -421,7 +421,7 @@ describe('Integration | Component | token-consumer', function () {
         },
       }));
 
-      await render(hbs `{{token-consumer}}`);
+      await render(hbs `<TokenConsumer />`);
 
       await fillIn('.token-string', 'token');
       expect(find('.token-type'))
@@ -434,7 +434,7 @@ describe('Integration | Component | token-consumer', function () {
   it('informs about incorrect token', async function () {
     stubExamine(this, 'token', reject({ id: 'badValueToken' }));
 
-    await render(hbs `{{token-consumer}}`);
+    await render(hbs `<TokenConsumer />`);
 
     await fillIn('.token-string', 'token');
 
@@ -445,14 +445,14 @@ describe('Integration | Component | token-consumer', function () {
   it('informs about other examine errors', async function () {
     stubExamine(this, 'token', reject({ id: 'someOtherError' }));
 
-    await render(hbs `{{token-consumer}}`);
+    await render(hbs `<TokenConsumer />`);
 
     await fillIn('.token-string', 'token');
     expect(find('.resource-load-error')).to.contain.text('someOtherError');
   });
 
   it('interprets whitespaces in token input as an empty value', async function () {
-    await render(hbs `{{token-consumer}}`);
+    await render(hbs `<TokenConsumer />`);
 
     await fillIn('.token-string', '   ');
     expect(find('.invalid-token-message')).to.not.exist;
@@ -463,7 +463,7 @@ describe('Integration | Component | token-consumer', function () {
   it(
     'interprets forbidden-only characters in token input as an incorrect token',
     async function () {
-      await render(hbs `{{token-consumer}}`);
+      await render(hbs `<TokenConsumer />`);
 
       await fillIn('.token-string', '!@#$%^&*()');
       expect(find('.invalid-token-message')).to.exist;
@@ -476,7 +476,7 @@ describe('Integration | Component | token-consumer', function () {
     let resolveRequest;
     stubExamine(this, 'token', new Promise(resolve => resolveRequest = resolve));
 
-    await render(hbs `{{token-consumer}}`);
+    await render(hbs `<TokenConsumer />`);
 
     expect(find('.spinner')).to.not.exist;
     await fillIn('.token-string', 'token');
@@ -504,7 +504,7 @@ describe('Integration | Component | token-consumer', function () {
         sinon.stub(tokenActions, 'createConsumeInviteTokenAction')
         .returns(consumeInviteTokenAction);
 
-      await render(hbs `{{token-consumer}}`);
+      await render(hbs `<TokenConsumer />`);
 
       await fillIn('.token-string', 'token');
       await selectChoose('.joining-record-selector', 'group0');
@@ -538,7 +538,7 @@ describe('Integration | Component | token-consumer', function () {
       sinon.stub(tokenActions, 'createConsumeInviteTokenAction')
         .returns(consumeInviteTokenAction);
 
-      await render(hbs `{{token-consumer}}`);
+      await render(hbs `<TokenConsumer />`);
 
       await fillIn('.token-string', 'token');
       await click('.confirm-btn');
@@ -557,7 +557,7 @@ describe('Integration | Component | token-consumer', function () {
         },
       },
     }));
-    await render(hbs `{{token-consumer}}`);
+    await render(hbs `<TokenConsumer />`);
 
     await fillIn('.token-string', 'token');
     const consumeTokenImage = find('.consume-token-image');
