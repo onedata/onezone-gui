@@ -10,13 +10,42 @@
 
 import { SharesSidebarItem } from 'onezone-gui/utils/shares-sidebar-item';
 import getIndexedListPosition from 'onedata-gui-common/utils/get-indexed-list-position';
+import compareStringBytes from 'onedata-gui-common/utils/compare-string-bytes';
 
-/**
- * @typedef {Object} ShareListCache
- * @property {Array<SharesSidebarItem>} array
- * @property {boolean} isStartReached
- * @property {boolean} isEndReached
- */
+class SpaceFetchCache {
+  constructor(array, isEndReached) {
+    /** @type {Array<SharesSidebarItem>} */
+    this.array = array;
+
+    /** @type {boolean} */
+    this.isEndReached = isEndReached;
+
+    /**
+     * Items indexes, before whose there are no items in the array. Eg. for indexes in the
+     * array source: `[c, d, e, f, g]`, the `emptyStartIndexes` would be: `[a, a1, a2, b,
+     * b1, b2]` etc. There can be infinite number of possible `emptyStartIndexes`, but the
+     * specific indexes are added to this collecion when there is a fetchPrev call that
+     * returns empty result, so we know, that there should not be more items in the
+     * beginning of source.
+     * @type {Array<string>}
+     */
+    this.emptyStartIndexes = [];
+  }
+
+  addEmptyStartIndex(index) {
+    this.emptyStartIndexes.push(index);
+    this.emptyStartIndexes.sort(compareStringBytes);
+  }
+
+  isEmptyStartIndex(index) {
+    for (let i = this.emptyStartIndexes.length - 1; i >= 0; --i) {
+      if (compareStringBytes(index, this.emptyStartIndexes[i])) {
+        return true;
+      }
+    }
+    return false;
+  }
+}
 
 /**
  * Provides method to get SharesSidebarItems list for space.
@@ -53,6 +82,9 @@ export default class ShareListFetcherToolkit {
    * @returns {Promise<ShareDataListPage>}
    */
   async getShareList(spaceId, listQuery) {
+    // Uncomment for debug
+    // console.log('getShareList', spaceId, JSON.stringify(listQuery), '\n');
+
     const { index, limit, offset } = listQuery;
 
     let effIndex = index;
@@ -61,9 +93,10 @@ export default class ShareListFetcherToolkit {
     let cachedArray;
     let cachedIsLast;
 
-    const spaceFetchCache = this.getSpaceFetchCache(spaceId);
-    if (spaceFetchCache && offset >= 0) {
-      const fullCachedArray = spaceFetchCache.array;
+    /** @type {SpaceFetchCache} */
+    const existingSpaceFetchCache = this.getSpaceFetchCache(spaceId);
+    if (existingSpaceFetchCache && offset >= 0) {
+      const fullCachedArray = existingSpaceFetchCache.array;
       const fullCachePosition = getIndexedListPosition(fullCachedArray, index);
       if (fullCachePosition < fullCachedArray.length) {
         const fragmentLength = Math.min(
@@ -77,18 +110,23 @@ export default class ShareListFetcherToolkit {
         effLimit = limit - fragmentLength;
         effIndex = cachedArray.at(-1).index;
         effOffset += 1;
-        cachedIsLast =
-          (cachedArray.at(-1) === fullCachedArray.at(-1)) && spaceFetchCache.isEndReached;
+        cachedIsLast = (cachedArray.at(-1) === fullCachedArray.at(-1)) &&
+          existingSpaceFetchCache.isEndReached;
         // FIXME: new index: trzeba sprawdzić jaki zakres cache można wziąć do wyniku (uwzględnić offset!); wtedy nowym indeksem będzie ostatni index + 1 z fragmentu cache
       } else {
         // FIXME: przekroczyliśmy tablicę: to oznacza, że poprzedni request nie zawierał tego rekordu
         // trzeba więc sprawdzić, czy poprzednim razem nie doszliśmy do końca
-        cachedIsLast = spaceFetchCache.isEndReached;
+        cachedIsLast = existingSpaceFetchCache.isEndReached;
       }
     }
     let backendArray;
     let backendIsLast;
-    if (!cachedIsLast && effLimit) {
+    let backendEmptyStartIndex = false;
+    if (
+      !cachedIsLast &&
+      effLimit &&
+      (effOffset >= 0 || !existingSpaceFetchCache.isEmptyStartIndex(effIndex))
+    ) {
       const result = await this.shareManager.getSpaceShareList(spaceId, {
         index: effIndex,
         limit: effLimit,
@@ -96,14 +134,19 @@ export default class ShareListFetcherToolkit {
       });
       backendArray = result.array;
       backendIsLast = result.isLast;
+      const isFetchPrev = effLimit === -effOffset;
+      if (isFetchPrev && backendArray.length < effLimit) {
+        backendEmptyStartIndex = backendArray[0]?.index;
+      }
     } else {
       backendArray = [];
       backendIsLast = true;
     }
-    this.setSpaceFetchCache(spaceId, {
-      array: backendArray,
-      isEndReached: backendIsLast,
-    });
+    const newSpaceFetchCache = new SpaceFetchCache(backendArray, backendIsLast);
+    this.setSpaceFetchCache(spaceId, newSpaceFetchCache);
+    if (backendEmptyStartIndex) {
+      newSpaceFetchCache.addEmptyStartIndex(backendEmptyStartIndex);
+    }
     const effArray = cachedArray ? [...cachedArray, ...backendArray] : backendArray;
     const effIsLast = cachedIsLast || backendIsLast;
 
@@ -151,10 +194,18 @@ export default class ShareListFetcherToolkit {
     this.spaceFetchCaches = {};
   }
 
+  /**
+   * @param {string} spaceId
+   * @returns {SpaceFetchCache}
+   */
   getSpaceFetchCache(spaceId) {
     return this.spaceFetchCaches[spaceId];
   }
 
+  /**
+   * @param {string} spaceId
+   * @param {SpaceFetchCache} spaceFetchCache
+   */
   setSpaceFetchCache(spaceId, spaceFetchCache) {
     this.spaceFetchCaches[spaceId] = spaceFetchCache;
   }

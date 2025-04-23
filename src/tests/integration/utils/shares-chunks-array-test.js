@@ -221,7 +221,6 @@ describe('Integration | Utility | shares-chunks-array', function () {
   it('fetches lists which have been fetched before after using reload', async function () {
     // --- given ---
     const spacesCount = 2;
-    // should be lesser than chunk size, to fully fetch list of first space
     const sharesPerSpace = 12;
     const helper = new Helper(this);
     await helper.givenUser();
@@ -232,8 +231,6 @@ describe('Integration | Utility | shares-chunks-array', function () {
       helper.getService('shareManager'),
       'getSpaceShareList'
     );
-
-    // --- when ---
     this.chunksArray = SharesChunksArray.create({
       ownerSource: this.owner,
       chunkSize: 10,
@@ -247,15 +244,19 @@ describe('Integration | Utility | shares-chunks-array', function () {
     // before reload, go back to the position, which needs only one fetch
     this.chunksArray.setIndices(0, 10);
     await settled();
-    await this.chunksArray.scheduleReload();
     getSpaceShareListSpy.resetHistory();
+
+    // --- when ---
+    await this.chunksArray.scheduleReload();
     this.chunksArray.setIndices(10, 20);
     await settled();
 
     // --- then ---
     // Note, that call count is after fetch next after spy history reset,
     // so we check only fetchNext calls.
-    expect(getSpaceShareListSpy).to.have.callCount(2);
+    // first 2 fetches - list for each space
+    // second 2 fetched - after setting indices to (10, 20) for each space
+    expect(getSpaceShareListSpy).to.have.callCount(4);
 
     // check if final array has proper elements
     const array = this.chunksArray.toArray();
@@ -268,13 +269,140 @@ describe('Integration | Utility | shares-chunks-array', function () {
     );
   });
 
-  // FIXME: test działania reload: po reloadzie powinno pobierać wszystko o nowa
+  it('has expected content after initial jump', async function () {
+    // --- given ---
+    const spacesCount = 2;
+    const sharesPerSpace = 12;
+    const helper = new Helper(this);
+    await helper.givenUser();
+    await helper.givenSpaces({ spacesCount });
+    await helper.givenShares({ perSpace: sharesPerSpace });
+    await helper.givenSimpleSpaceShareList();
 
-  // FIXME: test działania zawartości back: initialJumpIndex, następnie idziemy do początku i badamy czy będą dobre wpisy
+    const sortedShareIndexes = _.sortBy(helper.shareRecords.map(s => s.index));
 
-  // FIXME: test działania użycia cache back: initialJumpIndex, następnie do tyłu, pobierze coś, potem jescze raz do tyłu i powinno użyć samych cache (podobny s1-sh1, s1-sh2 itd. najpierw lista z jednego, potem drugiego)
-  // FIXME: jw. tylko niech będą naprzemienne shery
+    // --- when ---
+    this.chunksArray = SharesChunksArray.create({
+      ownerSource: this.owner,
+      chunkSize: 10,
+      // 12th share on the list
+      initialJumpIndex: sortedShareIndexes[12],
+    });
+    await this.chunksArray.initialLoad;
 
+    // --- then ---
+    // check if final array has proper elements
+    const array = this.chunksArray.toArray();
+    const arrayShareNames = array.map(share => share.name);
+    const allExpectedShareNames = helper.spaces.map(space =>
+      _.times(sharesPerSpace).map(i => `${Helper.generateShareName(space, i)}`)
+    ).flat().slice(12);
+    expect(arrayShareNames, arrayShareNames.join(',')).to.deep.equal(
+      _.sortBy(allExpectedShareNames)
+    );
+  });
+
+  it('has expected content when sliding range prev after initial jump', async function () {
+    // --- given ---
+    const spacesCount = 2;
+    const sharesPerSpace = 12;
+    const helper = new Helper(this);
+    await helper.givenUser();
+    await helper.givenSpaces({ spacesCount });
+    await helper.givenShares({ perSpace: sharesPerSpace });
+    await helper.givenSimpleSpaceShareList();
+
+    const sortedShareIndexes = _.sortBy(helper.shareRecords.map(s => s.index));
+
+    // --- when ---
+    this.chunksArray = SharesChunksArray.create({
+      ownerSource: this.owner,
+      chunkSize: 10,
+      // 12th share on the list
+      initialJumpIndex: sortedShareIndexes[12],
+    });
+    await this.chunksArray.initialLoad;
+    this.chunksArray.scheduleTask('fetchPrev');
+    await settled();
+    // added 10 new elements (fetchPrev using chunkSize)
+    this.chunksArray.setIndices(0, 10);
+    await settled();
+
+    // --- then ---
+    // check if final array has proper elements
+    const array = this.chunksArray.toArray();
+    const arrayShareNames = array.map(share => share.name);
+    const allExpectedShareNames = helper.spaces.map(space =>
+        _.times(sharesPerSpace).map(i => `${Helper.generateShareName(space, i)}`)
+      )
+      .flat()
+      // slice 2..12 because we started from jump to 12 and then fetched prev 10 elements
+      .slice(2, 12);
+    expect(arrayShareNames, arrayShareNames.join(',')).to.deep.equal(
+      _.sortBy(allExpectedShareNames)
+    );
+  });
+
+  it('does not query source arrays on fetch prev that have been runned out', async function () {
+    // --- given ---
+    const spacesCount = 2;
+    const chunkSize = 10;
+    // more than 1 chunk, but less than 2 chunks
+    const sharesPerSpace = (chunkSize - 1) * 2;
+    const helper = new Helper(this);
+    await helper.givenUser();
+    await helper.givenSpaces({ spacesCount });
+    await helper.givenShares({ perSpace: sharesPerSpace });
+    await helper.givenSimpleSpaceShareList();
+    const getSpaceShareListSpy = sinon.spy(
+      helper.getService('shareManager'),
+      'getSpaceShareList'
+    );
+    const sortedShareIndexes = _.sortBy(helper.shareRecords.map(s => s.index));
+    // middle of the space1 shares list
+    const initialPosition = 1.5 * sharesPerSpace;
+    this.chunksArray = SharesChunksArray.create({
+      ownerSource: this.owner,
+      chunkSize,
+      initialJumpIndex: sortedShareIndexes[initialPosition],
+    });
+    await this.chunksArray.initialLoad;
+    await this.chunksArray.scheduleTask('fetchPrev');
+    getSpaceShareListSpy.resetHistory();
+    // The first fetchPrev should load 10 items from each space shares list
+    // but only 10 from single space should be used to populate the array.
+
+    // --- when ---
+    this.chunksArray.setIndices(0, 10);
+    this.chunksArray.scheduleTask('fetchPrev');
+    await settled();
+
+    // --- then ---
+    // Second fetchPrev should query backend only for space that was not runned-out at
+    // previous queries.
+    expect(getSpaceShareListSpy).to.have.been.calledOnce;
+    expect(getSpaceShareListSpy).to.have.been.calledWith(
+      helper.spaces[0].entityId,
+      sinon.match({
+        index: helper.shareRecords[initialPosition - chunkSize].index,
+        limit: chunkSize,
+        offset: -chunkSize,
+      })
+    );
+
+    // check if final source array has proper elements (do not matter about current chunk)
+    const array = this.chunksArray.sourceArray.toArray();
+    const arrayShareNames = array.map(share => share.name);
+    const allExpectedShareNames = helper.spaces.map(space =>
+        _.times(sharesPerSpace).map(i => `${Helper.generateShareName(space, i)}`)
+      )
+      .flat()
+      // source array content
+      .slice(initialPosition - 2 * chunkSize, initialPosition + chunkSize);
+    expect(arrayShareNames, arrayShareNames.join(',')).to.deep.equal(
+      _.sortBy(allExpectedShareNames)
+    );
+  });
 });
 
 class Helper {
@@ -360,7 +488,7 @@ class Helper {
       return _.times(sharesCount).map(i => this.createSpaceSidebarItem(space, i));
     }).flat();
 
-    await allFulfilled(this.shareItems.map(shareItem => {
+    this.shareRecords = await allFulfilled(this.shareItems.map(shareItem => {
       const { index, name, spaceId, shareId } = shareItem;
       const space = this.spaces.find(space => space.entityId === spaceId);
       const id = gri({
@@ -385,10 +513,9 @@ class Helper {
         shareItem.spaceId === spaceId
       );
       const itemsSorted = _.sortBy(shareItems, 'index');
-      // FIXME: implementacja i przetestowanie obsługi indeksu, który nie istnieje, ale jest pomiędzy
       const startPosition = getIndexedListPosition(itemsSorted, index) + offset;
       const endPosition = startPosition + limit;
-      const itemsLimited = itemsSorted.slice(startPosition, endPosition);
+      const itemsLimited = itemsSorted.slice(Math.max(startPosition, 0), endPosition);
       return {
         array: itemsLimited,
         isLast: endPosition > itemsSorted.length,
