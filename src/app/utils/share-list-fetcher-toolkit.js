@@ -90,14 +90,35 @@ export default class ShareListFetcherToolkit {
     let effIndex = index;
     let effLimit = limit;
     let effOffset = offset;
+
+    /**
+     * A slice of cache that can be used in result.
+     * @type {Array<SharesSidebarItem>}
+     */
     let cachedArray;
+
+    /**
+     * A slice of cached items that will be used to populate the result includes the end
+     * of the actual result. No additional backend fetch is needed if doing fetchNext.
+     * @type {boolean}
+     */
     let cachedIsLast;
 
     /** @type {SpaceFetchCache} */
     const existingSpaceFetchCache = this.getSpaceFetchCache(spaceId);
     if (existingSpaceFetchCache && offset >= 0) {
+      /**
+       * All items from last backend fetch in this fetcher.
+       * @type {Array<SharesSidebarItem>}
+       */
       const fullCachedArray = existingSpaceFetchCache.array;
+
+      /**
+       * Array position (index) where latest cache starts useful data slice.
+       * @type {number}
+       */
       const fullCachePosition = getIndexedListPosition(fullCachedArray, index);
+
       if (fullCachePosition < fullCachedArray.length) {
         const fragmentLength = Math.min(
           fullCachedArray.length - fullCachePosition,
@@ -122,11 +143,11 @@ export default class ShareListFetcherToolkit {
     let backendArray;
     let backendIsLast;
     let backendEmptyStartIndex = false;
-    if (
-      !cachedIsLast &&
+    const shouldExecuteFetch = !cachedIsLast &&
       effLimit &&
-      (effOffset >= 0 || !existingSpaceFetchCache.isEmptyStartIndex(effIndex))
-    ) {
+      (effOffset >= 0 || !existingSpaceFetchCache.isEmptyStartIndex(effIndex));
+
+    if (shouldExecuteFetch) {
       const result = await this.shareManager.getSpaceShareList(spaceId, {
         index: effIndex,
         limit: effLimit,
@@ -138,15 +159,16 @@ export default class ShareListFetcherToolkit {
       if (isFetchPrev && backendArray.length < effLimit) {
         backendEmptyStartIndex = backendArray[0]?.index;
       }
+      const newSpaceFetchCache = new SpaceFetchCache(backendArray, backendIsLast);
+      this.setSpaceFetchCache(spaceId, newSpaceFetchCache);
+      if (backendEmptyStartIndex) {
+        newSpaceFetchCache.addEmptyStartIndex(backendEmptyStartIndex);
+      }
     } else {
       backendArray = [];
       backendIsLast = true;
     }
-    const newSpaceFetchCache = new SpaceFetchCache(backendArray, backendIsLast);
-    this.setSpaceFetchCache(spaceId, newSpaceFetchCache);
-    if (backendEmptyStartIndex) {
-      newSpaceFetchCache.addEmptyStartIndex(backendEmptyStartIndex);
-    }
+
     const effArray = cachedArray ? [...cachedArray, ...backendArray] : backendArray;
     const effIsLast = cachedIsLast || backendIsLast;
 

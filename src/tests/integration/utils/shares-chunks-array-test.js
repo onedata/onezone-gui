@@ -403,6 +403,51 @@ describe('Integration | Utility | shares-chunks-array', function () {
       _.sortBy(allExpectedShareNames)
     );
   });
+
+  /**
+   * Handles sitution when we have more spaces than shares fetch size. It causes the
+   * ShareListFetcherToolkit to lookup cache multiple times, but not using it. Successive
+   * fetches:
+   *
+   * 1. Each space shares list cache is created (with single share).
+   * 2. It lookups to cache and should use it, but the result is not used in final array.
+   * 3. It lookups to cache and should use it and the result should be used in final
+   *    array.
+   *
+   * It is important to preserve cache until pt. 3 is done.
+   */
+  it('preserves cache of single space list fetcher to be used multiple times', async function () {
+    // given
+    const spacesCount = 100;
+    const helper = new Helper(this);
+    await helper.givenUser();
+    await helper.givenSpaces({ spacesCount });
+    await helper.givenShares({ perSpace: 1 });
+    await helper.givenSimpleSpaceShareList();
+    this.chunksArray = SharesChunksArray.create({
+      ownerSource: this.owner,
+      chunkSize: 10,
+    });
+    await this.chunksArray.initialLoad;
+
+    // when
+    this.chunksArray.setIndices(10, 20);
+    await settled();
+    this.chunksArray.setIndices(20, 30);
+    await settled();
+
+    // then
+    const array = this.chunksArray.sourceArray.toArray();
+    const arrayShareNames = array.map(share => share.name);
+    const allExpectedShareNames = helper.spaces.map(space =>
+        `${Helper.generateShareName(space, 0)}`
+        // source array content
+      )
+      .slice(0, 30);
+    expect(arrayShareNames, arrayShareNames.join(',')).to.deep.equal(
+      _.sortBy(allExpectedShareNames)
+    );
+  });
 });
 
 class Helper {
