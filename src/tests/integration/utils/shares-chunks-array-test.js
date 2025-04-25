@@ -416,38 +416,86 @@ describe('Integration | Utility | shares-chunks-array', function () {
    *
    * It is important to preserve cache until pt. 3 is done.
    */
-  it('preserves cache of single space list fetcher to be used multiple times', async function () {
-    // given
-    const spacesCount = 100;
-    const helper = new Helper(this);
-    await helper.givenUser();
-    await helper.givenSpaces({ spacesCount });
-    await helper.givenShares({ perSpace: 1 });
-    await helper.givenSimpleSpaceShareList();
-    this.chunksArray = SharesChunksArray.create({
-      ownerSource: this.owner,
-      chunkSize: 10,
-    });
-    await this.chunksArray.initialLoad;
+  it('produces valid array after multiple fetch next if spaces count is larger than single chunk size',
+    async function () {
+      // given
+      const spacesCount = 100;
+      const helper = new Helper(this);
+      await helper.givenUser();
+      await helper.givenSpaces({ spacesCount });
+      await helper.givenShares({ perSpace: 1 });
+      await helper.givenSimpleSpaceShareList();
+      this.chunksArray = SharesChunksArray.create({
+        ownerSource: this.owner,
+        chunkSize: 10,
+      });
+      await this.chunksArray.initialLoad;
 
-    // when
-    this.chunksArray.setIndices(10, 20);
-    await settled();
-    this.chunksArray.setIndices(20, 30);
-    await settled();
+      // when
+      this.chunksArray.setIndices(10, 20);
+      await settled();
+      this.chunksArray.setIndices(20, 30);
+      await settled();
 
-    // then
-    const array = this.chunksArray.sourceArray.toArray();
-    const arrayShareNames = array.map(share => share.name);
-    const allExpectedShareNames = helper.spaces.map(space =>
-        `${Helper.generateShareName(space, 0)}`
-        // source array content
-      )
-      .slice(0, 30);
-    expect(arrayShareNames, arrayShareNames.join(',')).to.deep.equal(
-      _.sortBy(allExpectedShareNames)
-    );
-  });
+      // then
+      const array = this.chunksArray.sourceArray.toArray();
+      const arrayShareNames = array.map(share => share.name);
+      const allExpectedShareNames = helper.spaces.map(space =>
+          `${Helper.generateShareName(space, 0)}`
+          // source array content
+        )
+        .slice(0, 30);
+      expect(arrayShareNames, arrayShareNames.join(',')).to.deep.equal(
+        _.sortBy(allExpectedShareNames)
+      );
+    }
+  );
+
+  it('produces valid array after multiple fetch prev if spaces count is larger than single chunk size',
+    async function () {
+      // given
+      const spacesCount = 100;
+      const helper = new Helper(this);
+      await helper.givenUser();
+      await helper.givenSpaces({ spacesCount });
+      await helper.givenShares({ perSpace: 1 });
+      await helper.givenSimpleSpaceShareList();
+      const sortedShareIndexes = _.sortBy(helper.shareRecords.map(s => s.index));
+      const chunkSize = 10;
+      const startSharePosition = 30;
+      this.chunksArray = SharesChunksArray.create({
+        ownerSource: this.owner,
+        chunkSize,
+        initialJumpIndex: sortedShareIndexes[startSharePosition],
+      });
+      await this.chunksArray.initialLoad;
+
+      // when
+      this.chunksArray.scheduleTask('fetchPrev');
+      await settled();
+
+      this.chunksArray.setIndices(0, 10);
+      await settled();
+
+      this.chunksArray.setIndices(0, 10);
+      await settled();
+
+      // then
+      const array = this.chunksArray.sourceArray.toArray();
+      const arrayShareNames = array.map(share => share.name);
+      const allExpectedShareNames = helper.spaces.map(space =>
+          `${Helper.generateShareName(space, 0)}`
+          // source array content
+        )
+        .slice(
+          0,
+          startSharePosition + this.chunksArray.jumpChunkSize + chunkSize
+        );
+      expect(arrayShareNames, arrayShareNames.join(',')).to.deep.equal(
+        _.sortBy(allExpectedShareNames)
+      );
+    }
+  );
 });
 
 class Helper {

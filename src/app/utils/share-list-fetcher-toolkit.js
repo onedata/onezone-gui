@@ -39,7 +39,7 @@ class SpaceFetchCache {
 
   isEmptyStartIndex(index) {
     for (let i = this.emptyStartIndexes.length - 1; i >= 0; --i) {
-      if (compareStringBytes(index, this.emptyStartIndexes[i])) {
+      if (compareStringBytes(index, this.emptyStartIndexes[i]) <= 0) {
         return true;
       }
     }
@@ -143,9 +143,9 @@ export default class ShareListFetcherToolkit {
     let backendArray;
     let backendIsLast;
     let backendEmptyStartIndex = false;
-    const shouldExecuteFetch = !cachedIsLast &&
-      effLimit &&
-      (effOffset >= 0 || !existingSpaceFetchCache.isEmptyStartIndex(effIndex));
+    const shouldExecuteFetch = effLimit &&
+      (effOffset >= 0 && !cachedIsLast) ||
+      (effOffset < 0 && !existingSpaceFetchCache.isEmptyStartIndex(effIndex));
 
     if (shouldExecuteFetch) {
       const result = await this.shareManager.getSpaceShareList(spaceId, {
