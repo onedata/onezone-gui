@@ -81,9 +81,7 @@ export default class ShareListMultiFetcher {
         const results = await allFulfilled(promises);
         // Setting size to null, because we want full results to be passed down to main
         // merge.
-        // FIXME: debug
-        const mergedResults = mergeResults(results, { index, size: null, offset });
-        return mergedResults;
+        return mergeResults(results, { index, size: null, offset });
       } finally {
         this.batchRequestRegistry.destroyContainer(batchContainer);
       }

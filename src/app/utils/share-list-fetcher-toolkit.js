@@ -133,10 +133,7 @@ export default class ShareListFetcherToolkit {
         effOffset += 1;
         cachedIsLast = (cachedArray.at(-1) === fullCachedArray.at(-1)) &&
           existingSpaceFetchCache.isEndReached;
-        // FIXME: new index: trzeba sprawdzić jaki zakres cache można wziąć do wyniku (uwzględnić offset!); wtedy nowym indeksem będzie ostatni index + 1 z fragmentu cache
       } else {
-        // FIXME: przekroczyliśmy tablicę: to oznacza, że poprzedni request nie zawierał tego rekordu
-        // trzeba więc sprawdzić, czy poprzednim razem nie doszliśmy do końca
         cachedIsLast = existingSpaceFetchCache.isEndReached;
       }
     }
