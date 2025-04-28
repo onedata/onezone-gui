@@ -109,6 +109,9 @@
     .btn-toolbar {
       margin-right: 140px;
     }
+    padding-top: $padding-small-horizontal;
+    padding-bottom: $padding-small-horizontal;
+    padding-left: $padding-large-horizontal;
   }
 
   .one-collapsible-list-header .collapse-hidden {
@@ -195,9 +198,18 @@
       width: 100%;
 
       .record-name {
-        padding-left: 18px;
+        padding-left: 0.6em;
       }
     }
+  }
+
+  .one-collapsible-list .item-checkbox {
+    margin-right: 1em;
+  }
+
+  .pages-control {
+    justify-content: center;
+    padding: $padding-base-vertical 0;
   }
 
   @media (min-width: $screen-sm-min) {

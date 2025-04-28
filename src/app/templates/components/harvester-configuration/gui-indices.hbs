@@ -64,7 +64,12 @@
                         {{tt this (concat "assignMethods." assignMethod)}}
                       </OneDropdown>
                       <bsForm.group
-                        class={{concat-classes "col-xs-12 col-sm-6" (if (not-eq (get selectedAssignMethods guiPluginIndex.name) "create") "dropdown-input")}}
+                        class={{concat-classes
+                          "col-xs-12 col-sm-6"
+                          (if (not-eq (get selectedAssignMethods guiPluginIndex.name) "create")
+                            "dropdown-input"
+                          )
+                        }}
                         @validation={{if (get guiIndicesErrors guiPluginIndex.name) "error" "success"}}
                       >
                         {{#if (eq (get selectedAssignMethods guiPluginIndex.name) "create")}}
@@ -95,7 +100,11 @@
                         class="assigned-index-name"
                       >{{get (get indicesMapping guiPluginIndex.name) "name"}}</TruncatedString>
                     {{else}}
-                      <img class="warning-icon" src={{root-url "assets/images/sign-warning-large.svg"}}> <span class="unspecified">{{tt this "notAssigned"}}</span>
+                      <img
+                        class="warning-icon"
+                        src={{root-url "assets/images/sign-warning-large.svg"}}
+                      >
+                      <span class="unspecified">{{tt this "notAssigned"}}</span>
                     {{/if}}
                   {{/if}}
                 </div>
