@@ -21,7 +21,6 @@
         <figure class="main-figure">
           <img class="main-image" src="assets/images/space-data.svg">
           <TruncatedString
-            @tagName="span"
             class={{concat-classes "one-label" (if (not dataProviderProxy.content) "offline-warning")}}
           >
             {{#if dataProviderProxy.content}}
