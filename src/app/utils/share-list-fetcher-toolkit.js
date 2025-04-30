@@ -82,9 +82,6 @@ export default class ShareListFetcherToolkit {
    * @returns {Promise<ShareDataListPage>}
    */
   async getShareList(spaceId, listQuery) {
-    // Uncomment for debug
-    // console.log('getShareList', spaceId, JSON.stringify(listQuery), '\n');
-
     const { index, limit, offset } = listQuery;
 
     let effIndex = index;
