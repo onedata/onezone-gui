@@ -12,6 +12,13 @@ import { inject as service } from '@ember/service';
 
 @classNames('sidebar-shares')
 export default class SidebarShares extends ChunksArraySidebar {
+  /**
+   * Set of chunks array that has been at least used one time by some instance of
+   * SidebarShares.
+   * @type {Set<SharesChunksArray>}
+   */
+  static usedChunksArray = new Set();
+
   @service shareManager;
 
   /**
@@ -42,14 +49,28 @@ export default class SidebarShares extends ChunksArraySidebar {
     return 54;
   }
 
+  get wasChunksArrayUsed() {
+    return SidebarShares.usedChunksArray.has(this.chunksArray);
+  }
+
+  markChunksArrayAsUsed() {
+    SidebarShares.usedChunksArray.add(this.chunksArray);
+  }
+
   /**
    * @override
    */
   async didInsertElement() {
     await super.didInsertElement(...arguments);
-    // TODO: VFS-12506 Try to optimize numer of reloads (not needed on first init)
-    await this.chunksArray.scheduleReload();
-    // check if fetchPrev is needed because reload causes invalidation of start
-    await this.chunksArray.startChanged();
+    const shouldReloadArray = this.wasChunksArrayUsed;
+    this.markChunksArrayAsUsed();
+    if (shouldReloadArray) {
+      await this.chunksArray.scheduleReload();
+      if (this.isDestroyed) {
+        return;
+      }
+      // check if fetchPrev is needed because reload causes invalidation of start
+      await this.chunksArray.startChanged();
+    }
   }
 }

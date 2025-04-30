@@ -117,6 +117,16 @@ export default class SharesChunksArray extends MergedChunksArray.extend(OwnerInj
   /**
    * @override
    */
+  async _reload() {
+    // fetcherToolkit is not available on first fetch (performed as reload)
+    // but we don't need to clear it anyway on first run.
+    this.fetcherToolkit?.clearSpaceFetchCaches();
+    return await super._reload(...arguments);
+  }
+
+  /**
+   * @override
+   */
   async fetch() {
     const mutex = new Mutex();
     await mutex.acquire();
