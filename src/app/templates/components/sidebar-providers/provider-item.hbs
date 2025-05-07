@@ -1,35 +1,35 @@
 <OneIconTagged
-  class={{concat "sidebar-item-icon" (if offline " item-error")}}
+  class={{concat "sidebar-item-icon" (if this.offline " item-error")}}
   @icon="provider"
-  @tagIcon={{if offline "x"}}
+  @tagIcon={{if this.offline "x"}}
   @shadowType="none"
 />
 <TruncatedString class="sidebar-item-title">
-  <NameConflict @item={{item}} @tagName="span" class="one-label" />
+  <NameConflict @item={{this.item}} @tagName="span" class="one-label" />
 </TruncatedString>
-{{#if (or _spaceIdsLoaded _spacesLoaded)}}
+{{#if (or this.isSpacesCountAvailable this.areSpacesLoaded)}}
   <StatusToolbar as |toolbar|>
-    {{#if _spaceIdsLoaded}}
+    {{#if this.isSpacesCountAvailable}}
       <toolbar.icon
         @icon="space"
-        @innerText={{_spaces.length}}
-        @hint={{tt this "spaceCountHint" count=_spaces.length}}
+        @innerText={{this.spacesCount}}
+        @hint={{tt this "spaceCountHint" count=this.spacesCount}}
       />
     {{/if}}
-    {{#if _spacesLoaded}}
+    {{#if this.areSpacesLoaded}}
       <toolbar.icon
         @icon="provider"
-        @outerText={{_totalSupportSizeHumanReadable}}
-        @hint={{tt this "totalSupportHint" size=_totalSupportSizeHumanReadable}}
+        @outerText={{this.totalSupportSizeHumanReadable}}
+        @hint={{tt this "totalSupportHint" size=this.totalSupportSizeHumanReadable}}
       />
     {{/if}}
   </StatusToolbar>
 {{/if}}
 
-{{#unless inSidenav}}
+{{#unless this.inSidenav}}
   <ActionsToolbar
     @isMinimized={{true}}
     @dropdownPlacement="auto"
-    @actionsArray={{itemActions}}
+    @actionsArray={{this.itemActions}}
   />
 {{/unless}}
