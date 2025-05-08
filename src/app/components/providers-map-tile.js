@@ -8,12 +8,10 @@
 
 import Component from '@ember/component';
 import { computed } from '@ember/object';
-import layout from '../templates/components/providers-map-tile';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import ProvidersColors from 'onedata-gui-common/mixins/components/providers-colors';
 
 export default Component.extend(I18n, ProvidersColors, {
-  layout,
   tagName: '',
 
   /**
