@@ -47,6 +47,8 @@ export default class SharesChunksArray extends MergedChunksArray.extend(OwnerInj
   /** @type {ShareListFetcherToolkit} */
   fetcherToolkit = undefined;
 
+  fetchMutex = new Mutex();
+
   //#endregion
 
   @computed('currentUser.user.spaceList.list')
@@ -128,14 +130,13 @@ export default class SharesChunksArray extends MergedChunksArray.extend(OwnerInj
    * @override
    */
   async fetch() {
-    const mutex = new Mutex();
-    await mutex.acquire();
+    await this.fetchMutex.acquire();
     try {
       const multiFetchers = await this.createMultiFetchers();
       this.set('multiFetchers', multiFetchers);
       return await super.fetch(...arguments);
     } finally {
-      mutex.release();
+      this.fetchMutex.release();
     }
   }
 
