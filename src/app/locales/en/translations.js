@@ -100,6 +100,8 @@ import joinImage from './components/join-image';
 import spaceDetailsTile from './components/space-details-tile';
 import spaceMarketplaceTile from './components/space-marketplace-tile';
 import memberPrivileges from './components/member-privileges';
+import providerPlace from './components/provider-place';
+import providersMapTile from './components/providers-map-tile';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
@@ -287,6 +289,8 @@ const translations = {
     spaceDetailsTile,
     spaceMarketplaceTile,
     memberPrivileges,
+    providerPlace,
+    providersMapTile,
   },
   services: {
     tokenActions,
