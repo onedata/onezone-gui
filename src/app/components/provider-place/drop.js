@@ -9,7 +9,7 @@
 
 import Component from '@ember/component';
 
-import { sort, reads } from '@ember/object/computed';
+import { sort, reads, not } from '@ember/object/computed';
 import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/i18n';
@@ -123,12 +123,7 @@ export default Component.extend(I18n, {
     }
   ),
 
-  isVisitProviderButtonShown: computed(
-    'isListLoading',
-    function isVisitProviderButtonShown() {
-      return !this.isListLoading;
-    }
-  ),
+  isVisitProviderButtonShown: not('isListLoading'),
 
   listProxy: computed('chunkableListModelProxy', function listProxy() {
     const promise = (async () => {
@@ -141,6 +136,9 @@ export default Component.extend(I18n, {
 
   spaces: reads('listProxy.content'),
 
+  /**
+   * @override
+   */
   didInsertElement() {
     this._super(...arguments);
     (async () => {
