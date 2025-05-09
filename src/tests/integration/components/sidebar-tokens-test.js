@@ -166,8 +166,7 @@ describe('Integration | Component | sidebar-tokens', function () {
     });
   });
 
-  it(
-    'shows only cluster invite tokens, when type filter is "invite" and target filter is "cluster - all"',
+  it('shows only cluster invite tokens, when type filter is "invite" and target filter is "cluster - all"',
     async function () {
       await renderComponent();
 
@@ -182,8 +181,7 @@ describe('Integration | Component | sidebar-tokens', function () {
     }
   );
 
-  it(
-    'shows only cluster invite tokens, when type filter is "invite" and target filter is "cluster - cluster1"',
+  it('shows only cluster invite tokens, when type filter is "invite" and target filter is "cluster - cluster1"',
     async function () {
       await renderComponent();
 
@@ -197,8 +195,7 @@ describe('Integration | Component | sidebar-tokens', function () {
     }
   );
 
-  it(
-    'does not take "invite" dedicated filters into account after change from "invite" to "access" filter',
+  it('does not take "invite" dedicated filters into account after change from "invite" to "access" filter',
     async function () {
       await renderComponent();
 
