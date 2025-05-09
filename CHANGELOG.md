@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12695 Using updated onedata-gui-common with more Glimmer components
 * VFS-12673 Added caching to shares fetching to avoid multiple list fetching for the same space
 * VFS-12705 Added page control on members page
 * VFS-12694 Refactored all templates to use angle brackets components
