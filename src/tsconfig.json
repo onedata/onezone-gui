@@ -1,7 +1,6 @@
 {
   "extends": "@tsconfig/ember/tsconfig.json",
   "compilerOptions": {
-
     // The combination of `baseUrl` with `paths` allows Ember's classic package
     // layout, which is not resolvable with the Node resolution algorithm, to
     // work with TypeScript.
@@ -48,7 +47,13 @@
     "app/**/*",
     "tests/**/*",
     "types/**/*",
-    "lib/onedata-gui-common/**/*",
-    "lib/onedata-gui-websocket-client/**/*"
+    "lib/onedata-gui-common/app/**/*",
+    "lib/onedata-gui-common/addon/**/*",
+    "lib/onedata-gui-common/tests/**/*",
+    "lib/onedata-gui-common/types/**/*",
+    "lib/onedata-gui-websocket-client/app/**/*",
+    "lib/onedata-gui-websocket-client/addon/**/*",
+    "lib/onedata-gui-websocket-client/tests/**/*",
+    "lib/onedata-gui-websocket-client/types/**/*",
   ]
 }

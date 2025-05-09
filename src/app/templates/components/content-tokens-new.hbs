@@ -18,11 +18,13 @@
         </a>
         <div class="resource-name">
           {{tt this "header"}}
-            <TruncatedString @tagName="small" class="template-name">
-              {{tt this "fromTemplateHeader"
-                templateName=(t (concat "components.tokenTemplateSelector.templates." lastSelectedTemplateName ".title"))
-              }}
-            </TruncatedString>
+            <small class="template-name">
+              <TruncatedString>
+                {{tt this "fromTemplateHeader"
+                  templateName=(t (concat "components.tokenTemplateSelector.templates." lastSelectedTemplateName ".title"))
+                }}
+              </TruncatedString>
+            </small>
         </div>
       </h1>
     </div>
