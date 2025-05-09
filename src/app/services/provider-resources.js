@@ -47,4 +47,15 @@ export default class ProviderResourcesService extends Service {
       this.spaceListResolverMutex.release();
     }
   }
+
+  /** @override */
+  willDestroy() {
+    try {
+      for (const chunkable of this.chunkableSpaceListsCache.values()) {
+        chunkable.destroy();
+      }
+    } finally {
+      super.willDestroy(...arguments);
+    }
+  }
 }

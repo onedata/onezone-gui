@@ -12,7 +12,6 @@ import Component from '@ember/component';
 import { sort, reads } from '@ember/object/computed';
 import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
-import layout from 'onedata-gui-common/templates/components/provider-place/drop';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import { conditional, raw } from 'ember-awesome-macros';
 import getVisitOneproviderUrl from 'onedata-gui-common/utils/get-visit-oneprovider-url';
@@ -21,7 +20,6 @@ import InfiniteScroll from 'onedata-gui-common/utils/infinite-scroll';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 
 export default Component.extend(I18n, {
-  layout,
   classNames: 'provider-place-drop',
   classNameBindings: ['oneproviderStatusClass'],
 

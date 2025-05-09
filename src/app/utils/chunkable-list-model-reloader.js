@@ -3,13 +3,13 @@
  * ListModel.
  *
  * @author Jakub Liput
- * @copyright (C) 2024 ACK CYFRONET AGH
+ * @copyright (C) 2024-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import EmberObject, { computed } from '@ember/object';
 
-export default class VirtualListReloader extends EmberObject {
+export default class ChunkableListModelReloader extends EmberObject {
   listSortKey = 'index';
 
   /**
@@ -37,8 +37,11 @@ export default class VirtualListReloader extends EmberObject {
 
   /** @override */
   willDestroy() {
-    super.willDestroy(...arguments);
-    this.removeObserver(this.observedProperty, this, 'handleListChange', false);
+    try {
+      this.removeObserver(this.observedProperty, this, 'handleListChange', false);
+    } finally {
+      super.willDestroy(...arguments);
+    }
   }
 
   async handleListChange() {

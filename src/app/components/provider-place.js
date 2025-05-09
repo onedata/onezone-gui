@@ -28,7 +28,7 @@ export default Component.extend(I18n, {
 
   /**
    * A provider model that will be represented on map
-   * To inject.
+   * @virtual
    * @type {Onezone.ProviderDetails|Array<Onezone.ProviderDetails>}
    */
   provider: null,

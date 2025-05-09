@@ -9,13 +9,11 @@ import {
 } from 'ember-cli-clipboard/test-support';
 import GlobalNotifyStub from '../../helpers/global-notify-stub';
 import I18nStub from '../../helpers/i18n-stub';
-import EmberObject from '@ember/object';
-import { resolve } from 'rsvp';
-import { registerService } from '../../helpers/stub-service';
+import { lookupService, registerService } from '../../helpers/stub-service';
 import Service from '@ember/service';
-import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
-import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import globals from 'onedata-gui-common/utils/globals';
+import clearStore from '../../helpers/clear-store';
+import gri from 'onedata-gui-websocket-client/utils/gri';
 
 const COPY_SUCCESS_MSG = 'copySuccess';
 const COPY_ERROR_MSG = 'copyError';
@@ -41,9 +39,9 @@ const Router = Service.extend({
 });
 
 describe('Integration | Component | provider-place', function () {
-  setupRenderingTest();
+  const { afterEach } = setupRenderingTest();
 
-  beforeEach(function () {
+  beforeEach(async function () {
     const globalNotify = this.set(
       'globalNotify',
       registerService(this, 'globalNotify', GlobalNotifyStub)
@@ -65,49 +63,24 @@ describe('Integration | Component | provider-place', function () {
       },
     });
 
-    const spaces = [{
-      id: 'space1',
-      name: 'space1',
-      supportSizes: {
-        1: 1048576,
-      },
-    }, {
-      id: 'space2',
-      name: 'space2',
-      supportSizes: {
-        1: 1048576,
-        2: 2097152,
-      },
-    }];
-    spaces.isFulfilled = true;
+    const { spaces, provider, providers } = await createRecords(this);
 
-    const cluster = {
-      workerVersion: {
-        release: '20.02.0-alpha',
-      },
-    };
-
-    const provider = EmberObject.create({
-      id: '1',
-      entityId: '1',
-      name: 'provider1',
-      status: 'online',
-      spaceList: promiseObject(resolve({
-        list: promiseArray(resolve(spaces)),
-      })),
-      cluster: promiseObject(resolve(cluster)),
-    });
-
-    this.set('spaces', spaces);
-    this.set('provider', provider);
-    this.set('providers', [
+    this.setProperties({
+      spaces,
       provider,
-      Object.assign({}, provider, { id: '2', name: 'provider2' }),
-    ]);
+      providers,
+    });
+  });
+
+  afterEach(function () {
+    clearStore();
   });
 
   it('shows provider status', async function () {
-    await render(hbs `<ProviderPlace @provider={{provider}} />`);
+    // when
+    await render(hbs`<ProviderPlace @provider={{this.provider}} />`);
+
+    // then
     const providerPlace = find('.provider-place');
     expect(providerPlace).to.exist;
     expect(providerPlace).to.have.class('online');
@@ -167,3 +140,58 @@ describe('Integration | Component | provider-place', function () {
     expect(dropContainer.querySelector('.oneproviders-list-item.active')).to.exist;
   });
 });
+
+async function createRecords(mochaContext) {
+  const store = lookupService(mochaContext, 'store');
+  const providerId1 = '1';
+  const providerId2 = '2';
+  const space1 = await store.createRecord('space', {
+    name: 'space1',
+    supportSizes: {
+      [providerId1]: 1048576,
+    },
+  }).save();
+  const space2 = await store.createRecord('space', {
+    name: 'space2',
+    supportSizes: {
+      [providerId1]: 1048576,
+      [providerId2]: 2097152,
+    },
+  }).save();
+  const spaces = [space1, space2];
+  const cluster = await store.createRecord('cluster', {
+    workerVersion: {
+      release: '20.02.0-alpha',
+    },
+  }).save();
+  const spaceList1 = await store.createRecord('spaceList', {
+    list: spaces,
+  }).save();
+  const spaceList2 = await store.createRecord('spaceList', {
+    list: spaces,
+  }).save();
+  const provider1 = await store.createRecord('provider', {
+    id: gri({
+      entityType: 'provider',
+      entityId: providerId1,
+      aspect: 'instance',
+    }),
+    name: 'provider1',
+    online: true,
+    spaceList: spaceList1,
+    cluster,
+  }).save();
+  const provider2 = await store.createRecord('provider', {
+    id: gri({
+      entityType: 'provider',
+      entityId: providerId2,
+      aspect: 'instance',
+    }),
+    name: 'provider2',
+    online: true,
+    spaceList: spaceList2,
+    cluster,
+  }).save();
+
+  return { spaces, provider: provider1, providers: [provider1, provider2] };
+}
