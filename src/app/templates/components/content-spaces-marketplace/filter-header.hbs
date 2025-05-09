@@ -1,9 +1,9 @@
 <div class="form-group search-form-group">
   <div class="input-group with-icon-addon">
     <SearchBar
-      @placeholder={{tt this "searchPlaceholder"}}
       @search={{action "changeSearchValue"}}
       class="form-control"
+      placeholder={{tt this "searchPlaceholder"}}
     />
     <div class="input-group-addon">
       <OneIcon @icon="search" />

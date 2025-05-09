@@ -19,19 +19,19 @@
               <RecordInfoWithIcon @record={{creatorProxy.content}} />
             </td>
           {{else}}
-            <TruncatedString
-              @tagName="td"
-              class={{concat-classes
-                "property-value creator"
-                (if creatorIcon "has-icon")
-                (if isSpecialCreator "special")
-              }}
-            >
-              {{#if creatorIcon}}
-                <OneIcon @icon={{creatorIcon}} />
-              {{/if}}
-              {{creatorName}}
-            </TruncatedString>
+            <td>
+              <TruncatedString
+                class={{concat-classes
+                  "property-value creator"
+                  (if creatorIcon "has-icon")
+                  (if isSpecialCreator "special")
+                }}
+              >
+                {{#if creatorIcon}}
+                  <OneIcon @icon={{creatorIcon}} />
+                {{/if}}
+              </TruncatedString>
+            </td>
           {{/if}}
         </tr>
         <tr>
