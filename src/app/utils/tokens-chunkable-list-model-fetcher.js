@@ -7,7 +7,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import ChunkableListModelFetcher from 'onedata-gui-common/utils/chunkable-list-model-fetcher';
+import ChunkableListModelFetcher from 'onezone-gui/utils/chunkable-list-model-fetcher';
 
 export default class TokensChunkableListModelFetcher extends ChunkableListModelFetcher {
   /**

@@ -1,22 +1,23 @@
 /**
  * A first-level item component for providers sidebar
  *
- * @author Michał Borzęcki
- * @copyright (C) 2017-2020 ACK CYFRONET AGH
+ * @author Michał Borzęcki, Jakub Liput
+ * @copyright (C) 2017-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import { reads } from '@ember/object/computed';
 import { not } from '@ember/object/computed';
 import Component from '@ember/component';
-import { computed, get } from '@ember/object';
+import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { collect } from 'ember-awesome-macros';
-
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import bytesToString from 'onedata-gui-common/utils/bytes-to-string';
 import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
 import I18n from 'onedata-gui-common/mixins/i18n';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
+import { bool } from '@ember/object/computed';
 
 export default Component.extend(I18n, UserProxyMixin, {
   tagName: '',
@@ -24,11 +25,19 @@ export default Component.extend(I18n, UserProxyMixin, {
   currentUser: service(),
   clipboardActions: service(),
   globalClipboard: service(),
+  providerResources: service(),
 
   i18nPrefix: 'components.sidebarProviders.providerItem',
 
   /**
+   * @virtual
+   * @type {boolean}
+   */
+  inSidenav: false,
+
+  /**
    * Provider item
+   * @virtual
    * @type {Provider}
    */
   item: undefined,
@@ -100,75 +109,66 @@ export default Component.extend(I18n, UserProxyMixin, {
     }
   }),
 
-  /**
-   * @type {Ember.Computed<models/SpaceList>}
-   */
-  _spaceList: reads('provider.spaceList'),
+  spaceListProxy: reads('provider.spaceList'),
 
-  /**
-   * Spaces supported by provider visible by current user
-   * @type {Ember.ComputedProperty<Ember.Array<Space>>}
-   */
-  _spaces: reads('_spaceList.content.list.content'),
-
-  /**
-   * True if we know the list of space ids (eg. for counting spaces)
-   * @type {Ember.Computed<boolean>}
-   */
-  _spaceIdsLoaded: computed(
-    '_spaceList.isLoaded',
-    function _getSpaceIdsLoaded() {
-      const _spaceList = this.get('_spaceList');
-      return !!(
-        _spaceList &&
-        get(_spaceList, 'isLoaded')
+  chunkableSpaceListModelProxy: computed(
+    'provider',
+    function chunkableSpaceListModelProxy() {
+      return promiseObject(
+        this.providerResources.resolveChunkableSpaceListModel(this.provider)
       );
     }
   ),
 
+  spacesProxy: computed('chunkableSpaceListModelProxy', function spacesProxy() {
+    const promise = (async () => {
+      const chunkableListModel = await this.chunkableSpaceListModelProxy;
+      await chunkableListModel.chunksArray.initialLoad;
+      return chunkableListModel.listModel.list.toArray();
+    })();
+    return promiseObject(promise);
+  }),
+
+  spaces: reads('spacesProxy.content'),
+
+  spacesCount: computed('spaceListProxy.content.list', function spacesCount() {
+    return this.spaceListProxy.content?.hasMany('list').ids().length;
+  }),
+
+  /**
+   * True if we know the list of space ids (eg. for counting spaces)
+   * @type {Computed<boolean>}
+   */
+  isSpacesCountAvailable: reads('spaceListProxy.isFulfilled'),
+
   /**
    * True if information about spaces is loaded (eg. for displaying support sizes)
-   * @type {Ember.Computed<boolean>}
+   * @type {ComputedProperty<boolean>}
    */
-  _spacesLoaded: computed(
-    '_spaceIdsLoaded',
-    '_spaceList.list.isFulfilled',
-    function _getSpacesLoaded() {
-      const _spaceIdsLoaded = this.get('_spaceIdsLoaded');
-      const _spaceList = this.get('_spaceList');
-      return !!(
-        _spaceIdsLoaded &&
-        get(_spaceList, 'list.isFulfilled')
-      );
-    }),
+  areSpacesLoaded: bool('chunkableSpaceListModelProxy.content.chunksArray.initialLoad.isFulfilled'),
 
   /**
    * Total provider support size
    * @type {Ember.ComputedProperty<number>}
    */
-  _totalSupportSize: computed(
-    '_spaces.@each.supportSizes',
-    '_spacesLoaded',
+  totalSupportSize: computed(
     'providerId',
-    function _getTotalSupportSize() {
-      const {
-        _spaces,
-        _spacesLoaded,
-        providerId,
-      } = this.getProperties('_spaces', '_spacesLoaded', 'providerId');
-      if (_spacesLoaded) {
-        return _spaces.reduce(
-          (sum, space) => sum + get(space, `supportSizes.${providerId}`),
+    'spaces.@each.supportSizes',
+    function totalSupportSize() {
+      if (this.spaces) {
+        return this.spaces.reduce(
+          (sum, space) => sum + (space.supportSizes[this.providerId] ?? 0),
           0
         );
       }
-    }),
+    }
+  ),
 
   /**
    * Human-readable total support provided by the provider (eg. "30 GiB")
    * @type {Ember.ComputedProperty<string>}
    */
-  _totalSupportSizeHumanReadable: computedPipe('_totalSupportSize', bytesToString),
+  totalSupportSizeHumanReadable: computedPipe('totalSupportSize', bytesToString),
 
   /**
    * @override

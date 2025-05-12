@@ -13,7 +13,7 @@ import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { ChunksArraySidebarCollection } from 'onezone-gui/utils/chunks-array-sidebar-collection';
 import { ListModelSidebarCollection } from 'onezone-gui/utils/list-model-sidebar-collection';
 import { ChunkableListModelSidebarCollection } from 'onezone-gui/utils/chunkable-list-model-sidebar-collection';
-import ChunkableListModel from 'onedata-gui-common/utils/chunkable-list-model';
+import ChunkableListModel from 'onezone-gui/utils/chunkable-list-model';
 import TokensChunkableListModel from 'onezone-gui/utils/tokens-chunkable-list-model';
 import SharesChunksArray from 'onezone-gui/utils/shares-chunks-array';
 import { camelize } from '@ember/string';

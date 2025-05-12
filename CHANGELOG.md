@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12765 Added batch fetching and infinite scroll for provider space list on providers map
 * VFS-12758 Fixed tokens list cut-down after changing filter settings
 * VFS-12695 Using updated onedata-gui-common with more Glimmer components
 * VFS-12673 Added caching to shares fetching to avoid multiple list fetching for the same space

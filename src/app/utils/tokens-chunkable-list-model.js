@@ -7,7 +7,7 @@
  */
 
 import TokensChunkableListModelFetcher from './tokens-chunkable-list-model-fetcher';
-import ChunkableListModel from 'onedata-gui-common/utils/chunkable-list-model';
+import ChunkableListModel from 'onezone-gui/utils/chunkable-list-model';
 
 export default class TokensChunkableListModel extends ChunkableListModel {
   /** @override */
