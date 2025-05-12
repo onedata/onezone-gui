@@ -14,6 +14,7 @@ import ProgressTracker from 'onedata-gui-common/utils/progress-tracker';
 import GrisBatchContainerSpec from 'onedata-gui-websocket-client/utils/gris-batch-container-spec';
 import { OwsGraphOperation } from 'onedata-gui-websocket-client/services/onedata-graph';
 import { DebouncedBatchFlushStrategy } from 'onedata-gui-websocket-client/utils/batch-flush-strategies';
+import { all as allFulfilled } from 'rsvp';
 
 /**
  * @typedef {InfiniteScrollItem} ChunkableListModelFetcherItem
@@ -125,16 +126,19 @@ export default class ChunkableListModelFetcher {
    */
   async getPreparedList() {
     const itemsGris = this.listModel.belongsTo('list').ids();
-    const containers = _.chunk(itemsGris, this.batchFetchSize).map(grisChunk => {
-      const containerSpec = new GrisBatchContainerSpec(
-        OwsGraphOperation.Get,
-        grisChunk
-      );
-      return this.batchRequestRegistry.createContainer(
-        containerSpec,
-        DebouncedBatchFlushStrategy
-      );
-    });
+    const containerPromises = _.chunk(itemsGris, this.batchFetchSize)
+      .map(async (grisChunk) => {
+        const containerSpec = new GrisBatchContainerSpec(
+          OwsGraphOperation.Get,
+          grisChunk
+        );
+        await this.batchRequestRegistry.waitForNoConflicts(containerSpec);
+        return this.batchRequestRegistry.createContainer(
+          containerSpec,
+          DebouncedBatchFlushStrategy
+        );
+      });
+    const containers = await allFulfilled(containerPromises);
     this.progressTracker.reset(itemsGris.length);
     try {
       const list = this.listModel.list;
