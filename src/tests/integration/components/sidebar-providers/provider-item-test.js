@@ -41,19 +41,26 @@ describe('Integration | Component | sidebar-providers/provider-item', function (
   it('renders number of supported spaces', async function () {
     // given
     const store = lookupService(this, 'store');
+    const provider = await store.createRecord('provider', {
+      name: 'hello world',
+      online: true,
+    }).save();
     const spaces = await allFulfilled(
       ['space1', 'space2'].map(name =>
-        store.createRecord('space', { name })
+        store.createRecord('space', {
+          name,
+          supportSizes: {
+            [provider.entityId]: 1024,
+          },
+        })
       )
     );
     const spaceList = await store.createRecord('space-list', {
       list: spaces,
     });
-    const provider = await store.createRecord('provider', {
-      name: 'hello world',
-      online: true,
-      spaceList,
-    }).save();
+    provider.set('spaceList', spaceList);
+    await provider.save();
+
     this.set('provider', provider);
 
     // when
@@ -66,19 +73,25 @@ describe('Integration | Component | sidebar-providers/provider-item', function (
   it('reacts for change of number of supported spaces', async function () {
     // given
     const store = lookupService(this, 'store');
+    const provider = await store.createRecord('provider', {
+      name: 'hello world',
+      online: true,
+    }).save();
     const spaces = await allFulfilled(
       ['space1', 'space2'].map(name =>
-        store.createRecord('space', { name })
+        store.createRecord('space', {
+          name,
+          supportSizes: {
+            [provider.entityId]: 1024,
+          },
+        })
       )
     );
     const spaceList = await store.createRecord('space-list', {
       list: spaces,
     });
-    const provider = await store.createRecord('provider', {
-      name: 'hello world',
-      online: true,
-      spaceList,
-    }).save();
+    provider.set('spaceList', spaceList);
+    await provider.save();
     this.set('provider', provider);
     await render(hbs `<SidebarProviders::ProviderItem @item={{this.provider}} />`);
 
@@ -93,27 +106,65 @@ describe('Integration | Component | sidebar-providers/provider-item', function (
   it('renders total spaces support size', async function () {
     // given
     const store = lookupService(this, 'store');
+    const provider = await store.createRecord('provider', {
+      name: 'hello world',
+      online: true,
+    }).save();
     const spaces = await allFulfilled(
       ['space1', 'space2'].map(name =>
-        store.createRecord('space', { name })
+        store.createRecord('space', {
+          name,
+          supportSizes: {
+            [provider.entityId]: 1024,
+          },
+        })
       )
     );
     const spaceList = await store.createRecord('space-list', {
       list: spaces,
     });
+    provider.set('spaceList', spaceList);
+    await provider.save();
+    this.set('provider', provider);
+
+    // when
+    await render(hbs `<SidebarProviders::ProviderItem @item={{this.provider}} />`);
+
+    // then
+    const sizeElement = this.element.querySelector('.total-support-size');
+    expect(sizeElement).to.contain.text('2 KiB');
+  });
+
+  it('updates total support size when a space is added to provider', async function () {
+    // given
+    const store = lookupService(this, 'store');
     const provider = await store.createRecord('provider', {
       name: 'hello world',
       online: true,
-      spaceList,
     }).save();
+    const spaces = await allFulfilled(
+      ['space1', 'space2'].map(name =>
+        store.createRecord('space', {
+          name,
+          supportSizes: {
+            [provider.entityId]: 1024,
+          },
+        })
+      )
+    );
+    const spaceList = await store.createRecord('space-list', {
+      list: [spaces[0]],
+    });
+    provider.set('spaceList', spaceList);
+    await provider.save();
     this.set('provider', provider);
     await render(hbs `<SidebarProviders::ProviderItem @item={{this.provider}} />`);
 
     // when-then
-    const countElement = this.element.querySelector('.supported-spaces-count');
-    expect(countElement).to.contain.text('2');
-    spaceList.set('list', [spaces[0]]);
+    const sizeElement = this.element.querySelector('.total-support-size');
+    expect(sizeElement).to.contain.text('1 KiB');
+    spaceList.set('list', spaces);
     await spaceList.save();
-    expect(countElement).to.contain.text('1');
+    expect(sizeElement).to.contain.text('2 KiB');
   });
 });

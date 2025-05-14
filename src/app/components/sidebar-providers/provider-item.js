@@ -124,7 +124,7 @@ export default Component.extend(I18n, UserProxyMixin, {
     const promise = (async () => {
       const chunkableListModel = await this.chunkableSpaceListModelProxy;
       await chunkableListModel.chunksArray.initialLoad;
-      return chunkableListModel.listModel.list.toArray();
+      return chunkableListModel.listModel.list.content;
     })();
     return promiseObject(promise);
   }),

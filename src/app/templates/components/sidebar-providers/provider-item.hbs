@@ -19,6 +19,7 @@
     {{/if}}
     {{#if this.areSpacesLoaded}}
       <toolbar.icon
+        class="total-support-size"
         @icon="provider"
         @outerText={{this.totalSupportSizeHumanReadable}}
         @hint={{tt this "totalSupportHint" size=this.totalSupportSizeHumanReadable}}
