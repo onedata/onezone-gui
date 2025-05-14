@@ -131,7 +131,9 @@ export default Component.extend(I18n, UserProxyMixin, {
 
   spaces: reads('spacesProxy.content'),
 
-  spacesCount: computed('spaceListProxy.content.list', function spacesCount() {
+  // Note: length must be observed, because without it, computed is not fired when data is
+  // pushed (although tests using localstorage work).
+  spacesCount: computed('spaceListProxy.content.list.length', function spacesCount() {
     return this.spaceListProxy.content?.hasMany('list').ids().length;
   }),
 
