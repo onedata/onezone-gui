@@ -144,6 +144,9 @@ export default Component.extend(I18n, {
     (async () => {
       const chunksArray = await this.listProxy;
       await waitForRender();
+      if (this.isDestroyed || this.isDestroying) {
+        return;
+      }
       const infiniteScroll = InfiniteScroll.create({
         entries: chunksArray,
         // Should be the same as .provider-place-drop-space height style.
