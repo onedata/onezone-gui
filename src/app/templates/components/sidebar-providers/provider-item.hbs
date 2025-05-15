@@ -11,6 +11,7 @@
   <StatusToolbar as |toolbar|>
     {{#if this.isSpacesCountAvailable}}
       <toolbar.icon
+        class="supported-spaces-count"
         @icon="space"
         @innerText={{this.spacesCount}}
         @hint={{tt this "spaceCountHint" count=this.spacesCount}}
@@ -18,6 +19,7 @@
     {{/if}}
     {{#if this.areSpacesLoaded}}
       <toolbar.icon
+        class="total-support-size"
         @icon="provider"
         @outerText={{this.totalSupportSizeHumanReadable}}
         @hint={{tt this "totalSupportHint" size=this.totalSupportSizeHumanReadable}}
