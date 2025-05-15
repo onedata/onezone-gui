@@ -53,7 +53,7 @@ const TokenManager = Service.extend({
    * @param {Object} tokenPrototype token model prototype
    * @returns {Promise<Models.Token>}
    */
-  createToken(tokenPrototype) {
+  async createToken(tokenPrototype) {
     const currentUserEntityId = this.get('currentUser.userId');
     const additionalData = {};
     // New token prototype object is not compatible with Ember Data token model
@@ -68,7 +68,7 @@ const TokenManager = Service.extend({
       additionalData[fieldName] = compatibleTokenPrototype[fieldName];
       delete compatibleTokenPrototype[fieldName];
     });
-    return this.get('store')
+    const token = await this.store
       .createRecord('token', _.merge(compatibleTokenPrototype, {
         _meta: {
           aspect: 'user_named_token',
@@ -76,8 +76,9 @@ const TokenManager = Service.extend({
           additionalData,
         },
       }))
-      .save()
-      .then(token => this.reloadList().then(() => token));
+      .save();
+    this.reloadList();
+    return token;
   },
 
   /**
