@@ -1,11 +1,8 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
+import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, click, fillIn, find } from '@ember/test-helpers';
+import { render, find } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
-import sinon from 'sinon';
-import { resolve } from 'rsvp';
-import globals from 'onedata-gui-common/utils/globals';
 import { lookupService } from '../../../helpers/stub-service';
 import clearStore from '../../../helpers/clear-store';
 import { all as allFulfilled } from 'rsvp';
