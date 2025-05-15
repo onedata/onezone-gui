@@ -65,10 +65,11 @@ export default Service.extend({
    * Reloads *List relations of current user containing specified model. Only already
    * loaded lists will be reloaded
    * @param {String} listItemModelName
+   * @param {ReloadRecordListOptions} [options]
    * @returns {Promise}
    */
-  reloadUserRecordList(listItemModelName) {
-    return this.reloadRecordList(this.getCurrentUserRecord(), listItemModelName);
+  reloadUserRecordList(listItemModelName, options) {
+    return this.reloadRecordList(this.getCurrentUserRecord(), listItemModelName, options);
   },
 
   /**
@@ -77,11 +78,12 @@ export default Service.extend({
    * @param {String} listOwnerModelName
    * @param {String} recordId
    * @param {String} listItemModelName
+   * @param {ReloadRecordListOptions} [options]
    * @returns {Promise}
    */
-  reloadRecordListById(listOwnerModelName, recordId, listItemModelName) {
+  reloadRecordListById(listOwnerModelName, recordId, listItemModelName, options) {
     const record = this.getLoadedRecordById(listOwnerModelName, recordId);
-    return record ? this.reloadRecordList(record, listItemModelName) : resolve();
+    return record ? this.reloadRecordList(record, listItemModelName, options) : resolve();
   },
 
   /**
@@ -89,12 +91,13 @@ export default Service.extend({
    * loaded lists containing specified model will be reloaded
    * @param {String} listOwnerModelName
    * @param {String} listItemModelName
+   * @param {ReloadRecordListOptions} [options]
    * @returns {Promise}
    */
-  reloadRecordListInAllRecords(listOwnerModelName, listItemModelName) {
+  reloadRecordListInAllRecords(listOwnerModelName, listItemModelName, options) {
     const allRecords = this.getAllLoadedRecords(listOwnerModelName);
     return allFulfilled(
-      allRecords.map(record => this.reloadRecordList(record, listItemModelName))
+      allRecords.map(record => this.reloadRecordList(record, listItemModelName, options))
     ).catch(ignoreForbiddenError);
   },
 
@@ -103,9 +106,10 @@ export default Service.extend({
    * specified model will be reloaded
    * @param {GraphSingleModel} record
    * @param {String} listItemModelName
+   * @param {ReloadRecordListOptions} [options]
    * @returns {Promise}
    */
-  reloadRecordList(record, listItemModelName) {
+  reloadRecordList(record, listItemModelName, options) {
     const store = this.get('store');
     const modelClass = record.constructor;
     const listItemEmberModelName =
@@ -126,7 +130,7 @@ export default Service.extend({
       });
 
     return allFulfilled(
-      relationsToReload.map(relationName => record.reloadList(relationName))
+      relationsToReload.map(relationName => record.reloadList(relationName, options))
     );
   },
 

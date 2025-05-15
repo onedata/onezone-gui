@@ -77,7 +77,7 @@ const TokenManager = Service.extend({
         },
       }))
       .save();
-    this.reloadList();
+    this.reloadList({ onlyIds: true });
     return token;
   },
 
@@ -270,10 +270,11 @@ const TokenManager = Service.extend({
 
   /**
    * Reloads token list (if already loaded)
+   * @param {ReloadRecordListOptions} options
    * @returns {Promise<TokenList>}
    */
-  reloadList() {
-    return this.get('recordManager').reloadUserRecordList('token');
+  reloadList(options) {
+    return this.get('recordManager').reloadUserRecordList('token', options);
   },
 });
 
