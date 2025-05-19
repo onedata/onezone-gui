@@ -1,7 +1,7 @@
 <div class="type-filter-row filter-row">
   <label class="filter-label">{{tt this "typeFilter.label"}}:</label>
   <BsButtonGroup
-    @value={{selectedType}}
+    @value={{this.selectedType}}
     class="type-filter filter-control"
     @type="radio"
     @onChange={{action "typeChanged"}}
@@ -21,7 +21,10 @@
     </bg.button>
   </BsButtonGroup>
 </div>
-<OneCollapse @collapsed={{not isTargetFilterVisible}} class="target-filter-row-collapse">
+<OneCollapse
+  @collapsed={{not this.isTargetFilterVisible}}
+  class="target-filter-row-collapse"
+>
   <div class="target-filter-row filter-row">
     <label class="filter-label">{{tt this "targetFilter.label"}}:</label>
     <div class="filter-control target-filter">
@@ -30,9 +33,9 @@
         @tagName="div"
         @triggerClass="small"
         @dropdownClass="small"
-        @options={{targetModelOptions}}
+        @options={{this.targetModelOptions}}
         @onChange={{action "targetModelChanged"}}
-        @selected={{selectedTargetModelOption}}
+        @selected={{this.selectedTargetModelOption}}
         @renderInPlace={{true}}
         as |option|
       >
@@ -45,23 +48,30 @@
           >{{tt this (concat "targetFilter.model.options." option.modelName)}}</span>
         </TruncatedString>
       </OneDropdown>
-      <OneDropdown
-        class="target-record-filter"
-        @tagName="div"
-        @triggerClass="small"
-        @dropdownClass="small"
-        @options={{targetRecordOptions}}
-        @onChange={{action "targetRecordChanged"}}
-        @selected={{selectedTargetRecordOption}}
-        @renderInPlace={{true}}
-        @disabled={{isTargetRecordDisabled}}
-        @searchEnabled={{true}}
-        as |option|
-      >
-        <TruncatedString>
-          {{option.name}}
-        </TruncatedString>
-      </OneDropdown>
+      {{#if this.targetRecordOptionsLoaderProxy.isPending}}
+        <div class="dropdown-loader">
+          <SpinSpinnerBlock @sizeClass="xs" />
+          <div class="dropdown-loader-text truncate">{{tt this "loadingFilters"}}</div>
+        </div>
+      {{else}}
+        <OneDropdown
+          class="target-record-filter"
+          @tagName="div"
+          @triggerClass="small"
+          @dropdownClass="small"
+          @options={{this.targetRecordOptions}}
+          @onChange={{action "targetRecordChanged"}}
+          @selected={{this.effSelectedTargetRecordOption}}
+          @renderInPlace={{true}}
+          @disabled={{this.isTargetRecordDisabled}}
+          @searchEnabled={{true}}
+          as |option|
+        >
+          <TruncatedString>
+            {{option.name}}
+          </TruncatedString>
+        </OneDropdown>
+      {{/if}}
     </div>
   </div>
 </OneCollapse>

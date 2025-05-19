@@ -2,8 +2,8 @@
  * An advanced filters component for tokens sidebar. Provides filtering by token
  * type and target.
  *
- * @author  Michał Borzęcki
- * @copyright (C) 2019 ACK CYFRONET AGH
+ * @author  Michał Borzęcki, Jakub Liput
+ * @copyright (C) 2019-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -15,6 +15,9 @@ import { computed, observer, get } from '@ember/object';
 import { equal, raw } from 'ember-awesome-macros';
 import { scheduleOnce } from '@ember/runloop';
 import recordIcon from 'onedata-gui-common/utils/record-icon';
+import _ from 'lodash';
+import { all as allFulFilled, resolve } from 'rsvp';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 
 /**
  * @typedef {'all'|'access'|'identity'|'invite'} TokenTypeFilter
@@ -102,7 +105,7 @@ export default Component.extend(I18n, {
       const {
         collection,
         allModelOption,
-      } = this.getProperties('collection', 'allModelOption');
+      } = this;
       if (collection) {
         const modelNames = collection.mapBy('targetModelName').compact().uniq();
         const modelOptions = modelNames.map(modelName => ({
@@ -114,6 +117,26 @@ export default Component.extend(I18n, {
         })).sortBy('modelNameTranslation');
 
         return [allModelOption, ...modelOptions];
+      }
+    }
+  ),
+
+  tokensFullLoadProxy: computed('collection', function tokensFullLoadProxy() {
+    const promise = allFulFilled(this.collection.map(record =>
+      record.loadRequiredRelations()
+    ));
+    return promiseObject(promise);
+  }),
+
+  targetRecordOptionsLoaderProxy: computed(
+    'selectedTargetModelOption',
+    'tokensFullLoadProxy',
+    'allModelOption',
+    function targetRecordOptionsLoaderProxy() {
+      if (this.selectedTargetModelOption === this.allModelOption) {
+        return promiseObject(resolve());
+      } else {
+        return this.tokensFullLoadProxy;
       }
     }
   ),
@@ -132,25 +155,28 @@ export default Component.extend(I18n, {
         allModelOption,
         selectedTargetModelOption,
         collection,
-      } = this.getProperties(
-        'allRecordOption',
-        'allModelOption',
-        'selectedTargetModelOption',
-        'collection'
-      );
+      } = this;
 
       if (selectedTargetModelOption === allModelOption) {
         return [allRecordOption];
       } else {
-        const recordOptions = collection
-          .filterBy('targetModelName', get(selectedTargetModelOption, 'modelName'))
-          .filterBy('tokenTarget')
-          .uniqBy('tokenTarget')
-          .map(record => ({
-            record: get(record, 'tokenTarget'),
-            name: get(record, 'tokenTarget.name'),
-          }))
-          .sortBy('name');
+        // FIXME: wstawić proxy, które będzie ładować relacje Tokena
+        // to proxy będzie ChunkableListModel i będzie zawierać progress
+        // progress będzie można pokazać zamiast dropdowna z targetRecordOptions
+        // jeśli tylko progress nie będzie 100
+        // będzie działać nawet jak ktoś zmieni selectedTargetModelName
+        let recordOptions = collection;
+        const selectedTargetModelName = selectedTargetModelOption.modelName;
+        recordOptions = recordOptions.filter(token =>
+          token.targetModelName === selectedTargetModelName
+        );
+        recordOptions = recordOptions.filter(token => token.tokenTarget);
+        recordOptions = _.uniqBy(recordOptions, token => token.tokenTarget);
+        recordOptions = recordOptions.map(token => ({
+          record: token.tokenTarget,
+          name: token.tokenTarget.name,
+        }));
+        recordOptions = _.sortBy(recordOptions, 'name');
         return [allRecordOption, ...recordOptions];
       }
     }
@@ -161,6 +187,23 @@ export default Component.extend(I18n, {
    */
   isTargetRecordDisabled: equal('selectedTargetModelOption', 'allModelOption'),
 
+  effSelectedTargetRecordOption: computed(
+    'targetRecordOptionsLoaderProxy.isFulfilled',
+    'targetRecordOptions',
+    'selectedTargetRecordOption',
+    'allRecordOption',
+    function effSelectedTargetRecordOption() {
+      // Until the loader is not resolved, user should not be able to change target
+      // record, so it is probably "all" option.
+      if (!this.targetRecordOptionsLoaderProxy.isFulfilled) {
+        return this.allRecordOption;
+      }
+      const selectedRecord = this.selectedTargetRecordOption.record;
+      return this.targetRecordOptions.find(it => it.record === selectedRecord) ??
+        this.allRecordOption;
+    }
+  ),
+
   targetModelOptionsObserver: observer(
     'targetModelOptions',
     function targetModelOptionsObserver() {
@@ -168,35 +211,11 @@ export default Component.extend(I18n, {
         targetModelOptions,
         selectedTargetModelOption,
         allModelOption,
-      } = this.getProperties(
-        'targetModelOptions',
-        'selectedTargetModelOption',
-        'allModelOption'
-      );
+      } = this;
 
-      const selectedModel = get(selectedTargetModelOption, 'modelName');
-      if (!targetModelOptions.mapBy('modelName').includes(selectedModel)) {
+      const selectedModel = selectedTargetModelOption.modelName;
+      if (!targetModelOptions.map(it => it.modelName).includes(selectedModel)) {
         this.set('selectedTargetModelOption', allModelOption);
-      }
-    }
-  ),
-
-  targetRecordOptionsObserver: observer(
-    'targetRecordOptions',
-    function targetRecordOptionsObserver() {
-      const {
-        targetRecordOptions,
-        selectedTargetRecordOption,
-        allRecordOption,
-      } = this.getProperties(
-        'targetRecordOptions',
-        'selectedTargetRecordOption',
-        'allRecordOption'
-      );
-
-      const selectedRecord = get(selectedTargetRecordOption, 'record');
-      if (!targetRecordOptions.mapBy('record').includes(selectedRecord)) {
-        this.set('selectedTargetRecordOption', allRecordOption);
       }
     }
   ),
@@ -204,7 +223,7 @@ export default Component.extend(I18n, {
   filtersStateObserver: observer(
     'selectedType',
     'selectedTargetModelOption',
-    'selectedTargetRecordOption',
+    'effSelectedTargetRecordOption',
     function filtersStateObserver() {
       scheduleOnce('afterRender', this, 'notifyChange');
     }
@@ -213,14 +232,9 @@ export default Component.extend(I18n, {
   init() {
     this._super(...arguments);
 
-    const {
-      allModelOption,
-      allRecordOption,
-    } = this.getProperties('allModelOption', 'allRecordOption');
-
     this.setProperties({
-      selectedTargetModelOption: allModelOption,
-      selectedTargetRecordOption: allRecordOption,
+      selectedTargetModelOption: this.allModelOption,
+      selectedTargetRecordOption: this.allRecordOption,
     });
 
     this.notifyChange();
@@ -230,19 +244,14 @@ export default Component.extend(I18n, {
     const {
       selectedType,
       selectedTargetModelOption,
-      selectedTargetRecordOption,
+      effSelectedTargetRecordOption,
       onChange,
-    } = this.getProperties(
-      'selectedType',
-      'selectedTargetModelOption',
-      'selectedTargetRecordOption',
-      'onChange'
-    );
+    } = this;
 
     onChange({
       type: selectedType,
       targetModelName: selectedTargetModelOption.modelName,
-      targetRecord: get(selectedTargetRecordOption, 'record'),
+      targetRecord: effSelectedTargetRecordOption.record,
     });
   },
 

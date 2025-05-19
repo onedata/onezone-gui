@@ -28,6 +28,7 @@ export default {
         },
       },
     },
+    loadingFilters: 'Loading filters...',
   },
   tokenItem: {
     savingToken: 'saving token',

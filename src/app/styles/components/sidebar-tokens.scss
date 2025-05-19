@@ -60,6 +60,16 @@
       max-height: 150px;
       white-space: nowrap;
     }
+
+    .dropdown-loader {
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      .dropdown-loader-text {
+        font-size: $font-size-small;
+        margin-left: 0.5em;
+      }
+    }
   }
 
   @media (max-width: $screen-md-max) {
