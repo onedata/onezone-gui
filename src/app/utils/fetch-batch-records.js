@@ -17,11 +17,13 @@ import { DebouncedBatchFlushStrategy } from 'onedata-gui-websocket-client/utils/
 import ProgressTracker from 'onedata-gui-common/utils/progress-tracker';
 import BatchRequestRegistry from 'onedata-gui-websocket-client/services/batch-request-registry';
 
+const defaultBatchFetchSize = 100;
+
 /**
  * @typedef {Object} FetchBatchRecordsArgs
  * @property {BatchRequestRegistry} batchRequestRegistry
  * @property {ProgressTracker} progressTracker
- * @property {number} [batchFetchSize=100]
+ * @property {number} [batchFetchSize]
  * @property {Array<string>} itemsGris
  * @property {() => Promise<Array<Ember.Model>>} listResolver
  */
@@ -35,7 +37,7 @@ export default async function fetchBatchRecords(fetchBatchRecordsArgs) {
   const {
     batchRequestRegistry,
     progressTracker,
-    batchFetchSize = 100,
+    batchFetchSize = defaultBatchFetchSize,
     itemsGris,
     listResolver,
   } = fetchBatchRecordsArgs;
@@ -47,6 +49,7 @@ export default async function fetchBatchRecords(fetchBatchRecordsArgs) {
       DebouncedBatchFlushStrategy
     );
   });
+  // FIXME: nie wiem jak to może działać w przypadku konfliktu, bo przecież waitForNoConflicts zawiesi się do momentu jak inny kontener nie zostanie zresolvowany
   const containers = await allFulfilled(containerPromises);
   progressTracker.reset(itemsGris.length);
   try {
@@ -68,7 +71,8 @@ export default async function fetchBatchRecords(fetchBatchRecordsArgs) {
 
     // If record cannot be found, it is either not included in the list or it is
     // destroyed.
-    return list.filter((r) => !r.isDestroyed);
+    return list.filter((r) => !r?.isDestroyed);
+
   } finally {
     for (const container of containers) {
       batchRequestRegistry.destroyContainer(container);
@@ -92,16 +96,25 @@ function validateArgs(args) {
     );
   }
   if (
-    typeof args.batchFetchSize !== 'number' ||
-    args.batchFetchSize <= 0 ||
-    !Number.isInteger(args.batchFetchSize)
+    args.batchFetchSize !== undefined &&
+    (
+      typeof args.batchFetchSize !== 'number' ||
+      args.batchFetchSize <= 0 ||
+      !Number.isInteger(args.batchFetchSize)
+    )
   ) {
-    throw new Error('fetchBatchRecords: batchFetchSize must be a positive integer');
-  }
-  if (!Number.isInteger(args.batchFetchSize) || args.batchFetchSize <= 0) {
     throw new Error(
-      `fetchBatchRecords: batchFetchSize must be a positive integer, but it is: ${JSON.stringify(args.batchFetchSize)}`
+      'fetchBatchRecords: batchFetchSize must be undefined or a positive integer'
     );
   }
-  // FIXME: dalsze
+  if (!Array.isArray(args.itemsGris)) {
+    throw new Error(
+      'fetchBatchRecords: itemsGris must be an Array of strings'
+    );
+  }
+  if (typeof args.listResolver !== 'function') {
+    throw new Error(
+      'fetchBatchRecords: listResolver must be a function'
+    );
+  }
 }

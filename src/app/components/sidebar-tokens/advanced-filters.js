@@ -11,13 +11,15 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import { inject as service } from '@ember/service';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
-import { computed, observer, get } from '@ember/object';
+import { computed, observer } from '@ember/object';
 import { equal, raw } from 'ember-awesome-macros';
 import { scheduleOnce } from '@ember/runloop';
 import recordIcon from 'onedata-gui-common/utils/record-icon';
 import _ from 'lodash';
-import { all as allFulFilled, resolve } from 'rsvp';
+import { resolve, all as allFulfilled } from 'rsvp';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
+import fetchBatchRecords from 'onezone-gui/utils/fetch-batch-records';
+import ProgressTracker from 'onedata-gui-common/utils/progress-tracker';
 
 /**
  * @typedef {'all'|'access'|'identity'|'invite'} TokenTypeFilter
@@ -34,6 +36,7 @@ export default Component.extend(I18n, {
   classNames: ['advanced-filters', 'advanced-token-filters'],
 
   i18n: service(),
+  batchRequestRegistry: service(),
 
   /**
    * @override
@@ -68,6 +71,11 @@ export default Component.extend(I18n, {
    * @type {Object}
    */
   selectedTargetRecordOption: undefined,
+
+  /**
+   * @type {ProgressTracker}
+   */
+  progressTracker: undefined,
 
   /**
    * @type {Ember.ComputedProperty<boolean>}
@@ -121,22 +129,57 @@ export default Component.extend(I18n, {
     }
   ),
 
-  tokensFullLoadProxy: computed('collection', function tokensFullLoadProxy() {
-    const promise = allFulFilled(this.collection.map(record =>
-      record.loadRequiredRelations()
-    ));
-    return promiseObject(promise);
-  }),
+  /**
+   * @type {ComputedProperty<{ progressTracker: ProgressTracker, batchLoadProxy: PromiseObject}>}
+   */
+  tokensFullLoadData: computed(
+    'collection',
+    'selectedTargetModelOption',
+    function tokensFullLoadData() {
+      const {
+        selectedTargetModelOption,
+        batchRequestRegistry,
+        collection,
+      } = this;
+      const selectedTargetModelName = selectedTargetModelOption.modelName;
+      const itemsGris = _.chain(this.collection)
+        .filter(token => token.targetModelName === selectedTargetModelName)
+        .invokeMap('getTargetModelGri')
+        .filter(Boolean)
+        .uniq()
+        .value();
+      const progressTracker = new ProgressTracker(itemsGris.length);
+      const listResolver = async () => {
+        return allFulfilled(collection
+          .filter(token =>
+            token.targetRecordId && token.targetModelName === selectedTargetModelName
+          )
+          .map(token => token.loadRequiredRelations())
+        );
+      };
+      const promise = fetchBatchRecords({
+        batchRequestRegistry,
+        progressTracker,
+        itemsGris,
+        listResolver,
+      });
+      return {
+        progressTracker,
+        batchLoadProxy: promiseObject(promise),
+      };
+    }
+  ),
 
   targetRecordOptionsLoaderProxy: computed(
     'selectedTargetModelOption',
-    'tokensFullLoadProxy',
+    'tokensFullLoadData',
     'allModelOption',
     function targetRecordOptionsLoaderProxy() {
       if (this.selectedTargetModelOption === this.allModelOption) {
         return promiseObject(resolve());
       } else {
-        return this.tokensFullLoadProxy;
+        const { batchLoadProxy } = this.tokensFullLoadData;
+        return batchLoadProxy;
       }
     }
   ),
@@ -160,11 +203,6 @@ export default Component.extend(I18n, {
       if (selectedTargetModelOption === allModelOption) {
         return [allRecordOption];
       } else {
-        // FIXME: wstawić proxy, które będzie ładować relacje Tokena
-        // to proxy będzie ChunkableListModel i będzie zawierać progress
-        // progress będzie można pokazać zamiast dropdowna z targetRecordOptions
-        // jeśli tylko progress nie będzie 100
-        // będzie działać nawet jak ktoś zmieni selectedTargetModelName
         let recordOptions = collection;
         const selectedTargetModelName = selectedTargetModelOption.modelName;
         recordOptions = recordOptions.filter(token =>

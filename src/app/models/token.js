@@ -259,52 +259,47 @@ export default Model.extend(
       cancel(this.get('expirationTimer'));
     },
 
+    getTargetModelGri() {
+      if (!this.targetRecordId || !this.targetModelName) {
+        return null;
+      }
+      const adapter = this.store.adapterFor(this.targetModelName);
+      const entityType = adapter.getEntityTypeForModelName(this.targetModelName);
+      return gri({
+        entityType,
+        entityId: this.targetRecordId,
+        aspect: 'instance',
+        scope: 'auto',
+      });
+    },
+
     /**
      * @override
      * @returns {Promise<Models.User|Models.Group|Models.Cluster|Models.Space|Models.Harvester|null>}
      */
     async fetchTokenTarget() {
-      const {
-        store,
-        targetModelName,
-        targetRecordId,
-      } = this.getProperties(
-        'store',
-        'targetModelName',
-        'targetRecordId'
-      );
-
-      if (!targetModelName || !targetRecordId) {
+      const targetModelGri = this.getTargetModelGri();
+      if (!targetModelGri) {
         return null;
-      } else {
-        const adapter = store.adapterFor(targetModelName);
-        const entityType = adapter.getEntityTypeForModelName(targetModelName);
-
-        const targetModelGri = gri({
-          entityType,
-          entityId: targetRecordId,
-          aspect: 'instance',
-          scope: 'auto',
-        });
-
-        const currentRecord = store.peekRecord(targetModelName, targetModelGri);
-        if (
-          currentRecord && (
-            get(currentRecord, 'isDeleted') ||
-            get(currentRecord, 'isDestroyed') ||
-            get(currentRecord, 'isDestroying')
-          )
-        ) {
-          return null;
-        }
-
-        return await store.findRecord(
-          targetModelName,
-          targetModelGri, {
-            reload: true,
-          }
-        );
       }
+
+      const currentRecord = this.store.peekRecord(this.targetModelName, targetModelGri);
+      if (
+        currentRecord && (
+          currentRecord.isDeleted ||
+          currentRecord.isDestroyed ||
+          currentRecord.isDestroying
+        )
+      ) {
+        return null;
+      }
+
+      return await this.store.findRecord(
+        this.targetModelName,
+        targetModelGri, {
+          reload: true,
+        }
+      );
     },
 
     /**
@@ -328,6 +323,8 @@ export default Model.extend(
       }
     },
 
+    // FIXME: nazywanie tego required relations jest problematyczne - bo to może być ładowane leniwie, i nie chcemy ładować tego zawczasu
+    // zrobić kompozycję? tokenTarget?
     /**
      * @override
      */

@@ -28,7 +28,7 @@ export default {
         },
       },
     },
-    loadingFilters: 'Loading filters...',
+    loadingFilters: 'Loading... {{progress}}',
   },
   tokenItem: {
     savingToken: 'saving token',

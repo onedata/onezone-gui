@@ -51,7 +51,15 @@
       {{#if this.targetRecordOptionsLoaderProxy.isPending}}
         <div class="dropdown-loader">
           <SpinSpinnerBlock @sizeClass="xs" />
-          <div class="dropdown-loader-text truncate">{{tt this "loadingFilters"}}</div>
+          <div class="dropdown-loader-text truncate">
+            {{#if (eq this.selectedTargetModelOption this.allModelOption)}}
+              {{tt this "loadingFilters"}}
+            {{else}}
+              {{tt this "loadingFilters"
+                progress=this.tokensFullLoadData.progressTracker.progressText
+              }}
+            {{/if}}
+          </div>
         </div>
       {{else}}
         <OneDropdown
