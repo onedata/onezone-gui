@@ -19,7 +19,7 @@ export default EmberObject.extend(OwnerInjector, {
    * @type {ComputedProperty<PromiseObject<DS.RecordArray<Models.Token>>>}
    */
   allTokens: promise.object(computed(async function allTokens() {
-    return get(await this.tokenManager.getTokens(), 'list');
+    return (await this.tokenManager.getTokens(false)).list;
   })),
 
   /**

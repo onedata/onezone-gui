@@ -1,8 +1,8 @@
 /**
  * Has generic functions to manage records and relations.
  *
- * @author Michał Borzęcki
- * @copyright (C) 2020-2023 ACK CYFRONET AGH
+ * @author Michał Borzęcki, Jakub Liput
+ * @copyright (C) 2020-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -13,11 +13,13 @@ import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import RecordManagerConfiguration from 'onezone-gui/utils/record-manager-configuration';
+import fetchBatchRecords from 'onezone-gui/utils/fetch-batch-records';
 
 /**
  * @typedef {Object} LoadRecordOptions
  * @property {boolean} [reload]
  * @property {boolean} [backgroundReload]
+ * @property {boolean} [loadOptionalRelations]
  */
 
 /**
@@ -26,12 +28,14 @@ import RecordManagerConfiguration from 'onezone-gui/utils/record-manager-configu
 const defaultLoadRecordOptions = Object.freeze({
   reload: false,
   backgroundReload: false,
+  loadOptionalRelations: true,
 });
 
 export default Service.extend({
   currentUser: service(),
   store: service(),
   onedataGraphUtils: service(),
+  batchRequestRegistry: service(),
 
   /**
    * @type {Utils.RecordManagerConfiguration}
@@ -49,16 +53,44 @@ export default Service.extend({
   /**
    * Returns loaded *List relation of current user
    * @param {String} listItemModelName
+   * @param {boolan} [loadRequiredRelations] Some models have async relations that should
+   *   be loaded to have complete data of record. It is recommended to load them, but in
+   *   some cases like loading large number of records, it is better to load them lazily,
+   *   when they are needed.
    * @returns {Promise<GraphListModel>}
    */
-  getUserRecordList(listItemModelName) {
+  async getUserRecordList(listItemModelName, loadOptionalRelations = true) {
     const user = this.getCurrentUserRecord();
     const listRelationName = `${camelize(listItemModelName)}List`;
-    return user.getRelation(listRelationName)
-      .then(recordList => get(recordList, 'list').then(list =>
-        allFulfilled(list.map(record => this.loadRequiredRelationsOfRecord(record)))
-        .then(() => recordList)
-      ));
+    const listRecord = await user.getRelation(listRelationName);
+    const itemsGris = listRecord.hasMany('list').ids();
+    const listResolver = async () => {
+      try {
+        // Awaiting for list might fail when some single records cannot be fetched,
+        // but we can still try to read list afterwards.
+        await listRecord.list;
+      } catch {
+        console.warn(
+          'RecordManager.getUserRecordList: list cannot be fully resolved, some records may be missing'
+        );
+      }
+      return listRecord.list.toArray();
+    };
+    await fetchBatchRecords({
+      batchRequestRegistry: this.batchRequestRegistry,
+      itemsGris,
+      listResolver,
+    });
+
+    // FIXME: to jest pozbawione batcha - można by wymusić powstanie abstrackyjnego
+    // gettera to pobrania GRIs zależności
+
+    // After fetching batch record, content of list should be available in proxy.
+    const list = listRecord.list.content;
+    if (loadOptionalRelations) {
+      await allFulfilled(list.map(record => this.loadRequiredRelationsOfRecord(record)));
+    }
+    return listRecord;
   },
 
   /**
@@ -163,10 +195,18 @@ export default Service.extend({
    * @param {LoadRecordOptions} [loadOptions]
    * @returns {Promise<GraphModel>}
    */
-  getRecord(modelName, gri, loadOptions = defaultLoadRecordOptions) {
-    return this.get('store')
-      .findRecord(modelName, gri, { ...defaultLoadRecordOptions, ...loadOptions })
-      .then(record => this.loadRequiredRelationsOfRecord(record).then(() => record));
+  async getRecord(modelName, gri, loadOptions = defaultLoadRecordOptions) {
+    const record = await this.store.findRecord(
+      modelName,
+      gri, {
+        ...defaultLoadRecordOptions,
+        ...loadOptions,
+      }
+    );
+    if (loadOptions.loadOptionalRelations) {
+      await this.loadRequiredRelationsOfRecord(record);
+    }
+    return record;
   },
 
   /**

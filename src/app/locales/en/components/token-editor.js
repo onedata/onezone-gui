@@ -87,7 +87,7 @@ export default {
         },
         inviteTargetDetails: {
           loadingTarget: {
-            loadingText: 'Loading...',
+            loadingText: 'Loading available targets...',
           },
           target: {
             label: '',

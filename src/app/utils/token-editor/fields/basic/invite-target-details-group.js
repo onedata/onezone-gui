@@ -1,8 +1,8 @@
 /**
  * Invite target details fields of the tokens editor.
  *
- * @author Michał Borzęcki
- * @copyright (C) 2024 ACK CYFRONET AGH
+ * @author Michał Borzęcki, Jakub Liput
+ * @copyright (C) 2024-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -24,7 +24,7 @@ import { groupedFlags as harvesterFlags } from 'onedata-gui-websocket-client/uti
 import { groupedFlags as clusterFlags } from 'onedata-gui-websocket-client/utils/cluster-privileges-flags';
 import { groupedFlags as atmInventoryFlags } from 'onedata-gui-websocket-client/utils/atm-inventory-privileges-flags';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import RecordOptionsArrayProxy from 'onedata-gui-common/utils/record-options-array-proxy';
 import recordIcon from 'onedata-gui-common/utils/record-icon';
@@ -98,6 +98,8 @@ const TargetField = DropdownField.extend({
     this.cachedTargetsModelNameObserver();
   },
 });
+
+const infiniteLoadProxy = promiseObject(new Promise(() => {}));
 
 const privilegesForModels = {
   space: spaceFlags,
@@ -244,30 +246,43 @@ export const InviteTargetDetailsGroup = FormFieldsGroup.extend({
   /**
    * @override
    */
-  fields: computed(() => [
-    SiblingLoadingField.extend({
-      loadingProxy: reads('parent.cachedTargetsProxy'),
-      addColonToLabel: false,
-    }).create({
-      siblingName: 'target',
-      name: 'loadingTarget',
-    }),
-    TargetField.create(),
-    FormFieldsGroup.extend({
-      isVisible: reads('parent.inviteTypeSpec.hasPrivileges'),
-    }).create({
-      name: 'invitePrivilegesDetails',
-      fields: [
-        SiblingLoadingField.extend({
-          loadingProxy: reads('parent.parent.cachedPrivilegesPresetProxy'),
-        }).create({
-          name: 'loadingPrivileges',
-          siblingName: 'privileges',
-        }),
-        InvitePrivilegesField.create(),
-      ],
-    }),
-  ]),
+  fields: computed(function fields() {
+    return [
+      SiblingLoadingField.extend({
+        loadingProxy: computed(
+          'parent.cachedTargetsProxy',
+          function loadingProxy() {
+            return this.parent?.cachedTargetsProxy ?? infiniteLoadProxy;
+          }
+        ),
+        addColonToLabel: false,
+      }).create({
+        siblingName: 'target',
+        name: 'loadingTarget',
+      }),
+      TargetField.create(),
+      FormFieldsGroup.extend({
+        isVisible: reads('parent.inviteTypeSpec.hasPrivileges'),
+      }).create({
+        name: 'invitePrivilegesDetails',
+        fields: [
+          SiblingLoadingField.extend({
+            loadingProxy: computed(
+              'parent.parent.cachedPrivilegesPresetProxy',
+              function loadingProxy() {
+                return this.parent?.parent?.cachedPrivilegesPresetProxy ??
+                  infiniteLoadProxy;
+              }
+            ),
+          }).create({
+            name: 'loadingPrivileges',
+            siblingName: 'privileges',
+          }),
+          InvitePrivilegesField.create(),
+        ],
+      }),
+    ];
+  }),
 
   /**
    * @type {ComputedProperty<{ value: string, targetModelName: string | undefined, icon: string, hasPrivileges: boolean }>}
@@ -288,9 +303,7 @@ export const InviteTargetDetailsGroup = FormFieldsGroup.extend({
   /**
    * @type {ComputedProperty<PromiseObject<Array<Object>>>}
    */
-  cachedTargetsProxy: PromiseObject.create({
-    promise: new Promise(() => {}),
-  }),
+  cachedTargetsProxy: undefined,
 
   /**
    * @type {ComputedProperty<string | undefined>}
@@ -300,9 +313,7 @@ export const InviteTargetDetailsGroup = FormFieldsGroup.extend({
   /**
    * @type {ComputedProperty<PromiseObject<Array<string>>>}
    */
-  cachedPrivilegesPresetProxy: PromiseObject.create({
-    promise: new Promise(() => {}),
-  }),
+  cachedPrivilegesPresetProxy: undefined,
 
   /**
    * @type {ComputedProperty<Object | undefined>}
@@ -325,6 +336,12 @@ export const InviteTargetDetailsGroup = FormFieldsGroup.extend({
    * @override
    */
   init() {
+    const cachedPrivilegesPresetProxy = promiseObject(resolve());
+    const cachedTargetsProxy = promiseObject(resolve());
+    this.setProperties({
+      cachedPrivilegesPresetProxy,
+      cachedTargetsProxy,
+    });
     this._super(...arguments);
     this.cacheSetter();
   },

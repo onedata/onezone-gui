@@ -10,7 +10,7 @@
  * @property {any} * additional options of caveat
  */
 
-import { get, computed, observer } from '@ember/object';
+import { computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';

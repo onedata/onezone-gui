@@ -2,7 +2,7 @@
  * Provides data for routes and components associated with tokens tab.
  *
  * @author Michał Borzęcki, Jakub Liput
- * @copyright (C) 2018-2020 ACK CYFRONET AGH
+ * @copyright (C) 2018-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -31,21 +31,22 @@ const TokenManager = Service.extend({
 
   /**
    * Fetches collection of all tokens
-   *
+   * @param { boolean } loadOptionalRelations
    * @returns {Promise<Models.TokenList>} resolves to a record containing
    *   an array of tokens
    */
-  getTokens() {
-    return this.get('recordManager').getUserRecordList('token');
+  getTokens(loadOptionalRelations = false) {
+    return this.recordManager.getUserRecordList('token', loadOptionalRelations);
   },
 
   /**
    * Returns token with specified gri
    * @param {String} gri
+   * @param {boolean} loadOptionalRelations
    * @returns {Promise<Models.Token>} token promise
    */
-  getRecord(gri) {
-    return this.get('recordManager').getRecord('token', gri);
+  getRecord(gri, loadOptionalRelations = false) {
+    return this.recordManager.getRecord('token', gri, { loadOptionalRelations });
   },
 
   /**

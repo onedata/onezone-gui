@@ -2,7 +2,8 @@
  * Returns native array with all records loaded using batch requests.
  *
  * Each batch request has maximum `batchFetchSize` size (every batch except the last has
- * equal `batchFetchSize` size). It updates the provided `progressTracker` automatically.
+ * equal `batchFetchSize` size). It updates the `progressTracker` automatically if
+ * provided.
  *
  * @author Jakub Liput
  * @copyright (C) 2025 ACK CYFRONET AGH
@@ -14,7 +15,6 @@ import _ from 'lodash';
 import GrisBatchContainerSpec from 'onedata-gui-websocket-client/utils/gris-batch-container-spec';
 import { OwsGraphOperation } from 'onedata-gui-websocket-client/services/onedata-graph';
 import { DebouncedBatchFlushStrategy } from 'onedata-gui-websocket-client/utils/batch-flush-strategies';
-import ProgressTracker from 'onedata-gui-common/utils/progress-tracker';
 import BatchRequestRegistry from 'onedata-gui-websocket-client/services/batch-request-registry';
 
 const defaultBatchFetchSize = 100;
@@ -51,7 +51,7 @@ export default async function fetchBatchRecords(fetchBatchRecordsArgs) {
   });
   // FIXME: nie wiem jak to może działać w przypadku konfliktu, bo przecież waitForNoConflicts zawiesi się do momentu jak inny kontener nie zostanie zresolvowany
   const containers = await allFulfilled(containerPromises);
-  progressTracker.reset(itemsGris.length);
+  progressTracker?.reset(itemsGris.length);
   try {
     const listPromise = listResolver();
     for (const container of containers) {
@@ -61,7 +61,9 @@ export default async function fetchBatchRecords(fetchBatchRecordsArgs) {
       } finally {
         batchRequestRegistry.destroyContainer(container);
       }
-      progressTracker.doneCount += messagesCount;
+      if (progressTracker) {
+        progressTracker.doneCount += messagesCount;
+      }
     }
     const list = await listPromise;
     // FIXME: dla dużej liczby tokenów ze spejsami jako target, zawiesi ładowanie aż do momentu, kiedy pobierze wszytkie spejsy
@@ -85,11 +87,6 @@ export default async function fetchBatchRecords(fetchBatchRecordsArgs) {
  * @param {FetchBatchRecordsArgs} fetchBatchRecordsArgs
  */
 function validateArgs(args) {
-  if (!(args.progressTracker instanceof ProgressTracker)) {
-    throw new Error(
-      'fetchBatchRecords: progressTracker must be an instance of ProgressTracker service'
-    );
-  }
   if (!(args.batchRequestRegistry instanceof BatchRequestRegistry)) {
     throw new Error(
       'fetchBatchRecords: batchRequestRegistry must be an instance of ProgressTracker BatchRequestRegistry'
