@@ -88,252 +88,266 @@ const allowedInviteTypes = Object.keys(tokenInviteTypeToTargetModelMapping);
 
 export const entityType = 'token';
 
-export default Model.extend(
+const mixins = [
   GraphSingleModelMixin,
-  createDataProxyMixin('tokenTarget'), {
-    name: attr('string'),
-    type: attr('object'),
-    revoked: attr('boolean'),
-    metadata: attr('object'),
-    token: attr('string'),
+  createDataProxyMixin('tokenTarget'),
+];
 
-    /**
-     * Array of caveats
-     * @type {Array<TokenCaveat>}
-     */
-    caveats: attr('array'),
+export default Model.extend(...mixins, {
+  name: attr('string'),
+  type: attr('object'),
+  revoked: attr('boolean'),
+  metadata: attr('object'),
+  token: attr('string'),
 
-    /**
-     * @type {boolean}
-     */
-    isExpired: false,
+  /**
+   * Array of caveats
+   * @type {Array<TokenCaveat>}
+   */
+  caveats: attr('array'),
 
-    /**
-     * Ember timer object
-     * @type {any}
-     */
-    expirationTimer: undefined,
+  /**
+   * @type {boolean}
+   */
+  isExpired: false,
 
-    /**
-     * One of: 'access', 'identity', 'invite'
-     * @type {Ember.ComputedProperty<String>}
-     */
-    typeName: computed('type', function typeName() {
-      const type = this.get('type') || {};
+  /**
+   * Ember timer object
+   * @type {any}
+   */
+  expirationTimer: undefined,
 
-      if (type.accessToken) {
-        return 'access';
-      } else if (type.identityToken) {
-        return 'identity';
-      } else if (type.inviteToken) {
-        return 'invite';
-      } else {
-        return undefined;
+  /**
+   * One of: 'access', 'identity', 'invite'
+   * @type {Ember.ComputedProperty<String>}
+   */
+  typeName: computed('type', function typeName() {
+    const type = this.get('type') || {};
+
+    if (type.accessToken) {
+      return 'access';
+    } else if (type.identityToken) {
+      return 'identity';
+    } else if (type.inviteToken) {
+      return 'invite';
+    } else {
+      return undefined;
+    }
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<string|undefined>}
+   */
+  inviteType: computed('type.inviteToken.inviteType', function inviteType() {
+    const tokenInviteType = this.get('type.inviteToken.inviteType');
+    return allowedInviteTypes.includes(tokenInviteType) ?
+      tokenInviteType : undefined;
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<string|undefined>}
+   */
+  targetModelName: computed('inviteType', function targetModelName() {
+    const inviteType = this.get('inviteType');
+    if (inviteType) {
+      return tokenInviteTypeToTargetModelMapping[inviteType].modelName;
+    }
+  }),
+
+  /**
+   * @type {ComputedProperty<String|undefined>}
+   */
+  targetRecordId: computed('inviteType', function targetModelId() {
+    const {
+      type,
+      inviteType,
+    } = this.getProperties('type', 'inviteType');
+    if (inviteType) {
+      const targetModelMapping =
+        tokenInviteTypeToTargetModelMapping[inviteType];
+      return targetModelMapping && type.inviteToken[targetModelMapping.idFieldName];
+    } else {
+      return undefined;
+    }
+  }),
+
+  /**
+   * UNIX timestamp of token expiration time
+   * @type {Ember.ComputedProperty<number|undefined>}
+   */
+  validUntil: computed('caveats', function validUntil() {
+    const caveats = this.get('caveats') || [];
+    const timeCaveat = caveats.findBy('type', 'time');
+    return timeCaveat ? timeCaveat.validUntil : undefined;
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<number|String|undefined>}
+   */
+  usageLimit: reads('metadata.usageLimit'),
+
+  /**
+   * @type {Ember.ComputedProperty<number|undefined>}
+   */
+  usageCount: reads('metadata.usageCount'),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  usageLimitReached: computed('usageLimit', 'usageCount', function usageLimitReached() {
+    const {
+      usageCount,
+      usageLimit,
+    } = this.getProperties('usageCount', 'usageLimit');
+
+    if (typeof usageCount === 'number' && typeof usageLimit === 'number') {
+      return usageCount >= usageLimit;
+    } else {
+      // Usage limit is not defined
+      return false;
+    }
+  }),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isObsolete: or('isExpired', 'usageLimitReached'),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  isActive: and(not('isObsolete'), not('revoked')),
+
+  /**
+   * @type {ComputedProperty<Array<String>|undefined}
+   */
+  privileges: reads('metadata.privileges'),
+
+  index: computed('isActive', 'isObsolete', 'name', 'entityId', function index() {
+    const activeIndex = this.isActive ? '0' : '1';
+    const obsoleteIndex = this.isObsolete ? '1' : '0';
+    return `${activeIndex}\0${obsoleteIndex}\0${this.name}\0${this.entityId}`;
+  }),
+
+  validUntilObserver: observer('validUntil', function validUntilObserver() {
+    const {
+      validUntil,
+      isExpired,
+    } = this.getProperties('validUntil', 'isExpired');
+    const nowTimestamp = moment().unix();
+    const hasValidUntil = typeof validUntil === 'number';
+
+    if (!hasValidUntil || validUntil >= nowTimestamp) {
+      if (isExpired) {
+        this.set('isExpired', false);
       }
-    }),
-
-    /**
-     * @type {Ember.ComputedProperty<string|undefined>}
-     */
-    inviteType: computed('type.inviteToken.inviteType', function inviteType() {
-      const tokenInviteType = this.get('type.inviteToken.inviteType');
-      return allowedInviteTypes.includes(tokenInviteType) ?
-        tokenInviteType : undefined;
-    }),
-
-    /**
-     * @type {Ember.ComputedProperty<string|undefined>}
-     */
-    targetModelName: computed('inviteType', function targetModelName() {
-      const inviteType = this.get('inviteType');
-      if (inviteType) {
-        return tokenInviteTypeToTargetModelMapping[inviteType].modelName;
+    } else {
+      if (!isExpired) {
+        this.set('isExpired', true);
       }
-    }),
+    }
 
-    /**
-     * @type {ComputedProperty<String|undefined>}
-     */
-    targetRecordId: computed('inviteType', function targetModelId() {
-      const {
-        type,
-        inviteType,
-      } = this.getProperties('type', 'inviteType');
-      if (inviteType) {
-        const targetModelMapping =
-          tokenInviteTypeToTargetModelMapping[inviteType];
-        return targetModelMapping && type.inviteToken[targetModelMapping.idFieldName];
-      } else {
-        return undefined;
+    this.rescheduleExpirationTimer();
+  }),
+
+  init() {
+    this._super(...arguments);
+
+    this.validUntilObserver();
+  },
+
+  destroy() {
+    this._super(...arguments);
+
+    cancel(this.get('expirationTimer'));
+  },
+
+  getTargetModelGri() {
+    if (!this.targetRecordId || !this.targetModelName) {
+      return null;
+    }
+    const adapter = this.store.adapterFor(this.targetModelName);
+    const entityType = adapter.getEntityTypeForModelName(this.targetModelName);
+    return gri({
+      entityType,
+      entityId: this.targetRecordId,
+      aspect: 'instance',
+      scope: 'auto',
+    });
+  },
+
+  /**
+   * @override
+   * @returns {Promise<Models.User|Models.Group|Models.Cluster|Models.Space|Models.Harvester|null>}
+   */
+  async fetchTokenTarget() {
+    const targetModelGri = this.getTargetModelGri();
+    if (!targetModelGri) {
+      return null;
+    }
+
+    const currentRecord = this.store.peekRecord(this.targetModelName, targetModelGri);
+    if (
+      currentRecord && (
+        currentRecord.isDeleted ||
+        currentRecord.isDestroyed ||
+        currentRecord.isDestroying
+      )
+    ) {
+      return null;
+    }
+
+    return await this.store.findRecord(
+      this.targetModelName,
+      targetModelGri, {
+        reload: true,
       }
-    }),
+    );
+  },
 
-    /**
-     * UNIX timestamp of token expiration time
-     * @type {Ember.ComputedProperty<number|undefined>}
-     */
-    validUntil: computed('caveats', function validUntil() {
-      const caveats = this.get('caveats') || [];
-      const timeCaveat = caveats.findBy('type', 'time');
-      return timeCaveat ? timeCaveat.validUntil : undefined;
-    }),
+  /**
+   * @returns {undefined}
+   */
+  rescheduleExpirationTimer() {
+    const {
+      expirationTimer,
+      validUntil,
+    } = this.getProperties('expirationTimer', 'validUntil');
+    const nowTimestamp = moment().unix();
 
-    /**
-     * @type {Ember.ComputedProperty<number|String|undefined>}
-     */
-    usageLimit: reads('metadata.usageLimit'),
-
-    /**
-     * @type {Ember.ComputedProperty<number|undefined>}
-     */
-    usageCount: reads('metadata.usageCount'),
-
-    /**
-     * @type {Ember.ComputedProperty<boolean>}
-     */
-    usageLimitReached: computed('usageLimit', 'usageCount', function usageLimitReached() {
-      const {
-        usageCount,
-        usageLimit,
-      } = this.getProperties('usageCount', 'usageLimit');
-
-      if (typeof usageCount === 'number' && typeof usageLimit === 'number') {
-        return usageCount >= usageLimit;
-      } else {
-        // Usage limit is not defined
-        return false;
-      }
-    }),
-
-    /**
-     * @type {ComputedProperty<boolean>}
-     */
-    isObsolete: or('isExpired', 'usageLimitReached'),
-
-    /**
-     * @type {Ember.ComputedProperty<boolean>}
-     */
-    isActive: and(not('isObsolete'), not('revoked')),
-
-    /**
-     * @type {ComputedProperty<Array<String>|undefined}
-     */
-    privileges: reads('metadata.privileges'),
-
-    index: computed('isActive', 'isObsolete', 'name', 'entityId', function index() {
-      const activeIndex = this.isActive ? '0' : '1';
-      const obsoleteIndex = this.isObsolete ? '1' : '0';
-      return `${activeIndex}\0${obsoleteIndex}\0${this.name}\0${this.entityId}`;
-    }),
-
-    validUntilObserver: observer('validUntil', function validUntilObserver() {
-      const {
-        validUntil,
-        isExpired,
-      } = this.getProperties('validUntil', 'isExpired');
-      const nowTimestamp = moment().unix();
-      const hasValidUntil = typeof validUntil === 'number';
-
-      if (!hasValidUntil || validUntil >= nowTimestamp) {
-        if (isExpired) {
-          this.set('isExpired', false);
-        }
-      } else {
-        if (!isExpired) {
-          this.set('isExpired', true);
-        }
-      }
-
-      this.rescheduleExpirationTimer();
-    }),
-
-    init() {
-      this._super(...arguments);
-
-      this.validUntilObserver();
-    },
-
-    destroy() {
-      this._super(...arguments);
-
-      cancel(this.get('expirationTimer'));
-    },
-
-    getTargetModelGri() {
-      if (!this.targetRecordId || !this.targetModelName) {
-        return null;
-      }
-      const adapter = this.store.adapterFor(this.targetModelName);
-      const entityType = adapter.getEntityTypeForModelName(this.targetModelName);
-      return gri({
-        entityType,
-        entityId: this.targetRecordId,
-        aspect: 'instance',
-        scope: 'auto',
-      });
-    },
-
-    /**
-     * @override
-     * @returns {Promise<Models.User|Models.Group|Models.Cluster|Models.Space|Models.Harvester|null>}
-     */
-    async fetchTokenTarget() {
-      const targetModelGri = this.getTargetModelGri();
-      if (!targetModelGri) {
-        return null;
-      }
-
-      const currentRecord = this.store.peekRecord(this.targetModelName, targetModelGri);
-      if (
-        currentRecord && (
-          currentRecord.isDeleted ||
-          currentRecord.isDestroyed ||
-          currentRecord.isDestroying
-        )
-      ) {
-        return null;
-      }
-
-      return await this.store.findRecord(
-        this.targetModelName,
-        targetModelGri, {
-          reload: true,
-        }
+    cancel(expirationTimer);
+    if (typeof validUntil === 'number' && validUntil > nowTimestamp) {
+      // If validUntil == nowTimestamp, then token is still valid, so we need +1s.
+      const timerTime = (validUntil - nowTimestamp + 1) * 1000;
+      this.set(
+        'expirationTimer',
+        later(() => this.set('isExpired', true), timerTime)
       );
-    },
+    }
+  },
 
-    /**
-     * @returns {undefined}
-     */
-    rescheduleExpirationTimer() {
-      const {
-        expirationTimer,
-        validUntil,
-      } = this.getProperties('expirationTimer', 'validUntil');
-      const nowTimestamp = moment().unix();
+  /**
+   * @override
+   */
+  async loadRequiredRelations() {
+    await this._super(...arguments);
+    try {
+      return this.tokenTargetProxy;
+    } catch {
+      // Errors while loading token target are a normal situation e.g. target can not
+      // exist or we have insufficient access rights. We can ignore them. Any errors are
+      // still accessible via the proxy object.
+    }
+  },
 
-      cancel(expirationTimer);
-      if (typeof validUntil === 'number' && validUntil > nowTimestamp) {
-        // If validUntil == nowTimestamp, then token is still valid, so we need +1s.
-        const timerTime = (validUntil - nowTimestamp + 1) * 1000;
-        this.set(
-          'expirationTimer',
-          later(() => this.set('isExpired', true), timerTime)
-        );
-      }
-    },
-
-    // FIXME: nazywanie tego required relations jest problematyczne - bo to może być ładowane leniwie, i nie chcemy ładować tego zawczasu
-    // zrobić kompozycję? tokenTarget?
-    /**
-     * @override
-     */
-    loadRequiredRelations() {
-      return this._super(...arguments)
-        // Errors while loading token target are a normal situation e.g. target can not
-        // exist or we have insufficient access rights. We can ignore them. Any errors are
-        // still accessible via the proxy object.
-        .then(() => this.get('tokenTargetProxy').catch(() => {}));
-    },
-  }
-).reopenClass(StaticGraphModelMixin);
+  /**
+   * @override
+   */
+  getRequiredRelationsGris() {
+    const tokenTargetGri = this.getTargetModelGri();
+    if (tokenTargetGri) {
+      return [tokenTargetGri];
+    }
+    return [];
+  },
+}).reopenClass(StaticGraphModelMixin);

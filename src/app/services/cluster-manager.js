@@ -27,14 +27,10 @@ export default Service.extend({
   onedataGraph: service(),
   onedataGraphUtils: service(),
   tokenManager: service(),
+  recordManager: service(),
 
-  getClusters() {
-    return this.get('currentUser').getCurrentUserRecord()
-      .then(user => get(user, 'clusterList'))
-      .then(clusterList => get(clusterList, 'list')
-        .then(list => allFulfilled(list.map(cluster => cluster.getNameProxy())))
-        .then(() => clusterList)
-      );
+  async getClusters() {
+    return await this.recordManager.getUserRecordList('cluster', true);
   },
 
   getRecord(id) {

@@ -14,12 +14,13 @@ import gri from 'onedata-gui-websocket-client/utils/gri';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import RecordManagerConfiguration from 'onezone-gui/utils/record-manager-configuration';
 import fetchBatchRecords from 'onezone-gui/utils/fetch-batch-records';
+import _ from 'lodash';
 
 /**
  * @typedef {Object} LoadRecordOptions
  * @property {boolean} [reload]
  * @property {boolean} [backgroundReload]
- * @property {boolean} [loadOptionalRelations]
+ * @property {boolean} [loadRequiredRelations]
  */
 
 /**
@@ -28,7 +29,7 @@ import fetchBatchRecords from 'onezone-gui/utils/fetch-batch-records';
 const defaultLoadRecordOptions = Object.freeze({
   reload: false,
   backgroundReload: false,
-  loadOptionalRelations: true,
+  loadRequiredRelations: true,
 });
 
 export default Service.extend({
@@ -59,7 +60,8 @@ export default Service.extend({
    *   when they are needed.
    * @returns {Promise<GraphListModel>}
    */
-  async getUserRecordList(listItemModelName, loadOptionalRelations = true) {
+  async getUserRecordList(listItemModelName, loadRequiredRelations = true) {
+    const { batchRequestRegistry } = this;
     const user = this.getCurrentUserRecord();
     const listRelationName = `${camelize(listItemModelName)}List`;
     const listRecord = await user.getRelation(listRelationName);
@@ -77,18 +79,30 @@ export default Service.extend({
       return listRecord.list.toArray();
     };
     await fetchBatchRecords({
-      batchRequestRegistry: this.batchRequestRegistry,
+      batchRequestRegistry,
       itemsGris,
       listResolver,
     });
 
-    // FIXME: to jest pozbawione batcha - można by wymusić powstanie abstrackyjnego
-    // gettera to pobrania GRIs zależności
-
     // After fetching batch record, content of list should be available in proxy.
-    const list = listRecord.list.content;
-    if (loadOptionalRelations) {
-      await allFulfilled(list.map(record => this.loadRequiredRelationsOfRecord(record)));
+    const list = listRecord.list.content.toArray();
+    if (loadRequiredRelations) {
+      const relationsGris = _.chain(list)
+        .map(record => record.getRequiredRelationsGris())
+        .flatten()
+        .uniq()
+        .value();
+      if (relationsGris.length) {
+        const relationsListResolver =
+          () => allFulfilled(
+            list.map(record => this.loadRequiredRelationsOfRecord(record))
+          );
+        await fetchBatchRecords({
+          batchRequestRegistry,
+          itemsGris: relationsGris,
+          listResolver: relationsListResolver,
+        });
+      }
     }
     return listRecord;
   },
@@ -203,7 +217,7 @@ export default Service.extend({
         ...loadOptions,
       }
     );
-    if (loadOptions.loadOptionalRelations) {
+    if (loadOptions.loadRequiredRelations) {
       await this.loadRequiredRelationsOfRecord(record);
     }
     return record;

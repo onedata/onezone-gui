@@ -31,22 +31,22 @@ const TokenManager = Service.extend({
 
   /**
    * Fetches collection of all tokens
-   * @param { boolean } loadOptionalRelations
+   * @param {boolean} loadRequiredRelations
    * @returns {Promise<Models.TokenList>} resolves to a record containing
    *   an array of tokens
    */
-  getTokens(loadOptionalRelations = false) {
-    return this.recordManager.getUserRecordList('token', loadOptionalRelations);
+  getTokens(loadRequiredRelations = false) {
+    return this.recordManager.getUserRecordList('token', loadRequiredRelations);
   },
 
   /**
    * Returns token with specified gri
    * @param {String} gri
-   * @param {boolean} loadOptionalRelations
+   * @param {boolean} loadRequiredRelations
    * @returns {Promise<Models.Token>} token promise
    */
-  getRecord(gri, loadOptionalRelations = false) {
-    return this.recordManager.getRecord('token', gri, { loadOptionalRelations });
+  getRecord(gri, loadRequiredRelations = false) {
+    return this.recordManager.getRecord('token', gri, { loadRequiredRelations });
   },
 
   /**
