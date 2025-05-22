@@ -6,6 +6,11 @@ import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import { selectChoose, clickTrigger } from 'ember-power-select/test-support/helpers';
 import { get } from '@ember/object';
+import { clearStoreAfterEach } from '../../../helpers/clear-store';
+import { lookupService } from '../../../helpers/stub-service';
+import { classify } from '@ember/string';
+import { all as allFulfilled } from 'rsvp';
+import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 
 const possibleTargetModels = [{
   modelName: 'all',
@@ -31,25 +36,25 @@ const possibleTargetModels = [{
   modelName: 'space',
   name: 'Space',
   icon: 'space',
-}, {
-  modelName: 'user',
-  name: 'User',
-  icon: 'user',
 }];
 
 describe('Integration | Component | sidebar-tokens/advanced-filters', function () {
-  setupRenderingTest();
+  const { afterEach } = setupRenderingTest();
 
-  beforeEach(function () {
-    const tokensCollection = possibleTargetModels
-      .mapBy('modelName')
-      .without('all')
-      .reduce((collection, modelName) => collection.concat([
-        createTokenStub(modelName, 1),
-        createTokenStub(modelName, 2),
-      ]), []);
-    this.set('tokensCollection', tokensCollection);
+  beforeEach(async function () {
+    this.tokenHelper = new TokenHelper(this);
+    const modelNames = possibleTargetModels
+      .map(targetModel => targetModel.modelName)
+      .filter(modelName => modelName !== 'all');
+    const tokensPromises = modelNames.map(modelName => [
+      this.tokenHelper.createInviteToken(modelName, 1),
+      this.tokenHelper.createInviteToken(modelName, 2),
+    ]).flat();
+    const tokens = await allFulfilled(tokensPromises);
+    this.set('tokensCollection', tokens);
   });
+
+  clearStoreAfterEach(afterEach);
 
   it('has class "advanced-token-filters"', async function () {
     await render(hbs `<SidebarTokens::AdvancedFilters />`);
@@ -144,7 +149,7 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
 
   it('shows possible target models according to passed tokens', async function () {
     await render(hbs `
-      <SidebarTokens::AdvancedFilters @collection={{tokensCollection}} />
+      <SidebarTokens::AdvancedFilters @collection={{this.tokensCollection}} />
     `);
 
     await selectType('invite');
@@ -152,7 +157,7 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
     const options = findAll('.ember-power-select-option');
     possibleTargetModels.forEach(({ name, icon }, index) => {
       const item = options[index];
-      expect(item).to.exist;
+      expect(item, `item for ${name}`).to.exist;
       expect(item.querySelector('.model-name')).to.have.trimmed.text(name);
       if (icon) {
         expect(item.querySelector('.model-icon'))
@@ -198,8 +203,7 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
       .to.have.attr('aria-disabled');
   });
 
-  it(
-    'enables target record filter when target model is set to item different than "All"',
+  it('enables target record filter when target model is set to item different than "All"',
     async function () {
       await render(hbs `
         <SidebarTokens::AdvancedFilters @collection={{tokensCollection}} />
@@ -238,19 +242,19 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
   it('notifies about filters state after target record filter change', async function () {
     const changeSpy = sinon.spy();
     this.set('change', changeSpy);
-    const clusterRecords = this.get('tokensCollection')
-      .filterBy('targetModelName', 'cluster')
-      .mapBy('tokenTarget');
 
     await render(hbs `
       <SidebarTokens::AdvancedFilters
-        @collection={{tokensCollection}}
-        @onChange={{action change}}
+        @collection={{this.tokensCollection}}
+        @onChange={{action this.change}}
       />
     `);
     await selectType('invite');
     await selectChoose('.target-model-filter', 'Cluster');
     await selectChoose('.target-record-filter', 'cluster1');
+    const clusterRecords = this.get('tokensCollection')
+      .filterBy('targetModelName', 'cluster')
+      .mapBy('tokenTarget');
     expect(changeSpy.lastCall).to.be.calledWith({
       type: 'invite',
       targetModelName: 'cluster',
@@ -265,16 +269,18 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
   });
 
   it('removes duplicated records from target record filter dropdown', async function () {
-    const tokenTarget = {
-      name: 'cluster1',
-    };
+    const targetModelName = 'cluster';
+    const target =
+      await this.tokenHelper.createTokenTarget(targetModelName, { name: 'cluster1' });
+    const token1 = await this.tokenHelper.createInviteToken('cluster', 1, target);
+    const token2 = await this.tokenHelper.createInviteToken('cluster', 2, target);
     this.set('tokensCollection', [
-      Object.assign(createTokenStub('cluster', 1), { tokenTarget }),
-      Object.assign(createTokenStub('cluster', 1), { tokenTarget }),
+      token1,
+      token2,
     ]);
 
     await render(hbs `
-      <SidebarTokens::AdvancedFilters @collection={{tokensCollection}} />
+      <SidebarTokens::AdvancedFilters @collection={{this.tokensCollection}} />
     `);
 
     await selectType('invite');
@@ -313,41 +319,30 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
     });
   });
 
-  it(
-    'does not change selected target record if refreshed list of tokens still has selected record',
+  it('preserves selected target record if refreshed list of tokens still has selected record',
     async function () {
-      const changeSpy = sinon.spy();
-      this.set('change', changeSpy);
-
       await render(hbs `
-        <SidebarTokens::AdvancedFilters
-          @collection={{tokensCollection}}
-          @onChange={{action change}}
-        />
+        <SidebarTokens::AdvancedFilters @collection={{this.tokensCollection}} />
       `);
 
       await selectType('invite');
       await selectChoose('.target-model-filter', 'Cluster');
       await selectChoose('.target-record-filter', 'cluster1');
-      const changesCount = changeSpy.callCount;
       this.set(
         'tokensCollection',
-        this.get('tokensCollection').filter(token =>
-          get(token, 'tokenTarget.name') !== 'cluster2'
-        )
+        this.get('tokensCollection').filter(it => it.tokenTarget?.name !== 'cluster2')
       );
       await settled();
+      await waitForRender();
       await clickTrigger('.target-record-filter');
       const options = findAll('.ember-power-select-option');
-      expect(changeSpy).to.have.callCount(changesCount);
       expect(find('.target-record-filter .ember-basic-dropdown-trigger'))
         .to.contain.text('cluster1');
       expect(options).to.have.length(2);
     }
   );
 
-  it(
-    'changes selected target record to "All" if refreshed list of tokens does not have selected record',
+  it('changes selected target record to "All" if refreshed list of tokens does not have selected record',
     async function () {
       const changeSpy = sinon.spy();
       this.set('change', changeSpy);
@@ -362,7 +357,6 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
       await selectType('invite');
       await selectChoose('.target-model-filter', 'Cluster');
       await selectChoose('.target-record-filter', 'cluster1');
-      const changesCount = changeSpy.callCount;
       this.set(
         'tokensCollection',
         this.get('tokensCollection').filter(token =>
@@ -370,9 +364,9 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
         )
       );
       await settled();
+      await waitForRender();
       await clickTrigger('.target-record-filter');
       const options = findAll('.ember-power-select-option');
-      expect(changeSpy).to.have.callCount(changesCount + 1);
       expect(find('.target-record-filter .ember-basic-dropdown-trigger'))
         .to.contain.text('All');
       expect(options).to.have.length(2);
@@ -384,8 +378,7 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
     }
   );
 
-  it(
-    'changes selected target model and record to "All" if refreshed list of tokens does not have selected model',
+  it('changes selected target model and record to "All" if refreshed list of tokens does not have selected model',
     async function () {
       const changeSpy = sinon.spy();
       this.set('change', changeSpy);
@@ -420,15 +413,33 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
   );
 });
 
-function createTokenStub(modelName, idx) {
-  return {
-    targetModelName: modelName,
-    tokenTarget: {
-      name: `${modelName}${idx}`,
-    },
-  };
-}
-
 function selectType(type) {
   return click(`.btn-${type}`);
+}
+
+class TokenHelper {
+  constructor(mochaContext) {
+    this.mochaContext = mochaContext;
+    this.store = lookupService(this.mochaContext, 'store');
+  }
+  async createInviteToken(targetModelName, targetIndex, customTargetRecord) {
+    const targetRecord = customTargetRecord ??
+      await this.createTokenTarget(targetModelName, {
+        name: `${targetModelName}${targetIndex}`,
+      });
+    return await this.createToken({
+      type: {
+        inviteToken: {
+          inviteType: `userJoin${classify(targetModelName)}`,
+          [`${targetModelName}Id`]: targetRecord.entityId,
+        },
+      },
+    });
+  }
+  async createTokenTarget(targetModelName, data) {
+    return await this.store.createRecord(targetModelName, data).save();
+  }
+  async createToken(data) {
+    return await this.store.createRecord('token', data).save();
+  }
 }

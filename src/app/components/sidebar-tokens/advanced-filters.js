@@ -11,9 +11,10 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import { inject as service } from '@ember/service';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
-import { computed, observer } from '@ember/object';
+import { computed } from '@ember/object';
 import { equal, raw } from 'ember-awesome-macros';
 import { scheduleOnce } from '@ember/runloop';
+import { asyncObserver } from 'onedata-gui-common/utils/observer';
 import recordIcon from 'onedata-gui-common/utils/record-icon';
 import _ from 'lodash';
 import { resolve, all as allFulfilled } from 'rsvp';
@@ -240,7 +241,7 @@ export default Component.extend(I18n, {
     }
   ),
 
-  targetModelOptionsObserver: observer(
+  targetModelOptionsObserver: asyncObserver(
     'targetModelOptions',
     function targetModelOptionsObserver() {
       const {
@@ -256,12 +257,12 @@ export default Component.extend(I18n, {
     }
   ),
 
-  filtersStateObserver: observer(
+  filtersStateObserver: asyncObserver(
     'selectedType',
     'selectedTargetModelOption',
     'effSelectedTargetRecordOption',
     function filtersStateObserver() {
-      scheduleOnce('afterRender', this, 'notifyChange');
+      scheduleOnce('afterRender', this, 'tryNotifyChange');
     }
   ),
 
@@ -273,22 +274,22 @@ export default Component.extend(I18n, {
       selectedTargetRecordOption: this.allRecordOption,
     });
 
-    this.notifyChange();
+    this.filtersStateObserver();
   },
 
-  notifyChange() {
+  tryNotifyChange() {
     const {
       selectedType,
       selectedTargetModelOption,
       effSelectedTargetRecordOption,
       onChange,
     } = this;
-
-    onChange({
+    const currentChangeset = {
       type: selectedType,
       targetModelName: selectedTargetModelOption.modelName,
       targetRecord: effSelectedTargetRecordOption.record,
-    });
+    };
+    onChange(currentChangeset);
   },
 
   actions: {

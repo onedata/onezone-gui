@@ -161,7 +161,7 @@ export default Model.extend(...mixins, {
     const {
       type,
       inviteType,
-    } = this.getProperties('type', 'inviteType');
+    } = this;
     if (inviteType) {
       const targetModelMapping =
         tokenInviteTypeToTargetModelMapping[inviteType];
@@ -278,7 +278,7 @@ export default Model.extend(...mixins, {
 
   /**
    * @override
-   * @returns {Promise<Models.User|Models.Group|Models.Cluster|Models.Space|Models.Harvester|null>}
+   * @returns {Promise<Models.AtmInventory|Models.Group|Models.Cluster|Models.Space|Models.Harvester|null>}
    */
   async fetchTokenTarget() {
     const targetModelGri = this.getTargetModelGri();
