@@ -14,7 +14,6 @@ import gri from 'onedata-gui-websocket-client/utils/gri';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import RecordManagerConfiguration from 'onezone-gui/utils/record-manager-configuration';
 import fetchBatchRecords from 'onezone-gui/utils/fetch-batch-records';
-import _ from 'lodash';
 
 /**
  * @typedef {Object} LoadRecordOptions
@@ -87,11 +86,9 @@ export default Service.extend({
     // After fetching batch record, content of list should be available in proxy.
     const list = listRecord.list.content.toArray();
     if (loadRequiredRelations) {
-      const relationsGris = _.chain(list)
+      const relationsGris = list
         .map(record => record.getRequiredRelationsGris())
-        .flatten()
-        .uniq()
-        .value();
+        .flat();
       if (relationsGris.length) {
         const relationsListResolver =
           () => allFulfilled(

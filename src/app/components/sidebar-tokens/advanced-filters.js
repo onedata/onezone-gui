@@ -142,12 +142,10 @@ export default Component.extend(I18n, {
         collection,
       } = this;
       const selectedTargetModelName = selectedTargetModelOption.modelName;
-      const itemsGris = _.chain(this.collection)
+      const itemsGris = this.collection
         .filter(token => token.targetModelName === selectedTargetModelName)
-        .invokeMap('getTargetModelGri')
-        .filter(Boolean)
-        .uniq()
-        .value();
+        .map(token => token.getTargetModelGri())
+        .filter(Boolean);
       const progressTracker = new ProgressTracker(itemsGris.length);
       const listResolver = async () => {
         return allFulfilled(collection

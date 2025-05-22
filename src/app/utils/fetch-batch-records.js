@@ -41,7 +41,9 @@ export default async function fetchBatchRecords(fetchBatchRecordsArgs) {
     itemsGris,
     listResolver,
   } = fetchBatchRecordsArgs;
-  const containerPromises = _.chunk(itemsGris, batchFetchSize).map(async (grisChunk) => {
+  const uniqeItemsGris = _.uniq(itemsGris);
+  const griArrayChunks = _.chunk(uniqeItemsGris, batchFetchSize);
+  const containerPromises = griArrayChunks.map(async (grisChunk) => {
     const containerSpec = new GrisBatchContainerSpec(OwsGraphOperation.Get, grisChunk);
     await batchRequestRegistry.waitForNoConflicts(containerSpec);
     return batchRequestRegistry.createContainer(
@@ -49,9 +51,8 @@ export default async function fetchBatchRecords(fetchBatchRecordsArgs) {
       DebouncedBatchFlushStrategy
     );
   });
-  // FIXME: nie wiem jak to może działać w przypadku konfliktu, bo przecież waitForNoConflicts zawiesi się do momentu jak inny kontener nie zostanie zresolvowany
   const containers = await allFulfilled(containerPromises);
-  progressTracker?.reset(itemsGris.length);
+  progressTracker?.reset(uniqeItemsGris.length);
   try {
     const listPromise = listResolver();
     for (const container of containers) {
@@ -66,10 +67,6 @@ export default async function fetchBatchRecords(fetchBatchRecordsArgs) {
       }
     }
     const list = await listPromise;
-    // FIXME: dla dużej liczby tokenów ze spejsami jako target, zawiesi ładowanie aż do momentu, kiedy pobierze wszytkie spejsy
-    // FIXME: te relacje będą pobierane nie-batchowo
-    // FIXME: to by trzeba było zrobić globalny ogarniacz ładowania relacji req.
-    // await allFulfilled(list.map(record => record.loadRequiredRelations?.()));
 
     // If record cannot be found, it is either not included in the list or it is
     // destroyed.
