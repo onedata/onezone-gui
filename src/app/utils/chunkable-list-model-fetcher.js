@@ -12,6 +12,7 @@ import { defaultAdvancedFilter } from 'onedata-gui-common/components/one-sidebar
 import ProgressTracker from 'onedata-gui-common/utils/progress-tracker';
 import fetchBatchRecords from './fetch-batch-records';
 import _ from 'lodash';
+import { defaultBatchFetchSize } from './batch-records-loader';
 
 /**
  * @typedef {InfiniteScrollItem} ChunkableListModelFetcherItem
@@ -24,7 +25,7 @@ export default class ChunkableListModelFetcher {
    * How many max items should be fetched in single batch.
    * @type {number}
    */
-  batchFetchSize = 100;
+  batchFetchSize = defaultBatchFetchSize;
 
   /**
    * @type {ProgressTracker}

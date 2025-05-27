@@ -19,13 +19,19 @@ import recordIcon from 'onedata-gui-common/utils/record-icon';
 import _ from 'lodash';
 import { resolve, all as allFulfilled } from 'rsvp';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
-import fetchBatchRecords from 'onezone-gui/utils/fetch-batch-records';
-import ProgressTracker from 'onedata-gui-common/utils/progress-tracker';
 import { defaultSeparator } from 'onedata-gui-common/components/name-conflict';
 import addConflictLabels from 'onedata-gui-common/utils/add-conflict-labels';
+import BatchRecordsLoader from 'onezone-gui/utils/batch-records-loader';
 
 /**
  * @typedef {'all'|'access'|'identity'|'invite'} TokenTypeFilter
+ */
+
+/**
+ * @typedef {Object} TargetModelOption
+ * @property {'group'|'space'|'user'|'cluster'|'harvester'|'atmInventory'} modelName
+ * @property {string} modelNameTranslation
+ * @property {OneIconName} icon
  */
 
 /**
@@ -59,6 +65,18 @@ export default Component.extend(I18n, {
    * @type {Array<Models.Token>}
    */
   collection: undefined,
+
+  /**
+   * Stores BatchRecordsLoaders suitable for TargetRecordOptions. For example, when user
+   * selects "space" target record option, then we start loading spaces referenced by
+   * tokens using batch requests. It may last long, so if user changes target record
+   * option, then we should not forget object with loading state, but create new loader
+   * for example for "group" type. These two loaders are working indepedently, paralelly.
+   * When user goes back to "space" type, then he will see the loader progress stored
+   * previously.
+   * @type {Map<TargetRecordOption, BatchRecordsLoader>}
+   */
+  targetRecordsLoaders: undefined,
 
   /**
    * @type {TokenTypeFilter}
@@ -107,7 +125,7 @@ export default Component.extend(I18n, {
   }),
 
   /**
-   * @type {Ember.ComputedProperty<Array<{modelName: string, name: string, icon: string}>>}
+   * @type {Ember.ComputedProperty<Array<TargetModelOption>>}
    */
   targetModelOptions: computed(
     'allModelOption',
@@ -133,57 +151,50 @@ export default Component.extend(I18n, {
   ),
 
   /**
-   * @type {ComputedProperty<{ progressTracker: ProgressTracker, batchLoadProxy: PromiseObject}>}
+   * Promise proxy that resolves when invite target records for current context are
+   * fetched and have assigned conflict labels.
+   * @type {ComputedProperty<PromiseObject<undefined>>}
    */
-  tokensFullLoadData: computed(
+  targetRecordOptionsLoaderProxy: computed(
     'collection',
     'selectedTargetModelOption',
-    function tokensFullLoadData() {
-      const {
-        selectedTargetModelOption,
-        batchRequestRegistry,
-        collection,
-      } = this;
-      const selectedTargetModelName = selectedTargetModelOption.modelName;
-      const itemsGris = this.collection
-        .filter(token => token.targetModelName === selectedTargetModelName)
-        .map(token => token.getTargetModelGri())
-        .filter(Boolean);
-      const progressTracker = new ProgressTracker(itemsGris.length);
-      const listResolver = async () => {
-        return allFulfilled(collection
-          .filter(token =>
-            token.targetRecordId && token.targetModelName === selectedTargetModelName
-          )
-          .map(token => token.loadRequiredRelations())
-        );
-      };
-      const promise = fetchBatchRecords({
-        batchRequestRegistry,
-        progressTracker,
-        itemsGris,
-        listResolver,
-      });
-      return {
-        progressTracker,
-        batchLoadProxy: promiseObject(promise),
-      };
+    'allModelOption',
+    'type',
+    function targetRecordOptionsLoaderProxy() {
+      if (
+        this.type !== 'invite' ||
+        this.selectedTargetModelOption === this.allModelOption
+      ) {
+        return promiseObject(resolve());
+      } else {
+        const batchRecordsLoader =
+          this.getBatchRecordsLoader(this.selectedTargetModelOption);
+        return promiseObject((async () => {
+          const targetRecords = await batchRecordsLoader.getPromise();
+          addConflictLabels(targetRecords, 'name', 'entityId');
+        })());
+      }
     }
   ),
 
-  targetRecordOptionsLoaderProxy: computed(
+  /**
+   * Progress tracker suitable to use in the current context of invite token filter.
+   * It is null if
+   * @type {ComputedProperty<ProgressTracker|null>}
+   */
+  inviteProgressTracker: computed(
+    'collection',
     'selectedTargetModelOption',
-    'tokensFullLoadData',
     'allModelOption',
-    function targetRecordOptionsLoaderProxy() {
-      if (this.selectedTargetModelOption === this.allModelOption) {
-        return promiseObject(resolve());
+    'type',
+    function inviteProgressTracker() {
+      if (
+        this.type !== 'invite' ||
+        this.selectedTargetModelOption === this.allModelOption
+      ) {
+        return null;
       } else {
-        const { batchLoadProxy } = this.tokensFullLoadData;
-        return promiseObject((async () => {
-          const targetRecords = await batchLoadProxy;
-          addConflictLabels(targetRecords, 'name', 'entityId');
-        })());
+        return this.getBatchRecordsLoader(this.selectedTargetModelOption).progressTracker;
       }
     }
   ),
@@ -286,6 +297,8 @@ export default Component.extend(I18n, {
     this.setProperties({
       selectedTargetModelOption: this.allModelOption,
       selectedTargetRecordOption: this.allRecordOption,
+      // FIXME: declare
+      targetRecordsLoaders: new Map(),
     });
 
     this.filtersStateObserver();
@@ -304,6 +317,56 @@ export default Component.extend(I18n, {
       targetRecord: effSelectedTargetRecordOption.record,
     };
     onChange(currentChangeset);
+  },
+
+  // FIXME: zmiany nazw na bardziej sugerujące, że chodzi o targety
+  /**
+   * @param {TargetModelOption} targetModelOption
+   * @returns {BatchRecordsLoader}
+   */
+  createBatchRecordsLoader(targetModelOption) {
+    const {
+      batchRequestRegistry,
+      collection,
+    } = this;
+    const targetModelName = targetModelOption.modelName;
+    const itemsGris = this.collection
+      .filter(token => token.targetModelName === targetModelName)
+      .map(token => token.getTargetModelGri())
+      .filter(Boolean);
+    const listResolver = async () => {
+      const list = await allFulfilled(collection
+        .filter(token =>
+          token.targetRecordId && token.targetModelName === targetModelName
+        )
+        .map(token => token.loadRequiredRelations())
+      );
+      return _.uniq(list);
+    };
+
+    const batchRecordsLoader = new BatchRecordsLoader({
+      batchRequestRegistry,
+      itemsGris,
+      listResolver,
+    });
+    batchRecordsLoader.getPromise();
+    return batchRecordsLoader;
+  },
+
+  // FIXME: typedef
+  /**
+   * @param {TargetModelOption} targetModelOption
+   * @returns {BatchRecordsLoader}
+   */
+  getBatchRecordsLoader(targetModelOption) {
+    // FIXME: invalidate if collection changed from last time
+    if (!this.targetRecordsLoaders.has(targetModelOption)) {
+      this.targetRecordsLoaders.set(
+        targetModelOption,
+        this.createBatchRecordsLoader(targetModelOption)
+      );
+    }
+    return this.targetRecordsLoaders.get(targetModelOption);
   },
 
   actions: {
