@@ -17,7 +17,8 @@ import { OwsGraphOperation } from 'onedata-gui-websocket-client/services/onedata
 import { DebouncedBatchFlushStrategy } from 'onedata-gui-websocket-client/utils/batch-flush-strategies';
 import BatchRequestRegistry from 'onedata-gui-websocket-client/services/batch-request-registry';
 
-const defaultBatchFetchSize = 100;
+// FIXME: 100
+const defaultBatchFetchSize = 10;
 
 /**
  * @typedef {Object} FetchBatchRecordsArgs

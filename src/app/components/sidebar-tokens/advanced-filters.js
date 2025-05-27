@@ -21,6 +21,8 @@ import { resolve, all as allFulfilled } from 'rsvp';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import fetchBatchRecords from 'onezone-gui/utils/fetch-batch-records';
 import ProgressTracker from 'onedata-gui-common/utils/progress-tracker';
+import { defaultSeparator } from 'onedata-gui-common/components/name-conflict';
+import addConflictLabels from 'onedata-gui-common/utils/add-conflict-labels';
 
 /**
  * @typedef {'all'|'access'|'identity'|'invite'} TokenTypeFilter
@@ -178,7 +180,10 @@ export default Component.extend(I18n, {
         return promiseObject(resolve());
       } else {
         const { batchLoadProxy } = this.tokensFullLoadData;
-        return batchLoadProxy;
+        return promiseObject((async () => {
+          const targetRecords = await batchLoadProxy;
+          addConflictLabels(targetRecords, 'name', 'entityId');
+        })());
       }
     }
   ),
@@ -209,10 +214,15 @@ export default Component.extend(I18n, {
         );
         recordOptions = recordOptions.filter(token => token.tokenTarget);
         recordOptions = _.uniqBy(recordOptions, token => token.tokenTarget);
-        recordOptions = recordOptions.map(token => ({
-          record: token.tokenTarget,
-          name: token.tokenTarget.name,
-        }));
+        recordOptions = recordOptions.map(token => {
+          const tokenTargetName = token.tokenTarget.name;
+          const conflictLabel = token.tokenTarget.conflictLabel;
+          return {
+            record: token.tokenTarget,
+            name: conflictLabel ?
+              `${tokenTargetName}${defaultSeparator}${conflictLabel}` : tokenTargetName,
+          };
+        });
         recordOptions = _.sortBy(recordOptions, 'name');
         return [allRecordOption, ...recordOptions];
       }
@@ -240,6 +250,10 @@ export default Component.extend(I18n, {
         this.allRecordOption;
     }
   ),
+
+  targetRecordSearchField: computed(function () {
+    return this.effSelectedTargetRecordOption.record ? 'name' : '';
+  }),
 
   targetModelOptionsObserver: asyncObserver(
     'targetModelOptions',

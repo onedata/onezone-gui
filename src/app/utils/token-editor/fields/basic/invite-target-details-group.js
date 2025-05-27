@@ -46,6 +46,11 @@ const TargetField = DropdownField.extend({
   /**
    * @override
    */
+  useRecordLabel: true,
+
+  /**
+   * @override
+   */
   options: reads('cachedTargetsProxy.content'),
 
   /**
