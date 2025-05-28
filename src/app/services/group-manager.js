@@ -34,6 +34,7 @@ export default Service.extend({
   providerManager: service(),
   harvesterManager: service(),
   recordManager: service(),
+  batchRequestRegistry: service(),
 
   /**
    * Fetches collection of all groups
@@ -74,7 +75,8 @@ export default Service.extend({
    */
   getAllKnownGroups() {
     const knownGroupsProxy = AllKnownGroupsProxyArray.create({
-      recordManager: this.get('recordManager'),
+      recordManager: this.recordManager,
+      batchRequestRegistry: this.batchRequestRegistry,
     });
     return destroyablePromiseArray(
       get(knownGroupsProxy, 'allRecordsProxy').then(() => knownGroupsProxy)

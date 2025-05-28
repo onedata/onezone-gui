@@ -14,11 +14,13 @@ import { promise } from 'ember-awesome-macros';
 import { computed, get } from '@ember/object';
 import { all as allFulfilled } from 'rsvp';
 import AllKnownMembersProxyArrayBase from 'onezone-gui/utils/all-known-members-proxy-array-base';
+import _ from 'lodash';
 
 export default Service.extend({
   onedataGraph: service(),
   store: service(),
   recordManager: service(),
+  batchRequestRegistry: service(),
 
   /**
    * Changes user password
@@ -82,7 +84,8 @@ export default Service.extend({
    */
   getAllKnownUsers() {
     const knownUsersProxy = AllKnownUsersProxyArray.create({
-      recordManager: this.get('recordManager'),
+      recordManager: this.recordManager,
+      batchRequestRegistry: this.batchRequestRegistry,
     });
     return destroyablePromiseArray(
       get(knownUsersProxy, 'allRecordsProxy').then(() => knownUsersProxy)
@@ -102,16 +105,12 @@ const AllKnownUsersProxyArray = AllKnownMembersProxyArrayBase.extend({
   allRecordsProxy: promise.array(computed(
     'groupsUsersListsProxy.[]',
     'spacesUsersListsProxy.[]',
-    function usersProxy() {
+    function allRecordsProxy() {
       const {
         recordManager,
         groupsUsersListsProxy,
         spacesUsersListsProxy,
-      } = this.getProperties(
-        'recordManager',
-        'groupsUsersListsProxy',
-        'spacesUsersListsProxy'
-      );
+      } = this;
       const usersArray = [];
       return allFulfilled([
         groupsUsersListsProxy,
@@ -124,7 +123,7 @@ const AllKnownUsersProxyArray = AllKnownMembersProxyArrayBase.extend({
         groupsUserLists.concat(spacesUsersListsProxy).forEach(usersList =>
           usersArray.push(...usersList.toArray())
         );
-        return usersArray.uniqBy('entityId');
+        return _.uniqBy(usersArray, 'entityId');
       });
     }
   )),
