@@ -165,6 +165,7 @@ import createAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/crea
 import removeAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/remove-atm-workflow-schema-revision-action';
 import goToFile from './utils/url-action-handlers/go-to-file';
 import onezoneLoginViewModel from './utils/onezone-login-view-model';
+import consumerCaveatGroup from './utils/token-editor/fields/caveats/consumer-caveat-group';
 
 const translations = {
   tabs: {
@@ -356,6 +357,13 @@ const translations = {
     },
     urlActionHandlers: {
       goToFile,
+    },
+    tokenEditor: {
+      fields: {
+        caveats: {
+          consumerCaveatGroup,
+        },
+      },
     },
   },
 };

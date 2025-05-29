@@ -146,6 +146,7 @@ export const ModelTagsField = TagsField.extend({
 
   /**
    * @override
+   * @type {ComputedProperty<ModelSelectorEditorSettings>}
    */
   tagEditorSettings: hash('models'),
 
