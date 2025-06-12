@@ -1,5 +1,5 @@
 <PromiseProxyContainer @proxy={{tokenDataSource}}>
-  <form @onsubmit={{prevent-default}} class="form form-horizontal form-component">
+  <form onsubmit={{prevent-default}} class="form form-horizontal form-component">
     <FormComponent::FieldRenderer @field={{basicGroup}} />
     {{#if (or (eq mode "create") hasVisibleCaveats)}}
       <h1 class="caveats-header">

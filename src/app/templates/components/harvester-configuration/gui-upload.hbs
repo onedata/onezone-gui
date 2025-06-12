@@ -3,7 +3,7 @@
   <OneLabelTip @title={{tt this "sectionHint"}} />
 </h1>
 <input type="file" class="upload-gui-input" accept=".gz" onchange={{action "fileChange"}}>
-<form @onsubmit={{prevent-default}} class="row upload-form">
+<form onsubmit={{prevent-default}} class="row upload-form">
   <div class="col-xs-12 col-sm-5">
     <input class="form-control file-name-input input-sm" type="text" readonly="readonly" value={{selectedFile.name}} {{action "browse"}}>
   </div>
