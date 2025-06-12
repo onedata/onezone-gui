@@ -75,7 +75,7 @@
   <tab.pane
     @id="editor"
     @title={{tt this "tabs.editor"}}
-    class="fill-flex-using-column no-padding"
+    class="workflow-editor-tab fill-flex-using-column no-padding"
   >
     <WorkflowVisualiser
       @rawData={{visualiserData}}
@@ -87,6 +87,7 @@
   <tab.pane
     @id="details"
     @title={{tt this "tabs.details"}}
+    class="workflow-details-tab"
   >
     <ContentAtmInventoriesWorkflows::RevisionDetailsForm
       @atmWorkflowSchema={{atmWorkflowSchema}}

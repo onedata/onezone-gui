@@ -148,7 +148,7 @@ describe('Integration | Component | content-atm-inventories-workflows/editor-vie
       const tabs = findAll('.nav-tabs .nav-link');
       expect(tabs[0]).to.have.trimmed.text('Editor');
       expect(tabs[0]).to.have.class('active');
-      expect(find('#editor.tab-pane')).to.have.class('active');
+      expect(find('.workflow-editor-tab.tab-pane')).to.have.class('active');
       expect(tabs[1]).to.have.trimmed.text('Details');
     });
 
@@ -160,7 +160,7 @@ describe('Integration | Component | content-atm-inventories-workflows/editor-vie
       await click(detailsTabLink);
 
       expect(detailsTabLink).to.have.class('active');
-      expect(find('#details.tab-pane')).to.have.class('active');
+      expect(find('.workflow-details-tab.tab-pane')).to.have.class('active');
       expect(form.querySelector('.state-field .dropdown-field-trigger'))
         .to.contain.text('Stable');
       expect(form.querySelector('.description-field .form-control'))
