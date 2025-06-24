@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12811 Upgraded Ember Bootstrap to 4.9.0
 * VFS-12825 Fixed live change of supporting spaces count in providers sidebar
 * VFS-12765 Added batch fetching and infinite scroll for provider space list on providers map
 * VFS-12758 Fixed tokens list cut-down after changing filter settings

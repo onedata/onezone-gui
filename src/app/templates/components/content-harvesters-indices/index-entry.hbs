@@ -64,9 +64,9 @@
 {{#let (component listItem.content) as |listItemContent|}}
   <listItemContent>
     {{!-- fade=false to prevent scroll issues during tabs animation --}}
-    <BsTab class="bs-tab-onedata bs-tab-modern" @fade={{false}} as |tab|>
+    <OneBsTab class="bs-tab-onedata bs-tab-modern" @fade={{false}} as |tab|>
       <tab.pane
-        @elementId={{concat parentView.elementId "-progress-tab"}}
+        @id={{concat parentView.elementId "-progress-tab"}}
         @title={{tt this "harvestingProgress"}}
       >
         {{!-- Hiding progress table when it is hidden by any parent. Fixes 0 size of the table
@@ -82,11 +82,11 @@
         {{/if}}
       </tab.pane>
       <tab.pane
-        @elementId={{concat parentView.elementId "-settings-tab"}}
+        @id={{concat parentView.elementId "-settings-tab"}}
         @title={{tt this "settings"}}
       >
         <ContentHarvestersIndices::IndexForm @mode="view" @index={{index}} />
       </tab.pane>
-    </BsTab>
+    </OneBsTab>
   </listItemContent>
 {{/let}}

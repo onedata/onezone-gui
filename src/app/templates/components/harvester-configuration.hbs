@@ -1,13 +1,13 @@
-<BsTab
+<OneBsTab
   @activeId={{activeTab}}
   @onChange={{action "onTabChange"}}
   class="bs-tab-onedata bs-tab-modern"
   as |tab|
 >
-  <tab.pane @elementId="general-tab" @title={{tt this "generalHeader"}}>
+  <tab.pane @id="general-tab" @title={{tt this "generalHeader"}}>
     <HarvesterConfiguration::General @harvester={{harvester}} />
   </tab.pane>
-  <tab.pane @elementId="gui-plugin-tab" @title={{tt this "guiPluginHeader"}}>
+  <tab.pane @id="gui-plugin-tab" @title={{tt this "guiPluginHeader"}}>
     <HarvesterConfiguration::GuiPlugin @harvester={{harvester}} />
   </tab.pane>
-</BsTab>
+</OneBsTab>

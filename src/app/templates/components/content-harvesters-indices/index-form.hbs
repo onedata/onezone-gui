@@ -1,4 +1,4 @@
-<form class="form form-horizontal form-component clearfix">
+<form onsubmit={{prevent-default}} class="form form-horizontal form-component clearfix">
   <FormComponent::FieldRenderer @field={{fields}} />
   {{#if (eq mode "create")}}
     <div class="btn-toolbar">

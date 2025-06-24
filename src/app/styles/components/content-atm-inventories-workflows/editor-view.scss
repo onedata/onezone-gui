@@ -56,12 +56,12 @@
     margin: 0 auto;
   }
 
-  .tab-content > #editor.active {
+  .tab-content > .workflow-editor-tab.active {
     display: flex;
     min-height: 0;
   }
 
-  .tab-content > *:not(#editor) {
+  .tab-content > *:not(.workflow-editor-tab) {
     overflow-y: auto;
   }
 

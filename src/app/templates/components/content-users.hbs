@@ -41,7 +41,7 @@
             @centered={{false}}
             @verifyCurrentPassword={{user.hasPassword}}
             @changingPassword={{isChangingPassword}}
-            @submit={{action "saveNewPassword"}}
+            @onSubmit={{action "saveNewPassword"}}
             @cancel={{action "stopPasswordChange"}}
           />
         {{else}}
