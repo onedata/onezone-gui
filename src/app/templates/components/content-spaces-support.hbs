@@ -8,7 +8,7 @@
   </div>
 
   <div class="row content-row">
-    <BsTab class="only-tab-bar bs-tab-onedata bs-tab-modern" as |tab|>
+    <OneBsTab class="only-tab-bar bs-tab-onedata bs-tab-modern" as |tab|>
       <tab.pane @title={{tt this "requestSupport.tabName"}}>
         <ContentSpacesSupport::RequestSupport @space={{space}} />
       </tab.pane>
@@ -18,7 +18,7 @@
       <tab.pane @title={{tt this "exposeData.tabName"}}>
         <ContentSpacesSupport::ExposeData @space={{space}} />
       </tab.pane>
-    </BsTab>
+    </OneBsTab>
   </div>
 {{else}}
   <ContentInfo

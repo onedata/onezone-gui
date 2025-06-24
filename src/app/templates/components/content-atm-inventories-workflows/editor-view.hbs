@@ -64,7 +64,7 @@
     </div>
   </h1>
 </div>
-<BsTab
+<OneBsTab
   @activeId={{activeTab}}
   @onChange={{action "onTabChange"}}
   class="only-tab-bar bs-tab-onedata bs-tab-modern fill-flex-using-column"
@@ -75,7 +75,7 @@
   <tab.pane
     @id="editor"
     @title={{tt this "tabs.editor"}}
-    class="fill-flex-using-column no-padding"
+    class="workflow-editor-tab fill-flex-using-column no-padding"
   >
     <WorkflowVisualiser
       @rawData={{visualiserData}}
@@ -84,13 +84,17 @@
       @mode="edit"
     />
   </tab.pane>
-  <tab.pane @id="details" @title={{tt this "tabs.details"}}>
+  <tab.pane
+    @id="details"
+    @title={{tt this "tabs.details"}}
+    class="workflow-details-tab"
+  >
     <ContentAtmInventoriesWorkflows::RevisionDetailsForm
       @atmWorkflowSchema={{atmWorkflowSchema}}
       @revisionNumber={{revisionNumber}}
       @onChange={{action "detailsDataChange"}}
     />
   </tab.pane>
-</BsTab>
+</OneBsTab>
 {{yield}}
 
