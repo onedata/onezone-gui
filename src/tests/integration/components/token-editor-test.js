@@ -10,14 +10,18 @@ import _ from 'lodash';
 import { lookupService } from '../../helpers/stub-service';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
-import { resolve, reject, Promise } from 'rsvp';
+import { resolve, reject, Promise, all as allFulfilled } from 'rsvp';
 import moment from 'moment';
 import { set } from '@ember/object';
 import OneTooltipHelper from '../../helpers/one-tooltip';
-import { dasherize, underscore } from '@ember/string';
+import { underscore } from '@ember/string';
 import { suppressRejections } from '../../helpers/suppress-rejections';
 import { findInElementsByText } from '../../helpers/find';
 import globals from 'onedata-gui-common/utils/globals';
+import { defineProperty } from '@ember/object';
+import gri from 'onedata-gui-websocket-client/utils/gri';
+import { entityType as userEntityType } from 'onezone-gui/models/user';
+import { clearStoreAfterEach } from '../../helpers/clear-store';
 
 const tokenInviteTypes = [{
   inviteType: 'userJoinGroup',
@@ -201,21 +205,76 @@ const regions = [
 ];
 
 describe('Integration | Component | token-editor', function () {
-  setupRenderingTest();
+  const { afterEach } = setupRenderingTest();
 
-  beforeEach(function () {
-    const currentUser = {
-      entityId: 'currentuser',
+  clearStoreAfterEach(afterEach);
+
+  beforeEach(async function () {
+    // FIXME: debug code
+    const startTime = new Date().getTime();
+    const store = lookupService(this, 'store');
+    const spaceList = await store.createRecord('spaceList', { list: [] }).save();
+    const groupList = await store.createRecord('groupList', { list: [] }).save();
+    const currentUser = await store.createRecord('user', {
+      id: gri({
+        entityType: userEntityType,
+        entityId: 'currentuser',
+        aspect: 'instance',
+        scope: 'private',
+      }),
       name: 'currentuser',
-    };
+      spaceList,
+      groupList,
+    }).save();
     const onedataGraphStub =
       sinon.stub(lookupService(this, 'onedata-graph'), 'request');
     const recordManagerService = lookupService(this, 'record-manager');
     sinon.stub(recordManagerService, 'getCurrentUserRecord').returns(currentUser);
+    const currentUserService = lookupService(this, 'current-user');
+    defineProperty(currentUserService, 'user', {
+      get() {
+        return currentUser;
+      },
+    });
     const getUserRecordListStub = sinon.stub(recordManagerService, 'getUserRecordList');
     const getRecordByIdStub = sinon.stub(recordManagerService, 'getRecordById').rejects();
     const mockedRecords = {};
-    [
+
+    /**
+     * @returns {Promise<Ember.Model>}
+     */
+    async function createRecord(index, modelName) {
+      const modelGri = gri({
+        entityType: underscore(modelName),
+        entityId: `${modelName}${index}`,
+        aspect: 'instance',
+      });
+      const user = await store.createRecord('user', {
+        id: gri({
+          entityType: userEntityType,
+          entityId: `${modelName}${index}user`,
+          aspect: 'instance',
+        }),
+        name: `${modelName}${index}user`,
+      });
+      const group = await store.createRecord('group', {
+        id: gri({
+          entityType: userEntityType,
+          entityId: `${modelName}${index}group`,
+          aspect: 'instance',
+        }),
+        name: `${modelName}${index}group`,
+      });
+      const effUserList = await store.createRecord('userList', { list: [user] });
+      const effGroupList = await store.createRecord('groupList', { list: [group] });
+      return await store.createRecord(modelName, {
+        id: modelGri,
+        name: `${modelName}${index}`,
+        effUserList,
+        effGroupList,
+      }).save();
+    }
+    const modelNames = [
       'user',
       'space',
       'group',
@@ -223,53 +282,30 @@ describe('Integration | Component | token-editor', function () {
       'provider',
       'cluster',
       'atmInventory',
-    ].forEach(modelName => {
-      const viewPrivilege = modelName === 'atmInventory' ?
-        'atm_inventory_view' : `${modelName}_view`;
-      onedataGraphStub.withArgs({
-        gri: `${underscore(modelName)}.null.privileges:private`,
-        operation: 'get',
-        subscribe: false,
-      }).resolves({ member: [viewPrivilege] });
-      mockedRecords[modelName] = _.reverse(_.range(3)).map(index => ({
-        entityId: `${modelName}${index}`,
-        entityType: underscore(modelName),
-        name: `${modelName}${index}`,
-        constructor: {
-          modelName: dasherize(modelName),
-        },
-        // Additional `store` property to let `isRecord` util return true
-        store: true,
-        effUserList: PromiseObject.create({
-          promise: resolve({
-            list: PromiseArray.create({
-              promise: resolve([{
-                entityId: `${modelName}${index}user`,
-                name: `${modelName}${index}user`,
-              }]),
-            }),
+    ];
+    await allFulfilled(
+      modelNames.map(async (modelName) => {
+        const viewPrivilege = modelName === 'atmInventory' ?
+          'atm_inventory_view' : `${modelName}_view`;
+        onedataGraphStub.withArgs({
+          gri: `${underscore(modelName)}.null.privileges:private`,
+          operation: 'get',
+          subscribe: false,
+        }).resolves({ member: [viewPrivilege] });
+
+        mockedRecords[modelName] = await allFulfilled(
+          _.reverse(_.range(3)).map(index => createRecord(index, modelName))
+        );
+        getUserRecordListStub.withArgs(modelName).resolves({
+          list: PromiseArray.create({
+            promise: resolve(mockedRecords[modelName]),
           }),
-        }),
-        effGroupList: PromiseObject.create({
-          promise: resolve({
-            list: PromiseArray.create({
-              promise: resolve([{
-                entityId: `${modelName}${index}group`,
-                name: `${modelName}${index}group`,
-              }]),
-            }),
-          }),
-        }),
-      }));
-      getUserRecordListStub.withArgs(modelName).resolves({
-        list: PromiseArray.create({
-          promise: resolve(mockedRecords[modelName]),
-        }),
-      });
-      mockedRecords[modelName].forEach(record =>
-        getRecordByIdStub.withArgs(modelName, record.entityId).resolves(record)
-      );
-    });
+        });
+        mockedRecords[modelName].forEach(record =>
+          getRecordByIdStub.withArgs(modelName, record.entityId).resolves(record)
+        );
+      })
+    );
     getUserRecordListStub.withArgs('token').resolves({
       list: PromiseArray.create({
         promise: resolve([]),
@@ -291,6 +327,8 @@ describe('Integration | Component | token-editor', function () {
       mockedRecords,
       currentUser,
     });
+    const endTime = new Date().getTime();
+    console.log('time [ms]', endTime - startTime);
   });
 
   it('has class "token-editor"', async function () {
@@ -336,8 +374,7 @@ describe('Integration | Component | token-editor', function () {
     );
   });
 
-  it(
-    'has "type" field with preselected "access" option and corresponding autogenerated name',
+  it('has "type" field with preselected "access" option and corresponding autogenerated name',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -356,8 +393,7 @@ describe('Integration | Component | token-editor', function () {
     type: 'invite',
     newName: /Inv\. .+/,
   }].forEach(({ type, newName }) => {
-    it(
-      `notifies about "type" field change to ${type} and changes autogenerated name`,
+    it(`notifies about "type" field change to ${type} and changes autogenerated name`,
       async function () {
         await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -370,8 +406,7 @@ describe('Integration | Component | token-editor', function () {
     );
   });
 
-  it(
-    'marking name field as modified stops updating by name autogenerator',
+  it('marking name field as modified stops updating by name autogenerator',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -386,8 +421,7 @@ describe('Integration | Component | token-editor', function () {
     'access',
     'identity',
   ].forEach(type => {
-    it(
-      `does not show invitation related basic fields if "type" is "${type}"`,
+    it(`does not show invitation related basic fields if "type" is "${type}"`,
       async function () {
         await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -397,8 +431,7 @@ describe('Integration | Component | token-editor', function () {
     );
   });
 
-  it(
-    'shows invitation related basic fields only if "type" is "invite"',
+  it('shows invitation related basic fields only if "type" is "invite"',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -421,8 +454,7 @@ describe('Integration | Component | token-editor', function () {
     });
   });
 
-  it(
-    `has "inviteType" field with preselected "${preselectedInviteType.label}" option`,
+  it(`has "inviteType" field with preselected "${preselectedInviteType.label}" option`,
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -434,8 +466,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'does not inform about invalid "target" field when it is hidden',
+  it('does not inform about invalid "target" field when it is hidden',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -443,8 +474,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'has not valid "target" field when it is empty',
+  it('has not valid "target" field when it is empty',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -464,8 +494,7 @@ describe('Integration | Component | token-editor', function () {
     tokenName,
     modelNameInPrivileges,
   }) => {
-    it(
-      `notifies about "inviteType" field change to "${label}" and changes autogenerated name`,
+    it(`notifies about "inviteType" field change to "${label}" and changes autogenerated name`,
       async function () {
         await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -479,8 +508,7 @@ describe('Integration | Component | token-editor', function () {
     );
 
     if (targetModelName) {
-      it(
-        `shows correct "target" field when "inviteType" field is "${label}"`,
+      it(`shows correct "target" field when "inviteType" field is "${label}"`,
         async function () {
           await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -502,8 +530,7 @@ describe('Integration | Component | token-editor', function () {
         }
       );
 
-      it(
-        `notifies about "target" field change when "inviteType" field is "${label}"`,
+      it(`notifies about "target" field change when "inviteType" field is "${label}"`,
         async function () {
           await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -526,8 +553,7 @@ describe('Integration | Component | token-editor', function () {
       );
 
       if (!noPrivileges) {
-        it(
-          `shows correct privileges field when "inviteType" field is "${label}"`,
+        it(`shows correct privileges field when "inviteType" field is "${label}"`,
           async function () {
             await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -557,8 +583,7 @@ describe('Integration | Component | token-editor', function () {
           }
         );
 
-        it(
-          `notifies about "privileges" field change when "inviteType" field is "${label}"`,
+        it(`notifies about "privileges" field change when "inviteType" field is "${label}"`,
           async function () {
             await render(hbs `<TokenEditor
               @mode="create"
@@ -584,8 +609,7 @@ describe('Integration | Component | token-editor', function () {
           }
         );
       } else {
-        it(
-          `does not show privileges when "inviteType" field is "${label}"`,
+        it(`does not show privileges when "inviteType" field is "${label}"`,
           async function () {
             await render(hbs `<TokenEditor
               @mode="create"
@@ -600,8 +624,7 @@ describe('Integration | Component | token-editor', function () {
         );
       }
     } else {
-      it(
-        `does not show invite target details when "inviteType" field is "${label}"`,
+      it(`does not show invite target details when "inviteType" field is "${label}"`,
         async function () {
           await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -614,8 +637,7 @@ describe('Integration | Component | token-editor', function () {
     }
   });
 
-  it(
-    'resets "target" field after change to inviteType which requires different model',
+  it('resets "target" field after change to inviteType which requires different model',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -639,8 +661,7 @@ describe('Integration | Component | token-editor', function () {
       .to.have.trimmed.text('');
   });
 
-  it(
-    'has "usageLimit" field with preselected "infinity" option and disabled number input',
+  it('has "usageLimit" field with preselected "infinity" option and disabled number input',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -656,8 +677,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'notifies about empty limit input error when usageLimit is set to use number',
+  it('notifies about empty limit input error when usageLimit is set to use number',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -670,8 +690,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'notifies about correct limit input value when usageLimit is set to use number',
+  it('notifies about correct limit input value when usageLimit is set to use number',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -686,8 +705,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'notifies about too low limit input error when usageLimit is set to use number',
+  it('notifies about too low limit input error when usageLimit is set to use number',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -702,8 +720,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'has collapsed caveats on init',
+  it('has collapsed caveats on init',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -711,8 +728,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'allows to expand all caveats',
+  it('allows to expand all caveats',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -721,8 +737,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'does not collapse enabled caveats',
+  it('does not collapse enabled caveats',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -734,8 +749,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'shows warning message when no caveats are enabled',
+  it('shows warning message when no caveats are enabled',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -747,8 +761,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'allows to open all caveats through "no caveats" warning message',
+  it('allows to open all caveats through "no caveats" warning message',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -784,8 +797,7 @@ describe('Integration | Component | token-editor', function () {
     isEnabledByDefault,
     dontTestValue,
   }) => {
-    it(
-      `renders unchecked toggle, label, tip and disabled description for ${name} caveat${isEnabledByDefault ? '' : ' on init'}`,
+    it(`renders unchecked toggle, label, tip and disabled description for ${name} caveat${isEnabledByDefault ? '' : ' on init'}`,
       async function () {
         await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -804,8 +816,7 @@ describe('Integration | Component | token-editor', function () {
       }
     );
 
-    it(
-      `has valid and ${isEnabledByDefault ? 'enabled' : 'disabled'} ${name} caveat on init`,
+    it(`has valid and ${isEnabledByDefault ? 'enabled' : 'disabled'} ${name} caveat on init`,
       async function () {
         await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -820,8 +831,7 @@ describe('Integration | Component | token-editor', function () {
     );
 
     if (!isEnabledByDefault) {
-      it(
-        `hides disabled description and shows form field on ${name} caveat toggle change`,
+      it(`hides disabled description and shows form field on ${name} caveat toggle change`,
         async function () {
           await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -841,8 +851,7 @@ describe('Integration | Component | token-editor', function () {
     }
   });
 
-  it(
-    'renders expire caveat form elements when that caveat is enabled',
+  it('renders expire caveat form elements when that caveat is enabled',
     async function () {
       const tomorrow = moment().add(1, 'day').endOf('day');
       const dayAfterTomorrow = moment(tomorrow).add(1, 'day');
@@ -858,8 +867,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'notifies about expire caveat change',
+  it('notifies about expire caveat change',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -875,8 +883,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'renders interface caveat form elements when that caveat is enabled',
+  it('renders interface caveat form elements when that caveat is enabled',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -894,8 +901,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'notifies about interface caveat change',
+  it('notifies about interface caveat change',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -914,8 +920,7 @@ describe('Integration | Component | token-editor', function () {
     'asn',
     'ip',
   ].forEach(caveatName => {
-    it(
-      `renders empty, invalid ${caveatName} caveat when it is enabled`,
+    it(`renders empty, invalid ${caveatName} caveat when it is enabled`,
       async function () {
         await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -927,8 +932,7 @@ describe('Integration | Component | token-editor', function () {
     );
   });
 
-  it(
-    'notifies about asn caveat change',
+  it('notifies about asn caveat change',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -941,8 +945,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'not allows to input invalid asn',
+  it('not allows to input invalid asn',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -955,8 +958,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'notifies about ip caveat change',
+  it('notifies about ip caveat change',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -977,8 +979,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'not allows to input invalid ip',
+  it('not allows to input invalid ip',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -991,8 +992,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'renders empty, invalid region caveat when it is enabled',
+  it('renders empty, invalid region caveat when it is enabled',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -1007,8 +1007,7 @@ describe('Integration | Component | token-editor', function () {
   );
 
   regions.forEach(({ label, value }) => {
-    it(
-      `notifies about region caveat change to ["${value}"]`,
+    it(`notifies about region caveat change to ["${value}"]`,
       async function () {
         await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -1026,8 +1025,7 @@ describe('Integration | Component | token-editor', function () {
     );
   });
 
-  it(
-    'notifies about region caveat type change to "deny"',
+  it('notifies about region caveat type change to "deny"',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -1042,8 +1040,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'sorts tags in region caveat input',
+  it('sorts tags in region caveat input',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -1068,8 +1065,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'renders empty, invalid country caveat when it is enabled',
+  it('renders empty, invalid country caveat when it is enabled',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -1086,8 +1082,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'notifies about country caveat change',
+  it('notifies about country caveat change',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -1101,8 +1096,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'not allows to input invalid country',
+  it('not allows to input invalid country',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -1116,8 +1110,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'notifies about country caveat type change to "deny"',
+  it('notifies about country caveat type change to "deny"',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -1132,8 +1125,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'renders empty, invalid consumer caveat when it is enabled',
+  it('renders empty, invalid consumer caveat when it is enabled',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -1179,15 +1171,16 @@ describe('Integration | Component | token-editor', function () {
       'provider2',
     ],
   }].forEach(({ model, name, list }) => {
-    it(
-      `shows ${model} list in consumer caveat`,
+    it(`shows ${model} list in consumer caveat`,
       async function () {
         await render(hbs `<TokenEditor @mode="create" />`);
 
         await toggleCaveatsSection();
         await toggleCaveat('consumer');
         await click('.consumer-field .tags-input');
+        await settled();
         await selectChoose('.tags-selector', name);
+        await settled();
         expect(find('.tags-selector .ember-power-select-trigger'))
           .to.have.trimmed.text(name);
         const selectorItems = getTagsSelector().querySelectorAll('.selector-item');
@@ -1205,6 +1198,7 @@ describe('Integration | Component | token-editor', function () {
     await toggleCaveatsSection();
     await toggleCaveat('consumer');
     await click('.consumer-field .tags-input');
+    await settled();
     await click(getTagsSelector().querySelector('.record-item'));
     expectCaveatToHaveValue(this, 'consumer', true, [{
       model: 'user',
@@ -1218,15 +1212,16 @@ describe('Integration | Component | token-editor', function () {
     'Group',
     'Oneprovider',
   ].forEach((typeName) => {
-    it(
-      `removes concrete ${typeName} tags when "all" ${typeName} tag has been selected in consumer caveat`,
+    it(`removes concrete ${typeName} tags when "all" ${typeName} tag has been selected in consumer caveat`,
       async function () {
         await render(hbs `<TokenEditor @mode="create" />`);
 
         await toggleCaveatsSection();
         await toggleCaveat('consumer');
         await click('.consumer-field .tags-input');
+        await settled();
         await selectChoose('.tags-selector', typeName);
+        await settled();
         await click(getTagsSelector().querySelector('.record-item'));
         await click(getTagsSelector().querySelector('.record-item'));
         expect(getFieldElement('consumer').querySelectorAll('.tag-item'))
@@ -1245,6 +1240,7 @@ describe('Integration | Component | token-editor', function () {
     await toggleCaveatsSection();
     await toggleCaveat('consumer');
     await click('.consumer-field .tags-input');
+    await settled();
     await click(getTagsSelector().querySelectorAll('.record-item')[1]);
     await click(getTagsSelector().querySelector('.record-item'));
     const tagItems = getFieldElement('consumer').querySelectorAll('.tag-item');
@@ -1252,15 +1248,16 @@ describe('Integration | Component | token-editor', function () {
     expect(tagItems[1]).to.have.trimmed.text('group0user');
   });
 
-  it(
-    'shows service list in service caveat',
+  it('shows service list in service caveat',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
       await toggleCaveatsSection();
       await toggleCaveat('service');
       await click('.service-field .tags-input');
+      await settled();
       await selectChoose('.tags-selector', 'Service');
+      await settled();
       expect(find('.tags-selector .ember-power-select-trigger'))
         .to.have.trimmed.text('Service');
       const selectorItems = getTagsSelector().querySelectorAll('.selector-item');
@@ -1272,15 +1269,16 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'shows service onepanel list in service caveat',
+  it('shows service onepanel list in service caveat',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
       await toggleCaveatsSection();
       await toggleCaveat('service');
       await click('.service-field .tags-input');
+      await settled();
       await selectChoose('.tags-selector', 'Service Onepanel');
+      await settled();
       expect(find('.tags-selector .ember-power-select-trigger'))
         .to.have.trimmed.text('Service Onepanel');
       const selectorItems = getTagsSelector().querySelectorAll('.selector-item');
@@ -1297,6 +1295,7 @@ describe('Integration | Component | token-editor', function () {
     await toggleCaveatsSection();
     await toggleCaveat('service');
     await click('.service-field .tags-input');
+    await settled();
     await click(getTagsSelector().querySelectorAll('.record-item')[1]);
     expectCaveatToHaveValue(this, 'service', true, [{
       model: 'service',
@@ -1309,15 +1308,16 @@ describe('Integration | Component | token-editor', function () {
     'Service',
     'Service Onepanel',
   ].forEach((typeName) => {
-    it(
-      `removes concrete ${typeName} tags when "all" ${typeName} tag has been selected in service caveat`,
+    it(`removes concrete ${typeName} tags when "all" ${typeName} tag has been selected in service caveat`,
       async function () {
         await render(hbs `<TokenEditor @mode="create" />`);
 
         await toggleCaveatsSection();
         await toggleCaveat('service');
         await click('.service-field .tags-input');
+        await settled();
         await selectChoose('.tags-selector', typeName);
+        await settled();
         await click(
           findInElementsByText(getTagsSelector().querySelectorAll('.record-item'), '0')
         );
@@ -1340,6 +1340,7 @@ describe('Integration | Component | token-editor', function () {
     await toggleCaveatsSection();
     await toggleCaveat('service');
     await click('.service-field .tags-input');
+    await settled();
     await click(getTagsSelector().querySelectorAll('.record-item')[2]);
     await click(getTagsSelector().querySelectorAll('.record-item')[1]);
     const tagItems = getFieldElement('service').querySelectorAll('.tag-item');
@@ -1347,8 +1348,7 @@ describe('Integration | Component | token-editor', function () {
     expect(tagItems[1]).to.have.trimmed.text('provider1');
   });
 
-  it(
-    'renders empty, valid path caveat when it is enabled',
+  it('renders empty, valid path caveat when it is enabled',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -1360,8 +1360,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'preselects first available space and path "" with placeholder for new entry in path caveat',
+  it('preselects first available space and path "" with placeholder for new entry in path caveat',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -1385,8 +1384,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'allows to choose between available spaces in path caveat entry',
+  it('allows to choose between available spaces in path caveat entry',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -1401,8 +1399,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'notifies about path caveat entry space change',
+  it('notifies about path caveat entry space change',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -1427,8 +1424,7 @@ describe('Integration | Component | token-editor', function () {
     '/asd/',
     '/asd/xcv.cpp',
   ].forEach(pathString => {
-    it(
-      `notifies about correct path caveat string ${JSON.stringify(pathString)}`,
+    it(`notifies about correct path caveat string ${JSON.stringify(pathString)}`,
       async function () {
         await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -1450,8 +1446,7 @@ describe('Integration | Component | token-editor', function () {
     '/asd//',
     ' /asd',
   ].forEach(pathString => {
-    it(
-      `notifies about incorrect path caveat string ${JSON.stringify(pathString)}`,
+    it(`notifies about incorrect path caveat string ${JSON.stringify(pathString)}`,
       async function () {
         await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -1467,8 +1462,7 @@ describe('Integration | Component | token-editor', function () {
     );
   });
 
-  it(
-    'hides enabled description when readonly caveat is disabled',
+  it('hides enabled description when readonly caveat is disabled',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -1477,8 +1471,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'renders readonly caveat form elements when that caveat is enabled',
+  it('renders readonly caveat form elements when that caveat is enabled',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -1491,8 +1484,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'renders empty, valid objectId caveat when it is enabled',
+  it('renders empty, valid objectId caveat when it is enabled',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -1504,8 +1496,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'notifies about objectId caveat change',
+  it('notifies about objectId caveat change',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -1519,8 +1510,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'informs about invalid (empty) objectId entry',
+  it('informs about invalid (empty) objectId entry',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -1531,8 +1521,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'has readonly, path and objectId caveats under dataAccessCaveats group',
+  it('has readonly, path and objectId caveats under dataAccessCaveats group',
     async function () {
       const caveatsToCheck = [
         'readonly',
@@ -1553,8 +1542,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'shows access token caveats when token type is changed to access',
+  it('shows access token caveats when token type is changed to access',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -1566,8 +1554,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'shows identity token caveats when token type is changed to identity',
+  it('shows identity token caveats when token type is changed to identity',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -1579,8 +1566,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'shows invite token caveats when token type is changed to invite',
+  it('shows invite token caveats when token type is changed to invite',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -1592,8 +1578,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'ignores validation errors in access only caveats when token type is not access',
+  it('ignores validation errors in access only caveats when token type is not access',
     async function () {
       await render(hbs `<TokenEditor @mode="create" @onChange={{action change}} />`);
 
@@ -1614,8 +1599,7 @@ describe('Integration | Component | token-editor', function () {
     expect(find('.service-caveat-warning')).to.exist;
   });
 
-  it(
-    'does not show service caveat warning when service caveat is enabled',
+  it('does not show service caveat warning when service caveat is enabled',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -1625,8 +1609,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'does not show service caveat warning when service caveat is disabled and not available',
+  it('does not show service caveat warning when service caveat is disabled and not available',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -1635,14 +1618,14 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'shows service caveat warning when service caveat has Onezone service selected',
+  it('shows service caveat warning when service caveat has Onezone service selected',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
       await toggleCaveatsSection();
       await toggleCaveat('service');
       await click('.service-field .tags-input');
+      await settled();
       await click(findInElementsByText(
         getTagsSelector().querySelectorAll('.record-item'),
         'onezone'
@@ -1651,8 +1634,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'shows service caveat warning when service caveat is enabled, but empty',
+  it('shows service caveat warning when service caveat is enabled, but empty',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -1662,8 +1644,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'does not show service caveat warning when service caveat is disabled and interface caveat is set to oneclient',
+  it('does not show service caveat warning when service caveat is disabled and interface caveat is set to oneclient',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -1674,8 +1655,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'shows service caveat warning when service caveat is disabled and interface caveat is set to REST',
+  it('shows service caveat warning when service caveat is disabled and interface caveat is set to REST',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -1686,8 +1666,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'does not show service caveat warning when service caveat is disabled and readonly caveat is enabled',
+  it('does not show service caveat warning when service caveat is disabled and readonly caveat is enabled',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -1697,8 +1676,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'shows service caveat warning when service caveat is disabled and path caveat is enabled without any path',
+  it('shows service caveat warning when service caveat is disabled and path caveat is enabled without any path',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -1708,8 +1686,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'does not show service caveat warning when service caveat is disabled and path caveat is enabled with one path included',
+  it('does not show service caveat warning when service caveat is disabled and path caveat is enabled with one path included',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -1720,8 +1697,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'shows service caveat warning when service caveat is disabled and objectId caveat is enabled without any object id',
+  it('shows service caveat warning when service caveat is disabled and objectId caveat is enabled without any object id',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -1731,8 +1707,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'does not show service caveat warning when service caveat is disabled and objectId caveat is enabled with one object id included',
+  it('does not show service caveat warning when service caveat is disabled and objectId caveat is enabled with one object id included',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -1770,8 +1745,7 @@ describe('Integration | Component | token-editor', function () {
     expect(submitStub).to.be.calledOnce;
   });
 
-  it(
-    'passess token raw model via injected onSubmit on submit click (access token example with all caveats)',
+  it('passess token raw model via injected onSubmit on submit click (access token example with all caveats)',
     async function () {
       const submitStub = sinon.stub().resolves();
       this.set('submit', submitStub);
@@ -1808,10 +1782,12 @@ describe('Integration | Component | token-editor', function () {
       // consumer
       await toggleCaveat('consumer');
       await click('.consumer-field .tags-input');
+      await settled();
       await click(getTagsSelector().querySelectorAll('.record-item')[0]);
       // service
       await toggleCaveat('service');
       await click('.service-field .tags-input');
+      await settled();
       await click(getTagsSelector().querySelectorAll('.record-item')[1]);
       // interface
       await toggleCaveat('interface');
@@ -1873,8 +1849,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'passess token raw model via injected onSubmit on submit click (invite token example without caveats)',
+  it('passess token raw model via injected onSubmit on submit click (invite token example without caveats)',
     async function () {
       const submitStub = sinon.stub().resolves();
       this.set('submit', submitStub);
@@ -1899,8 +1874,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'passess token raw model via injected onSubmit on submit click (register Oneprovider example without caveats)',
+  it('passess token raw model via injected onSubmit on submit click (register Oneprovider example without caveats)',
     async function () {
       const submitStub = sinon.stub().resolves();
       this.set('submit', submitStub);
@@ -1920,8 +1894,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'disables all fields and shows spinner in submit button when submit promise is pending',
+  it('disables all fields and shows spinner in submit button when submit promise is pending',
     async function () {
       let submitResolve;
       const submitStub = sinon.stub()
@@ -1940,8 +1913,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'is in mode "create" by default',
+  it('is in mode "create" by default',
     async function () {
       await render(hbs `<TokenEditor />`);
 
@@ -1949,8 +1921,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'has all fields in edition mode, when mode is "create"',
+  it('has all fields in edition mode, when mode is "create"',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -1959,8 +1930,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'has all fields in view mode, when mode is "view"',
+  it('has all fields in view mode, when mode is "view"',
     async function () {
       await render(hbs `<TokenEditor @mode="view" />`);
 
@@ -1969,8 +1939,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'renders fields from view mode when component is in view mode',
+  it('renders fields from view mode when component is in view mode',
     async function () {
       await render(hbs `<TokenEditor @mode="view" />`);
 
@@ -1983,8 +1952,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'does not show fields from view mode, when is in create mode',
+  it('does not show fields from view mode, when is in create mode',
     async function () {
       await render(hbs `<TokenEditor @mode="create" />`);
 
@@ -1993,8 +1961,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'shows passed token data in view mode (access token, all caveats)',
+  it('shows passed token data in view mode (access token, all caveats)',
     async function () {
       const now = new Date();
       const token = {
@@ -2145,8 +2112,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'shows passed token data in view mode (invite token, no caveats)',
+  it('shows passed token data in view mode (invite token, no caveats)',
     async function () {
       const token = {
         name: 'token1',
@@ -2184,8 +2150,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'shows passed token data in view mode (invite token with unknown target, no caveats)',
+  it('shows passed token data in view mode (invite token with unknown target, no caveats)',
     async function () {
       suppressRejections();
       const token = {
@@ -2220,8 +2185,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'has only name and revoked fields in edition mode, when mode is "edit"',
+  it('has only name and revoked fields in edition mode, when mode is "edit"',
     async function () {
       await render(hbs `<TokenEditor @mode="edit" />`);
 
@@ -2233,8 +2197,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'represents token values in edit fields in component "edit" mode',
+  it('represents token values in edit fields in component "edit" mode',
     async function () {
       const token = {
         name: 'token1',
@@ -2252,8 +2215,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'does not change values in edit fields, when token data changes in edit mode',
+  it('does not change values in edit fields, when token data changes in edit mode',
     async function () {
       const token = {
         name: 'token1',
@@ -2298,8 +2260,7 @@ describe('Integration | Component | token-editor', function () {
     expect(cancel).to.not.have.attr('disabled');
   });
 
-  it(
-    'renders disabled submit button when form becomes invalid in edit mode',
+  it('renders disabled submit button when form becomes invalid in edit mode',
     async function () {
       const token = {
         name: 'token1',
@@ -2315,8 +2276,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'calls injected onSubmit on submit click with empty diff object in edit mode',
+  it('calls injected onSubmit on submit click with empty diff object in edit mode',
     async function () {
       const token = {
         name: 'token1',
@@ -2339,8 +2299,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'calls injected onSubmit on submit click with diff object containing changed fields in edit mode',
+  it('calls injected onSubmit on submit click with diff object containing changed fields in edit mode',
     async function () {
       const token = {
         name: 'token1',
@@ -2365,8 +2324,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'disables all fields and shows spinner in submit button when submit promise is pending in edit mode',
+  it('disables all fields and shows spinner in submit button when submit promise is pending in edit mode',
     async function () {
       const token = {
         name: 'token1',
@@ -2396,8 +2354,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'calls injected onCancel on cancel click in edit mode',
+  it('calls injected onCancel on cancel click in edit mode',
     async function () {
       const cancelSpy = sinon.spy();
       this.set('cancel', cancelSpy);
@@ -2409,8 +2366,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'prefills form with injected token in "create" mode (access token with all caveats)',
+  it('prefills form with injected token in "create" mode (access token with all caveats)',
     async function () {
       const now = new Date();
       const token = {
@@ -2536,8 +2492,7 @@ describe('Integration | Component | token-editor', function () {
     }
   );
 
-  it(
-    'prefills form with injected token in "create" mode (invite token with no caveats)',
+  it('prefills form with injected token in "create" mode (invite token with no caveats)',
     async function () {
       const token = {
         name: 'my token',
