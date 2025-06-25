@@ -294,6 +294,9 @@ export default {
           pathDisabledText: {
             text: 'This token is not limited to data access to specific paths.',
           },
+          loadingPathSpaces: {
+            loadingText: 'Loading available spaces...',
+          },
         },
         objectIdCaveat: {
           objectIdEnabled: {

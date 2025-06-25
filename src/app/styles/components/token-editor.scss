@@ -258,7 +258,7 @@
     }
 
     .field-edit-mode.caveat-group.is-enabled {
-      .caveat-group-toggle {
+      .caveat-group-toggle, .loadingPathSpaces-field {
         padding-top: $padding-base-vertical;
       }
 

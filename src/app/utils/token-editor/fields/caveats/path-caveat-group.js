@@ -18,7 +18,7 @@ import SiblingLoadingField from 'onedata-gui-common/utils/form-component/sibling
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
 import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields-group';
 import RecordOptionsArrayProxy from 'onedata-gui-common/utils/record-options-array-proxy';
-import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
+import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { caveatCustomFieldCommonExtension, createCaveatGroup } from './common';
 
 const LoadingPathSpacesField = SiblingLoadingField.extend({
@@ -175,18 +175,17 @@ export const PathCaveatGroup = createCaveatGroup('path', {
             };
           }) : [];
         this.setProperties({
-          spacesProxy: PromiseArray.create({
-            promise: resolve(spaceEntries),
-          }),
+          spacesProxy: promiseArray(resolve(spaceEntries)),
           spacesProxyIsForMode: 'view',
         });
       } else if (!this.spacesProxy || this.spacesProxyIsForMode === 'view') {
+        const spacesPromise = (async () => {
+          const spaceList = await this.recordManager.getUserRecordList('space');
+          const list = await spaceList.list;
+          return RecordOptionsArrayProxy.create({ records: list });
+        })();
         this.setProperties({
-          spacesProxy: PromiseArray.create({
-            promise: this.recordManager.getUserRecordList('space')
-              .then((recordsList) => get(recordsList, 'list'))
-              .then((records) => RecordOptionsArrayProxy.create({ records })),
-          }),
+          spacesProxy: promiseArray(spacesPromise),
           spacesProxyIsForMode: 'edit',
         });
       }
