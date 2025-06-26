@@ -87,7 +87,18 @@ export default {
         },
         inviteTargetDetails: {
           loadingTarget: {
-            loadingText: 'Loading available targets...',
+            loader: {
+              text: 'Loading available {{modelsName}}... {{percentage}}',
+              modelsName: {
+                unknown: 'targets',
+                group: 'groups',
+                space: 'spaces',
+                user: 'users',
+                cluster: 'clusters',
+                harvester: 'harvesters',
+                atmInventory: 'automation inventories',
+              },
+            },
           },
           target: {
             label: '',

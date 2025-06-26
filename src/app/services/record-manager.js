@@ -14,6 +14,7 @@ import gri from 'onedata-gui-websocket-client/utils/gri';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import RecordManagerConfiguration from 'onezone-gui/utils/record-manager-configuration';
 import fetchBatchRecords from 'onezone-gui/utils/fetch-batch-records';
+import BatchRecordsLoader from '../utils/batch-records-loader';
 
 /**
  * @typedef {Object} LoadRecordOptions
@@ -50,16 +51,7 @@ export default Service.extend({
     }
   },
 
-  /**
-   * Returns loaded *List relation of current user
-   * @param {String} listItemModelName
-   * @param {boolan} [loadRequiredRelations] Some models have async relations that should
-   *   be loaded to have complete data of record. It is recommended to load them, but in
-   *   some cases like loading large number of records, it is better to load them lazily,
-   *   when they are needed.
-   * @returns {Promise<GraphListModel>}
-   */
-  async getUserRecordList(listItemModelName, loadRequiredRelations = true) {
+  async resolveUserRecordListLoader(listItemModelName) {
     const { batchRequestRegistry } = this;
     const user = this.getCurrentUserRecord();
     const listRelationName = `${camelize(listItemModelName)}List`;
@@ -72,20 +64,39 @@ export default Service.extend({
         await listRecord.list;
       } catch {
         console.warn(
-          'RecordManager.getUserRecordList: list cannot be fully resolved, some records may be missing'
+          'RecordManager.resolveUserRecordListLoader: list cannot be fully resolved, some records may be missing'
         );
       }
       return listRecord.list.toArray();
     };
-    await fetchBatchRecords({
+    return new BatchRecordsLoader({
       batchRequestRegistry,
       itemsGris,
       listResolver,
     });
+  },
+
+  /**
+   * Returns loaded *List relation of current user
+   * @param {String} listItemModelName
+   * @param {boolan} [loadRequiredRelations] Some models have async relations that should
+   *   be loaded to have complete data of record. It is recommended to load them, but in
+   *   some cases like loading large number of records, it is better to load them lazily,
+   *   when they are needed.
+   * @returns {Promise<GraphListModel>}
+   */
+  async getUserRecordList(listItemModelName, loadRequiredRelations = true) {
+    /** @type {BatchRecordsLoader} */
+    const loader = await this.resolveUserRecordListLoader(listItemModelName);
+    await loader.getPromise();
+    const listRelationName = `${camelize(listItemModelName)}List`;
+    const user = this.getCurrentUserRecord();
+    const listRecord = await user.getRelation(listRelationName);
 
     // After fetching batch record, content of list should be available in proxy.
-    const list = listRecord.list.content.toArray();
     if (loadRequiredRelations) {
+      const { batchRequestRegistry } = this;
+      const list = listRecord.list.content.toArray();
       const relationsGris = list
         .map(record => record.getRequiredRelationsGris())
         .flat();

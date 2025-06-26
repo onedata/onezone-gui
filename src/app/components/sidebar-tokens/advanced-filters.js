@@ -24,12 +24,16 @@ import addConflictLabels from 'onedata-gui-common/utils/add-conflict-labels';
 import BatchRecordsLoader from 'onezone-gui/utils/batch-records-loader';
 
 /**
+ * @typedef {'group'|'space'|'user'|'cluster'|'harvester'|'atmInventory'} TokenTargetModelName
+ */
+
+/**
  * @typedef {'all'|'access'|'identity'|'invite'} TokenTypeFilter
  */
 
 /**
  * @typedef {Object} TargetModelOption
- * @property {'group'|'space'|'user'|'cluster'|'harvester'|'atmInventory'} modelName
+ * @property {TokenTargetModelName} modelName
  * @property {string} modelNameTranslation
  * @property {OneIconName} icon
  */
@@ -37,7 +41,7 @@ import BatchRecordsLoader from 'onezone-gui/utils/batch-records-loader';
 /**
  * @typedef {Object} TokensSidebarAdvancedFilter
  * @property {TokenTypeFilter} type
- * @property {string} targetModelName 'space'|'group'|...
+ * @property {TokenTargetModelName} targetModelName
  * @property {Ember.Model|null} targetRecord null|Models.*; null means all records
  */
 
