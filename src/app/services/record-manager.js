@@ -15,6 +15,7 @@ import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-erro
 import RecordManagerConfiguration from 'onezone-gui/utils/record-manager-configuration';
 import fetchBatchRecords from 'onezone-gui/utils/fetch-batch-records';
 import BatchRecordsLoader from '../utils/batch-records-loader';
+import { Mutex } from 'async-mutex';
 
 /**
  * @typedef {Object} LoadRecordOptions
@@ -43,12 +44,33 @@ export default Service.extend({
    */
   configuration: undefined,
 
+  /**
+   * Stores Mutexes for guarding against using loaders multiple times from
+   * getUserRecordList.
+   * @type {Object<UserListModelName, Mutex>}
+   */
+  userRecordListLoaderMutexes: undefined,
+
   init() {
     this._super(...arguments);
 
+    this.set('userRecordListLoaderMutexes', {});
     if (!this.get('configuration')) {
       this.set('configuration', new RecordManagerConfiguration(this));
     }
+  },
+
+  /**
+   * @param {UserListModelName} listItemModelName
+   * @returns {Mutex}
+   */
+  getUserRecordListLoaderMutex(listItemModelName) {
+    let mutex = this.userRecordListLoaderMutexes[listItemModelName];
+    if (!mutex) {
+      mutex = new Mutex();
+      this.userRecordListLoaderMutexes[listItemModelName] = mutex;
+    }
+    return mutex;
   },
 
   async resolveUserRecordListLoader(listItemModelName) {
@@ -78,17 +100,23 @@ export default Service.extend({
 
   /**
    * Returns loaded *List relation of current user
-   * @param {String} listItemModelName
-   * @param {boolan} [loadRequiredRelations] Some models have async relations that should
+   * @param {UserListModelName} listItemModelName
+   * @param {boolean} [loadRequiredRelations] Some models have async relations that should
    *   be loaded to have complete data of record. It is recommended to load them, but in
    *   some cases like loading large number of records, it is better to load them lazily,
    *   when they are needed.
    * @returns {Promise<GraphListModel>}
    */
   async getUserRecordList(listItemModelName, loadRequiredRelations = true) {
-    /** @type {BatchRecordsLoader} */
-    const loader = await this.resolveUserRecordListLoader(listItemModelName);
-    await loader.getPromise();
+    const loaderMutex = this.getUserRecordListLoaderMutex(listItemModelName);
+    try {
+      await loaderMutex.acquire();
+      /** @type {BatchRecordsLoader} */
+      const loader = await this.resolveUserRecordListLoader(listItemModelName);
+      await loader.getPromise();
+    } finally {
+      loaderMutex.release();
+    }
     const listRelationName = `${camelize(listItemModelName)}List`;
     const user = this.getCurrentUserRecord();
     const listRecord = await user.getRelation(listRelationName);

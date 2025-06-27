@@ -13,7 +13,6 @@ import EmberObject, {
   computed,
   get,
   set,
-  getProperties,
   observer,
 } from '@ember/object';
 import { reads } from '@ember/object/computed';
@@ -156,6 +155,9 @@ export default Component.extend(I18n, {
           this._super(...arguments);
           scheduleOnce('afterRender', component, 'notifyAboutChange');
         },
+        isValidObserver: observer('isValid', function isValidObserver() {
+          this.component.notifyAboutChange();
+        }),
       })
       .create({
         component,
@@ -328,22 +330,19 @@ export default Component.extend(I18n, {
   },
 
   notifyAboutChange() {
-    safeExec(this, () => {
-      const {
-        fields,
-        onChange,
-      } = this.getProperties('fields', 'onChange');
+    if (this.isDestroyed || this.isDestroying) {
+      return;
+    }
 
-      const {
-        isValid,
-        invalidFields,
-      } = getProperties(fields, 'isValid', 'invalidFields');
+    const {
+      isValid,
+      invalidFields,
+    } = this.fields;
 
-      onChange({
-        values: fields.dumpValue(),
-        isValid,
-        invalidFields: invalidFields.mapBy('valuePath'),
-      });
+    this.onChange({
+      values: this.fields.dumpValue(),
+      isValid,
+      invalidFields: invalidFields.map(field => field.valuePath),
     });
   },
 
