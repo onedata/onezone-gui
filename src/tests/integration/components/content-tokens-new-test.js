@@ -93,7 +93,10 @@ describe('Integration | Component | content-tokens-new', function () {
       }),
       name: 'me',
       spaceList,
+      providerList,
       groupList,
+      harvesterList,
+      tokenList,
     }).save();
 
     defineProperty(currentUserService, 'userProxy', {
@@ -216,7 +219,9 @@ describe('Integration | Component | content-tokens-new', function () {
         })),
       });
 
-      await render(hbs `<ContentTokensNew />`);
+      await render(hbs`<ContentTokensNew />`);
+      // wait for targets dropdown to load
+      await settled();
 
       checkShowsTemplate('Custom');
       expect(find('.type-field .option-invite input')).to.have.property('checked', true);
