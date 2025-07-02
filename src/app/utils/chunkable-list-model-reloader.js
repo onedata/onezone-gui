@@ -59,6 +59,7 @@ export default class VirtualListReloader extends EmberObject {
       if (reset) {
         this.chunksArray.setIndices(0, this.initialArraySize);
       }
+      await this.chunksArray.taskQueue.waitForAllTasks();
       await this.chunksArray.scheduleReload();
       await this.chunksArray.startChanged();
     }
