@@ -389,13 +389,17 @@ export const InviteTargetDetailsGroup = FormFieldsGroup.extend({
         newTargetsModelName &&
         this.cachedTargetsModelName !== newTargetsModelName
       ) {
-        const loaderProxy = promiseObject(
-          this.recordManager.resolveUserRecordListLoader(newTargetsModelName)
-        );
+        const loaderProxy =
+          this.recordManager.getUserRecordListLoaderProxy(newTargetsModelName);
         const targetsPromise = (async () => {
           const records = await (await loaderProxy).getPromise();
           return RecordOptionsArrayProxy.create({ records });
         })();
+        // Delete last loader cache after its load to refresh the list on new load (eg. a
+        // new group has been added).
+        targetsPromise.finally(() =>
+          this.recordManager.clearUserRecordListLoaderCache(newTargetsModelName)
+        );
         this.setProperties({
           cachedTargetsModelName: newTargetsModelName,
           cachedTargetsLoaderProxy: loaderProxy,

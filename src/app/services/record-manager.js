@@ -16,6 +16,7 @@ import RecordManagerConfiguration from 'onezone-gui/utils/record-manager-configu
 import fetchBatchRecords from 'onezone-gui/utils/fetch-batch-records';
 import BatchRecordsLoader from '../utils/batch-records-loader';
 import { Mutex } from 'async-mutex';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 
 /**
  * @typedef {Object} LoadRecordOptions
@@ -47,13 +48,23 @@ export default Service.extend({
   /**
    * Stores Mutexes for guarding against using loaders multiple times from
    * getUserRecordList.
+   * @private
    * @type {Object<UserListModelName, Mutex>}
    */
   userRecordListLoaderMutexes: undefined,
 
+  /**
+   * Cache of user record list loaders to prevent creating multiple loaders before the
+   * former does not finish. It is used by `getUserRecordListLoaderProxy`.
+   * @private
+   * @type {Object<UserListModelName, BatchRecordsLoader>}
+   */
+  listLoaderProxies: undefined,
+
   init() {
     this._super(...arguments);
 
+    this.clearUserRecordListLoaderCache();
     this.set('userRecordListLoaderMutexes', {});
     if (!this.get('configuration')) {
       this.set('configuration', new RecordManagerConfiguration(this));
@@ -73,6 +84,10 @@ export default Service.extend({
     return mutex;
   },
 
+  /**
+   * @param {UserListModelName} listItemModelName
+   * @returns {BatchRecordsLoader}
+   */
   async resolveUserRecordListLoader(listItemModelName) {
     const { batchRequestRegistry } = this;
     const user = this.getCurrentUserRecord();
@@ -96,6 +111,43 @@ export default Service.extend({
       itemsGris,
       listResolver,
     });
+  },
+
+  /**
+   * Guarantees that there is single global instance of loader for list type at once.
+   * Note, that once the loader is initialized for model type, it will be returned every
+   * time, because listLoaderProxies object is not cleared automatically. You can clear
+   * the cache using `clearUserRecordListLoaderCache`.
+   *
+   * Of course you can still create loaders directly multiple times at once, but it can
+   * lead to batch conflicts.
+   *
+   * @param {UserListModelName} listItemModelName
+   * @returns {BatchRecordsLoader}
+   */
+  getUserRecordListLoaderProxy(listItemModelName) {
+    let loaderProxy = this.listLoaderProxies[listItemModelName];
+    if (!loaderProxy) {
+      loaderProxy = promiseObject(
+        this.resolveUserRecordListLoader(listItemModelName)
+      );
+      this.listLoaderProxies[listItemModelName] = loaderProxy;
+    }
+    return loaderProxy;
+  },
+
+  /**
+   * Remove cached list loader(s). Typically you can safely do this after the loader
+   * promise resolves (all record have been loaded).
+   * @param {UserListModelName} listItemModelName If specified, only the proxy for the
+   *   specified model will be cleared.
+   */
+  clearUserRecordListLoaderCache(listItemModelName) {
+    if (listItemModelName) {
+      delete this.listLoaderProxies[listItemModelName];
+    } else {
+      this.set('listLoaderProxies', {});
+    }
   },
 
   /**
