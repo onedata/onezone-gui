@@ -478,11 +478,11 @@ export default Component.extend(I18n, {
   isPrivilegesToggleDisabled: computed(
     'hasCurrentUserAdminSetPrivileges',
     'hasCurrentUserSetPrivileges',
-    'owners',
+    'owners.[]',
     'currentUser.userId',
     function isPrivilegesToggleDisabled() {
-      for (const owner of this.owners.currentState || []) {
-        if (owner.id.includes(this.currentUser.userId)) {
+      for (const owner of this.owners.toArray()) {
+        if (owner.entityId === this.currentUser.userId) {
           return false;
         }
       }
