@@ -79,7 +79,7 @@ export default Action.extend({
       const {
         visibleTokens,
         tokensToRemove,
-      } = this.getProperties('visibleTokens', 'tokensToRemove');
+      } = this;
 
       if (!visibleTokens) {
         return tokensToRemove;
@@ -93,16 +93,12 @@ export default Action.extend({
    * @override
    */
   execute() {
-    if (!this.get('disabled')) {
+    if (!this.disabled) {
       const {
         tokensToRemove,
         selectedTokensToRemove,
         modalManager,
-      } = this.getProperties(
-        'tokensToRemove',
-        'selectedTokensToRemove',
-        'modalManager'
-      );
+      } = this;
 
       const result = ActionResult.create();
       return modalManager
@@ -126,13 +122,7 @@ export default Action.extend({
    */
   async removeTokens(tokens) {
     const tokenManager = this.tokenManager;
-
-    let results = [];
-    try {
-      results = await tokenManager.deleteTokens(...tokens.map(token => token.id));
-    } catch (reason) {
-      results.push([{ state: 'rejected', reason }]);
-    }
+    const results = await tokenManager.deleteTokens(...tokens.map(token => token.id));
     const errorResults = results.filter(it => it.state === 'rejected');
     if (errorResults.length) {
       throw errorResults[0].reason;

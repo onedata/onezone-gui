@@ -169,21 +169,20 @@ const TokenManager = Service.extend({
   /**
    * Deletes tokens.
    * @param {Array<string>} ids Token GRIs.
-   * @returns {Promise<Array<PromiseState>>}
+   * @returns {Promise<Array<PromiseState>>} Array of promise state for each token
+   *   deletion and extra promise state for reload operation.
    */
   async deleteTokens(...ids) {
-    let deleteResults;
+    const deleteResults = await allSettled(ids.map(async (tokenGri) => {
+      const token = await this.getRecord(tokenGri);
+      return await token.destroyRecord();
+    }));
     try {
-      deleteResults = await allSettled(ids.map(async (tokenGri) => {
-        const token = await this.getRecord(tokenGri);
-        return await token.destroyRecord();
-      }));
-    } finally {
-      try {
-        await this.reloadList();
-      } catch {
-        // do not throw reload error as we want to resolve promise states
-      }
+      const reloadResult = await this.reloadList();
+      deleteResults.push({ state: 'fulfilled', value: reloadResult });
+    } catch (reason) {
+      // do not throw reload error as we want to resolve promise states
+      deleteResults.push({ state: 'rejected', reason });
     }
     return deleteResults;
   },

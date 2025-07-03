@@ -7,18 +7,21 @@ import CleanObsoleteTokensAction from 'onezone-gui/utils/token-actions/clean-obs
 import { get, getProperties } from '@ember/object';
 import sinon from 'sinon';
 import { lookupService } from '../../../helpers/stub-service';
-import { reject, resolve } from 'rsvp';
+import { all as allFulfilled } from 'rsvp';
 import {
   getModal,
   getModalBody,
   getModalFooter,
 } from '../../../helpers/modal';
+import { clearStoreAfterEach } from '../../../helpers/clear-store';
+import _ from 'lodash';
 
 describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', function () {
   const { afterEach } = setupRenderingTest();
 
-  beforeEach(function () {
-    const tokens = [{
+  beforeEach(async function () {
+    const store = lookupService(this, 'store');
+    const tokenPromises = [{
       name: 'access token 1',
       typeName: 'access',
       isObsolete: true,
@@ -42,7 +45,8 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
       name: 'invite token 2',
       typeName: 'invite',
       isObsolete: true,
-    }];
+    }].map(data => createToken(store, data));
+    const tokens = await allFulfilled(tokenPromises);
     this.setProperties({
       tokens,
       context: {
@@ -55,6 +59,8 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
   afterEach(function () {
     this.action?.destroy();
   });
+
+  clearStoreAfterEach(afterEach);
 
   it('has correct className, icon and title', function () {
     this.action = CleanObsoleteTokensAction.create({
@@ -90,12 +96,15 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
       .to.equal('Clean up obsolete tokens (nothing to clean)');
   });
 
-  it('is disabled when there are no tokens to remove', function () {
-    const tokens = this.get('tokens').setEach('isObsolete', false);
+  it('is disabled when there are no tokens to remove', async function () {
+    await allFulfilled(this.tokens.map(async (token) => {
+      token.set('caveats', []);
+      await token.save();
+    }));
     this.action = CleanObsoleteTokensAction.create({
       ownerSource: this.owner,
       context: {
-        collection: tokens,
+        collection: this.tokens,
       },
     });
 
@@ -205,8 +214,7 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
     expect(inviteTokens[0].querySelector('.one-checkbox')).to.have.class('checked');
   });
 
-  it(
-    'returns promise with cancelled ActionResult after execute() and modal close using "Cancel"',
+  it('returns promise with cancelled ActionResult after execute() and modal close using "Cancel"',
     async function () {
       this.action = CleanObsoleteTokensAction.create({
         ownerSource: this.owner,
@@ -224,26 +232,18 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
   );
 
   it('executes removing selected tokens on submit (success scenario)', async function () {
-    const tokens = this.get('tokens');
     this.action = CleanObsoleteTokensAction.create({
       ownerSource: this.owner,
       context: this.get('context'),
     });
     const tokenManager = lookupService(this, 'token-manager');
     const reloadTokensSpy = sinon.stub(tokenManager, 'reloadList').resolves();
-    let reloadCalledAfterRemove = true;
-    const deleteTokenStub = sinon
-      .stub(tokenManager, 'deleteToken')
-      .callsFake(() => {
-        if (reloadTokensSpy.called) {
-          reloadCalledAfterRemove = false;
-        }
-        return resolve();
-      });
     const successNotifySpy = sinon.spy(
       lookupService(this, 'global-notify'),
       'success'
     );
+    const destroySpies = this.tokens.map(token => sinon.spy(token, 'destroyRecord'));
+    const tokenDestroyers = _.zip(this.tokens, destroySpies);
 
     await render(hbs `<GlobalModalMounter />`);
     const actionResultPromise = this.action.execute();
@@ -251,20 +251,21 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
 
     await click(getModalFooter().querySelector('.remove-tokens-submit'));
     const actionResult = await actionResultPromise;
-    expect(deleteTokenStub).to.be.calledThrice;
-    tokens.filterBy('isObsolete').forEach(token =>
-      expect(deleteTokenStub).to.be.calledWith(get(token, 'id'))
-    );
+    for (const [token, destroySpy] of tokenDestroyers) {
+      if (token.isObsolete) {
+        expect(destroySpy).to.have.been.calledOnce;
+      } else {
+        expect(destroySpy).to.not.have.been.called;
+      }
+    }
     expect(reloadTokensSpy).to.be.calledOnce;
-    expect(reloadCalledAfterRemove).to.be.true;
     expect(successNotifySpy).to.be.calledWith(
       sinon.match.has('string', 'Selected tokens have been removed.')
     );
     expect(get(actionResult, 'status')).to.equal('done');
   });
 
-  it(
-    'executes removing selected tokens on submit (remove failure scenario)',
+  it('executes removing selected tokens on submit (remove failure scenario)',
     async function () {
       this.action = CleanObsoleteTokensAction.create({
         ownerSource: this.owner,
@@ -272,15 +273,9 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
       });
       const tokenManager = lookupService(this, 'token-manager');
       const reloadTokensSpy = sinon.stub(tokenManager, 'reloadList').resolves();
-      let reloadCalledAfterRemove = true;
-      sinon
-        .stub(tokenManager, 'deleteToken')
-        .callsFake(() => {
-          if (reloadTokensSpy.called) {
-            reloadCalledAfterRemove = false;
-          }
-          return reject('error');
-        });
+      const obsoleteToken = this.tokens.find(token => token.isObsolete);
+      const destroyError = new Error('mock destroy error');
+      sinon.stub(obsoleteToken, 'destroyRecord').rejects(destroyError);
       const failureNotifySpy = sinon.spy(
         lookupService(this, 'global-notify'),
         'backendError'
@@ -293,31 +288,26 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
       await click(getModalFooter().querySelector('.remove-tokens-submit'));
       const actionResult = await actionResultPromise;
       expect(reloadTokensSpy).to.be.calledOnce;
-      expect(reloadCalledAfterRemove).to.be.true;
 
       expect(failureNotifySpy).to.be.calledWith(
         sinon.match.has('string', 'removing tokens'),
-        'error'
+        destroyError
       );
-      const {
-        status,
-        error,
-      } = getProperties(actionResult, 'status', 'error');
+      const { status, error } = actionResult;
       expect(status).to.equal('failed');
-      expect(error).to.equal('error');
+      expect(error).to.equal(destroyError);
     }
   );
 
-  it(
-    'executes removing selected tokens on submit (reload failure scenario)',
+  it('executes removing selected tokens on submit (reload failure scenario)',
     async function () {
       this.action = CleanObsoleteTokensAction.create({
         ownerSource: this.owner,
         context: this.get('context'),
       });
       const tokenManager = lookupService(this, 'token-manager');
-      sinon.stub(tokenManager, 'reloadList').callsFake(() => reject('error'));
-      sinon.stub(tokenManager, 'deleteToken').resolves();
+      const reloadError = new Error('mock reload error');
+      sinon.stub(tokenManager, 'reloadList').rejects(reloadError);
       const failureNotifySpy = sinon.spy(
         lookupService(this, 'global-notify'),
         'backendError'
@@ -331,14 +321,11 @@ describe('Integration | Utility | token-actions/clean-obsolete-tokens-action', f
       const actionResult = await actionResultPromise;
       expect(failureNotifySpy).to.be.calledWith(
         sinon.match.has('string', 'removing tokens'),
-        'error'
+        reloadError
       );
-      const {
-        status,
-        error,
-      } = getProperties(actionResult, 'status', 'error');
+      const { status, error } = actionResult;
       expect(status).to.equal('failed');
-      expect(error).to.equal('error');
+      expect(error).to.equal(reloadError);
     }
   );
 });
@@ -353,4 +340,30 @@ function getIdentityTokenItems() {
 
 function getInviteTokenItems() {
   return getModalBody().querySelectorAll('.invite-tokens-list .checkbox-list-item');
+}
+
+async function createToken(store, { name, typeName, isObsolete }) {
+  let type;
+  switch (typeName) {
+    case 'access':
+      type = { accessToken: {} };
+      break;
+    case 'identity':
+      type = { identityToken: {} };
+      break;
+    case 'invite':
+      type = { inviteToken: {} };
+      break;
+    default:
+      break;
+  }
+  const caveats = [];
+  if (isObsolete) {
+    caveats.push({ type: 'time', validUntil: 0 });
+  }
+  return await store.createRecord('token', {
+    name,
+    type,
+    caveats,
+  }).save();
 }
