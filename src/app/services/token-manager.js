@@ -9,7 +9,7 @@
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 import _ from 'lodash';
-import { all as allFulfilled } from 'rsvp';
+import { all as allFulfilled, allSettled } from 'rsvp';
 import { get } from '@ember/object';
 import {
   tokenInviteTypeToTargetModelMapping,
@@ -153,16 +153,39 @@ const TokenManager = Service.extend({
   },
 
   /**
-   * Deletes token
-   * @param {string} id token id
+   * Deletes single token.
+   * @param {string} id Token GRI.
    * @returns {Promise}
    */
-  deleteToken(id) {
-    return this.getRecord(id)
-      .then(token => token.destroyRecord())
-      .then(destroyResult =>
-        this.get('recordManager').reloadUserRecordList('token').then(() => destroyResult)
-      );
+  async deleteToken(id) {
+    const promiseState = (await this.deleteTokens(id))[0];
+    if (promiseState.state === 'rejected') {
+      throw promiseState.reason;
+    } else {
+      return promiseState.value;
+    }
+  },
+
+  /**
+   * Deletes tokens.
+   * @param {Array<string>} ids Token GRIs.
+   * @returns {Promise<Array<PromiseState>>}
+   */
+  async deleteTokens(...ids) {
+    let deleteResults;
+    try {
+      deleteResults = await allSettled(ids.map(async (tokenGri) => {
+        const token = await this.getRecord(tokenGri);
+        return await token.destroyRecord();
+      }));
+    } finally {
+      try {
+        await this.reloadList();
+      } catch {
+        // do not throw reload error as we want to resolve promise states
+      }
+    }
+    return deleteResults;
   },
 
   /**
@@ -275,7 +298,7 @@ const TokenManager = Service.extend({
    * @returns {Promise<TokenList>}
    */
   reloadList(options) {
-    return this.get('recordManager').reloadUserRecordList('token', options);
+    return this.recordManager.reloadUserRecordList('token', options);
   },
 });
 
