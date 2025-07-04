@@ -481,7 +481,7 @@ export default Component.extend(I18n, {
     'owners.[]',
     'currentUser.userId',
     function isPrivilegesToggleDisabled() {
-      for (const owner of this.owners.toArray()) {
+      for (const owner of this.owners?.toArray() ?? []) {
         if (owner.entityId === this.currentUser.userId) {
           return false;
         }

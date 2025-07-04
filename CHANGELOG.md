@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12938 Fixed showing privileges
 * VFS-12888 Fixed insufficient privileges as space owner
 * VFS-12811 Upgraded Ember Bootstrap to 4.9.0
 * VFS-12825 Fixed live change of supporting spaces count in providers sidebar
