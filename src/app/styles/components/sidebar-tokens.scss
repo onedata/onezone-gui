@@ -62,6 +62,21 @@
     }
   }
 
+  .token-copy-toolbar {
+    margin-left: $padding-small-horizontal;
+    margin-right: -4px;
+    visibility: hidden;
+
+    .token-copy-icon {
+      font-size: 180%;
+      vertical-align: middle;
+    }
+  }
+
+  .one-list-item:hover .token-copy-toolbar {
+    visibility: visible;
+  }
+
   @media (max-width: $screen-md-max) {
     .advanced-filters {
       .type-filter {

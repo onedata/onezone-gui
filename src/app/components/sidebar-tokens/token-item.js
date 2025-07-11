@@ -233,5 +233,13 @@ export default Component.extend(I18n, {
     closeRemoveTokenModal() {
       this.set('isRemoveTokenModalOpened', false);
     },
+    copyToken(event) {
+      event.stopPropagation();
+      event.preventDefault();
+      this.get('globalClipboard').copy(
+        this.get('token.data.token'),
+        this.t('token')
+      );
+    },
   },
 });
