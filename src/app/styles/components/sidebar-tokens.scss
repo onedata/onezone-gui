@@ -78,6 +78,13 @@
     }
   }
 
+  @media (hover: none) {
+    .token-copy-toolbar {
+      display: none;
+    }
+  }
+
+
   .one-list-item:hover .token-copy-toolbar {
     display: block;
   }
