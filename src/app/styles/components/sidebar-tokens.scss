@@ -63,7 +63,7 @@
   }
 
   .token-copy-toolbar {
-    margin-left: calc($padding-xs-horizontal);
+    margin-left: $padding-xs-horizontal;
     margin-right: -10px;
     display: none;
     padding: $padding-xs-horizontal;

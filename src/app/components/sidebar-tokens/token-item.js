@@ -236,8 +236,8 @@ export default Component.extend(I18n, {
     copyToken(event) {
       event.stopPropagation();
       event.preventDefault();
-      this.get('globalClipboard').copy(
-        this.get('token.data.token'),
+      this.globalClipboard.copy(
+        this.token.data.token,
         this.t('token')
       );
     },
