@@ -118,8 +118,8 @@ export default Model.extend(...mixins, {
   init() {
     this._super(...arguments);
     this.set('isLoadedDeferred', defer());
-    // TODO: this does not work properly with localstorage adapter
-    // so some views can be broken (undefined name and domain)
+    // Note: this does not work properly with localstorage adapter
+    // so some views can be broken (undefined name and domain).
     if (this.isLoaded) {
       this.asyncPropertiesObserver();
     }

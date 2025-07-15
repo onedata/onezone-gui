@@ -63,7 +63,9 @@ const ConsumerField = ModelTagsField.extend({
     }
   ),
 
-  // FIXME: definicja settings
+  /**
+   * @type {ComputedProperty<{ spaceCount: number, groupCount: number }>}
+   */
   modelListLoadingInfo: computed(
     'currentUser.user.{spaceList.isFulfilled,groupList.isFulfilled}',
     function modelListLoadingInfo() {
@@ -84,7 +86,8 @@ const ConsumerField = ModelTagsField.extend({
         return;
       }
       const { spaceCount, groupCount } = this.modelListLoadingInfo;
-      if (spaceCount < 100 && groupCount < 100) {
+      const minEntityCountForLabel = 100;
+      if (spaceCount < minEntityCountForLabel && groupCount < minEntityCountForLabel) {
         return;
       }
       let entities;

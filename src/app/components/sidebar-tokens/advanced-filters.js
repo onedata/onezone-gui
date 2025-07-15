@@ -172,7 +172,7 @@ export default Component.extend(I18n, {
         return promiseObject(resolve());
       } else {
         const batchRecordsLoader =
-          this.getBatchRecordsLoader(this.selectedTargetModelOption);
+          this.getBatchTargetRecordsLoader(this.selectedTargetModelOption);
         return promiseObject((async () => {
           const targetRecords = await batchRecordsLoader.getPromise();
           addConflictLabels(targetRecords, 'name', 'entityId');
@@ -183,7 +183,7 @@ export default Component.extend(I18n, {
 
   /**
    * Progress tracker suitable to use in the current context of invite token filter.
-   * It is null if
+   * It is null if there is no batch loader in use in the current context.
    * @type {ComputedProperty<ProgressTracker|null>}
    */
   inviteProgressTracker: computed(
@@ -198,7 +198,8 @@ export default Component.extend(I18n, {
       ) {
         return null;
       } else {
-        return this.getBatchRecordsLoader(this.selectedTargetModelOption).progressTracker;
+        return this.getBatchTargetRecordsLoader(this.selectedTargetModelOption)
+          .progressTracker;
       }
     }
   ),
@@ -266,7 +267,7 @@ export default Component.extend(I18n, {
     }
   ),
 
-  targetRecordSearchField: computed(function () {
+  targetRecordSearchField: computed(function targetRecordSearchField() {
     return this.effSelectedTargetRecordOption.record ? 'name' : '';
   }),
 
@@ -301,7 +302,6 @@ export default Component.extend(I18n, {
     this.setProperties({
       selectedTargetModelOption: this.allModelOption,
       selectedTargetRecordOption: this.allRecordOption,
-      // FIXME: declare
       targetRecordsLoaders: new Map(),
     });
 
@@ -323,12 +323,11 @@ export default Component.extend(I18n, {
     onChange(currentChangeset);
   },
 
-  // FIXME: zmiany nazw na bardziej sugerujące, że chodzi o targety
   /**
    * @param {TargetModelOption} targetModelOption
    * @returns {BatchRecordsLoader}
    */
-  createBatchRecordsLoader(targetModelOption) {
+  createBatchTargetRecordsLoader(targetModelOption) {
     const {
       batchRequestRegistry,
       collection,
@@ -357,17 +356,15 @@ export default Component.extend(I18n, {
     return batchRecordsLoader;
   },
 
-  // FIXME: typedef
   /**
    * @param {TargetModelOption} targetModelOption
    * @returns {BatchRecordsLoader}
    */
-  getBatchRecordsLoader(targetModelOption) {
-    // FIXME: invalidate if collection changed from last time
+  getBatchTargetRecordsLoader(targetModelOption) {
     if (!this.targetRecordsLoaders.has(targetModelOption)) {
       this.targetRecordsLoaders.set(
         targetModelOption,
-        this.createBatchRecordsLoader(targetModelOption)
+        this.createBatchTargetRecordsLoader(targetModelOption)
       );
     }
     return this.targetRecordsLoaders.get(targetModelOption);
