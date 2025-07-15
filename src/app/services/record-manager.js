@@ -90,7 +90,7 @@ export default Service.extend({
    */
   async resolveUserRecordListLoader(listItemModelName) {
     const { batchRequestRegistry } = this;
-    const user = this.getCurrentUserRecord();
+    const user = await this.currentUser.userProxy;
     const listRelationName = `${camelize(listItemModelName)}List`;
     const listRecord = await user.getRelation(listRelationName);
     const itemsGris = listRecord.hasMany('list').ids();
