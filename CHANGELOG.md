@@ -5,6 +5,8 @@
 ### Latest changes
 
 * VFS-12759 Optimized token creation views for large number of spaces, groups, etc.
+* VFS-12938 Fixed showing privileges
+* VFS-12888 Fixed insufficient privileges as space owner
 * VFS-12811 Upgraded Ember Bootstrap to 4.9.0
 * VFS-12825 Fixed live change of supporting spaces count in providers sidebar
 * VFS-12765 Added batch fetching and infinite scroll for provider space list on providers map
