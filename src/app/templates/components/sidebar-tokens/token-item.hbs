@@ -22,7 +22,10 @@
     {{/if}}
   </div>
 {{/if}}
-
+<div class="token-copy-toolbar" onclick={{action "copyToken"}}>
+  <OneIcon @icon="browser-copy" class="token-copy-icon" />
+  <OneTooltip @title={{tt this "copyToClipboard"}} />
+</div>
 <ActionsToolbar
   @isMinimized={{true}}
   @dropdownPlacement="auto"

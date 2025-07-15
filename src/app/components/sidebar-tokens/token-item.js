@@ -146,7 +146,7 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  actionsArray: collect('copyTokenAction', 'renameAction', 'removeAction', 'copyIdAction'),
+  actionsArray: collect('renameAction', 'removeAction', 'copyTokenAction', 'copyIdAction'),
 
   /**
    * @override
@@ -232,6 +232,14 @@ export default Component.extend(I18n, {
     },
     closeRemoveTokenModal() {
       this.set('isRemoveTokenModalOpened', false);
+    },
+    copyToken(event) {
+      event.stopPropagation();
+      event.preventDefault();
+      this.globalClipboard.copy(
+        this.token.data.token,
+        this.t('token')
+      );
     },
   },
 });
