@@ -232,63 +232,62 @@ const TokenManager = Service.extend({
    * @param {String} joiningRecordId
    * @returns {Promise<GraphSingleModel>} target record
    */
-  consumeInviteToken(token, targetModelName, joiningModelName, joiningRecordId) {
+  async consumeInviteToken(token, targetModelName, joiningModelName, joiningRecordId) {
     const {
       store,
       onedataGraphUtils,
       onedataGraphContext,
       recordManager,
-    } = this.getProperties(
-      'store',
-      'onedataGraphUtils',
-      'onedataGraphContext',
-      'recordManager'
-    );
+    } = this;
     const adapter = store.adapterFor('user');
     const targetEntityType = adapter.getEntityTypeForModelName(targetModelName);
     const joiningEntityType = adapter.getEntityTypeForModelName(joiningModelName);
-    return onedataGraphUtils.joinRelation(
+    const { gri: targetGri } = await onedataGraphUtils.joinRelation(
       targetEntityType,
       token, [`as${_.upperFirst(joiningEntityType)}`, joiningRecordId]
-    ).then(({ gri: targetGri }) => {
-      const targetId = parseGri(targetGri).entityId;
-      const targetGriWithAutoScope = gri({
-        entityType: targetEntityType,
-        entityId: targetId,
-        aspect: 'instance',
-        scope: 'auto',
-      });
-      onedataGraphContext.register(targetGriWithAutoScope, gri({
-        entityType: joiningEntityType,
-        entityId: joiningRecordId,
-        aspect: 'instance',
-        scope: 'auto',
-      }));
-      return allFulfilled([
-        recordManager.reloadRecordListById(
-          joiningModelName,
-          joiningRecordId,
-          targetModelName
-        ).catch(ignoreForbiddenError),
-        recordManager.reloadRecordListById(
-          targetModelName,
-          targetId,
-          joiningModelName
-        ).catch(ignoreForbiddenError),
-        recordManager.reloadUserRecordList(targetModelName),
-      ]).then(() =>
-        recordManager.getRecord(targetModelName, targetGriWithAutoScope)
-        .catch(error => {
-          // It is possible in some invite scenarios (like space -> harvester), that
-          // user cannot fetch target record after joining, because he did not become
-          // a member of a target record. In such situations "forbidden" errors are normal.
-          if (error && error.id === 'forbidden') {
-            return null;
-          }
-          throw error;
-        })
-      );
+    );
+    const targetId = parseGri(targetGri).entityId;
+    const targetGriWithAutoScope = gri({
+      entityType: targetEntityType,
+      entityId: targetId,
+      aspect: 'instance',
+      scope: 'auto',
     });
+    onedataGraphContext.register(targetGriWithAutoScope, gri({
+      entityType: joiningEntityType,
+      entityId: joiningRecordId,
+      aspect: 'instance',
+      scope: 'auto',
+    }));
+    const joiningModelListReloading = recordManager.reloadRecordListById(
+      joiningModelName,
+      joiningRecordId,
+      targetModelName
+    ).catch(ignoreForbiddenError);
+    const targetModelListReloading = recordManager.reloadRecordListById(
+      targetModelName,
+      targetId,
+      joiningModelName
+    ).catch(ignoreForbiddenError);
+    const userListReloading = recordManager.reloadUserRecordList(targetModelName);
+
+    await allFulfilled([
+      joiningModelListReloading,
+      targetModelListReloading,
+      userListReloading,
+    ]);
+
+    try {
+      return await recordManager.getRecord(targetModelName, targetGriWithAutoScope);
+    } catch (error) {
+      // It is possible in some invite scenarios (like space -> harvester), that
+      // user cannot fetch target record after joining, because he did not become
+      // a member of a target record. In such situations "forbidden" errors are normal.
+      if (error && error.id === 'forbidden') {
+        return null;
+      }
+      throw error;
+    }
   },
 
   /**

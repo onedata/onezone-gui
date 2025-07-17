@@ -65,7 +65,7 @@ export default class ShareListMultiFetcher {
         OwsGraphOperation.Create,
         shareListGris
       );
-      const batchContainer = this.batchRequestRegistry.createContainer(
+      const batchContainer = await this.batchRequestRegistry.createContainer(
         containerSpec,
         DebouncedBatchFlushStrategy
       );

@@ -79,8 +79,7 @@ export default class BatchRecordsLoader {
     const griArrayChunks = _.chunk(this.itemsGris, this.batchFetchSize);
     const containerPromises = griArrayChunks.map(async (grisChunk) => {
       const containerSpec = new GrisBatchContainerSpec(OwsGraphOperation.Get, grisChunk);
-      await this.batchRequestRegistry.waitForNoConflicts(containerSpec);
-      return this.batchRequestRegistry.createContainer(
+      return await this.batchRequestRegistry.createContainer(
         containerSpec,
         DebouncedBatchFlushStrategy
       );
