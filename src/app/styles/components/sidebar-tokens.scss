@@ -72,6 +72,33 @@
     }
   }
 
+  .token-copy-toolbar {
+    margin-left: $padding-xs-horizontal;
+    margin-right: -10px;
+    display: none;
+    padding: $padding-xs-horizontal;
+
+    &:hover {
+      color: $color-one-red;
+    }
+
+    .token-copy-icon {
+      font-size: 180%;
+      vertical-align: middle;
+    }
+  }
+
+  @media (hover: none) {
+    .token-copy-toolbar {
+      display: none;
+    }
+  }
+
+
+  .one-list-item:hover .token-copy-toolbar {
+    display: block;
+  }
+
   @media (max-width: $screen-md-max) {
     .advanced-filters {
       .type-filter {
