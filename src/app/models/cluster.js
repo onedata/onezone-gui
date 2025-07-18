@@ -9,7 +9,7 @@ import attr from 'ember-data/attr';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
-import { get, computed, observer } from '@ember/object';
+import { computed, observer } from '@ember/object';
 import { reads, equal } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
@@ -26,176 +26,195 @@ import globals from 'onedata-gui-common/utils/globals';
 
 export const entityType = 'cluster';
 
-export default Model.extend(
+const mixins = [
   GraphSingleModelMixin,
   InvitingModelMixin,
   OneproviderClusterInfoMixin,
   createDataProxyMixin('name'),
   createDataProxyMixin('domain'),
   createDataProxyMixin('isOnline'),
-  createDataProxyMixin('standaloneOrigin'), {
-    onedataConnection: service(),
-    onedataGraph: service(),
+  createDataProxyMixin('standaloneOrigin'),
+];
 
-    type: attr('string'),
-    provider: belongsTo('provider'),
-    onepanelProxy: attr('boolean'),
-    workerVersion: attr('object'),
-    onepanelVersion: attr('object'),
-    canViewPrivileges: attr('boolean', { defaultValue: false }),
-    directMembership: attr('boolean', { defaultValue: false }),
-    scope: attr('string'),
+export default Model.extend(...mixins, {
+  onedataConnection: service(),
+  onedataGraph: service(),
 
-    // members of this cluster
-    groupList: belongsTo('groupList'),
-    userList: belongsTo('userList'),
-    effGroupList: belongsTo('groupList'),
-    effUserList: belongsTo('userList'),
-    areEffPrivilegesRecalculated: attr('boolean'),
+  type: attr('string'),
+  provider: belongsTo('provider'),
+  onepanelProxy: attr('boolean'),
+  workerVersion: attr('object'),
+  onepanelVersion: attr('object'),
+  canViewPrivileges: attr('boolean', { defaultValue: false }),
+  directMembership: attr('boolean', { defaultValue: false }),
+  scope: attr('string'),
 
-    /**
-     * Fields:
-     * - creationTime (unix timestamp number)
-     */
-    info: attr('object'),
+  // members of this cluster
+  groupList: belongsTo('groupList'),
+  userList: belongsTo('userList'),
+  effGroupList: belongsTo('groupList'),
+  effUserList: belongsTo('userList'),
+  areEffPrivilegesRecalculated: attr('boolean'),
 
-    /**
-     * Deferred object that is revolved when record loads.
-     * @type {RSVP.Deferred}
-     */
-    isLoadedDeferred: undefined,
+  /**
+   * Fields:
+   * - creationTime (unix timestamp number)
+   */
+  info: attr('object'),
 
-    /**
-     * @type {ComputedProperty<Number>}
-     */
-    creationTime: reads('info.creationTime'),
+  /**
+   * Deferred object that is revolved when record loads.
+   * @type {RSVP.Deferred}
+   */
+  isLoadedDeferred: undefined,
 
-    /**
-     * @type {ComputedProperty<String>}
-     */
-    serviceType: reads('type'),
+  /**
+   * @type {ComputedProperty<Number>}
+   */
+  creationTime: reads('info.creationTime'),
 
-    oneproviderEntityId: computed(function oneproviderEntityId() {
-      return parseGri(this.belongsTo('provider').id()).entityId;
-    }),
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  serviceType: reads('type'),
 
-    /**
-     * True, if user has a "View cluster" privilege
-     * @type {Ember.ComputedProperty<boolean>}
-     */
-    hasViewPrivilege: equal('scope', 'private'),
+  oneproviderEntityId: computed(function oneproviderEntityId() {
+    return parseGri(this.belongsTo('provider').id()).entityId;
+  }),
 
-    providerOnlineObserver: observer(
-      'provider.online',
-      function providerOnlineObserver() {
-        if (!this.isLoaded) {
-          return;
-        }
-        // not using replace, because we want see pending state of isOnlineProxy property
-        this.updateIsOnlineProxy();
+  /**
+   * True, if user has a "View cluster" privilege
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  hasViewPrivilege: equal('scope', 'private'),
+
+  providerOnlineObserver: observer(
+    'provider.online',
+    function providerOnlineObserver() {
+      if (!this.isLoaded) {
+        return;
       }
-    ),
+      // not using replace, because we want see pending state of isOnlineProxy property
+      this.updateIsOnlineProxy();
+    }
+  ),
 
-    asyncPropertiesObserver: observer(
-      'provider.{name,domain}',
-      function asyncPropertiesObserver() {
-        if (!this.isLoaded) {
-          return;
-        }
-        return this.loadAsyncProperties();
+  asyncPropertiesObserver: observer(
+    'provider.{name,domain}',
+    function asyncPropertiesObserver() {
+      if (!this.isLoaded) {
+        return;
       }
-    ),
+      return this.loadAsyncProperties();
+    }
+  ),
 
-    isLoadedObserver: observer('isLoaded', function isLoadedObserver() {
-      if (this.isLoaded) {
-        this.isLoadedDeferred.resolve();
+  isLoadedObserver: observer('isLoaded', function isLoadedObserver() {
+    if (this.isLoaded) {
+      this.isLoadedDeferred.resolve();
+    }
+  }),
+
+  init() {
+    this._super(...arguments);
+    this.set('isLoadedDeferred', defer());
+    // Note: this does not work properly with localstorage adapter
+    // so some views can be broken (undefined name and domain).
+    if (this.isLoaded) {
+      this.asyncPropertiesObserver();
+    }
+  },
+
+  /**
+   * @override
+   */
+  async fetchName() {
+    await this.isLoadedDeferred.promise;
+    if (this.isDestroyed) {
+      return;
+    }
+    if (this.type === 'oneprovider') {
+      const provider = await this.provider;
+      return provider?.name;
+    } else {
+      return this.onedataConnection.zoneName;
+    }
+  },
+
+  /**
+   * @override
+   */
+  async fetchDomain() {
+    await this.isLoadedDeferred.promise;
+    if (this.isDestroyed) {
+      return;
+    }
+    if (this.type === 'oneprovider') {
+      const provider = await this.provider;
+      return provider?.domain;
+    } else {
+      return this.onedataConnection.zoneDomain;
+    }
+  },
+
+  /**
+   * @override
+   */
+  async fetchIsOnline() {
+    await this.isLoadedDeferred.promise;
+    return this._fetchIsOnline();
+  },
+
+  /**
+   * @override
+   */
+  fetchStandaloneOrigin() {
+    return this.fetchRemoteGuiContext().then(({ apiOrigin }) =>
+      'https://' + apiOrigin
+    );
+  },
+
+  _fetchIsOnline() {
+    const {
+      standaloneOriginProxy,
+      entityId,
+    } = this.getProperties('standaloneOriginProxy', 'entityId');
+    return standaloneOriginProxy.then(standaloneOrigin => {
+      return validateOnepanelConnection(standaloneOrigin, entityId);
+    });
+  },
+
+  loadAsyncProperties() {
+    return hash({
+      name: this.updateNameProxy({ replace: true }),
+      domain: this.updateDomainProxy({ replace: true }),
+    });
+  },
+
+  fetchRemoteGuiContext() {
+    const guiContextPath =
+      `${globals.location.origin}/${onepanelAbbrev}/${this.get('entityId')}/gui-context`;
+    return resolve($.get(guiContextPath));
+  },
+
+  /**
+   * @override
+   */
+  async loadRequiredRelations() {
+    await this._super(...arguments);
+    await this.loadAsyncProperties();
+  },
+
+  /**
+   * @override
+   */
+  getRequiredRelationsGris() {
+    if (this.type === 'oneprovider') {
+      const providerGri = this.belongsTo('provider').id();
+      if (providerGri) {
+        return [providerGri];
       }
-    }),
-
-    init() {
-      this._super(...arguments);
-      this.set('isLoadedDeferred', defer());
-      // TODO: this does not work properly with localstorage adapter
-      // so some views can be broken (undefined name and domain)
-      if (this.isLoaded) {
-        this.asyncPropertiesObserver();
-      }
-    },
-
-    /**
-     * @override
-     */
-    async fetchName() {
-      await this.isLoadedDeferred.promise;
-      if (this.get('type') === 'oneprovider') {
-        return !this.isDestroyed ?
-          this.get('provider').then(provider => provider && get(provider, 'name')) :
-          '';
-      } else {
-        return resolve(this.get('onedataConnection.zoneName'));
-      }
-    },
-
-    /**
-     * @override
-     */
-    async fetchDomain() {
-      await this.isLoadedDeferred.promise;
-      if (this.get('type') === 'oneprovider') {
-        return !this.isDestroyed ?
-          this.get('provider').then(provider => provider && get(provider, 'domain')) :
-          '';
-      } else {
-        return resolve(this.get('onedataConnection.zoneDomain'));
-      }
-    },
-
-    /**
-     * @override
-     */
-    async fetchIsOnline() {
-      await this.isLoadedDeferred.promise;
-      return this._fetchIsOnline();
-    },
-
-    /**
-     * @override
-     */
-    fetchStandaloneOrigin() {
-      return this.fetchRemoteGuiContext().then(({ apiOrigin }) =>
-        'https://' + apiOrigin
-      );
-    },
-
-    _fetchIsOnline() {
-      const {
-        standaloneOriginProxy,
-        entityId,
-      } = this.getProperties('standaloneOriginProxy', 'entityId');
-      return standaloneOriginProxy.then(standaloneOrigin => {
-        return validateOnepanelConnection(standaloneOrigin, entityId);
-      });
-    },
-
-    loadAsyncProperties() {
-      return hash({
-        name: this.updateNameProxy({ replace: true }),
-        domain: this.updateDomainProxy({ replace: true }),
-      });
-    },
-
-    fetchRemoteGuiContext() {
-      const guiContextPath =
-        `${globals.location.origin}/${onepanelAbbrev}/${this.get('entityId')}/gui-context`;
-      return resolve($.get(guiContextPath));
-    },
-
-    /**
-     * @override
-     */
-    loadRequiredRelations() {
-      return this._super(...arguments)
-        .then(() => this.loadAsyncProperties());
-    },
-  }
-).reopenClass(StaticGraphModelMixin);
+    }
+    return [];
+  },
+}).reopenClass(StaticGraphModelMixin);

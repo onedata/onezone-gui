@@ -5,56 +5,76 @@ import { render, click, find, findAll } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import { lookupService } from '../../../helpers/stub-service';
 import sinon from 'sinon';
-import { resolve } from 'rsvp';
-import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
-import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
+import { clearStoreAfterEach } from '../../../helpers/clear-store';
+import gri from 'onedata-gui-websocket-client/utils/gri';
 
 describe(
   'Integration | Component | token-template-selector/readonly-data-for-user-template',
   function () {
-    setupRenderingTest();
+    const { afterEach } = setupRenderingTest();
 
-    beforeEach(function () {
+    clearStoreAfterEach(afterEach);
+
+    beforeEach(async function () {
       const recordManagerService = lookupService(this, 'record-manager');
-      const userConstructor = {
-        modelName: 'user',
+      const store = lookupService(this, 'store');
+      const instance = {
+        aspect: 'instance',
+        scope: 'auto',
       };
-      sinon.stub(recordManagerService, 'getCurrentUserRecord')
-        .returns({
-          constructor: userConstructor,
+
+      const currentUser = await store.createRecord('user', {
+        id: gri({
+          entityType: 'user',
           entityId: 'me',
-          name: 'me',
-        });
-      const userInSpaceAndGroup = {
-        constructor: userConstructor,
-        entityId: 'duplicated',
+          ...instance,
+          scope: 'private',
+        }),
+        name: 'me',
+      }).save();
+
+      const userInSpaceAndGroup = await store.createRecord('user', {
+        id: gri({
+          entityType: 'user',
+          entityId: 'duplicated',
+          ...instance,
+        }),
         name: 'duplicated',
-      };
+      }).save();
+      const userInSpaceOnly = await store.createRecord('user', {
+        id: gri({
+          entityType: 'user',
+          entityId: 'fromspaceonly',
+          ...instance,
+        }),
+        name: 'fromspaceonly',
+      }).save();
+      const groupEffUserList = await store.createRecord('userList', {
+        list: [userInSpaceAndGroup],
+      }).save();
+      const spaceEffUserList = await store.createRecord('userList', {
+        list: [userInSpaceAndGroup, userInSpaceOnly],
+      }).save();
+      const group = await store.createRecord('group', {
+        effUserList: groupEffUserList,
+      }).save();
+      const space = await store.createRecord('space', {
+        effUserList: spaceEffUserList,
+      }).save();
+      const currentUserGroupList = await store.createRecord('groupList', {
+        list: [group],
+      });
+      const currentUserSpaceList = await store.createRecord('spaceList', {
+        list: [space],
+      });
+
+      sinon.stub(recordManagerService, 'getCurrentUserRecord').returns(currentUser);
       sinon.stub(recordManagerService, 'getUserRecordList')
-        .withArgs('group')
-        .returns(promiseObject(resolve({
-          list: promiseArray(resolve([{
-            effUserList: promiseObject(resolve({
-              list: promiseArray(resolve([userInSpaceAndGroup])),
-            })),
-          }])),
-        })))
-        .withArgs('space')
-        .returns(promiseObject(resolve({
-          list: promiseArray(resolve([{
-            effUserList: promiseObject(resolve({
-              list: promiseArray(resolve([userInSpaceAndGroup, {
-                constructor: userConstructor,
-                entityId: 'fromspaceonly',
-                name: 'fromspaceonly',
-              }])),
-            })),
-          }])),
-        })));
+        .withArgs('group').resolves(currentUserGroupList)
+        .withArgs('space').resolves(currentUserSpaceList);
     });
 
-    it(
-      'renders tile with "template-readonlyDataForUser" class, correct title and image',
+    it('renders tile with "template-readonlyDataForUser" class, correct title and image',
       async function () {
         await render(hbs `<TokenTemplateSelector::ReadonlyDataForUserTemplate />`);
 

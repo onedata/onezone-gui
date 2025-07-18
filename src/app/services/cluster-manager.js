@@ -2,18 +2,14 @@
  * Provides data and operations for routes and components associated with clusters tab.
  *
  * @author Jakub Liput
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @copyright (C) 2018-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Service, { inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
-import {
-  Promise,
-  resolve,
-  all as allFulfilled,
-} from 'rsvp';
+import { Promise, resolve } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import { entityType as clusterEntityType } from 'onezone-gui/models/cluster';
 
@@ -27,14 +23,10 @@ export default Service.extend({
   onedataGraph: service(),
   onedataGraphUtils: service(),
   tokenManager: service(),
+  recordManager: service(),
 
-  getClusters() {
-    return this.get('currentUser').getCurrentUserRecord()
-      .then(user => get(user, 'clusterList'))
-      .then(clusterList => get(clusterList, 'list')
-        .then(list => allFulfilled(list.map(cluster => cluster.getNameProxy())))
-        .then(() => clusterList)
-      );
+  async getClusters() {
+    return await this.recordManager.getUserRecordList('cluster', true);
   },
 
   getRecord(id) {

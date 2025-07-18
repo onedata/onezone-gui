@@ -41,6 +41,7 @@ export default WorkflowManager.extend({
   recordManager: service(),
   onedataGraph: service(),
   onedataConnection: service(),
+  batchRequestRegistry: service(),
 
   /**
    * @override
@@ -502,7 +503,8 @@ export default WorkflowManager.extend({
    */
   getAllKnownAtmLambdas() {
     const knownAtmLambdasProxy = AllKnownAtmLambdasProxyArray.create({
-      recordManager: this.get('recordManager'),
+      recordManager: this.recordManager,
+      batchRequestRegistry: this.batchRequestRegistry,
     });
     return destroyablePromiseArray(
       get(knownAtmLambdasProxy, 'atmLambdasProxy').then(() => knownAtmLambdasProxy)

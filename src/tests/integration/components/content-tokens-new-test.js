@@ -6,86 +6,130 @@ import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import { lookupService } from '../../helpers/stub-service';
 import { isSlideActive, getSlide } from '../../helpers/one-carousel';
-import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
-import { resolve, Promise } from 'rsvp';
+import { resolve, Promise, all as allFulfilled } from 'rsvp';
 import { set } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
+import { clearStoreAfterEach } from '../../helpers/clear-store';
+import { defineProperty } from '@ember/object';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 
 describe('Integration | Component | content-tokens-new', function () {
-  setupRenderingTest();
+  const { afterEach } = setupRenderingTest();
 
-  beforeEach(function () {
-    const spaces = [{
-      name: 'space0',
-      entityId: 'space0',
-    }, {
-      name: 'space1',
-      entityId: 'space1',
-    }];
-    const oneproviders = [{
-      name: 'provider0',
-      entityId: 'provider0',
-    }, {
-      name: 'provider1',
-      entityId: 'provider1',
-    }];
-    const harvesters = [{
-      entityId: 'harvester0',
-      name: 'harvester0',
-    }, {
-      entityId: 'harvester1',
-      name: 'harvester1',
-    }];
+  clearStoreAfterEach(afterEach);
+
+  beforeEach(async function () {
+    const store = lookupService(this, 'store');
     const recordManager = lookupService(this, 'record-manager');
-    const currentUser = {
-      entityId: 'user1',
-      name: 'me',
+    const currentUserService = lookupService(this, 'current-user');
+    const instance = {
+      aspect: 'instance',
+      scope: 'auto',
     };
+    const spaces = await allFulfilled(
+      [{
+        entityId: 'space0',
+        name: 'space0',
+      }, {
+        entityId: 'space1',
+        name: 'space1',
+      }].map(({ entityId, name }) =>
+        store.createRecord('space', {
+          name,
+          id: gri({ entityId, entityType: 'space', ...instance }),
+        }).save()
+      )
+    );
+    const providers = await allFulfilled(
+      [{
+        entityId: 'provider0',
+        name: 'provider0',
+      }, {
+        entityId: 'provider1',
+        name: 'provider1',
+      }].map(({ entityId, name }) =>
+        store.createRecord('provider', {
+          name,
+          id: gri({ entityId, entityType: 'provider', ...instance }),
+        }).save()
+      )
+    );
+    const harvesters = await allFulfilled(
+      [{
+        entityId: 'harvester0',
+        name: 'harvester0',
+      }, {
+        entityId: 'harvester1',
+        name: 'harvester1',
+      }].map(({ entityId, name }) =>
+        store.createRecord('harvester', {
+          name,
+          id: gri({ entityId, entityType: 'harvester', ...instance }),
+        }).save()
+      )
+    );
+
+    const spaceList = await store.createRecord('spaceList', {
+      list: spaces,
+    }).save();
+    const providerList = await store.createRecord('providerList', {
+      list: providers,
+    }).save();
+    const groupList = await store.createRecord('groupList', {
+      list: [],
+    }).save();
+    const harvesterList = await store.createRecord('harvesterList', {
+      list: harvesters,
+    }).save();
+    const tokenList = await store.createRecord('tokenList', {
+      list: [],
+    }).save();
+
+    const currentUser = await store.createRecord('user', {
+      id: gri({
+        entityId: 'user1',
+        entityType: 'user',
+        aspect: 'instance',
+      }),
+      name: 'me',
+      spaceList,
+      providerList,
+      groupList,
+      harvesterList,
+      tokenList,
+    }).save();
+
+    defineProperty(currentUserService, 'userProxy', {
+      get() {
+        return promiseObject(resolve(currentUser));
+      },
+    });
+    defineProperty(currentUserService, 'user', {
+      get() {
+        return currentUser;
+      },
+    });
     sinon.stub(recordManager, 'getCurrentUserRecord').returns(currentUser);
     sinon.stub(recordManager, 'getUserRecordList')
-      .withArgs('space').resolves({
-        list: PromiseArray.create({
-          promise: resolve(spaces),
-        }),
-      })
-      .withArgs('provider').resolves({
-        list: PromiseArray.create({
-          promise: resolve(oneproviders),
-        }),
-      })
-      .withArgs('group').resolves({
-        list: PromiseArray.create({
-          promise: resolve([]),
-        }),
-      })
-      .withArgs('harvester').resolves({
-        list: PromiseArray.create({
-          promise: resolve(harvesters),
-        }),
-      })
-      .withArgs('token').resolves({
-        list: PromiseArray.create({
-          promise: resolve([]),
-        }),
-      });
+      .withArgs('space').resolves(spaceList)
+      .withArgs('provider').resolves(providerList)
+      .withArgs('group').resolves(groupList)
+      .withArgs('harvester').resolves(harvesterList)
+      .withArgs('token').resolves(tokenList);
     sinon.stub(recordManager, 'getRecordById')
       .withArgs('user', 'user1').resolves(currentUser)
       .withArgs('space', 'space0').resolves(spaces[0])
-      .withArgs('provider', 'provider0').resolves(oneproviders[0]);
-    const harvester1Gri = gri({
-      entityType: 'harvester',
-      entityId: harvesters[1].entityId,
-      aspect: 'instance',
-      scope: 'auto',
-    });
+      .withArgs('provider', 'provider0').resolves(providers[0]);
+    const harvester1Gri = harvesters[1].gri;
     const findRecordStub = sinon.stub(lookupService(this, 'store'), 'findRecord');
-    findRecordStub.callsFake(function (modelName, gri) {
-      if (gri === harvester1Gri) {
-        return resolve(harvesters[1]);
-      } else {
-        return findRecordStub.wrappedMethod.apply(this, arguments);
-      }
-    });
+    findRecordStub
+      .callsFake(function (modelName, gri) {
+        if (gri === harvester1Gri) {
+          return resolve(harvesters[1]);
+        } else {
+          return findRecordStub.wrappedMethod.apply(this, arguments);
+        }
+      });
     set(lookupService(this, 'onedata-connection'), 'onezoneRecord', {
       name: 'onezone',
       serviceType: 'onezone',
@@ -108,8 +152,7 @@ describe('Integration | Component | content-tokens-new', function () {
     expect(isSlideActive('templates')).to.be.true;
   });
 
-  it(
-    'passess raw token to CreateTokenAction instance and executes it',
+  it('passess raw token to CreateTokenAction instance and executes it',
     async function () {
       const tokenActions = lookupService(this, 'token-actions');
       const createTokenAction = {
@@ -136,8 +179,7 @@ describe('Integration | Component | content-tokens-new', function () {
     }
   );
 
-  it(
-    'token editor form is blocked until CreateTokenAction execution is done',
+  it('token editor form is blocked until CreateTokenAction execution is done',
     async function () {
       let resolveSubmit;
       const tokenActions = lookupService(this, 'token-actions');
@@ -160,8 +202,7 @@ describe('Integration | Component | content-tokens-new', function () {
     }
   );
 
-  it(
-    'injects values passed via aspectOptions to form',
+  it('injects values passed via aspectOptions to form',
     async function () {
       set(lookupService(this, 'navigation-state'), 'aspectOptions', {
         tokenTemplate: btoa(JSON.stringify({
@@ -178,7 +219,9 @@ describe('Integration | Component | content-tokens-new', function () {
         })),
       });
 
-      await render(hbs `<ContentTokensNew />`);
+      await render(hbs`<ContentTokensNew />`);
+      // wait for targets dropdown to load
+      await settled();
 
       checkShowsTemplate('Custom');
       expect(find('.type-field .option-invite input')).to.have.property('checked', true);
@@ -188,8 +231,7 @@ describe('Integration | Component | content-tokens-new', function () {
     }
   );
 
-  it(
-    'does not show selected template name on token template selector slide',
+  it('does not show selected template name on token template selector slide',
     async function () {
       await render(hbs `<ContentTokensNew />`);
 
@@ -296,8 +338,7 @@ describe('Integration | Component | content-tokens-new', function () {
     expect(isSlideActive('templates')).to.be.true;
   });
 
-  it(
-    'resets form back to the templates default after user chose template, modified form, came back to templates list and selected the same template again',
+  it('resets form back to the templates default after user chose template, modified form, came back to templates list and selected the same template again',
     async function () {
       await renderAndSelectTemplate('onezoneRest');
       await click('.interface-field .option-oneclient');

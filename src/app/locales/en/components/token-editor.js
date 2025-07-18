@@ -87,7 +87,18 @@ export default {
         },
         inviteTargetDetails: {
           loadingTarget: {
-            loadingText: 'Loading...',
+            loader: {
+              text: 'Loading available {{modelsName}}... {{percentage}}',
+              modelsName: {
+                unknown: 'targets',
+                group: 'groups',
+                space: 'spaces',
+                user: 'users',
+                cluster: 'clusters',
+                harvester: 'harvesters',
+                atmInventory: 'automation inventories',
+              },
+            },
           },
           target: {
             label: '',
@@ -293,6 +304,9 @@ export default {
           },
           pathDisabledText: {
             text: 'This token is not limited to data access to specific paths.',
+          },
+          loadingPathSpaces: {
+            loadingText: 'Loading available spaces...',
           },
         },
         objectIdCaveat: {

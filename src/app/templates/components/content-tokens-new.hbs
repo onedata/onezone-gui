@@ -29,11 +29,13 @@
       </h1>
     </div>
     <div class="row content-row">
-      <TokenEditor
-        @mode="create"
-        @token={{lastSelectedTemplate}}
-        @onSubmit={{action "submit"}}
-      />
+      <RenderLater @triggerRender={{eq this.activeSlide "form"}}>
+        <TokenEditor
+          @mode="create"
+          @token={{lastSelectedTemplate}}
+          @onSubmit={{action "submit"}}
+        />
+      </RenderLater>
     </div>
   </carousel.slide>
 </OneCarousel>

@@ -18,8 +18,9 @@ import SiblingLoadingField from 'onedata-gui-common/utils/form-component/sibling
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
 import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields-group';
 import RecordOptionsArrayProxy from 'onedata-gui-common/utils/record-options-array-proxy';
-import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
+import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { caveatCustomFieldCommonExtension, createCaveatGroup } from './common';
+import { Mutex } from 'async-mutex';
 
 const LoadingPathSpacesField = SiblingLoadingField.extend({
   ...caveatCustomFieldCommonExtension,
@@ -150,6 +151,18 @@ export const PathCaveatGroup = createCaveatGroup('path', {
   spacesProxy: undefined,
 
   /**
+   * Due to some complicated/buggy code, the `spacesProxySetter` can be invoked multiple
+   * times when it is not needed and invoked heavy operation of fetching all spaces. This
+   * property holds the last `value` value, which can be compared by observer to prevent
+   * multiple invocations.
+   *
+   * This problem could be fixed by rewriting observers to computed
+   * properties, but it needs a lot of work.
+   * @type {any}
+   */
+  spacesProxySetterValue: undefined,
+
+  /**
    * @override
    */
   isApplicable: equal('valuesSource.basic.type', raw('access')),
@@ -175,18 +188,24 @@ export const PathCaveatGroup = createCaveatGroup('path', {
             };
           }) : [];
         this.setProperties({
-          spacesProxy: PromiseArray.create({
-            promise: resolve(spaceEntries),
-          }),
+          spacesProxy: promiseArray(resolve(spaceEntries)),
           spacesProxyIsForMode: 'view',
         });
       } else if (!this.spacesProxy || this.spacesProxyIsForMode === 'view') {
+        if (this.spacesProxySetterValue === this.value) {
+          console.warn(
+            'PathCaveatGroup: spacesProxySetter tried to fetch spaces more than once for the same value, skipping'
+          );
+          return;
+        }
+        this.set('spacesProxySetterValue', this.value);
+        const spacesPromise = (async () => {
+          const spaceList = await this.recordManager.getUserRecordList('space');
+          const list = await spaceList.list;
+          return RecordOptionsArrayProxy.create({ records: list });
+        })();
         this.setProperties({
-          spacesProxy: PromiseArray.create({
-            promise: this.recordManager.getUserRecordList('space')
-              .then((recordsList) => get(recordsList, 'list'))
-              .then((records) => RecordOptionsArrayProxy.create({ records })),
-          }),
+          spacesProxy: promiseArray(spacesPromise),
           spacesProxyIsForMode: 'edit',
         });
       }
@@ -196,5 +215,6 @@ export const PathCaveatGroup = createCaveatGroup('path', {
   init() {
     this._super(...arguments);
     this.spacesProxySetter();
+    this.set('spacesProxyMutex', new Mutex());
   },
 }, [LoadingPathSpacesField, PathField]);

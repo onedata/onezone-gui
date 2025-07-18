@@ -7,14 +7,12 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import _ from 'lodash';
 import { tracked } from '@glimmer/tracking';
 import { defaultAdvancedFilter } from 'onedata-gui-common/components/one-sidebar';
 import ProgressTracker from 'onedata-gui-common/utils/progress-tracker';
-import GrisBatchContainerSpec from 'onedata-gui-websocket-client/utils/gris-batch-container-spec';
-import { OwsGraphOperation } from 'onedata-gui-websocket-client/services/onedata-graph';
-import { DebouncedBatchFlushStrategy } from 'onedata-gui-websocket-client/utils/batch-flush-strategies';
-import { all as allFulfilled } from 'rsvp';
+import fetchBatchRecords from './fetch-batch-records';
+import _ from 'lodash';
+import { defaultBatchFetchSize } from './batch-records-loader';
 
 /**
  * @typedef {InfiniteScrollItem} ChunkableListModelFetcherItem
@@ -27,7 +25,7 @@ export default class ChunkableListModelFetcher {
    * How many max items should be fetched in single batch.
    * @type {number}
    */
-  batchFetchSize = 100;
+  batchFetchSize = defaultBatchFetchSize;
 
   /**
    * @type {ProgressTracker}
@@ -125,51 +123,34 @@ export default class ChunkableListModelFetcher {
    * @returns {Promise<Array<Object>>}
    */
   async getPreparedList() {
+    const {
+      batchRequestRegistry,
+      progressTracker,
+      batchFetchSize,
+      listModel,
+    } = this;
     const itemsGris = this.listModel.belongsTo('list').ids();
-    const containerPromises = _.chunk(itemsGris, this.batchFetchSize)
-      .map(async (grisChunk) => {
-        const containerSpec = new GrisBatchContainerSpec(
-          OwsGraphOperation.Get,
-          grisChunk
-        );
-        await this.batchRequestRegistry.waitForNoConflicts(containerSpec);
-        return this.batchRequestRegistry.createContainer(
-          containerSpec,
-          DebouncedBatchFlushStrategy
-        );
-      });
-    const containers = await allFulfilled(containerPromises);
-    this.progressTracker.reset(itemsGris.length);
-    try {
-      const list = this.listModel.list;
-      for (const container of containers) {
-        const messagesCount = container.messagesCount;
-        try {
-          await container.flush();
-        } finally {
-          this.batchRequestRegistry.destroyContainer(container);
-        }
-        this.progressTracker.doneCount += messagesCount;
-      }
+    const listResolver = async () => {
       try {
         // Awaiting for list might fail when some single records cannot be fetched,
         // but we can still try to read list afterwards.
-        await list;
+        await listModel.list;
       } catch {
         console.warn(
-          'ChunkableListModelFetcher.getPreparedList: list cannot be fully resolved, some records may be missing'
+          'ChunkableListModelFetcher.listResolver: list cannot be fully resolved, some records may be missing'
         );
       }
-      // If record cannot be found, it is either not included in the list or it is
-      // destroyed.
-      const recordsArray = list.filter(r => !r.isDestroyed);
-      const sortedStaticList = _.sortBy(recordsArray, this.listSortKey);
-      return sortedStaticList;
-    } finally {
-      for (const container of containers) {
-        this.batchRequestRegistry.destroyContainer(container);
-      }
-    }
+      return listModel.list.toArray();
+    };
+
+    const records = await fetchBatchRecords({
+      batchRequestRegistry,
+      progressTracker,
+      batchFetchSize,
+      itemsGris,
+      listResolver,
+    });
+    return _.sortBy(records, this.listSortKey);
   }
 
   /**

@@ -1,8 +1,8 @@
 /**
  * Has generic functions to manage records and relations.
  *
- * @author Michał Borzęcki
- * @copyright (C) 2020-2023 ACK CYFRONET AGH
+ * @author Michał Borzęcki, Jakub Liput
+ * @copyright (C) 2020-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -13,11 +13,16 @@ import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import RecordManagerConfiguration from 'onezone-gui/utils/record-manager-configuration';
+import fetchBatchRecords from 'onezone-gui/utils/fetch-batch-records';
+import BatchRecordsLoader from '../utils/batch-records-loader';
+import { Mutex } from 'async-mutex';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 
 /**
  * @typedef {Object} LoadRecordOptions
  * @property {boolean} [reload]
  * @property {boolean} [backgroundReload]
+ * @property {boolean} [loadRequiredRelations]
  */
 
 /**
@@ -26,49 +31,179 @@ import RecordManagerConfiguration from 'onezone-gui/utils/record-manager-configu
 const defaultLoadRecordOptions = Object.freeze({
   reload: false,
   backgroundReload: false,
+  loadRequiredRelations: true,
 });
 
 export default Service.extend({
   currentUser: service(),
   store: service(),
   onedataGraphUtils: service(),
+  batchRequestRegistry: service(),
 
   /**
    * @type {Utils.RecordManagerConfiguration}
    */
   configuration: undefined,
 
+  /**
+   * Stores Mutexes for guarding against using loaders multiple times from
+   * getUserRecordList.
+   * @private
+   * @type {Object<UserListModelName, Mutex>}
+   */
+  userRecordListLoaderMutexes: undefined,
+
+  /**
+   * Cache of user record list loaders to prevent creating multiple loaders before the
+   * former does not finish. It is used by `getUserRecordListLoaderProxy`.
+   * @private
+   * @type {Object<UserListModelName, BatchRecordsLoader>}
+   */
+  listLoaderProxies: undefined,
+
   init() {
     this._super(...arguments);
 
+    this.clearUserRecordListLoaderCache();
+    this.set('userRecordListLoaderMutexes', {});
     if (!this.get('configuration')) {
       this.set('configuration', new RecordManagerConfiguration(this));
     }
   },
 
   /**
+   * @param {UserListModelName} listItemModelName
+   * @returns {Mutex}
+   */
+  getUserRecordListLoaderMutex(listItemModelName) {
+    let mutex = this.userRecordListLoaderMutexes[listItemModelName];
+    if (!mutex) {
+      mutex = new Mutex();
+      this.userRecordListLoaderMutexes[listItemModelName] = mutex;
+    }
+    return mutex;
+  },
+
+  /**
+   * @param {UserListModelName} listItemModelName
+   * @returns {BatchRecordsLoader}
+   */
+  async resolveUserRecordListLoader(listItemModelName) {
+    const { batchRequestRegistry } = this;
+    const user = await this.currentUser.userProxy;
+    const listRelationName = `${camelize(listItemModelName)}List`;
+    const listRecord = await user.getRelation(listRelationName);
+    const itemsGris = listRecord.hasMany('list').ids();
+    const listResolver = async () => {
+      try {
+        // Awaiting for list might fail when some single records cannot be fetched,
+        // but we can still try to read list afterwards.
+        await listRecord.list;
+      } catch {
+        console.warn(
+          'RecordManager.resolveUserRecordListLoader: list cannot be fully resolved, some records may be missing'
+        );
+      }
+      return listRecord.list.toArray();
+    };
+    return new BatchRecordsLoader({
+      batchRequestRegistry,
+      itemsGris,
+      listResolver,
+    });
+  },
+
+  /**
+   * Guarantees that there is single global instance of loader for list type at once.
+   * Note, that once the loader is initialized for model type, it will be returned every
+   * time, because listLoaderProxies object is not cleared automatically. You can clear
+   * the cache using `clearUserRecordListLoaderCache`.
+   *
+   * Of course you can still create loaders directly multiple times at once, but it can
+   * lead to batch conflicts.
+   *
+   * @param {UserListModelName} listItemModelName
+   * @returns {BatchRecordsLoader}
+   */
+  getUserRecordListLoaderProxy(listItemModelName) {
+    let loaderProxy = this.listLoaderProxies[listItemModelName];
+    if (!loaderProxy) {
+      loaderProxy = promiseObject(
+        this.resolveUserRecordListLoader(listItemModelName)
+      );
+      this.listLoaderProxies[listItemModelName] = loaderProxy;
+    }
+    return loaderProxy;
+  },
+
+  /**
+   * Remove cached list loader(s). Typically you can safely do this after the loader
+   * promise resolves (all record have been loaded).
+   * @param {UserListModelName} listItemModelName If specified, only the proxy for the
+   *   specified model will be cleared.
+   */
+  clearUserRecordListLoaderCache(listItemModelName) {
+    if (listItemModelName) {
+      delete this.listLoaderProxies[listItemModelName];
+    } else {
+      this.set('listLoaderProxies', {});
+    }
+  },
+
+  /**
    * Returns loaded *List relation of current user
-   * @param {String} listItemModelName
+   * @param {UserListModelName} listItemModelName
+   * @param {boolean} [loadRequiredRelations] Some models have async relations that should
+   *   be loaded to have complete data of record. It is recommended to load them, but in
+   *   some cases like loading large number of records, it is better to load them lazily,
+   *   when they are needed.
    * @returns {Promise<GraphListModel>}
    */
-  getUserRecordList(listItemModelName) {
-    const user = this.getCurrentUserRecord();
+  async getUserRecordList(listItemModelName, loadRequiredRelations = true) {
+    const loaderMutex = this.getUserRecordListLoaderMutex(listItemModelName);
+    try {
+      await loaderMutex.acquire();
+      /** @type {BatchRecordsLoader} */
+      const loader = await this.resolveUserRecordListLoader(listItemModelName);
+      await loader.getPromise();
+    } finally {
+      loaderMutex.release();
+    }
     const listRelationName = `${camelize(listItemModelName)}List`;
-    return user.getRelation(listRelationName)
-      .then(recordList => get(recordList, 'list').then(list =>
-        allFulfilled(list.map(record => this.loadRequiredRelationsOfRecord(record)))
-        .then(() => recordList)
-      ));
+    const user = this.getCurrentUserRecord();
+    const listRecord = await user.getRelation(listRelationName);
+
+    // After fetching batch record, content of list should be available in proxy.
+    if (loadRequiredRelations) {
+      const { batchRequestRegistry } = this;
+      const list = listRecord.list.content.toArray();
+      const relationsGris = list
+        .map(record => record.getRequiredRelationsGris())
+        .flat();
+      if (relationsGris.length) {
+        const relationsListResolver =
+          () => allFulfilled(
+            list.map(record => this.loadRequiredRelationsOfRecord(record))
+          );
+        await fetchBatchRecords({
+          batchRequestRegistry,
+          itemsGris: relationsGris,
+          listResolver: relationsListResolver,
+        });
+      }
+    }
+    return listRecord;
   },
 
   /**
    * Reloads *List relations of current user containing specified model. Only already
    * loaded lists will be reloaded
    * @param {String} listItemModelName
+   * @param {ReloadRecordListOptions} [options]
    * @returns {Promise}
    */
-  reloadUserRecordList(listItemModelName) {
-    return this.reloadRecordList(this.getCurrentUserRecord(), listItemModelName);
+  reloadUserRecordList(listItemModelName, options) {
+    return this.reloadRecordList(this.getCurrentUserRecord(), listItemModelName, options);
   },
 
   /**
@@ -77,11 +212,12 @@ export default Service.extend({
    * @param {String} listOwnerModelName
    * @param {String} recordId
    * @param {String} listItemModelName
+   * @param {ReloadRecordListOptions} [options]
    * @returns {Promise}
    */
-  reloadRecordListById(listOwnerModelName, recordId, listItemModelName) {
+  reloadRecordListById(listOwnerModelName, recordId, listItemModelName, options) {
     const record = this.getLoadedRecordById(listOwnerModelName, recordId);
-    return record ? this.reloadRecordList(record, listItemModelName) : resolve();
+    return record ? this.reloadRecordList(record, listItemModelName, options) : resolve();
   },
 
   /**
@@ -89,12 +225,13 @@ export default Service.extend({
    * loaded lists containing specified model will be reloaded
    * @param {String} listOwnerModelName
    * @param {String} listItemModelName
+   * @param {ReloadRecordListOptions} [options]
    * @returns {Promise}
    */
-  reloadRecordListInAllRecords(listOwnerModelName, listItemModelName) {
+  reloadRecordListInAllRecords(listOwnerModelName, listItemModelName, options) {
     const allRecords = this.getAllLoadedRecords(listOwnerModelName);
     return allFulfilled(
-      allRecords.map(record => this.reloadRecordList(record, listItemModelName))
+      allRecords.map(record => this.reloadRecordList(record, listItemModelName, options))
     ).catch(ignoreForbiddenError);
   },
 
@@ -103,9 +240,10 @@ export default Service.extend({
    * specified model will be reloaded
    * @param {GraphSingleModel} record
    * @param {String} listItemModelName
+   * @param {ReloadRecordListOptions} [options]
    * @returns {Promise}
    */
-  reloadRecordList(record, listItemModelName) {
+  reloadRecordList(record, listItemModelName, options) {
     const store = this.get('store');
     const modelClass = record.constructor;
     const listItemEmberModelName =
@@ -126,7 +264,7 @@ export default Service.extend({
       });
 
     return allFulfilled(
-      relationsToReload.map(relationName => record.reloadList(relationName))
+      relationsToReload.map(relationName => record.reloadList(relationName, options))
     );
   },
 
@@ -159,10 +297,18 @@ export default Service.extend({
    * @param {LoadRecordOptions} [loadOptions]
    * @returns {Promise<GraphModel>}
    */
-  getRecord(modelName, gri, loadOptions = defaultLoadRecordOptions) {
-    return this.get('store')
-      .findRecord(modelName, gri, { ...defaultLoadRecordOptions, ...loadOptions })
-      .then(record => this.loadRequiredRelationsOfRecord(record).then(() => record));
+  async getRecord(modelName, gri, loadOptions = defaultLoadRecordOptions) {
+    const record = await this.store.findRecord(
+      modelName,
+      gri, {
+        ...defaultLoadRecordOptions,
+        ...loadOptions,
+      }
+    );
+    if (loadOptions.loadRequiredRelations) {
+      await this.loadRequiredRelationsOfRecord(record);
+    }
+    return record;
   },
 
   /**

@@ -1,12 +1,12 @@
 /**
  * Invite target details fields of the tokens editor.
  *
- * @author Michał Borzęcki
- * @copyright (C) 2024 ACK CYFRONET AGH
+ * @author Michał Borzęcki, Jakub Liput
+ * @copyright (C) 2024-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import EmberObject, { get, computed, observer } from '@ember/object';
+import EmberObject, { computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import { scheduleOnce } from '@ember/runloop';
@@ -24,8 +24,8 @@ import { groupedFlags as harvesterFlags } from 'onedata-gui-websocket-client/uti
 import { groupedFlags as clusterFlags } from 'onedata-gui-websocket-client/utils/cluster-privileges-flags';
 import { groupedFlags as atmInventoryFlags } from 'onedata-gui-websocket-client/utils/atm-inventory-privileges-flags';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
-import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
+import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import RecordOptionsArrayProxy from 'onedata-gui-common/utils/record-options-array-proxy';
 import recordIcon from 'onedata-gui-common/utils/record-icon';
 import { tokenInviteTypeOptions } from './common';
@@ -42,6 +42,11 @@ const TargetField = DropdownField.extend({
    * @override
    */
   addColonToLabel: false,
+
+  /**
+   * @override
+   */
+  useRecordLabel: true,
 
   /**
    * @override
@@ -98,6 +103,8 @@ const TargetField = DropdownField.extend({
     this.cachedTargetsModelNameObserver();
   },
 });
+
+const infiniteLoadProxy = promiseObject(new Promise(() => {}));
 
 const privilegesForModels = {
   space: spaceFlags,
@@ -244,30 +251,59 @@ export const InviteTargetDetailsGroup = FormFieldsGroup.extend({
   /**
    * @override
    */
-  fields: computed(() => [
-    SiblingLoadingField.extend({
-      loadingProxy: reads('parent.cachedTargetsProxy'),
-      addColonToLabel: false,
-    }).create({
-      siblingName: 'target',
-      name: 'loadingTarget',
-    }),
-    TargetField.create(),
-    FormFieldsGroup.extend({
-      isVisible: reads('parent.inviteTypeSpec.hasPrivileges'),
-    }).create({
-      name: 'invitePrivilegesDetails',
-      fields: [
-        SiblingLoadingField.extend({
-          loadingProxy: reads('parent.parent.cachedPrivilegesPresetProxy'),
-        }).create({
-          name: 'loadingPrivileges',
-          siblingName: 'privileges',
-        }),
-        InvitePrivilegesField.create(),
-      ],
-    }),
-  ]),
+  fields: computed(function fields() {
+    return [
+      SiblingLoadingField.extend({
+        /** @override */
+        i18nPrefix: 'components.tokenEditor.fields.basic.inviteDetails.inviteTargetDetails.loadingTarget',
+        loadingProxy: computed(
+          'parent.cachedTargetsProxy',
+          function loadingProxy() {
+            return this.parent?.cachedTargetsProxy ?? infiniteLoadProxy;
+          }
+        ),
+        loadingText: computed(
+          'parent.{cachedTargetsProgressTracker.progressText,cachedTargetsModelName}',
+          function loadingText() {
+            const tracker = this.parent?.cachedTargetsProgressTracker;
+            const targetsModelName = this.parent?.cachedTargetsModelName;
+            const modelsNameText = this.t(`loader.modelsName.${targetsModelName}`, {}, {
+              default: this.t('loader.modelsName.unknown'),
+            });
+            return this.t('loader.text', {
+              modelsName: modelsNameText,
+              percentage: tracker?.progressText || '',
+            });
+          }
+        ),
+        addColonToLabel: false,
+      }).create({
+        siblingName: 'target',
+        name: 'loadingTarget',
+      }),
+      TargetField.create(),
+      FormFieldsGroup.extend({
+        isVisible: reads('parent.inviteTypeSpec.hasPrivileges'),
+      }).create({
+        name: 'invitePrivilegesDetails',
+        fields: [
+          SiblingLoadingField.extend({
+            loadingProxy: computed(
+              'parent.parent.cachedPrivilegesPresetProxy',
+              function loadingProxy() {
+                return this.parent?.parent?.cachedPrivilegesPresetProxy ??
+                  infiniteLoadProxy;
+              }
+            ),
+          }).create({
+            name: 'loadingPrivileges',
+            siblingName: 'privileges',
+          }),
+          InvitePrivilegesField.create(),
+        ],
+      }),
+    ];
+  }),
 
   /**
    * @type {ComputedProperty<{ value: string, targetModelName: string | undefined, icon: string, hasPrivileges: boolean }>}
@@ -281,6 +317,11 @@ export const InviteTargetDetailsGroup = FormFieldsGroup.extend({
   ),
 
   /**
+   * @type {ComputedProperty<ProgressTracker|null>}
+   */
+  cachedTargetsProgressTracker: reads('cachedTargetsLoaderProxy.progressTracker'),
+
+  /**
    * @type {ComputedProperty<string | undefined>}
    */
   cachedTargetsModelName: undefined,
@@ -288,9 +329,12 @@ export const InviteTargetDetailsGroup = FormFieldsGroup.extend({
   /**
    * @type {ComputedProperty<PromiseObject<Array<Object>>>}
    */
-  cachedTargetsProxy: PromiseObject.create({
-    promise: new Promise(() => {}),
-  }),
+  cachedTargetsProxy: undefined,
+
+  /**
+   * @type {PromiseObject<ProgressTracker>}
+   */
+  cachedTargetsLoaderProxy: undefined,
 
   /**
    * @type {ComputedProperty<string | undefined>}
@@ -300,9 +344,7 @@ export const InviteTargetDetailsGroup = FormFieldsGroup.extend({
   /**
    * @type {ComputedProperty<PromiseObject<Array<string>>>}
    */
-  cachedPrivilegesPresetProxy: PromiseObject.create({
-    promise: new Promise(() => {}),
-  }),
+  cachedPrivilegesPresetProxy: undefined,
 
   /**
    * @type {ComputedProperty<Object | undefined>}
@@ -325,6 +367,12 @@ export const InviteTargetDetailsGroup = FormFieldsGroup.extend({
    * @override
    */
   init() {
+    const cachedPrivilegesPresetProxy = promiseObject(resolve());
+    const cachedTargetsProxy = promiseObject(resolve());
+    this.setProperties({
+      cachedPrivilegesPresetProxy,
+      cachedTargetsProxy,
+    });
     this._super(...arguments);
     this.cacheSetter();
   },
@@ -341,13 +389,21 @@ export const InviteTargetDetailsGroup = FormFieldsGroup.extend({
         newTargetsModelName &&
         this.cachedTargetsModelName !== newTargetsModelName
       ) {
+        const loaderProxy =
+          this.recordManager.getUserRecordListLoaderProxy(newTargetsModelName);
+        const targetsPromise = (async () => {
+          const records = await (await loaderProxy).getPromise();
+          return RecordOptionsArrayProxy.create({ records });
+        })();
+        // Delete last loader cache after its load to refresh the list on new load (eg. a
+        // new group has been added).
+        targetsPromise.finally(() =>
+          this.recordManager.clearUserRecordListLoaderCache(newTargetsModelName)
+        );
         this.setProperties({
           cachedTargetsModelName: newTargetsModelName,
-          cachedTargetsProxy: PromiseArray.create({
-            promise: this.recordManager.getUserRecordList(newTargetsModelName)
-              .then(recordsList => get(recordsList, 'list'))
-              .then(records => RecordOptionsArrayProxy.create({ records })),
-          }),
+          cachedTargetsLoaderProxy: loaderProxy,
+          cachedTargetsProxy: promiseArray(targetsPromise),
         });
       }
       if (
@@ -356,31 +412,28 @@ export const InviteTargetDetailsGroup = FormFieldsGroup.extend({
       ) {
         this.setProperties({
           cachedPrivilegesModelName: newPrivilegesModelName,
-          cachedPrivilegesPresetProxy: PromiseArray.create({
-            promise: this.privilegeManager
-              .getPrivilegesPresetForModel(newTargetsModelName)
-              .then(result => result['member']),
-          }),
+          cachedPrivilegesPresetProxy: promiseArray(this.privilegeManager
+            .getPrivilegesPresetForModel(newTargetsModelName)
+            .then(result => result['member'])
+          ),
         });
       }
     } else {
       if (newTargetsModelName) {
+        const targets = this.currentInviteTarget ? [
+          EmberObject.extend({
+            label: reads('value.name'),
+          }).create({
+            value: this.currentInviteTarget,
+            icon: recordIcon(this.currentInviteTarget),
+          }),
+        ] : [];
         this.setProperties({
           cachedTargetsModelName: newTargetsModelName,
-          cachedTargetsProxy: PromiseArray.create({
-            promise: resolve(this.currentInviteTarget ? [
-              EmberObject.extend({
-                label: reads('value.name'),
-              }).create({
-                value: this.currentInviteTarget,
-                icon: recordIcon(this.currentInviteTarget),
-              }),
-            ] : []),
-          }),
+          cachedTargetsProxy: promiseArray(resolve(targets)),
+          cachedTargetsLoaderProxy: null,
           cachedPrivilegesModelName: newPrivilegesModelName,
-          cachedPrivilegesPresetProxy: PromiseArray.create({
-            promise: resolve([]),
-          }),
+          cachedPrivilegesPresetProxy: promiseArray(resolve([])),
         });
       }
     }

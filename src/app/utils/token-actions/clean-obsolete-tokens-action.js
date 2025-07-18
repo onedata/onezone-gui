@@ -1,19 +1,18 @@
 /**
  * Allows to remove disabled tokens from passed list of tokens.
  *
- * @author Michał Borzęcki
- * @copyright (C) 2019 ACK CYFRONET AGH
+ * @author Michał Borzęcki, Jakub Liput
+ * @copyright (C) 2019-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { computed, get } from '@ember/object';
+import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { isEmpty, conditional } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
 import computedT from 'onedata-gui-common/utils/computed-t';
 import Action from 'onedata-gui-common/utils/action';
 import ActionResult from 'onedata-gui-common/utils/action-result';
-import { reject, allSettled } from 'rsvp';
 
 export default Action.extend({
   tokenManager: service(),
@@ -80,7 +79,7 @@ export default Action.extend({
       const {
         visibleTokens,
         tokensToRemove,
-      } = this.getProperties('visibleTokens', 'tokensToRemove');
+      } = this;
 
       if (!visibleTokens) {
         return tokensToRemove;
@@ -94,16 +93,12 @@ export default Action.extend({
    * @override
    */
   execute() {
-    if (!this.get('disabled')) {
+    if (!this.disabled) {
       const {
         tokensToRemove,
         selectedTokensToRemove,
         modalManager,
-      } = this.getProperties(
-        'tokensToRemove',
-        'selectedTokensToRemove',
-        'modalManager'
-      );
+      } = this;
 
       const result = ActionResult.create();
       return modalManager
@@ -125,20 +120,14 @@ export default Action.extend({
    * @param {Array<Models.Token>} tokens
    * @returns {Promise}
    */
-  removeTokens(tokens) {
-    const tokenManager = this.get('tokenManager');
-    return allSettled(tokens.map(token => tokenManager.deleteToken(get(token, 'id'))))
-      .then(results => tokenManager.reloadList()
-        .then(() => results)
-        .catch(reason => (results || []).concat([{ state: 'rejected', reason }]))
-      )
-      .then(results => {
-        const errorResults = results.filterBy('state', 'rejected');
-        if (errorResults.length) {
-          return reject(errorResults[0].reason);
-        } else {
-          return results.mapBy('value');
-        }
-      });
+  async removeTokens(tokens) {
+    const tokenManager = this.tokenManager;
+    const results = await tokenManager.deleteTokens(...tokens.map(token => token.id));
+    const errorResults = results.filter(it => it.state === 'rejected');
+    if (errorResults.length) {
+      throw errorResults[0].reason;
+    } else {
+      return results.map(it => it.value);
+    }
   },
 });

@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12759 Optimized token creation views for large number of spaces, groups, etc.
 * VFS-12946 Added copy icon in tokens sidebar
 * VFS-12938 Fixed showing privileges
 * VFS-12888 Fixed insufficient privileges as space owner

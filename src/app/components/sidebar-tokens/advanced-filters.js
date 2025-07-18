@@ -2,8 +2,8 @@
  * An advanced filters component for tokens sidebar. Provides filtering by token
  * type and target.
  *
- * @author  Michał Borzęcki
- * @copyright (C) 2019 ACK CYFRONET AGH
+ * @author  Michał Borzęcki, Jakub Liput
+ * @copyright (C) 2019-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -11,19 +11,37 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import { inject as service } from '@ember/service';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
-import { computed, observer, get } from '@ember/object';
+import { computed } from '@ember/object';
 import { equal, raw } from 'ember-awesome-macros';
 import { scheduleOnce } from '@ember/runloop';
+import { asyncObserver } from 'onedata-gui-common/utils/observer';
 import recordIcon from 'onedata-gui-common/utils/record-icon';
+import _ from 'lodash';
+import { resolve, all as allFulfilled } from 'rsvp';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
+import { defaultSeparator } from 'onedata-gui-common/components/name-conflict';
+import addConflictLabels from 'onedata-gui-common/utils/add-conflict-labels';
+import BatchRecordsLoader from 'onezone-gui/utils/batch-records-loader';
+
+/**
+ * @typedef {'group'|'space'|'user'|'cluster'|'harvester'|'atmInventory'} TokenTargetModelName
+ */
 
 /**
  * @typedef {'all'|'access'|'identity'|'invite'} TokenTypeFilter
  */
 
 /**
+ * @typedef {Object} TargetModelOption
+ * @property {TokenTargetModelName} modelName
+ * @property {string} modelNameTranslation
+ * @property {OneIconName} icon
+ */
+
+/**
  * @typedef {Object} TokensSidebarAdvancedFilter
  * @property {TokenTypeFilter} type
- * @property {string} targetModelName 'space'|'group'|...
+ * @property {TokenTargetModelName} targetModelName
  * @property {Ember.Model|null} targetRecord null|Models.*; null means all records
  */
 
@@ -31,6 +49,7 @@ export default Component.extend(I18n, {
   classNames: ['advanced-filters', 'advanced-token-filters'],
 
   i18n: service(),
+  batchRequestRegistry: service(),
 
   /**
    * @override
@@ -52,6 +71,18 @@ export default Component.extend(I18n, {
   collection: undefined,
 
   /**
+   * Stores BatchRecordsLoaders suitable for TargetRecordOptions. For example, when user
+   * selects "space" target record option, then we start loading spaces referenced by
+   * tokens using batch requests. It may last long, so if user changes target record
+   * option, then we should not forget object with loading state, but create new loader
+   * for example for "group" type. These two loaders are working indepedently, paralelly.
+   * When user goes back to "space" type, then he will see the loader progress stored
+   * previously.
+   * @type {Map<TargetRecordOption, BatchRecordsLoader>}
+   */
+  targetRecordsLoaders: undefined,
+
+  /**
    * @type {TokenTypeFilter}
    */
   selectedType: 'all',
@@ -65,6 +96,11 @@ export default Component.extend(I18n, {
    * @type {Object}
    */
   selectedTargetRecordOption: undefined,
+
+  /**
+   * @type {ProgressTracker}
+   */
+  progressTracker: undefined,
 
   /**
    * @type {Ember.ComputedProperty<boolean>}
@@ -93,7 +129,7 @@ export default Component.extend(I18n, {
   }),
 
   /**
-   * @type {Ember.ComputedProperty<Array<{modelName: string, name: string, icon: string}>>}
+   * @type {Ember.ComputedProperty<Array<TargetModelOption>>}
    */
   targetModelOptions: computed(
     'allModelOption',
@@ -102,7 +138,7 @@ export default Component.extend(I18n, {
       const {
         collection,
         allModelOption,
-      } = this.getProperties('collection', 'allModelOption');
+      } = this;
       if (collection) {
         const modelNames = collection.mapBy('targetModelName').compact().uniq();
         const modelOptions = modelNames.map(modelName => ({
@@ -114,6 +150,56 @@ export default Component.extend(I18n, {
         })).sortBy('modelNameTranslation');
 
         return [allModelOption, ...modelOptions];
+      }
+    }
+  ),
+
+  /**
+   * Promise proxy that resolves when invite target records for current context are
+   * fetched and have assigned conflict labels.
+   * @type {ComputedProperty<PromiseObject<undefined>>}
+   */
+  targetRecordOptionsLoaderProxy: computed(
+    'collection',
+    'selectedTargetModelOption',
+    'allModelOption',
+    'type',
+    function targetRecordOptionsLoaderProxy() {
+      if (
+        this.type !== 'invite' ||
+        this.selectedTargetModelOption === this.allModelOption
+      ) {
+        return promiseObject(resolve());
+      } else {
+        const batchRecordsLoader =
+          this.getBatchTargetRecordsLoader(this.selectedTargetModelOption);
+        return promiseObject((async () => {
+          const targetRecords = await batchRecordsLoader.getPromise();
+          addConflictLabels(targetRecords, 'name', 'entityId');
+        })());
+      }
+    }
+  ),
+
+  /**
+   * Progress tracker suitable to use in the current context of invite token filter.
+   * It is null if there is no batch loader in use in the current context.
+   * @type {ComputedProperty<ProgressTracker|null>}
+   */
+  inviteProgressTracker: computed(
+    'collection',
+    'selectedTargetModelOption',
+    'allModelOption',
+    'type',
+    function inviteProgressTracker() {
+      if (
+        this.type !== 'invite' ||
+        this.selectedTargetModelOption === this.allModelOption
+      ) {
+        return null;
+      } else {
+        return this.getBatchTargetRecordsLoader(this.selectedTargetModelOption)
+          .progressTracker;
       }
     }
   ),
@@ -132,25 +218,28 @@ export default Component.extend(I18n, {
         allModelOption,
         selectedTargetModelOption,
         collection,
-      } = this.getProperties(
-        'allRecordOption',
-        'allModelOption',
-        'selectedTargetModelOption',
-        'collection'
-      );
+      } = this;
 
       if (selectedTargetModelOption === allModelOption) {
         return [allRecordOption];
       } else {
-        const recordOptions = collection
-          .filterBy('targetModelName', get(selectedTargetModelOption, 'modelName'))
-          .filterBy('tokenTarget')
-          .uniqBy('tokenTarget')
-          .map(record => ({
-            record: get(record, 'tokenTarget'),
-            name: get(record, 'tokenTarget.name'),
-          }))
-          .sortBy('name');
+        let recordOptions = collection;
+        const selectedTargetModelName = selectedTargetModelOption.modelName;
+        recordOptions = recordOptions.filter(token =>
+          token.targetModelName === selectedTargetModelName
+        );
+        recordOptions = recordOptions.filter(token => token.tokenTarget);
+        recordOptions = _.uniqBy(recordOptions, token => token.tokenTarget);
+        recordOptions = recordOptions.map(token => {
+          const tokenTargetName = token.tokenTarget.name;
+          const conflictLabel = token.tokenTarget.conflictLabel;
+          return {
+            record: token.tokenTarget,
+            name: conflictLabel ?
+              `${tokenTargetName}${defaultSeparator}${conflictLabel}` : tokenTargetName,
+          };
+        });
+        recordOptions = _.sortBy(recordOptions, 'name');
         return [allRecordOption, ...recordOptions];
       }
     }
@@ -161,89 +250,124 @@ export default Component.extend(I18n, {
    */
   isTargetRecordDisabled: equal('selectedTargetModelOption', 'allModelOption'),
 
-  targetModelOptionsObserver: observer(
+  effSelectedTargetRecordOption: computed(
+    'targetRecordOptionsLoaderProxy.isFulfilled',
+    'targetRecordOptions',
+    'selectedTargetRecordOption',
+    'allRecordOption',
+    function effSelectedTargetRecordOption() {
+      // Until the loader is not resolved, user should not be able to change target
+      // record, so it is probably "all" option.
+      if (!this.targetRecordOptionsLoaderProxy.isFulfilled) {
+        return this.allRecordOption;
+      }
+      const selectedRecord = this.selectedTargetRecordOption.record;
+      return this.targetRecordOptions.find(it => it.record === selectedRecord) ??
+        this.allRecordOption;
+    }
+  ),
+
+  targetRecordSearchField: computed(function targetRecordSearchField() {
+    return this.effSelectedTargetRecordOption.record ? 'name' : '';
+  }),
+
+  targetModelOptionsObserver: asyncObserver(
     'targetModelOptions',
     function targetModelOptionsObserver() {
       const {
         targetModelOptions,
         selectedTargetModelOption,
         allModelOption,
-      } = this.getProperties(
-        'targetModelOptions',
-        'selectedTargetModelOption',
-        'allModelOption'
-      );
+      } = this;
 
-      const selectedModel = get(selectedTargetModelOption, 'modelName');
-      if (!targetModelOptions.mapBy('modelName').includes(selectedModel)) {
+      const selectedModel = selectedTargetModelOption.modelName;
+      if (!targetModelOptions.map(it => it.modelName).includes(selectedModel)) {
         this.set('selectedTargetModelOption', allModelOption);
       }
     }
   ),
 
-  targetRecordOptionsObserver: observer(
-    'targetRecordOptions',
-    function targetRecordOptionsObserver() {
-      const {
-        targetRecordOptions,
-        selectedTargetRecordOption,
-        allRecordOption,
-      } = this.getProperties(
-        'targetRecordOptions',
-        'selectedTargetRecordOption',
-        'allRecordOption'
-      );
-
-      const selectedRecord = get(selectedTargetRecordOption, 'record');
-      if (!targetRecordOptions.mapBy('record').includes(selectedRecord)) {
-        this.set('selectedTargetRecordOption', allRecordOption);
-      }
-    }
-  ),
-
-  filtersStateObserver: observer(
+  filtersStateObserver: asyncObserver(
     'selectedType',
     'selectedTargetModelOption',
-    'selectedTargetRecordOption',
+    'effSelectedTargetRecordOption',
     function filtersStateObserver() {
-      scheduleOnce('afterRender', this, 'notifyChange');
+      scheduleOnce('afterRender', this, 'tryNotifyChange');
     }
   ),
 
   init() {
     this._super(...arguments);
 
-    const {
-      allModelOption,
-      allRecordOption,
-    } = this.getProperties('allModelOption', 'allRecordOption');
-
     this.setProperties({
-      selectedTargetModelOption: allModelOption,
-      selectedTargetRecordOption: allRecordOption,
+      selectedTargetModelOption: this.allModelOption,
+      selectedTargetRecordOption: this.allRecordOption,
+      targetRecordsLoaders: new Map(),
     });
 
-    this.notifyChange();
+    this.filtersStateObserver();
   },
 
-  notifyChange() {
+  tryNotifyChange() {
     const {
       selectedType,
       selectedTargetModelOption,
-      selectedTargetRecordOption,
+      effSelectedTargetRecordOption,
       onChange,
-    } = this.getProperties(
-      'selectedType',
-      'selectedTargetModelOption',
-      'selectedTargetRecordOption',
-      'onChange'
-    );
-
-    onChange({
+    } = this;
+    const currentChangeset = {
       type: selectedType,
       targetModelName: selectedTargetModelOption.modelName,
-      targetRecord: get(selectedTargetRecordOption, 'record'),
+      targetRecord: effSelectedTargetRecordOption.record,
+    };
+    onChange(currentChangeset);
+  },
+
+  /**
+   * @param {TargetModelOption} targetModelOption
+   * @returns {BatchRecordsLoader}
+   */
+  createBatchTargetRecordsLoader(targetModelOption) {
+    const {
+      batchRequestRegistry,
+      collection,
+    } = this;
+    const targetModelName = targetModelOption.modelName;
+    const itemsGris = this.collection
+      .filter(token => token.targetModelName === targetModelName)
+      .map(token => token.getTargetModelGri())
+      .filter(Boolean);
+    const listResolver = async () => {
+      const list = await allFulfilled(collection
+        .filter(token =>
+          token.targetRecordId && token.targetModelName === targetModelName
+        )
+        .map(token => token.loadRequiredRelations())
+      );
+      return _.uniq(list);
+    };
+
+    const batchRecordsLoader = new BatchRecordsLoader({
+      batchRequestRegistry,
+      itemsGris,
+      listResolver,
     });
+    batchRecordsLoader.getPromise();
+    return batchRecordsLoader;
+  },
+
+  /**
+   * @param {TargetModelOption} targetModelOption
+   * @returns {BatchRecordsLoader}
+   */
+  getBatchTargetRecordsLoader(targetModelOption) {
+    if (!this.targetRecordsLoaders.has(targetModelOption)) {
+      this.targetRecordsLoaders.set(
+        targetModelOption,
+        this.createBatchTargetRecordsLoader(targetModelOption)
+      );
+    }
+    return this.targetRecordsLoaders.get(targetModelOption);
   },
 
   actions: {

@@ -2,14 +2,14 @@
  * Provides data for routes and components associated with tokens tab.
  *
  * @author Michał Borzęcki, Jakub Liput
- * @copyright (C) 2018-2020 ACK CYFRONET AGH
+ * @copyright (C) 2018-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 import _ from 'lodash';
-import { all as allFulfilled } from 'rsvp';
+import { all as allFulfilled, allSettled } from 'rsvp';
 import { get } from '@ember/object';
 import {
   tokenInviteTypeToTargetModelMapping,
@@ -31,21 +31,22 @@ const TokenManager = Service.extend({
 
   /**
    * Fetches collection of all tokens
-   *
+   * @param {boolean} loadRequiredRelations
    * @returns {Promise<Models.TokenList>} resolves to a record containing
    *   an array of tokens
    */
-  getTokens() {
-    return this.get('recordManager').getUserRecordList('token');
+  getTokens(loadRequiredRelations = false) {
+    return this.recordManager.getUserRecordList('token', loadRequiredRelations);
   },
 
   /**
    * Returns token with specified gri
    * @param {String} gri
+   * @param {boolean} loadRequiredRelations
    * @returns {Promise<Models.Token>} token promise
    */
-  getRecord(gri) {
-    return this.get('recordManager').getRecord('token', gri);
+  getRecord(gri, loadRequiredRelations = false) {
+    return this.recordManager.getRecord('token', gri, { loadRequiredRelations });
   },
 
   /**
@@ -53,7 +54,7 @@ const TokenManager = Service.extend({
    * @param {Object} tokenPrototype token model prototype
    * @returns {Promise<Models.Token>}
    */
-  createToken(tokenPrototype) {
+  async createToken(tokenPrototype) {
     const currentUserEntityId = this.get('currentUser.userId');
     const additionalData = {};
     // New token prototype object is not compatible with Ember Data token model
@@ -68,7 +69,7 @@ const TokenManager = Service.extend({
       additionalData[fieldName] = compatibleTokenPrototype[fieldName];
       delete compatibleTokenPrototype[fieldName];
     });
-    return this.get('store')
+    const token = await this.store
       .createRecord('token', _.merge(compatibleTokenPrototype, {
         _meta: {
           aspect: 'user_named_token',
@@ -76,8 +77,9 @@ const TokenManager = Service.extend({
           additionalData,
         },
       }))
-      .save()
-      .then(token => this.reloadList().then(() => token));
+      .save();
+    this.reloadList({ onlyIds: true });
+    return token;
   },
 
   /**
@@ -151,16 +153,38 @@ const TokenManager = Service.extend({
   },
 
   /**
-   * Deletes token
-   * @param {string} id token id
+   * Deletes single token.
+   * @param {string} id Token GRI.
    * @returns {Promise}
    */
-  deleteToken(id) {
-    return this.getRecord(id)
-      .then(token => token.destroyRecord())
-      .then(destroyResult =>
-        this.get('recordManager').reloadUserRecordList('token').then(() => destroyResult)
-      );
+  async deleteToken(id) {
+    const promiseState = (await this.deleteTokens(id))[0];
+    if (promiseState.state === 'rejected') {
+      throw promiseState.reason;
+    } else {
+      return promiseState.value;
+    }
+  },
+
+  /**
+   * Deletes tokens.
+   * @param {Array<string>} ids Token GRIs.
+   * @returns {Promise<Array<PromiseState>>} Array of promise state for each token
+   *   deletion and extra promise state for reload operation.
+   */
+  async deleteTokens(...ids) {
+    const deleteResults = await allSettled(ids.map(async (tokenGri) => {
+      const token = await this.getRecord(tokenGri);
+      return await token.destroyRecord();
+    }));
+    try {
+      const reloadResult = await this.reloadList();
+      deleteResults.push({ state: 'fulfilled', value: reloadResult });
+    } catch (reason) {
+      // do not throw reload error as we want to resolve promise states
+      deleteResults.push({ state: 'rejected', reason });
+    }
+    return deleteResults;
   },
 
   /**
@@ -208,71 +232,71 @@ const TokenManager = Service.extend({
    * @param {String} joiningRecordId
    * @returns {Promise<GraphSingleModel>} target record
    */
-  consumeInviteToken(token, targetModelName, joiningModelName, joiningRecordId) {
+  async consumeInviteToken(token, targetModelName, joiningModelName, joiningRecordId) {
     const {
       store,
       onedataGraphUtils,
       onedataGraphContext,
       recordManager,
-    } = this.getProperties(
-      'store',
-      'onedataGraphUtils',
-      'onedataGraphContext',
-      'recordManager'
-    );
+    } = this;
     const adapter = store.adapterFor('user');
     const targetEntityType = adapter.getEntityTypeForModelName(targetModelName);
     const joiningEntityType = adapter.getEntityTypeForModelName(joiningModelName);
-    return onedataGraphUtils.joinRelation(
+    const { gri: targetGri } = await onedataGraphUtils.joinRelation(
       targetEntityType,
       token, [`as${_.upperFirst(joiningEntityType)}`, joiningRecordId]
-    ).then(({ gri: targetGri }) => {
-      const targetId = parseGri(targetGri).entityId;
-      const targetGriWithAutoScope = gri({
-        entityType: targetEntityType,
-        entityId: targetId,
-        aspect: 'instance',
-        scope: 'auto',
-      });
-      onedataGraphContext.register(targetGriWithAutoScope, gri({
-        entityType: joiningEntityType,
-        entityId: joiningRecordId,
-        aspect: 'instance',
-        scope: 'auto',
-      }));
-      return allFulfilled([
-        recordManager.reloadRecordListById(
-          joiningModelName,
-          joiningRecordId,
-          targetModelName
-        ).catch(ignoreForbiddenError),
-        recordManager.reloadRecordListById(
-          targetModelName,
-          targetId,
-          joiningModelName
-        ).catch(ignoreForbiddenError),
-        recordManager.reloadUserRecordList(targetModelName),
-      ]).then(() =>
-        recordManager.getRecord(targetModelName, targetGriWithAutoScope)
-        .catch(error => {
-          // It is possible in some invite scenarios (like space -> harvester), that
-          // user cannot fetch target record after joining, because he did not become
-          // a member of a target record. In such situations "forbidden" errors are normal.
-          if (error && error.id === 'forbidden') {
-            return null;
-          }
-          throw error;
-        })
-      );
+    );
+    const targetId = parseGri(targetGri).entityId;
+    const targetGriWithAutoScope = gri({
+      entityType: targetEntityType,
+      entityId: targetId,
+      aspect: 'instance',
+      scope: 'auto',
     });
+    onedataGraphContext.register(targetGriWithAutoScope, gri({
+      entityType: joiningEntityType,
+      entityId: joiningRecordId,
+      aspect: 'instance',
+      scope: 'auto',
+    }));
+    const joiningModelListReloading = recordManager.reloadRecordListById(
+      joiningModelName,
+      joiningRecordId,
+      targetModelName
+    ).catch(ignoreForbiddenError);
+    const targetModelListReloading = recordManager.reloadRecordListById(
+      targetModelName,
+      targetId,
+      joiningModelName
+    ).catch(ignoreForbiddenError);
+    const userListReloading = recordManager.reloadUserRecordList(targetModelName);
+
+    await allFulfilled([
+      joiningModelListReloading,
+      targetModelListReloading,
+      userListReloading,
+    ]);
+
+    try {
+      return await recordManager.getRecord(targetModelName, targetGriWithAutoScope);
+    } catch (error) {
+      // It is possible in some invite scenarios (like space -> harvester), that
+      // user cannot fetch target record after joining, because he did not become
+      // a member of a target record. In such situations "forbidden" errors are normal.
+      if (error && error.id === 'forbidden') {
+        return null;
+      }
+      throw error;
+    }
   },
 
   /**
    * Reloads token list (if already loaded)
+   * @param {ReloadRecordListOptions} options
    * @returns {Promise<TokenList>}
    */
-  reloadList() {
-    return this.get('recordManager').reloadUserRecordList('token');
+  reloadList(options) {
+    return this.recordManager.reloadUserRecordList('token', options);
   },
 });
 
