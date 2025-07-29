@@ -99,7 +99,7 @@ export default class ShareListFetcherToolkit {
      * of the actual result. No additional backend fetch is needed if doing fetchNext.
      * @type {boolean}
      */
-    let cachedIsLast;
+    let cachedIsLast = false;
 
     /** @type {SpaceFetchCache} */
     const existingSpaceFetchCache = this.getSpaceFetchCache(spaceId);
@@ -160,7 +160,7 @@ export default class ShareListFetcherToolkit {
       }
     } else {
       backendArray = [];
-      backendIsLast = true;
+      backendIsLast = cachedIsLast || !limit;
     }
 
     const effArray = cachedArray ? [...cachedArray, ...backendArray] : backendArray;
