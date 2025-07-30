@@ -1,8 +1,8 @@
 /**
  * Shows modal, that allows to choose one of available groups
  *
- * @author Michał Borzęcki
- * @copyright (C) 2018-2019 ACK CYFRONET AGH
+ * @author Michał Borzęcki, Jakub Liput
+ * @copyright (C) 2018-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -86,15 +86,15 @@ export default SelectModelModal.extend({
    * @override
    */
   recordsForDropdown: computed(
-    'records.content.[]',
+    'recordsProxy.content.[]',
     'relatedRecord',
     function recordsForDropdown() {
       const {
-        records,
+        recordsProxy,
         relatedRecord,
-      } = this.getProperties('records', 'relatedRecord');
-      if (get(records, 'isFulfilled')) {
-        return get(records, 'content')
+      } = this;
+      if (recordsProxy.isFulfilled) {
+        return recordsProxy.content
           .filter(group => group !== relatedRecord)
           .sort((g1, g2) =>
             get(g1, 'name').localeCompare(get(g2, 'name'))
@@ -109,9 +109,9 @@ export default SelectModelModal.extend({
    * @override
    */
   loadRecords() {
-    this.set('records', PromiseArray.create({
-      promise: this.get('groupManager').getGroups()
-        .then(groupList => get(groupList, 'list')),
+    this.set('recordsProxy', PromiseArray.create({
+      promise: this.groupManager.getGroups()
+        .then(groupList => groupList.list),
     }));
   },
 });

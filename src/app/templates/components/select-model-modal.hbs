@@ -13,7 +13,7 @@
     {{messageText}}
   </p>
   <div class="dropdown-container">
-    <PromiseProxyContainer @proxy={{records}} @sizeClass="sm">
+    <PromiseProxyContainer @proxy={{this.recordsProxy}} @sizeClass="sm">
       <OneDropdown
         @options={{recordsForDropdown}}
         @selected={{selectedRecord}}

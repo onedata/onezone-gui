@@ -1,12 +1,12 @@
 /**
  * Shows modal, that allows to choose one of available spaces
  *
- * @author Michał Borzęcki
- * @copyright (C) 2019 ACK CYFRONET AGH
+ * @author Michał Borzęcki, Jakub Liput
+ * @copyright (C) 2019-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { get, computed, getProperties } from '@ember/object';
+import { computed, getProperties } from '@ember/object';
 import { inject as service } from '@ember/service';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import layout from 'onezone-gui/templates/components/select-model-modal';
@@ -82,9 +82,9 @@ export default SelectModelModal.extend({
    * @override
    */
   loadRecords() {
-    this.set('records', PromiseArray.create({
-      promise: this.get('spaceManager').getSpaces()
-        .then(spaceList => get(spaceList, 'list')),
+    this.set('recordsProxy', PromiseArray.create({
+      promise: this.spaceManager.getSpaces()
+        .then(spaceList => spaceList.list),
     }));
   },
 });
