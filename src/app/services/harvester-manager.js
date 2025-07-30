@@ -1,8 +1,8 @@
 /**
  * Defines oprations related to harvester management.
  *
- * @author Michał Borzęcki
- * @copyright (C) 20190-2020 ACK CYFRONET AGH
+ * @author Michał Borzęcki, Jakub Liput
+ * @copyright (C) 2019-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -56,21 +56,22 @@ export default Service.extend(
 
     /**
      * Creates new harvester
-     * @param {Object} harvester
+     * @param {Object} harvesterData
      * @returns {Promise<Harvester>}
      */
-    createRecord(harvester) {
-      return this.get('currentUser').getCurrentUserRecord()
-        .then(user => {
-          return this.get('store').createRecord(
-            'harvester',
-            Object.assign({}, harvester, {
-              _meta: {
-                authHint: ['asUser', get(user, 'entityId')],
-              },
-            })
-          ).save().then(harvester => this.reloadList().then(() => harvester));
-        });
+    async createRecord(harvesterData) {
+      const user = await this.currentUser.getCurrentUserRecord();
+      const newHarvester = this.store.createRecord(
+        'harvester', {
+          ...harvesterData,
+          _meta: {
+            authHint: ['asUser', user.entityId],
+          },
+        }
+      );
+      await newHarvester.save();
+      await this.reloadList();
+      return newHarvester;
     },
 
     /**
