@@ -2,7 +2,7 @@
  * Provides data for routes and components associated with spaces tab
  *
  * @author Jakub Liput
- * @copyright (C) 2018-2022 ACK CYFRONET AGH
+ * @copyright (C) 2018-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -174,7 +174,7 @@ export default Service.extend({
         authHint: ['asUser', get(user, 'entityId')],
       },
     }).save();
-    await this.reloadList(false);
+    await this.reloadList();
     return space;
   },
 
@@ -202,7 +202,7 @@ export default Service.extend({
    *   reloaded.
    * @returns {Promise<SpaceList>}
    */
-  async reloadList(reloadSpaceRecords = true) {
+  async reloadList(reloadSpaceRecords = false) {
     const user = await this.currentUser.getCurrentUserRecord();
     const spaceList = await user.belongsTo('spaceList').reload(true);
     const list = await spaceList.list;
