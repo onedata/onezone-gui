@@ -166,18 +166,16 @@ export default Service.extend({
    * Creates new space
    * @returns {Promise<Space>}
    */
-  createRecord({ name }) {
-    return this.get('currentUser').getCurrentUserRecord()
-      .then(user => {
-        return this.get('store').createRecord('space', {
-            name,
-            _meta: {
-              authHint: ['asUser', get(user, 'entityId')],
-            },
-          })
-          .save()
-          .then(space => this.reloadList().then(() => space));
-      });
+  async createRecord({ name }) {
+    const user = await this.currentUser.getCurrentUserRecord();
+    const space = await this.store.createRecord('space', {
+      name,
+      _meta: {
+        authHint: ['asUser', get(user, 'entityId')],
+      },
+    }).save();
+    await this.reloadList(false);
+    return space;
   },
 
   /**
@@ -200,13 +198,17 @@ export default Service.extend({
 
   /**
    * Reloads space list
+   * @param {boolean} reloadSpaceRecords If true, each space record on the list will be
+   *   reloaded.
    * @returns {Promise<SpaceList>}
    */
-  reloadList() {
-    return this.get('currentUser').getCurrentUserRecord()
-      .then(user => user.belongsTo('spaceList').reload(true))
-      .then(spaceList => get(spaceList, 'list'))
-      .then(list => list.reload());
+  async reloadList(reloadSpaceRecords = true) {
+    const user = await this.currentUser.getCurrentUserRecord();
+    const spaceList = await user.belongsTo('spaceList').reload(true);
+    const list = await spaceList.list;
+    if (reloadSpaceRecords) {
+      await list.reload();
+    }
   },
 
   /**
