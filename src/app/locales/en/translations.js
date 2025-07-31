@@ -70,7 +70,6 @@ import contentHarvestersIndices from './components/content-harvesters-indices';
 import contentHarvestersMembers from './components/content-harvesters-members';
 import contentHarvestersEmpty from './components/content-harvesters-empty';
 import contentHarvestersPlugin from './components/content-harvesters-plugin';
-import addYourSpaceModal from './components/add-your-space-modal';
 import harvesterRemoveModal from './components/harvester-remove-modal';
 import harvesterConfiguration from './components/harvester-configuration';
 import uploadPresenter from './components/upload-presenter';
@@ -166,6 +165,7 @@ import removeAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/remo
 import goToFile from './utils/url-action-handlers/go-to-file';
 import onezoneLoginViewModel from './utils/onezone-login-view-model';
 import consumerCaveatGroup from './utils/token-editor/fields/caveats/consumer-caveat-group';
+import addYourSpaceAction from './utils/add-your-space-action';
 
 const translations = {
   tabs: {
@@ -259,7 +259,6 @@ const translations = {
     contentHarvestersMembers,
     contentHarvestersEmpty,
     contentHarvestersPlugin,
-    addYourSpaceModal,
     harvesterRemoveModal,
     harvesterConfiguration,
     uploadPresenter,
@@ -308,6 +307,7 @@ const translations = {
   utils: {
     atmWorkflow,
     onezoneLoginViewModel,
+    addYourSpaceAction,
     apiSamplesActions: {
       showApiSamplesAction,
     },

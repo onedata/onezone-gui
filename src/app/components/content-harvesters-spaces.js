@@ -1,8 +1,8 @@
 /**
  * A component that shows spaces attached to harvester
  *
- * @author Michał Borzęcki, Agnieszka Warchoł
- * @copyright (C) 2019-2021 ACK CYFRONET AGH
+ * @author Michał Borzęcki, Agnieszka Warchoł, Jakub Liput
+ * @copyright (C) 2019-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -11,12 +11,17 @@ import { computed, get } from '@ember/object';
 import { collect } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import { inject as service } from '@ember/service';
-import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import { ResourceListItem } from 'onedata-gui-common/components/resources-list';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import { promise } from 'ember-awesome-macros';
 import { resolve } from 'rsvp';
+import AddYourSpaceAction from 'onezone-gui/utils/add-your-space-action';
+import {
+  destroyDestroyableComputedValues,
+  destroyableComputed,
+  initDestroyableCache,
+} from 'onedata-gui-common/utils/destroyable-computed';
 
 export default Component.extend(I18n, GlobalActions, {
   classNames: ['content-harvesters-spaces'],
@@ -33,16 +38,6 @@ export default Component.extend(I18n, GlobalActions, {
    * @type {Models.Harvester}
    */
   harvester: undefined,
-
-  /**
-   * @type {boolean}
-   */
-  isAddYourSpaceModalOpened: false,
-
-  /**
-   * @type {boolean}
-   */
-  isAddingYourSpace: false,
 
   /**
    * @type {ComputedProperty<PromiseArray<Models.Space>>}
@@ -72,16 +67,15 @@ export default Component.extend(I18n, GlobalActions, {
     }));
   }),
 
-  /**
-   * @type {Ember.ComputedProperty<Action>}
-   */
-  addYourSpaceAction: computed(function addYourSpaceAction() {
-    return {
-      action: () => this.set('isAddYourSpaceModalOpened', true),
-      title: this.t('addYourSpace'),
-      class: 'add-your-space-action',
-      icon: 'space-add',
-    };
+  addYourSpaceAction: destroyableComputed('harvester', function addYourSpaceAction() {
+    return AddYourSpaceAction.create({
+      ownerSource: this,
+      context: {
+        onSpaceAdd: this.addYourSpace.bind(this),
+        relatedRecord: this.harvester,
+        relation: 'sourceFor',
+      },
+    });
   }),
 
   /**
@@ -111,19 +105,28 @@ export default Component.extend(I18n, GlobalActions, {
     'inviteSpaceUsingTokenAction'
   ),
 
+  /** @override */
+  init() {
+    initDestroyableCache(this);
+    this._super(...arguments);
+  },
+
+  /** @override */
+  willDestroy() {
+    try {
+      destroyDestroyableComputedValues(this);
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
+  async addYourSpace(space) {
+    await this.harvesterActions.addSpaceToHarvester(this.harvester, space);
+  },
+
   actions: {
-    addYourSpace(space) {
-      this.set('isAddingYourSpace', true);
-      const {
-        harvester,
-        harvesterActions,
-      } = this.getProperties('harvester', 'harvesterActions');
-      return harvesterActions.addSpaceToHarvester(harvester, space).finally(() =>
-        safeExec(this, 'setProperties', {
-          isAddingYourSpace: false,
-          isAddYourSpaceModalOpened: false,
-        })
-      );
+    openAddYourSpaceModal() {
+      this.addYourSpaceAction.executeCallback();
     },
     inviteSpaceUsingToken() {
       return this.get('inviteSpaceUsingTokenAction').execute();
