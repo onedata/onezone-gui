@@ -1,15 +1,14 @@
 /**
  * Provides data for routes and components associated with groups tab.
  *
- * @author Michał Borzęcki
- * @copyright (C) 2018-2020 ACK CYFRONET AGH
+ * @author Michał Borzęcki, Jakub Liput
+ * @copyright (C) 2018-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 import { computed, get } from '@ember/object';
-import _ from 'lodash';
 import {
   Promise,
   resolve,
@@ -85,20 +84,20 @@ export default Service.extend({
 
   /**
    * Creates new group
-   * @param {object} group group representation
+   * @param {object} groupData group representation
    * @returns {Promise<Group>}
    */
-  createGroup(group) {
-    return this.get('currentUser').getCurrentUserRecord()
-      .then(user => {
-        return this.get('store').createRecord('group', _.merge({}, group, {
-            _meta: {
-              authHint: ['asUser', get(user, 'entityId')],
-            },
-          }))
-          .save()
-          .then(group => this.reloadList().then(() => group));
-      });
+  async createGroup(groupData) {
+    const user = await this.currentUser.getCurrentUserRecord();
+    const createData = {
+      ...groupData,
+      _meta: {
+        authHint: ['asUser', user.entityId],
+      },
+    };
+    const group = await this.store.createRecord('group', createData).save();
+    await this.reloadList();
+    return group;
   },
 
   /**
@@ -335,9 +334,9 @@ export default Service.extend({
    * Reloads group list
    * @returns {Promise<GroupList>}
    */
-  reloadList() {
-    return this.get('currentUser').getCurrentUserRecord()
-      .then(user => user.belongsTo('groupList').reload(true));
+  async reloadList() {
+    const user = await this.currentUser.getCurrentUserRecord();
+    return await user.belongsTo('groupList').reload(true);
   },
 
   /**

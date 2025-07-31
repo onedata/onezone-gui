@@ -127,12 +127,7 @@ export default Service.extend(I18n, {
       router,
       spaceManager,
       guiUtils,
-    } = this.getProperties(
-      'globalNotify',
-      'router',
-      'spaceManager',
-      'guiUtils',
-    );
+    } = this;
     return spaceManager.createRecord({ name })
       .catch(error => {
         globalNotify.backendError(this.t('spaceCreation'), error);
@@ -144,7 +139,7 @@ export default Service.extend(I18n, {
           'onedata.sidebar.content.aspect',
           'spaces',
           guiUtils.getRoutableIdFor(space),
-          'index`',
+          'index',
         );
       });
   },
