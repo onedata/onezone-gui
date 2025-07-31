@@ -123,7 +123,7 @@ export default Service.extend({
    * lead to batch conflicts.
    *
    * @param {UserListModelName} listItemModelName
-   * @returns {BatchRecordsLoader}
+   * @returns {PromiseObject<BatchRecordsLoader>}
    */
   getUserRecordListLoaderProxy(listItemModelName) {
     let loaderProxy = this.listLoaderProxies[listItemModelName];

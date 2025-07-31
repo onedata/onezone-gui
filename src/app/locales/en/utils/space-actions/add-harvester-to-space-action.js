@@ -5,4 +5,5 @@ export default {
   modalSubmit: 'Add',
   successNotificationText: 'The harvester has been successfully added to the space.',
   failureNotificationActionName: 'adding the harvester to the space',
+  loading: 'Loading available harvesters... {{progress}}',
 };
