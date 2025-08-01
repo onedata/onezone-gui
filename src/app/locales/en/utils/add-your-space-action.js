@@ -4,9 +4,9 @@ export default {
   modalDescription: 'Choose a space which should become a {{relation}} {{recordType}} "{{recordName}}":',
   dropdownPlaceholder: 'Choose a space...',
   modalSubmit: 'Add',
+  loading: 'Loading available spaces... {{progress}}',
   // recordType
   harvester: 'harvester',
-  loading: 'Loading available spaces... {{progress}}',
   // relation
   sourceFor: 'source for',
 };

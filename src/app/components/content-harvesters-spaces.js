@@ -71,7 +71,7 @@ export default Component.extend(I18n, GlobalActions, {
     return AddYourSpaceAction.create({
       ownerSource: this,
       context: {
-        onSpaceAdd: this.addYourSpace.bind(this),
+        onSpaceAdd: (selectedSpace) => this.addYourSpace(selectedSpace),
         relatedRecord: this.harvester,
         relation: 'sourceFor',
       },

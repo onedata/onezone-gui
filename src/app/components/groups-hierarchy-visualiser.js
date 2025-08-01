@@ -569,7 +569,7 @@ export default Component.extend(I18n, {
     const action = AddYourGroupAction.create({
       ownerSource: this,
       context: {
-        onGroupAdd: this.addYourGroup.bind(this),
+        onGroupAdd: (selectedGroup) => this.addYourGroup(group, selectedGroup, relation),
         relatedRecord: group,
         relation,
       },

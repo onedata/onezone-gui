@@ -391,7 +391,7 @@ export default Mixin.create({
       return AddYourGroupAction.create({
         ownerSource: this,
         context: {
-          onGroupAdd: this.addYourGroup.bind(this),
+          onGroupAdd: (selectedGroup) => this.addMemberGroup(selectedGroup),
           relatedRecord: this.record,
           relation: this.record.entityType === 'group' ? 'child' : 'member',
         },
@@ -677,10 +677,6 @@ export default Mixin.create({
         this.set('memberIdToExpand', null);
       }
     }
-  },
-
-  async addYourGroup(baseGroup, addedGroup) {
-    return await this.addMemberGroup(addedGroup);
   },
 
   actions: {
