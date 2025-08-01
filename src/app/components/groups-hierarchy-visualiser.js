@@ -67,7 +67,7 @@
  *      relation indicator - number of groups in relation. It is a trigger to
  *      show/hide relation in previous/next column.
  *    - modals: GroupLeaveModal, GroupRemoveModal, GroupRemoveRelationModal,
- *      GroupCreateRelativeModal, GroupAddYourGroupModal, GroupJoinUsingTokenModal,
+ *      GroupCreateRelativeModal, GroupJoinUsingTokenModal,
  *      PrivilegesEditorModal.
  *
  *                        GroupsHierarchyVisualiser
@@ -178,7 +178,7 @@ import { A } from '@ember/array';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
-import { Promise, resolve, reject } from 'rsvp';
+import { resolve, reject } from 'rsvp';
 import ColumnManager from 'onezone-gui/utils/groups-hierarchy-visualiser/column-manager';
 import Workspace from 'onezone-gui/utils/groups-hierarchy-visualiser/workspace';
 import {
@@ -197,6 +197,7 @@ import {
   destroyableComputed,
   initDestroyableCache,
 } from 'onedata-gui-common/utils/destroyable-computed';
+import AddYourGroupAction from 'onezone-gui/utils/add-your-group-action';
 
 export default Component.extend(I18n, {
   classNames: ['groups-hierarchy-visualiser'],
@@ -290,24 +291,6 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   isCreatingRelativeGroup: false,
-
-  /**
-   * Group for group-add-your-group-modal
-   * @type {Group|null}
-   */
-  groupToAddYourGroup: null,
-
-  /**
-   * Relative group type for group-add-your-group-modal. One of `parent`, `child`
-   * @type {string}
-   */
-  addYourGroupType: 'child',
-
-  /**
-   * If true, system is adding child|parent group to `groupToAddYourGroup`
-   * @type {boolean}
-   */
-  isAddingYourGroup: false,
 
   /**
    * Group for group-join-using-token-modal
@@ -582,6 +565,22 @@ export default Component.extend(I18n, {
     }
   },
 
+  async showAddYourGroupModal(group, relation) {
+    const action = AddYourGroupAction.create({
+      ownerSource: this,
+      context: {
+        onGroupAdd: this.addYourGroup.bind(this),
+        relatedRecord: group,
+        relation,
+      },
+    });
+    try {
+      await action.executeCallback();
+    } finally {
+      action.destroy();
+    }
+  },
+
   /**
    * Updates component width and height in workspace
    * @returns {undefined}
@@ -601,14 +600,11 @@ export default Component.extend(I18n, {
   loadGroupChildren(parentGroup) {
     let promise;
     if (get(parentGroup, 'hasViewPrivilege')) {
-      promise = parentGroup.belongsTo('childList').reload()
-        .then(childList => {
-          return childList.hasMany('list').reload()
-            .then(groupsList => Promise.all(
-              groupsList.map(g => g.reload())
-            ))
-            .then(() => childList);
-        });
+      promise = (async () => {
+        const childList = await parentGroup.belongsTo('childList').reload();
+        await childList.hasMany('list').reload();
+        return childList;
+      })();
     } else {
       promise = reject({ id: 'forbidden' });
     }
@@ -623,14 +619,11 @@ export default Component.extend(I18n, {
   loadGroupParents(childGroup) {
     let promise;
     if (get(childGroup, 'hasViewPrivilege')) {
-      promise = childGroup.belongsTo('parentList').reload()
-        .then(parentList => {
-          return parentList.hasMany('list').reload()
-            .then(list => Promise.all(
-              list.map(g => g.reload())
-            ))
-            .then(() => parentList);
-        });
+      promise = (async () => {
+        const childList = await childGroup.belongsTo('parentList').reload();
+        await childList.hasMany('list').reload();
+        return childList;
+      })();
     } else {
       promise = reject({ id: 'forbidden' });
     }
@@ -736,6 +729,19 @@ export default Component.extend(I18n, {
       });
   },
 
+  /**
+   * @param {Models.Group} baseGroup
+   * @param {Models.Group} addedGroup
+   * @param {import('../utils/add-your-group-action').GroupRelationAddType} relation
+   * @returns
+   */
+  addYourGroup(baseGroup, addedGroup, relation) {
+    const { groupActions } = this;
+    const methodName = relation === 'parent' ? 'addParent' : 'addChild';
+    const createFunction = groupActions[methodName].bind(groupActions);
+    return createFunction(baseGroup, addedGroup);
+  },
+
   actions: {
     showChildren(column, group) {
       let newColumn;
@@ -806,33 +812,7 @@ export default Component.extend(I18n, {
         );
     },
     showAddYourGroupModal(group, relation) {
-      this.setProperties({
-        groupToAddYourGroup: group,
-        addYourGroupType: relation,
-      });
-    },
-    addYourGroup(group) {
-      const {
-        groupToAddYourGroup,
-        addYourGroupType,
-        groupActions,
-      } = this.getProperties(
-        'groupToAddYourGroup',
-        'addYourGroupType',
-        'groupActions'
-      );
-      let createFunction = addYourGroupType === 'parent' ?
-        groupActions.addParent : groupActions.addChild;
-      createFunction = createFunction.bind(groupActions);
-
-      this.set('isAddingYourGroup', true);
-      return createFunction(groupToAddYourGroup, group)
-        .finally(() =>
-          safeExec(this, 'setProperties', {
-            isAddingYourGroup: false,
-            groupToAddYourGroup: null,
-          })
-        );
+      this.showAddYourGroupModal(group, relation);
     },
     async joinUsingToken(token) {
       const {

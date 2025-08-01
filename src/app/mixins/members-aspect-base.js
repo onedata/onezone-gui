@@ -1,8 +1,8 @@
 /**
  * Base functionality for members aspects of application.
  *
- * @author Michał Borzęcki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @author Michał Borzęcki, Jakub Liput
+ * @copyright (C) 2018-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -42,6 +42,7 @@ import {
 } from 'onedata-gui-common/utils/destroyable-computed';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { all as allFulfilled } from 'rsvp';
+import AddYourGroupAction from 'onezone-gui/utils/add-your-group-action';
 
 /**
  * @typedef {Models.UserList|Models.GroupList} MembersOwnersList
@@ -131,16 +132,6 @@ export default Mixin.create({
    * @type {boolean}
    */
   isCreatingChildGroup: false,
-
-  /**
-   * @type {boolean}
-   */
-  addYourGroupModalVisible: false,
-
-  /**
-   * @type {boolean}
-   */
-  isAddingYourGroup: false,
 
   /**
    * @type {boolean}
@@ -376,21 +367,37 @@ export default Mixin.create({
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  groupListActions: computed('inviteGroupUsingTokenAction', function groupListActions() {
-    return [{
+  groupListActions: computed(
+    'addYourGroupAction',
+    'inviteGroupUsingTokenAction',
+    function groupListActions() {
+      const createChildGroupAction = {
         action: () => this.set('createChildGroupModalVisible', true),
         title: this.t('createChildGroup'),
         class: 'create-child-group-action',
         icon: 'add-filled',
-      }, {
-        action: () => this.set('addYourGroupModalVisible', true),
-        title: this.t('addYourGroup'),
-        class: 'add-your-group-action',
-        icon: 'group-invite',
-      },
-      this.get('inviteGroupUsingTokenAction'),
-    ];
-  }),
+      };
+      return [
+        createChildGroupAction,
+        this.addYourGroupAction,
+        this.inviteGroupUsingTokenAction,
+      ];
+    }
+  ),
+
+  addYourGroupAction: destroyableComputed(
+    'record.entityType',
+    function addYourSpaceAction() {
+      return AddYourGroupAction.create({
+        ownerSource: this,
+        context: {
+          onGroupAdd: this.addYourGroup.bind(this),
+          relatedRecord: this.record,
+          relation: this.record.entityType === 'group' ? 'child' : 'member',
+        },
+      });
+    }
+  ),
 
   /**
    * @type {Ember.ComputedProperty<Action>}
@@ -614,7 +621,6 @@ export default Mixin.create({
     this.setProperties({
       memberToRemove: null,
       createChildGroupModalVisible: false,
-      addYourGroupModalVisible: false,
       joinAsUserModalVisible: false,
       selectedUsersProxies: A(),
       selectedGroupsProxies: A(),
@@ -671,6 +677,10 @@ export default Mixin.create({
         this.set('memberIdToExpand', null);
       }
     }
+  },
+
+  async addYourGroup(baseGroup, addedGroup) {
+    return await this.addMemberGroup(addedGroup);
   },
 
   actions: {
@@ -731,15 +741,6 @@ export default Mixin.create({
         safeExec(this, 'setProperties', {
           isCreatingChildGroup: false,
           createChildGroupModalVisible: false,
-        })
-      );
-    },
-    addYourGroup(group) {
-      this.set('isAddingYourGroup', true);
-      this.addMemberGroup(group).finally(() =>
-        safeExec(this, 'setProperties', {
-          isAddingYourGroup: false,
-          addYourGroupModalVisible: false,
         })
       );
     },

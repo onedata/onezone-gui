@@ -1,5 +1,5 @@
 /**
- * Shows modal with choose-a-space selector to add relation to it to some record.
+ * Shows modal with choose-a-group selector to add relation to it to some record.
  *
  * @author Jakub Liput
  * @copyright (C) 2025 ACK CYFRONET AGH
@@ -15,7 +15,7 @@ import ActionResult from 'onedata-gui-common/utils/action-result';
 import { computed } from '@ember/object';
 
 /**
- * @typedef {'sourceFor'} SpaceRelationAddType
+ * @typedef {'child'|'parent'|'member'} GroupRelationAddType
  */
 
 export default Action.extend({
@@ -25,17 +25,17 @@ export default Action.extend({
   /**
    * @override
    */
-  i18nPrefix: 'utils.addYourSpaceAction',
+  i18nPrefix: 'utils.addYourGroupAction',
 
   /**
    * @override
    */
-  icon: 'space-add',
+  icon: 'group-invite',
 
   /**
    * @override
    */
-  className: 'add-your-space-action',
+  className: 'add-your-group-action',
 
   //#region state
 
@@ -54,11 +54,11 @@ export default Action.extend({
    */
   relatedRecord: reads('context.relatedRecord'),
 
-  /** @type {SpaceRelationAddType} */
+  /** @type {GroupRelationAddType} */
   relation: reads('context.relation'),
 
-  /** @type {(space: Models.Space) => Promise<void>} */
-  onSpaceAdd: reads('context.onSpaceAdd'),
+  /** @type {(baseGroup: Models.Group, addedGroup: Models.Group, [relation]: GroupRelationAddType) => Promise<void>} */
+  onGroupAdd: reads('context.onGroupAdd'),
 
   /** @type {ComputedProperty<string|SafeString>} */
   loadingText: computed(
@@ -91,7 +91,7 @@ export default Action.extend({
 
     const recordsPromise = (async () => {
       const batchRecordsLoader =
-        await this.recordManager.resolveUserRecordListLoader('space');
+        await this.recordManager.resolveUserRecordListLoader('group');
       this.set('batchRecordsLoader', batchRecordsLoader);
       return batchRecordsLoader.getPromise();
     })();
@@ -102,10 +102,11 @@ export default Action.extend({
       submitText: this.t('modalSubmit'),
       loadingText: reads('parentAction.loadingText'),
       selectorPlaceholderText: this.t('dropdownPlaceholder'),
-      modalClass: 'add-your-space-modal',
+      modalClass: 'add-your-group-modal',
       recordsPromise,
-      onSubmit: space =>
-        result.interceptPromise(this.onSpaceAdd(space)),
+      onSubmit: selectedGroup => result.interceptPromise(
+        this.onGroupAdd(this.relatedRecord, selectedGroup, this.relation)
+      ),
     }).create({
       parentAction: this,
     });

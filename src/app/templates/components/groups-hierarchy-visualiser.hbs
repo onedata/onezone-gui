@@ -49,14 +49,6 @@ right column will always be before left in html --}}
   @relatedRecord={{groupToCreateRelative}}
   @relation={{newRelativeGroupType}}
 />
-<GroupAddYourGroupModal
-  @opened={{and groupToAddYourGroup (or isAddingYourGroup (not groupToAddYourGroup.isDeleted))}}
-  @close={{action (mut groupToAddYourGroup) null}}
-  @proceed={{action "addYourGroup"}}
-  @processing={{isAddingYourGroup}}
-  @relatedRecord={{groupToAddYourGroup}}
-  @relation={{addYourGroupType}}
-/>
 <GroupJoinUsingTokenModal
   @opened={{and groupConsumingToken (or isGroupConsumingToken (not groupConsumingToken.isDeleted))}}
   @close={{action (mut groupConsumingToken) null}}
