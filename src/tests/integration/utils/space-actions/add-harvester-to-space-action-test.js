@@ -91,7 +91,7 @@ describe(
       expect(getModalHeader().querySelector('h1'))
         .to.have.trimmed.text('Add one of your harvesters');
       expect(getModalBody().querySelector('p')).to.have.trimmed.text(
-        'Choose a harvester which should consume metadata from space "space1":'
+        'Choose a harvester that should consume metadata from space "space1":'
       );
       expect(getModalFooter().querySelector('.record-selector-submit'))
         .to.have.trimmed.text('Add');
