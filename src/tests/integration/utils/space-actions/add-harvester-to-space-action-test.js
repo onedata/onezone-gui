@@ -15,8 +15,6 @@ import {
   getModalFooter,
 } from '../../../helpers/modal';
 import { suppressRejections } from '../../../helpers/suppress-rejections';
-import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
-import { resolve } from 'rsvp';
 import { selectChoose, clickTrigger } from 'ember-power-select/test-support/helpers';
 
 describe(
@@ -40,7 +38,6 @@ describe(
           },
         },
       });
-      const recordManager = lookupService(this, 'record-manager');
       const harvester = await store.createRecord('harvester', {
         name: 'harvester1',
       }).save();
@@ -57,7 +54,7 @@ describe(
       user.set('spaceList', spaceList);
       await user.save();
       this.set('context', {
-        space,
+        relatedRecord: space,
       });
     });
 
@@ -94,7 +91,7 @@ describe(
       expect(getModalHeader().querySelector('h1'))
         .to.have.trimmed.text('Add one of your harvesters');
       expect(getModalBody().querySelector('p')).to.have.trimmed.text(
-        'Choose harvester which should consume metadata from space "space1":'
+        'Choose a harvester which should consume metadata from space "space1":'
       );
       expect(getModalFooter().querySelector('.record-selector-submit'))
         .to.have.trimmed.text('Add');

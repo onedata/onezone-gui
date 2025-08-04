@@ -1,7 +1,7 @@
 export default {
   title: 'Add one of your groups',
   modalHeader: 'Add one of your groups',
-  modalDescription: 'Choose a group which should become a {{relation}} {{recordType}} "{{recordName}}":',
+  modalDescription: 'Choose a group that should become a {{relation}} {{recordType}} "{{recordName}}":',
   dropdownPlaceholder: 'Choose a group...',
   modalSubmit: 'Add',
   loading: 'Loading available groups... {{progress}}',
