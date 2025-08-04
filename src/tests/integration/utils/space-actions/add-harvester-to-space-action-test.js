@@ -24,25 +24,40 @@ describe(
   function () {
     const { afterEach } = setupRenderingTest();
 
-    beforeEach(function () {
+    beforeEach(async function () {
+      const userId = 'user_id';
+      const store = lookupService(this, 'store');
+      const user = await store.createRecord('user', {
+        id: store.userGri(userId),
+        username: 'testuser',
+        fullName: 'Test User',
+      }).save();
+      const sessionService = lookupService(this, 'session');
+      sessionService.set('data', {
+        authenticated: {
+          identity: {
+            user: user.entityId,
+          },
+        },
+      });
       const recordManager = lookupService(this, 'record-manager');
-      const harvesters = [{
-        entityId: 'harvesterId',
+      const harvester = await store.createRecord('harvester', {
         name: 'harvester1',
-        constructor: {
-          modelName: 'harvester',
-        },
-      }];
-      sinon.stub(recordManager, 'getUserRecordList')
-        .withArgs('harvester')
-        .resolves({
-          list: promiseArray(resolve(harvesters)),
-        });
+      }).save();
+      this.set('harvester', harvester);
+      const harvesterList =
+        await store.createRecord('harvesterList', { list: [harvester] }).save();
+      user.set('harvesterList', harvesterList);
+      const space = await store.createRecord('space', {
+        name: 'space1',
+      });
+      this.set('space', space);
+      const spaceList =
+        await store.createRecord('spaceList', { list: [space] }).save();
+      user.set('spaceList', spaceList);
+      await user.save();
       this.set('context', {
-        space: {
-          name: 'space1',
-          entityId: 'spaceId',
-        },
+        space,
       });
     });
 
@@ -115,7 +130,10 @@ describe(
         await click(getModalFooter().querySelector('.record-selector-submit'));
         const actionResult = await actionResultPromise;
         expect(addHarvesterStub).to.be.calledOnce;
-        expect(addHarvesterStub).to.be.calledWith('harvesterId', 'spaceId');
+        expect(addHarvesterStub).to.be.calledWith(
+          this.harvester.entityId,
+          this.space.entityId
+        );
         expect(successNotifySpy).to.be.calledWith(sinon.match.has(
           'string',
           'The harvester has been successfully added to the space.'
