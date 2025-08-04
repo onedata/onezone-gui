@@ -91,7 +91,7 @@ export default Service.extend({
       },
     };
     const group = await this.store.createRecord('group', createData).save();
-    this.reloadList();
+    await this.reloadList();
     return group;
   },
 
