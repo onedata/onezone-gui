@@ -16,11 +16,14 @@ import {
 } from '../../../helpers/modal';
 import { suppressRejections } from '../../../helpers/suppress-rejections';
 import { selectChoose, clickTrigger } from 'ember-power-select/test-support/helpers';
+import { clearStoreAfterEach } from '../../../helpers/clear-store';
 
 describe(
   'Integration | Utility | space-actions/add-harvester-to-space-action',
   function () {
     const { afterEach } = setupRenderingTest();
+
+    clearStoreAfterEach(afterEach);
 
     beforeEach(async function () {
       const userId = 'user_id';
@@ -47,7 +50,7 @@ describe(
       user.set('harvesterList', harvesterList);
       const space = await store.createRecord('space', {
         name: 'space1',
-      });
+      }).save();
       this.set('space', space);
       const spaceList =
         await store.createRecord('spaceList', { list: [space] }).save();
