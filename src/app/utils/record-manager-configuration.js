@@ -131,7 +131,7 @@ export default class RecordManagerConfiguration {
    * @param {GraphModel} record
    */
   async onRecordRemove(modelName, record) {
-    await this.recordManager.reloadUserRecordList(modelName);
+    await this.recordManager.reloadUserRecordList(modelName, { onlyIds: true });
 
     switch (modelName) {
       case 'atmWorkflowSchema': {
@@ -140,7 +140,12 @@ export default class RecordManagerConfiguration {
         }
         const atmInventory = record.belongsTo('atmInventory').value();
         if (atmInventory) {
-          await this.recordManager.reloadRecordList(atmInventory, modelName);
+          await this.recordManager.reloadRecordList(
+            atmInventory,
+            modelName, {
+              onlyIds: true,
+            }
+          );
         }
         break;
       }
@@ -197,13 +202,17 @@ export default class RecordManagerConfiguration {
       this.recordManager.reloadRecordListById(
         relationOriginModelName,
         relationOriginRecordId,
-        relationTargetModelName
+        relationTargetModelName, {
+          onlyIds: true,
+        }
       ).catch(ignoreRelationReloadError),
       // Reload list of origins in target
       this.recordManager.reloadRecordListById(
         relationTargetModelName,
         relationTargetRecordId,
-        relationOriginModelName
+        relationOriginModelName, {
+          onlyIds: true,
+        }
       ).catch(ignoreRelationReloadError)
     );
 
@@ -216,13 +225,17 @@ export default class RecordManagerConfiguration {
         this.recordManager.reloadRecordListById(
           relationTargetModelName,
           relationTargetRecordId,
-          'user'
+          'user', {
+            onlyIds: true,
+          }
         ).catch(ignoreRelationReloadError),
         // Reload list of targets in current user (because it's possible that
         // current user is a member of origin group and that group was a source
         // of relation "current user -> target").
         this.recordManager.reloadUserRecordList(
-          relationTargetModelName
+          relationTargetModelName, {
+            onlyIds: true,
+          }
         ).catch(ignoreForbiddenError),
         // Reload additional model lists in origin as some types of targets
         // implicitly introduce additional relations
@@ -230,7 +243,9 @@ export default class RecordManagerConfiguration {
           this.recordManager.reloadRecordListById(
             relationOriginModelName,
             relationOriginRecordId,
-            modelInList
+            modelInList, {
+              onlyIds: true,
+            }
           ).catch(ignoreRelationReloadError)
         )
       );
@@ -244,13 +259,17 @@ export default class RecordManagerConfiguration {
         this.recordManager.reloadRecordListById(
           relationOriginModelName,
           relationOriginRecordId,
-          'user'
+          'user', {
+            onlyIds: true,
+          }
         ).catch(ignoreRelationReloadError),
         // Reload list of origins in current user (because it's possible that
         // current user is a member of target group and that group was a source
         // of relation "current user -> origin").
         this.recordManager.reloadUserRecordList(
-          relationOriginModelName
+          relationOriginModelName, {
+            onlyIds: true,
+          }
         ).catch(ignoreForbiddenError),
         // Reload additional model lists in target as some types of origins
         // implicitly introduce additional relations
@@ -258,7 +277,9 @@ export default class RecordManagerConfiguration {
           this.recordManager.reloadRecordListById(
             relationTargetModelName,
             relationTargetRecordId,
-            modelInList
+            modelInList, {
+              onlyIds: true,
+            }
           ).catch(ignoreRelationReloadError)
         )
       );
@@ -271,7 +292,7 @@ export default class RecordManagerConfiguration {
         // Reload additional model lists in current user as some types of targets
         // implicitly introduce additional relations
         ...customListsToReload.map((modelInList) =>
-          this.recordManager.reloadUserRecordList(modelInList)
+          this.recordManager.reloadUserRecordList(modelInList, { onlyIds: true })
           .catch(ignoreForbiddenError))
       );
     } else if (isCurrentUserATarget || relationTargetModelName === 'group') {
@@ -281,7 +302,7 @@ export default class RecordManagerConfiguration {
         // Reload additional model lists in current user as some types of origins
         // implicitly introduce additional relations
         ...customListsToReload.map((modelInList) =>
-          this.recordManager.reloadUserRecordList(modelInList)
+          this.recordManager.reloadUserRecordList(modelInList, { onlyIds: true })
           .catch(ignoreForbiddenError))
       );
     }

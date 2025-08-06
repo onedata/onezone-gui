@@ -178,17 +178,17 @@ export default Service.extend({
    * @param {String} spaceId
    * @returns {Promise}
    */
-  removeSpace(spaceId) {
-    const recordManager = this.get('recordManager');
-    return recordManager.removeRecordById('space', spaceId)
-      .then(() => allFulfilled([
-        recordManager.reloadUserRecordList('space'),
-        recordManager.reloadUserRecordList('provider').then(() =>
-          recordManager.reloadRecordListInAllRecords('provider', 'space')
-        ),
-        recordManager.reloadRecordListInAllRecords('group', 'space'),
-        recordManager.reloadRecordListInAllRecords('harvester', 'space'),
-      ]));
+  async removeSpace(spaceId) {
+    const recordManager = this.recordManager;
+    await recordManager.removeRecordById('space', spaceId);
+    // Note, that user space list is reloaded by recordManager.removeRecordById
+    await allFulfilled([
+      recordManager.reloadUserRecordList('provider', { onlyIds: true }).then(() =>
+        recordManager.reloadRecordListInAllRecords('provider', 'space', { onlyIds: true })
+      ),
+      recordManager.reloadRecordListInAllRecords('group', 'space', { onlyIds: true }),
+      recordManager.reloadRecordListInAllRecords('harvester', 'space', { onlyIds: true }),
+    ]);
   },
 
   /**
@@ -206,24 +206,26 @@ export default Service.extend({
     }
   },
 
+  // FIXME: może by to ujednolicić z RecordManager.removeUserRelation?
   /**
    * Removes user from a space
-   * @param {string} entityId
+   * @param {string} spaceId
    * @returns {Promise}
    */
-  leaveSpace(entityId) {
-    const space = this.getLoadedSpaceByEntityId(entityId);
-    return this.get('currentUser').getCurrentUserRecord()
-      .then(user => user.leaveSpace(entityId))
-      .then(destroyResult => {
-        return allFulfilled([
-          this.reloadList(),
-          space ? space.reload().catch(ignoreForbiddenError) : resolve(),
-          this.reloadEffUserList(entityId).catch(ignoreForbiddenError),
-          this.reloadUserList(entityId).catch(ignoreForbiddenError),
-          this.get('providerManager').reloadList(),
-        ]).then(() => destroyResult);
-      });
+  async leaveSpace(spaceId) {
+    const space = this.getLoadedSpaceByEntityId(spaceId);
+    const user = await this.currentUser.getCurrentUserRecord();
+    const destroyResult = await user.leaveSpace(spaceId);
+
+    await allFulfilled([
+      this.reloadList(),
+      (space ? space.reload().catch(ignoreForbiddenError) : resolve()),
+      this.reloadEffUserList(spaceId).catch(ignoreForbiddenError),
+      this.reloadUserList(spaceId).catch(ignoreForbiddenError),
+      this.providerManager.reloadList(),
+    ]);
+
+    return destroyResult;
   },
 
   /**

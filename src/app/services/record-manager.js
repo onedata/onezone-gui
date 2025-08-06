@@ -228,11 +228,16 @@ export default Service.extend({
    * @param {ReloadRecordListOptions} [options]
    * @returns {Promise}
    */
-  reloadRecordListInAllRecords(listOwnerModelName, listItemModelName, options) {
+  async reloadRecordListInAllRecords(listOwnerModelName, listItemModelName, options) {
     const allRecords = this.getAllLoadedRecords(listOwnerModelName);
-    return allFulfilled(
-      allRecords.map(record => this.reloadRecordList(record, listItemModelName, options))
-    ).catch(ignoreForbiddenError);
+    const effOptions = { onlyIds: true, ...options };
+    try {
+      await allFulfilled(allRecords.map(record =>
+        this.reloadRecordList(record, listItemModelName, effOptions)
+      ));
+    } catch (error) {
+      ignoreForbiddenError(error);
+    }
   },
 
   /**

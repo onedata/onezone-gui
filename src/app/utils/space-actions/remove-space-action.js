@@ -87,18 +87,8 @@ export default Action.extend({
   /**
    * @returns {Promise}
    */
-  removeSpace() {
-    const {
-      spaceManager,
-      space,
-      navigationState,
-    } = this.getProperties(
-      'spaceManager',
-      'space',
-      'navigationState'
-    );
-
-    return spaceManager.removeSpace(get(space, 'entityId'))
-      .then(() => navigationState.redirectToCollectionIfResourceNotExist());
+  async removeSpace() {
+    await this.spaceManager.removeSpace(this.space.entityId);
+    await this.navigationState.redirectToCollectionIfResourceNotExist();
   },
 });
