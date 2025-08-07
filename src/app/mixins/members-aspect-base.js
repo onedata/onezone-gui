@@ -387,7 +387,7 @@ export default Mixin.create({
 
   addYourGroupAction: destroyableComputed(
     'record.entityType',
-    function addYourSpaceAction() {
+    function addYourGroupAction() {
       return AddYourGroupAction.create({
         ownerSource: this,
         context: {

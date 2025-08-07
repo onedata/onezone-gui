@@ -8,7 +8,7 @@ import { setupRenderingTest } from 'ember-mocha';
 import { render, settled, click, find, findAll } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
-import { reject, Promise, all as allFulfilled } from 'rsvp';
+import { Promise, all as allFulfilled } from 'rsvp';
 import { suppressRejections } from '../../helpers/suppress-rejections';
 import sinon from 'sinon';
 import RemoveHarvesterFromSpaceAction from 'onezone-gui/utils/space-actions/remove-harvester-from-space-action';
@@ -18,7 +18,6 @@ import { registerService, lookupService } from '../../helpers/stub-service';
 import Service from '@ember/service';
 import globals from 'onedata-gui-common/utils/globals';
 import { clearStoreAfterEach } from '../../helpers/clear-store';
-import { defineProperty } from '@ember/object';
 
 const Router = Service.extend({
   urlFor() {
