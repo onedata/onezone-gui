@@ -125,13 +125,8 @@ export default Service.extend({
    *
    * @returns {Promise<Models.SpaceList>}
    */
-  getSpaces() {
-    return this.get('currentUser')
-      .getCurrentUserRecord()
-      .then(user => user.get('spaceList'))
-      .then(spaceList => get(spaceList, 'list')
-        .then(() => spaceList)
-      );
+  async getSpaces() {
+    return await this.recordManager.getUserRecordList('space');
   },
 
   async getSpacesGris() {

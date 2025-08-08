@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12839 Added loader to space/group relation-add modal
 * VFS-12934 Optimized time of creating new space when there is a large number of spaces
 * VFS-12845 Fixed share list in sidebar not loading all entries
 * VFS-12759 Optimized token creation views for large number of spaces, groups, etc.

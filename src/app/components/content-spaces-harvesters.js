@@ -74,7 +74,7 @@ export default Component.extend(I18n, GlobalActions, {
   addHarvesterAction: computed('space', function addHarvesterAction() {
     this.destroyCache.addHarvesterAction?.destroy();
     const action = this.spaceActions.createAddHarvesterToSpaceAction({
-      space: this.space,
+      relatedRecord: this.space,
     });
     return this.destroyCache.addHarvesterAction = action;
   }),

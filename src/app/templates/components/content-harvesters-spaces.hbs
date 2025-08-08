@@ -19,7 +19,7 @@
       <div class="action-buttons">
         <OneButton
           class="btn btn-primary btn-content-info btn-add-your-space"
-          @onClick={{action (mut isAddYourSpaceModalOpened) true}}
+          @onClick={{action "openAddYourSpaceModal"}}
         >
           {{tt this "addYourSpace"}}
         </OneButton>
@@ -36,12 +36,3 @@
     <ResourcesList @items={{spaceItems}} @isResourceWithAdditionalInfo={{true}} />
   {{/if}}
 </PromiseProxyContainer>
-
-<AddYourSpaceModal
-  @opened={{isAddYourSpaceModalOpened}}
-  @close={{action (mut isAddYourSpaceModalOpened) false}}
-  @proceed={{action "addYourSpace"}}
-  @processing={{isAddingYourSpace}}
-  @relatedRecord={{harvester}}
-  @relation="sourceFor"
-/>

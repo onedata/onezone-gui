@@ -55,7 +55,6 @@ import groupsHierarchyVisualiser from './components/groups-hierarchy-visualiser'
 import groupRemoveModal from './components/group-remove-modal';
 import removeRelationModal from './components/remove-relation-modal';
 import groupCreateRelativeModal from './components/group-create-relative-modal';
-import groupAddYourGroupModal from './components/group-add-your-group-modal';
 import groupJoinUsingTokenModal from './components/group-join-using-token-modal';
 import joinAsUserModal from './components/join-as-user-modal';
 import membershipVisualiser from './components/membership-visualiser';
@@ -70,7 +69,6 @@ import contentHarvestersIndices from './components/content-harvesters-indices';
 import contentHarvestersMembers from './components/content-harvesters-members';
 import contentHarvestersEmpty from './components/content-harvesters-empty';
 import contentHarvestersPlugin from './components/content-harvesters-plugin';
-import addYourSpaceModal from './components/add-your-space-modal';
 import harvesterRemoveModal from './components/harvester-remove-modal';
 import harvesterConfiguration from './components/harvester-configuration';
 import uploadPresenter from './components/upload-presenter';
@@ -166,6 +164,8 @@ import removeAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/remo
 import goToFile from './utils/url-action-handlers/go-to-file';
 import onezoneLoginViewModel from './utils/onezone-login-view-model';
 import consumerCaveatGroup from './utils/token-editor/fields/caveats/consumer-caveat-group';
+import addYourSpaceAction from './utils/add-your-space-action';
+import addYourGroupAction from './utils/add-your-group-action';
 
 const translations = {
   tabs: {
@@ -244,7 +244,6 @@ const translations = {
     groupRemoveModal,
     removeRelationModal,
     groupCreateRelativeModal,
-    groupAddYourGroupModal,
     groupJoinUsingTokenModal,
     joinAsUserModal,
     membershipVisualiser,
@@ -259,7 +258,6 @@ const translations = {
     contentHarvestersMembers,
     contentHarvestersEmpty,
     contentHarvestersPlugin,
-    addYourSpaceModal,
     harvesterRemoveModal,
     harvesterConfiguration,
     uploadPresenter,
@@ -308,6 +306,8 @@ const translations = {
   utils: {
     atmWorkflow,
     onezoneLoginViewModel,
+    addYourSpaceAction,
+    addYourGroupAction,
     apiSamplesActions: {
       showApiSamplesAction,
     },

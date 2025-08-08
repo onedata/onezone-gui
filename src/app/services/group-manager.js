@@ -38,15 +38,10 @@ export default Service.extend({
   /**
    * Fetches collection of all groups
    *
-   * @returns {Promise<DS.RecordArray<GroupList>>} resolves to an array of groups
+   * @returns {Promise<Models.GroupList>>}
    */
-  getGroups() {
-    return this.get('currentUser')
-      .getCurrentUserRecord()
-      .then(user => user.get('groupList'))
-      .then(groupList => groupList.get('list')
-        .then(() => groupList)
-      );
+  async getGroups() {
+    return await this.recordManager.getUserRecordList('group');
   },
 
   /**

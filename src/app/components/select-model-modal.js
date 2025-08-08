@@ -1,8 +1,8 @@
 /**
  * Shows modal, that allows to choose one of provided model records.
  *
- * @author Michał Borzęcki
- * @copyright (C) 2019 ACK CYFRONET AGH
+ * @author Michał Borzęcki, Jakub Liput
+ * @copyright (C) 2019-2025 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -11,7 +11,7 @@ import { computed, observer, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
-import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
+import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import _ from 'lodash';
 import computedT from 'onedata-gui-common/utils/computed-t';
 import { resolve } from 'rsvp';
@@ -90,7 +90,7 @@ export default Component.extend(I18n, {
   /**
    * @type {PromiseArray<Object>}
    */
-  records: undefined,
+  recordsProxy: undefined,
 
   /**
    * Selected group
@@ -101,7 +101,7 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Array<Object>>}
    */
-  recordsForDropdown: reads('records'),
+  recordsForDropdown: reads('recordsProxy.content'),
 
   /**
    * @type {Ember.ComputedProperty<string>}
@@ -131,10 +131,11 @@ export default Component.extend(I18n, {
 
   /**
    * Loads records for dropdown
-   * @returns {undefined}
+   * @virtual
+   * @returns {void}
    */
   loadRecords() {
-    this.set('records', PromiseArray.create({ promise: resolve([]) }));
+    this.set('recordsProxy', promiseArray(resolve([])));
   },
 
   actions: {

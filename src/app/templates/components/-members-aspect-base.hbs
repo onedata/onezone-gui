@@ -138,14 +138,6 @@
     @relatedRecord={{record}}
     @relation={{if (eq record.entityType "group") "child" "member"}}
   />
-  <GroupAddYourGroupModal
-    @opened={{addYourGroupModalVisible}}
-    @close={{action (mut addYourGroupModalVisible) false}}
-    @proceed={{action "addYourGroup"}}
-    @processing={{isAddingYourGroup}}
-    @relatedRecord={{record}}
-    @relation={{if (eq record.entityType "group") "child" "member"}}
-  />
   <RemoveRelationModal
     @opened={{and memberToRemove (not memberToRemove.isDeleted)}}
     @close={{action (mut memberToRemove) null}}

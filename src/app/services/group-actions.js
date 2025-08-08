@@ -264,50 +264,44 @@ export default Service.extend(I18n, {
 
   /**
    * Adds parent to specified child group
-   * @param {Group} group
+   * @param {Group} childGroup
    * @param {Object} futureParent
-   * @returns {Promise}
+   * @returns {Promise<void>}
    */
-  addParent(group, futureParent) {
-    const {
-      groupManager,
-      globalNotify,
-    } = this.getProperties('groupManager', 'globalNotify');
-    return groupManager.addChild(
-      get(futureParent, 'entityId'),
-      get(group, 'entityId')
-    ).then(() => {
-      globalNotify.success(this.t('addParentGroupSuccess', {
-        parentGroupName: get(futureParent, 'name'),
+  async addParent(childGroup, futureParent) {
+    try {
+      await this.groupManager.addChild(
+        futureParent.entityId,
+        childGroup.entityId
+      );
+      this.globalNotify.success(this.t('addParentGroupSuccess', {
+        parentGroupName: futureParent.name,
       }));
-    }).catch(error => {
-      globalNotify.backendError(this.t('parentGroupAddition'), error);
+    } catch (error) {
+      this.globalNotify.backendError(this.t('parentGroupAddition'), error);
       throw error;
-    });
+    }
   },
 
   /**
    * Adds child to specified parent group
-   * @param {Group} group
+   * @param {Group} parentGroup
    * @param {Group} futureChild
    * @returns {Promise}
    */
-  addChild(group, futureChild) {
-    const {
-      groupManager,
-      globalNotify,
-    } = this.getProperties('groupManager', 'globalNotify');
-    return groupManager.addChild(
-      get(group, 'entityId'),
-      get(futureChild, 'entityId')
-    ).then(() => {
-      globalNotify.success(this.t('addChildGroupSuccess', {
+  async addChild(parentGroup, futureChild) {
+    try {
+      await this.groupManager.addChild(
+        parentGroup.entityId,
+        futureChild.entityId
+      );
+      this.globalNotify.success(this.t('addChildGroupSuccess', {
         childGroupName: get(futureChild, 'name'),
       }));
-    }).catch(error => {
-      globalNotify.backendError(this.t('childGroupAddition'), error);
+    } catch (error) {
+      this.globalNotify.backendError(this.t('childGroupAddition'), error);
       throw error;
-    });
+    }
   },
 
   /**
