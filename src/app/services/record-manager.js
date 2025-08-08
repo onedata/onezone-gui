@@ -230,10 +230,9 @@ export default Service.extend({
    */
   async reloadRecordListInAllRecords(listOwnerModelName, listItemModelName, options) {
     const allRecords = this.getAllLoadedRecords(listOwnerModelName);
-    const effOptions = { onlyIds: true, ...options };
     try {
       await allFulfilled(allRecords.map(record =>
-        this.reloadRecordList(record, listItemModelName, effOptions)
+        this.reloadRecordList(record, listItemModelName, options)
       ));
     } catch (error) {
       ignoreForbiddenError(error);

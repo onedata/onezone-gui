@@ -183,11 +183,11 @@ export default Service.extend({
     await recordManager.removeRecordById('space', spaceId);
     // Note, that user space list is reloaded by recordManager.removeRecordById
     await allFulfilled([
-      recordManager.reloadUserRecordList('provider', { onlyIds: true }).then(() =>
-        recordManager.reloadRecordListInAllRecords('provider', 'space', { onlyIds: true })
+      recordManager.reloadUserRecordList('provider').then(() =>
+        recordManager.reloadRecordListInAllRecords('provider', 'space')
       ),
-      recordManager.reloadRecordListInAllRecords('group', 'space', { onlyIds: true }),
-      recordManager.reloadRecordListInAllRecords('harvester', 'space', { onlyIds: true }),
+      recordManager.reloadRecordListInAllRecords('group', 'space'),
+      recordManager.reloadRecordListInAllRecords('harvester', 'space'),
     ]);
   },
 
@@ -530,7 +530,7 @@ export default Service.extend({
       spaceRecordOrId : spaceRecordOrId.entityId;
     const sharesIdsData = await this.shareManager.getSpaceShareList(spaceId, {
       index: null,
-    }, { onlyIds: true });
+    });
     return {
       count: sharesIdsData.array.length,
       areMoreAvailable: !sharesIdsData.isLast,
