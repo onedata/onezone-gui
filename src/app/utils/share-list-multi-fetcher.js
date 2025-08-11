@@ -13,6 +13,7 @@ import GrisBatchContainerSpec from 'onedata-gui-websocket-client/utils/gris-batc
 import { OwsGraphOperation } from 'onedata-gui-websocket-client/services/onedata-graph';
 import { spaceShareListGri } from 'onezone-gui/services/share-manager';
 import { DebouncedBatchFlushStrategy } from 'onedata-gui-websocket-client/utils/batch-flush-strategies';
+import onlyFulfilledValues from 'onedata-gui-common/utils/only-fulfilled-values';
 
 /**
  * @enum {'init'|'pending'|'settled'}
@@ -29,6 +30,14 @@ export default class ShareListMultiFetcher {
    * @type {(status: ShareListMultiFetcherStatus, multiFetcher: ShareListMultiFetcher) => void}
    */
   onStatusChange = undefined;
+
+  /**
+   * If true, single space list fetcher's error will not throw error for the whole fetch
+   * (which is a default). Set to false to make single lists errors to fail the whole
+   * fetch.
+   * @type {boolean}
+   */
+  ignoreFetcherErrors = true;
 
   //#region state
 
@@ -78,7 +87,8 @@ export default class ShareListMultiFetcher {
           });
         });
         batchContainer.scheduleFlush();
-        const results = await allFulfilled(promises);
+        const allResolver = this.ignoreFetcherErrors ? onlyFulfilledValues : allFulfilled;
+        const results = await allResolver(promises);
         // Setting size to null, because we want full results to be passed down to main
         // merge.
         return mergeResults(results, { index, size: null, offset });
