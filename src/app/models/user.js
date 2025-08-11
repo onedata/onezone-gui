@@ -50,10 +50,9 @@ export default Model.extend(GraphSingleModelMixin, {
 
   //#region Non-store User operations
 
-  leaveSpace(spaceId) {
-    return this._leaveRelation('space', spaceId)
-      .then(() => this.get('providerList'))
-      .then(providerList => providerList.hasMany('list').reload());
+  async leaveSpace(spaceId) {
+    await this._leaveRelation('space', spaceId);
+    await this.providerList.reload();
   },
 
   leaveGroup(groupId) {

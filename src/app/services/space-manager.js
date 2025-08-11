@@ -206,7 +206,6 @@ export default Service.extend({
     }
   },
 
-  // FIXME: może by to ujednolicić z RecordManager.removeUserRelation?
   /**
    * Removes user from a space
    * @param {string} spaceId
@@ -214,18 +213,7 @@ export default Service.extend({
    */
   async leaveSpace(spaceId) {
     const space = this.getLoadedSpaceByEntityId(spaceId);
-    const user = await this.currentUser.getCurrentUserRecord();
-    const destroyResult = await user.leaveSpace(spaceId);
-
-    await allFulfilled([
-      this.reloadList(),
-      (space ? space.reload().catch(ignoreForbiddenError) : resolve()),
-      this.reloadEffUserList(spaceId).catch(ignoreForbiddenError),
-      this.reloadUserList(spaceId).catch(ignoreForbiddenError),
-      this.providerManager.reloadList(),
-    ]);
-
-    return destroyResult;
+    return await this.recordManager.removeUserRelation(space);
   },
 
   /**
