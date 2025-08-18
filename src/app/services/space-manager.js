@@ -178,17 +178,17 @@ export default Service.extend({
    * @param {String} spaceId
    * @returns {Promise}
    */
-  removeSpace(spaceId) {
-    const recordManager = this.get('recordManager');
-    return recordManager.removeRecordById('space', spaceId)
-      .then(() => allFulfilled([
-        recordManager.reloadUserRecordList('space'),
-        recordManager.reloadUserRecordList('provider').then(() =>
-          recordManager.reloadRecordListInAllRecords('provider', 'space')
-        ),
-        recordManager.reloadRecordListInAllRecords('group', 'space'),
-        recordManager.reloadRecordListInAllRecords('harvester', 'space'),
-      ]));
+  async removeSpace(spaceId) {
+    const recordManager = this.recordManager;
+    await recordManager.removeRecordById('space', spaceId);
+    // Note, that user space list is reloaded by recordManager.removeRecordById
+    await allFulfilled([
+      recordManager.reloadUserRecordList('provider').then(() =>
+        recordManager.reloadRecordListInAllRecords('provider', 'space')
+      ),
+      recordManager.reloadRecordListInAllRecords('group', 'space'),
+      recordManager.reloadRecordListInAllRecords('harvester', 'space'),
+    ]);
   },
 
   /**
@@ -208,22 +208,12 @@ export default Service.extend({
 
   /**
    * Removes user from a space
-   * @param {string} entityId
+   * @param {string} spaceId
    * @returns {Promise}
    */
-  leaveSpace(entityId) {
-    const space = this.getLoadedSpaceByEntityId(entityId);
-    return this.get('currentUser').getCurrentUserRecord()
-      .then(user => user.leaveSpace(entityId))
-      .then(destroyResult => {
-        return allFulfilled([
-          this.reloadList(),
-          space ? space.reload().catch(ignoreForbiddenError) : resolve(),
-          this.reloadEffUserList(entityId).catch(ignoreForbiddenError),
-          this.reloadUserList(entityId).catch(ignoreForbiddenError),
-          this.get('providerManager').reloadList(),
-        ]).then(() => destroyResult);
-      });
+  async leaveSpace(spaceId) {
+    const space = this.getLoadedSpaceByEntityId(spaceId);
+    return await this.recordManager.removeUserRelation(space);
   },
 
   /**
@@ -528,7 +518,7 @@ export default Service.extend({
       spaceRecordOrId : spaceRecordOrId.entityId;
     const sharesIdsData = await this.shareManager.getSpaceShareList(spaceId, {
       index: null,
-    }, { onlyIds: true });
+    });
     return {
       count: sharesIdsData.array.length,
       areMoreAvailable: !sharesIdsData.isLast,

@@ -78,7 +78,7 @@ const TokenManager = Service.extend({
         },
       }))
       .save();
-    this.reloadList({ onlyIds: true });
+    this.reloadList();
     return token;
   },
 

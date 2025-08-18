@@ -140,7 +140,10 @@ export default class RecordManagerConfiguration {
         }
         const atmInventory = record.belongsTo('atmInventory').value();
         if (atmInventory) {
-          await this.recordManager.reloadRecordList(atmInventory, modelName);
+          await this.recordManager.reloadRecordList(
+            atmInventory,
+            modelName
+          );
         }
         break;
       }
