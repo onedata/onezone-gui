@@ -3,117 +3,71 @@ import { describe, it, beforeEach, before, afterEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render, click, fillIn, settled, find, findAll } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
-import EmberObject, {
-  computed,
+import {
+  defineProperty,
   get,
-  getProperties,
   set,
 } from '@ember/object';
-import { reads } from '@ember/object/computed';
 import Service from '@ember/service';
 import { registerService, lookupService } from '../../helpers/stub-service';
 import I18nStub from '../../helpers/i18n-stub';
 import { htmlSafe } from '@ember/string';
 import { resolve } from 'rsvp';
-import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
-import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import Workspace from 'onezone-gui/utils/groups-hierarchy-visualiser/workspace';
 import GroupsHierarchyVisualiserHelper from '../../helpers/groups-hierarchy-visualiser';
-import { A } from '@ember/array';
 import sinon from 'sinon';
 import globals from 'onedata-gui-common/utils/globals';
 import LeaveAction from 'onezone-gui/utils/user-actions/leave-action';
+import { clearStoreAfterEach } from '../../helpers/clear-store';
+import _ from 'lodash';
 
 function getContainerStyle(style) {
   return htmlSafe(`width: ${style.width}px; height: ${style.height}px;`);
 }
 
-const RelationList = EmberObject.extend({
-  _list: Object.freeze([]),
+async function persistGroup(mochaContext, data) {
+  const store = lookupService(mochaContext, 'store');
+  const _childList = data._childList ?? [];
+  const _parentList = data._parentList ?? [];
+  const childList = await store.createRecord('groupList', { list: _childList }).save();
+  const parentList = await store.createRecord('groupList', { list: _parentList }).save();
+  const group = await store.createRecord('group', {
+    id: `group.${data.name}.instance:auto`,
+    directMembership: true,
+    childList,
+    parentList,
+    ...data,
+  }).save();
+  defineProperty(group, 'hasViewPrivilege', {
+    get() {
+      return true;
+    },
+  });
+  defineProperty(group, 'isEffectiveMember', {
+    get() {
+      return true;
+    },
+  });
+  return group;
+}
 
-  list: computed('_list', function list() {
-    return PromiseArray.create({ promise: resolve(this.get('_list')) });
-  }),
+async function setList(record, listName, list) {
+  const listRecord = await record[listName];
+  listRecord.set('list', list);
+  await listRecord.save();
+}
 
-  length: reads('_list.length'),
+async function appendToList(record, listName, member) {
+  const listRecord = await record[listName];
+  listRecord.set('list', [...listRecord.list.toArray(), member]);
+  await listRecord.save();
+}
 
-  hasMany() {
-    const model = this;
-    return {
-      ids() {
-        return get(model, '_list').mapBy('id');
-      },
-      reload() {
-        return get(model, 'list');
-      },
-    };
-  },
-});
-
-const GroupStub = EmberObject.extend({
-  entityType: 'group',
-  hasViewPrivilege: true,
-  isEffectiveMember: true,
-  directMembership: true,
-
-  id: computed('name', function id() {
-    return `group.${this.get('name')}.instance:auto`;
-  }),
-
-  _childList: undefined,
-
-  _parentList: undefined,
-
-  childList: computed('_childList', function () {
-    const _childList = this.get('_childList');
-    return PromiseObject.create({
-      promise: resolve(RelationList.create({
-        _list: _childList,
-      })),
-    });
-  }),
-
-  parentList: computed('_parentList.[]', function () {
-    const _parentList = this.get('_parentList');
-    return PromiseObject.create({
-      promise: resolve(RelationList.create({
-        _list: _parentList,
-      })),
-    });
-  }),
-
-  init() {
-    this._super(...arguments);
-    if (!this._childList) {
-      this.set('_childList', A());
-    }
-    if (!this._parentList) {
-      this.set('_parentList', A());
-    }
-  },
-
-  belongsTo(relationName) {
-    const model = this;
-    return {
-      value() {
-        return get(model, `${relationName}.content`);
-      },
-      reload() {
-        return get(model, relationName);
-      },
-    };
-  },
-
-  entityId: reads('name'),
-
-  reload() {
-    return resolve(this);
-  },
-});
-
-GroupStub.relationshipNames = {
-  belongsTo: ['childList', 'parentList'],
-};
+async function removeFromList(record, listName, member) {
+  const listRecord = await record[listName];
+  listRecord.set('list', _.without(listRecord.list.toArray(), member));
+  await listRecord.save();
+}
 
 describe('Integration | Component | groups-hierarchy-visualiser (main)', function () {
   setupRenderingTest();
@@ -124,7 +78,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
     LeaveAction.create().destroy();
   });
 
-  beforeEach(function beforeEach() {
+  beforeEach(async function beforeEach() {
     registerService(this, 'i18n', I18nStub);
     registerService(this, 'navigation-state', Service.extend({
       resourceCollectionContainsId() {
@@ -135,38 +89,27 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
     sinon.stub(lookupService(this, 'record-manager'), 'getCurrentUserRecord')
       .returns({});
 
-    const group = GroupStub.create({
-      name: 'a1',
-    });
-    const a1Children = A([
-      GroupStub.create({
-        name: 'b2',
-        _parentList: A([group]),
-      }),
-      GroupStub.create({
-        name: 'b1',
-        _parentList: A([group]),
-      }),
-    ]);
-    set(group, '_childList', a1Children);
-    const b1Children = A([
-      GroupStub.create({
-        name: 'c1',
-        _parentList: A([a1Children.objectAt(1)]),
-      }),
-    ]);
-    set(a1Children.objectAt(1), '_childList', b1Children);
-    const a1Parents = A([
-      GroupStub.create({
-        name: 'z1',
-        _childList: A([group]),
-      }),
-      GroupStub.create({
-        name: 'z2',
-        _childList: A([group]),
-      }),
-    ]);
-    set(group, '_parentList', a1Parents);
+    const a1 = await persistGroup(this, { name: 'a1' });
+    const b1 = await persistGroup(this, { name: 'b1' });
+    const b2 = await persistGroup(this, { name: 'b2' });
+    const c1 = await persistGroup(this, { name: 'c1' });
+    const z1 = await persistGroup(this, { name: 'z1' });
+    const z2 = await persistGroup(this, { name: 'z2' });
+    this.set('groups', { a1, b1, b2, c1, z1, z2 });
+
+    await setList(a1, 'parentList', [z1, z2]);
+    await setList(a1, 'childList', [b2, b1]);
+
+    await setList(b1, 'parentList', [a1]);
+    await setList(b1, 'childList', [c1]);
+
+    await setList(b2, 'parentList', [a1]);
+
+    await setList(c1, 'parentList', [b1]);
+
+    await setList(z1, 'childList', [a1]);
+
+    await setList(z2, 'childList', [a1]);
 
     const containerSize = {
       width: 1200,
@@ -175,7 +118,7 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
     this.setProperties({
       containerSize,
       containerStyle: getContainerStyle(containerSize),
-      group,
+      group: a1,
       workspace: Workspace.create({
         animationTime: 0,
       }),
@@ -208,6 +151,8 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
       LeaveAction.prototype.execute.restore();
     }
   });
+
+  clearStoreAfterEach(afterEach);
 
   it(
     'renders three columns - one startPoint, one parents and one children',
@@ -396,14 +341,16 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
   });
 
   it('creates new parent', async function () {
+    const mochaContext = this;
     let newParent = {};
     registerService(this, 'group-actions', Service.extend({
-      createParent(child, parentRepresentation) {
-        newParent = GroupStub.create(Object.assign(parentRepresentation, {
-          _childList: A([child]),
-        }));
-        get(child, '_parentList').pushObject(newParent);
-        return resolve(newParent);
+      async createParent(child, parentRepresentation) {
+        newParent = await persistGroup(mochaContext, {
+          _childList: [child],
+          ...parentRepresentation,
+        });
+        await appendToList(child, 'parentList', newParent);
+        return newParent;
       },
     }));
 
@@ -429,14 +376,16 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
   });
 
   it('creates new child', async function () {
+    const mochaContext = this;
     let newChild = {};
     registerService(this, 'group-actions', Service.extend({
-      createChild(parent, childRepresentation) {
-        newChild = GroupStub.create(Object.assign(childRepresentation, {
-          _parentList: A([parent]),
-        }));
-        get(parent, '_childList').pushObject(newChild);
-        return resolve(newChild);
+      async createChild(parent, childRepresentation) {
+        newChild = await persistGroup(mochaContext, {
+          _parentList: [parent],
+          ...childRepresentation,
+        });
+        await appendToList(parent, 'childList', newChild);
+        return newChild;
       },
     }));
 
@@ -463,12 +412,11 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
 
   it('removes group', async function () {
     let removedGroup = {};
-    const group = this.get('group');
+    const group = this.group;
     registerService(this, 'group-actions', Service.extend({
-      deleteGroup(groupToRemove) {
+      async deleteGroup(groupToRemove) {
         removedGroup = groupToRemove;
-        get(group, '_childList').removeObject(groupToRemove);
-        return resolve();
+        await removeFromList(group, 'childList', groupToRemove);
       },
     }));
 
@@ -514,12 +462,11 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
     let parentGroup = {};
     let childGroup = {};
     registerService(this, 'group-actions', Service.extend({
-      removeRelation(parent, child) {
+      async removeRelation(parent, child) {
         parentGroup = parent;
         childGroup = child;
-        get(parent, '_childList').removeObject(child);
-        get(child, '_parentList').removeObject(parent);
-        return resolve();
+        await removeFromList(parent, 'childList', child);
+        await removeFromList(child, 'parentList', parent);
       },
     }));
 
@@ -563,30 +510,25 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
     let childGroup = {};
     let passedToken = '';
     let newParent = {};
+    const mochaContext = this;
     lookupService(this, 'token-actions').createConsumeInviteTokenAction = context => {
       const {
         joiningRecord,
         targetModelName,
         token,
         dontRedirect,
-      } = getProperties(
-        context,
-        'joiningRecord',
-        'targetModelName',
-        'token',
-        'dontRedirect'
-      );
+      } = context;
       if (dontRedirect && targetModelName === 'group') {
         return {
-          execute() {
+          async execute() {
             childGroup = joiningRecord;
             passedToken = token;
-            newParent = GroupStub.create(Object.assign({
+            newParent = await persistGroup(mochaContext, {
               name: 'testParent',
-              _childList: A([joiningRecord]),
-            }));
-            get(joiningRecord, '_parentList').pushObject(newParent);
-            return resolve({ result: newParent });
+              _childList: [joiningRecord],
+            });
+            await appendToList(joiningRecord, 'parentList', newParent);
+            return { result: newParent };
           },
         };
       }
@@ -704,7 +646,8 @@ describe('Integration | Component | groups-hierarchy-visualiser (main)', functio
     await helper.clickRelation('a1', 'children', 'b1', 'children');
     let columns = helper.getAllColumns();
     const nonEmptyColumnsBefore = columns.filter((elem) => !elem.matches('.empty'));
-    set(this.get('group._childList').objectAt(1), 'isDeleted', true);
+    await this.groups.b1.destroyRecord();
+    this.groups.b1.unloadRecord();
     await settled();
     columns = helper.getAllColumns();
     const nonEmptyColumnsAfter = columns.filter((elem) => !elem.matches('.empty'));
