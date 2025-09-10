@@ -1,6 +1,6 @@
 
-<PromiseProxyContainer @proxy={{targetRecordOptionsLoaderProxyEff}}>
-  {{#if (or this.targetRecordOptionsLoaderProxyEff2.isPending allMembersLoadingProxy.isPending)}}
+<PromiseProxyContainer @proxy={{targetRecordOptionsLoaderProxy}}>
+  {{#if (or this.targetRecordOptionsLoaderProxy2.isPending this.allMembersLoadingProxy.isPending)}}
     <div class="loader">
       <SpinSpinnerBlock @sizeClass="xs" />
       <div class="loader-text truncate">

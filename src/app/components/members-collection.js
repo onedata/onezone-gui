@@ -332,12 +332,10 @@ export default Component.extend(I18n, {
   allMembersLoadingProxy: computed(
     'directMembersProxy',
     'effectiveMembersProxy',
-    'directGroupsProxy',
     function allMembersLoadingProxy() {
       return promiseObject(allFulfilled([
         this.directMembersProxy,
         this.effectiveMembersProxy,
-        // this.directGroupsProxy,
       ]));
     }
   ),
@@ -504,9 +502,8 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<PromiseObject<undefined>>}
    */
-  targetRecordOptionsLoaderProxyEff: computed(
+  targetRecordOptionsLoaderProxy: computed(
     'record',
-    'onlyDirect',
     'subjectType',
     function targetRecordOptionsLoaderProxy() {
       const listName = `eff${_.upperFirst(this.subjectType)}List`;
@@ -515,9 +512,9 @@ export default Component.extend(I18n, {
     }
   ),
 
-  targetRecordOptionsLoaderEff: reads('targetRecordOptionsLoaderProxyEff.content'),
+  targetRecordOptionsLoaderEff: reads('targetRecordOptionsLoaderProxy.content'),
 
-  targetRecordOptionsLoaderProxyEff2: computed(
+  targetRecordOptionsLoaderProxy2: computed(
     'targetRecordOptionsLoaderEff',
     function targetRecordOptionsLoaderProxy2() {
       return promiseObject((async () => {
