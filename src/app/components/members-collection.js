@@ -38,6 +38,7 @@ import joinStrings from 'onedata-gui-common/utils/i18n/join-strings';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import ArrayPaginator from 'onedata-gui-common/utils/array-paginator';
 import globals from 'onedata-gui-common/utils/globals';
+import BatchRecordsLoader from 'onezone-gui/utils/batch-records-loader';
 
 const fallbackActionsGenerator = () => [];
 
@@ -51,6 +52,7 @@ export default Component.extend(I18n, {
   currentUser: service(),
   recordManager: service(),
   store: service(),
+  batchRequestRegistry: service(),
 
   /**
    * @override
@@ -250,6 +252,11 @@ export default Component.extend(I18n, {
   searchQuery: undefined,
 
   /**
+   * @type {Map<TargetRecordOption, BatchRecordsLoader>}
+   */
+  targetRecordsLoaders: undefined,
+
+  /**
    * @type {string}
    */
   membersTypeText: computed('listHeader', function membersTypeText() {
@@ -305,21 +312,6 @@ export default Component.extend(I18n, {
   ),
 
   /**
-   * Direct groups
-   * @type {Ember.ComputedProperty<PromiseArray<DS.ManyArray<GraphSingleModel>>>}
-   */
-  directGroupsProxy: computed(
-    'record',
-    'subjectType',
-    function directGroupsProxy() {
-      if (this.subjectType === 'group') {
-        return this.directMembersProxy;
-      }
-      return this.getMembers('groupList');
-    }
-  ),
-
-  /**
    * Effective members
    * @type {Ember.ComputedProperty<PromiseArray<DS.ManyArray<GraphSingleModel>>>}
    */
@@ -345,7 +337,7 @@ export default Component.extend(I18n, {
       return promiseObject(allFulfilled([
         this.directMembersProxy,
         this.effectiveMembersProxy,
-        this.directGroupsProxy,
+        // this.directGroupsProxy,
       ]));
     }
   ),
@@ -505,11 +497,45 @@ export default Component.extend(I18n, {
     }
   ),
 
-  effectiveMembers: reads('effectiveMemebersProxy.content'),
-
   directMembers: reads('directMembersProxy.content'),
 
   members: reads('membersProxy.content'),
+
+  /**
+   * @type {ComputedProperty<PromiseObject<undefined>>}
+   */
+  targetRecordOptionsLoaderProxyEff: computed(
+    'record',
+    'onlyDirect',
+    'subjectType',
+    function targetRecordOptionsLoaderProxy() {
+      const listName = `eff${_.upperFirst(this.subjectType)}List`;
+      const batchRecordsLoader = this.getBatchTargetRecordsLoader(listName);
+      return promiseObject(batchRecordsLoader);
+    }
+  ),
+
+  targetRecordOptionsLoaderEff: reads('targetRecordOptionsLoaderProxyEff.content'),
+
+  targetRecordOptionsLoaderProxyEff2: computed(
+    'targetRecordOptionsLoaderEff',
+    function targetRecordOptionsLoaderProxy2() {
+      return promiseObject((async () => {
+        const tmp = this.targetRecordOptionsLoaderEff;
+        const targetRecords = await tmp.getPromise();
+        return targetRecords;
+      })());
+    }),
+
+  /**
+   * @type {ComputedProperty<ProgressTracker|null>}
+   */
+  progressTrackerEff: computed(
+    'targetRecordOptionsLoaderEff',
+    function progressTracker() {
+      return this.targetRecordOptionsLoaderEff.progressTracker;
+    }
+  ),
 
   membersObserver: observer(
     'members.@each.{entityId,name,username}',
@@ -685,6 +711,7 @@ export default Component.extend(I18n, {
 
   init() {
     this._super(...arguments);
+    this.set('targetRecordsLoaders', new Map());
     this.membersObserver();
     this.groupsObserver();
     this.set('privilegesRecordProxyCache', []);
@@ -725,11 +752,17 @@ export default Component.extend(I18n, {
    */
   getMembers(listName) {
     const record = this.record;
+    const effListName = listName.startsWith('eff') ? listName : `eff${_.upperFirst(listName)}`;
     let promise;
     if (get(record, 'hasViewPrivilege') !== false) {
-      promise = get(record, listName).then(sgl =>
-        sgl ? get(sgl, 'list') : A()
-      );
+      promise = (async () => {
+        const batchRecordsLoader = await this.getBatchTargetRecordsLoader(effListName);
+        await batchRecordsLoader.getPromise();
+
+        return get(record, listName).then(sgl =>
+          sgl ? get(sgl, 'list') : A()
+        );
+      })();
     } else {
       promise = reject({ id: 'forbidden' });
     }
@@ -767,6 +800,51 @@ export default Component.extend(I18n, {
       griAspectPrefix + griAspect,
       subjectId
     );
+  },
+
+  /**
+   * @param {TargetModelOption} targetModelOption
+   * @returns {BatchRecordsLoader}
+   */
+  async createBatchTargetRecordsLoader(listName) {
+    const {
+      batchRequestRegistry,
+      record,
+    } = this;
+    const listRecord = await record.getRelation(listName);
+    const itemsGris = listRecord.hasMany('list').ids();
+
+    const listResolver = async () => {
+      try {
+        // Awaiting for list might fail when some single records cannot be fetched,
+        // but we can still try to read list afterwards.
+        await listRecord.list;
+      } catch {
+        console.warn(
+          'MemberCollection.createBatchTargetRecordsLoader: list cannot be fully resolved, some records may be missing'
+        );
+      }
+      return listRecord.list.toArray();
+    };
+    return new BatchRecordsLoader({
+      batchRequestRegistry,
+      itemsGris,
+      listResolver,
+    });
+  },
+
+  /**
+   * @param {TargetModelOption} targetModelOption
+   * @returns {BatchRecordsLoader}
+   */
+  getBatchTargetRecordsLoader(listName) {
+    if (!this.targetRecordsLoaders.has(listName)) {
+      this.targetRecordsLoaders.set(
+        listName,
+        promiseObject(this.createBatchTargetRecordsLoader(listName))
+      );
+    }
+    return this.targetRecordsLoaders.get(listName);
   },
 
   actions: {

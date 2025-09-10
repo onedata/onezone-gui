@@ -1,254 +1,266 @@
-<PromiseProxyContainer @proxy={{allMembersLoadingProxy}}>
-  <OneCollapsibleList
-    @hasCheckboxes={{true}}
-    class={{concat subjectType "-list"}}
-    @selectionChanged={{recordsSelected}}
-    @isListCollapsed={{isListCollapsed}}
-    @listCollapsed={{action "listCollapsed"}}
-    @resetSelectionTrigger={{membersProxy}}
-    as |list|
-  >
-    <list.header
-      @title={{effListHeader}}
-      @searchVisible={{false}}
-      @withPlaceForDots={{true}}
+
+<PromiseProxyContainer @proxy={{targetRecordOptionsLoaderProxyEff}}>
+  {{#if (or this.targetRecordOptionsLoaderProxyEff2.isPending allMembersLoadingProxy.isPending)}}
+    <div class="loader">
+      <SpinSpinnerBlock @sizeClass="xs" />
+      <div class="loader-text truncate">
+        {{tt this "loadingFilters"
+          progress=this.progressTrackerEff.progressText
+        }}
+      </div>
+    </div>
+  {{else}}
+    <OneCollapsibleList
+      @hasCheckboxes={{true}}
+      class={{concat subjectType "-list"}}
+      @selectionChanged={{recordsSelected}}
+      @isListCollapsed={{isListCollapsed}}
+      @listCollapsed={{action "listCollapsed"}}
+      @resetSelectionTrigger={{membersProxy}}
+      as |list|
     >
-      {{#if members.length}}
-        <div class={{concat-classes
-          "form-group form-group-sm form-group-light search-group collapse-animation collapse-small"
-          (if _isListCollapsed "collapse-hidden")
-        }}>
-          <div class="input-group with-icon-addon">
-            <SearchBar @search={{action "onSearchInput"}} class="form-control" />
-            <div class="input-group-addon">
-              <OneIcon @icon="search" />
+      <list.header
+        @title={{effListHeader}}
+        @searchVisible={{false}}
+        @withPlaceForDots={{true}}
+      >
+        {{#if members.length}}
+          <div class={{concat-classes
+            "form-group form-group-sm form-group-light search-group collapse-animation collapse-small"
+            (if _isListCollapsed "collapse-hidden")
+          }}>
+            <div class="input-group with-icon-addon">
+              <SearchBar @search={{action "onSearchInput"}} class="form-control" />
+              <div class="input-group-addon">
+                <OneIcon @icon="search" />
+              </div>
             </div>
           </div>
-        </div>
-      {{/if}}
-      <ActionsToolbar
-        @isMinimized={{true}}
-        @toolbarClasses=""
-        @toolbarToggleClasses="btn-menu-toggle"
-        @dropdownPlacement="auto"
-        @actionsArray={{collectionActions}}
-      />
-    </list.header>
-    {{#each paginator.activePageArray key="id" as |memberProxy|}}
-      <list.item
-        class={{concat-classes
-          "member-item"
-          (concat "member-" memberProxy.member.entityId)
-        }}
-        @selectionValue={{if (and (not onlyDirect) (not (contains memberProxy.member directMembers)))
-          null
-          memberProxy
-        }}
-        as |listItem|
-      >
-        <listItem.header
-          @disableToggleIcon={{true}}
-          class={{if memberProxy.privilegesProxy.isModified "item-modified-header"}}
+        {{/if}}
+        <ActionsToolbar
+          @isMinimized={{true}}
+          @toolbarClasses=""
+          @toolbarToggleClasses="btn-menu-toggle"
+          @dropdownPlacement="auto"
+          @actionsArray={{collectionActions}}
+        />
+      </list.header>
+      {{#each paginator.activePageArray key="id" as |memberProxy|}}
+        <list.item
+          class={{concat-classes
+            "member-item"
+            (concat "member-" memberProxy.member.entityId)
+          }}
+          @selectionValue={{if (and (not onlyDirect) (not (contains memberProxy.member directMembers)))
+            null
+            memberProxy
+          }}
+          as |listItem|
         >
-          <RecordInfoWithIcon @record={{memberProxy.member}} />
-          <div class="right-container">
-            {{#if memberProxy.privilegesProxy.isModified}}
-              <span class="hidden-xs">
+          <listItem.header
+            @disableToggleIcon={{true}}
+            class={{if memberProxy.privilegesProxy.isModified "item-modified-header"}}
+          >
+            <RecordInfoWithIcon @record={{memberProxy.member}} />
+            <div class="right-container">
+              {{#if memberProxy.privilegesProxy.isModified}}
+                <span class="hidden-xs">
+                  <OneButton
+                    @type="primary"
+                    @buttonType="submit"
+                    @size="sm"
+                    @onClick={{action "savePrivileges" memberProxy}}
+                    class="save-btn"
+                  >
+                    {{tt this "save"}}
+                  </OneButton>
+                  <span class="space"></span>
+                  <OneButton
+                    @size="sm"
+                    @type="warning"
+                    class="discard-btn"
+                    @disabled={{memberProxy.privilegesProxy.isSaving}}
+                    @onClick={{action "discardChanges" memberProxy}}
+                  >
+                    {{tt this "discard"}}
+                  </OneButton>
+                  <span class="space"></span><span class="space"></span>
+                </span>
+              {{/if}}
+              <span class="labels-container">
+                {{#if memberProxy.isYou}}
+                <span class="space"></span><span class="label label-primary">{{tt this "you"}}</span>
+                {{/if}}
+                {{#if memberProxy.isOwner}}
+                  <span class="space"></span><span class="label label-info">{{tt this "owner"}}</span>
+                {{/if}}
+                {{#if (contains memberProxy.member directMembers)}}
+                  <span class="space"></span><span class="label label-default">{{tt this "direct"}}</span>
+                {{/if}}
+              </span>
+            </div>
+            {{#if memberProxy.actions.length}}
+              <ActionsToolbar
+                @isMinimized={{true}}
+                @toolbarClasses=""
+                @toolbarToggleClasses="btn-menu-toggle"
+                @dropdownPlacement="auto"
+                @actionsArray={{memberProxy.actions}}
+                @actionsArg={{memberProxy.member}}
+              />
+            {{/if}}
+          </listItem.header>
+          <listItem.content>
+            <RenderLater @triggerRender={{listItem.isActive}}>
+              <div class="hidden-sm hidden-md hidden-lg text-center row content-row">
                 <OneButton
-                  @type="primary"
-                  @buttonType="submit"
                   @size="sm"
+                  @type="primary"
+                  @disabled={{or
+                    memberProxy.privilegesProxy.saving
+                    (not memberProxy.privilegesProxy.isModified)
+                  }}
                   @onClick={{action "savePrivileges" memberProxy}}
-                  class="save-btn"
                 >
                   {{tt this "save"}}
                 </OneButton>
-                <span class="space"></span>
                 <OneButton
                   @size="sm"
                   @type="warning"
                   class="discard-btn"
-                  @disabled={{memberProxy.privilegesProxy.isSaving}}
+                  @disabled={{or
+                    memberProxy.privilegesProxy.saving
+                    (not memberProxy.privilegesProxy.isModified)
+                  }}
                   @onClick={{action "discardChanges" memberProxy}}
                 >
-                  {{tt this "discard"}}
+                  {{tt this "discard"
+                }}
                 </OneButton>
-                <span class="space"></span><span class="space"></span>
-              </span>
-            {{/if}}
-            <span class="labels-container">
-              {{#if memberProxy.isYou}}
-              <span class="space"></span><span class="label label-primary">{{tt this "you"}}</span>
-              {{/if}}
-              {{#if memberProxy.isOwner}}
-                <span class="space"></span><span class="label label-info">{{tt this "owner"}}</span>
-              {{/if}}
-              {{#if (contains memberProxy.member directMembers)}}
-                <span class="space"></span><span class="label label-default">{{tt this "direct"}}</span>
-              {{/if}}
-            </span>
-          </div>
-          {{#if memberProxy.actions.length}}
-            <ActionsToolbar
-              @isMinimized={{true}}
-              @toolbarClasses=""
-              @toolbarToggleClasses="btn-menu-toggle"
-              @dropdownPlacement="auto"
-              @actionsArray={{memberProxy.actions}}
-              @actionsArg={{memberProxy.member}}
-            />
-          {{/if}}
-        </listItem.header>
-        <listItem.content>
-          <RenderLater @triggerRender={{listItem.isActive}}>
-            <div class="hidden-sm hidden-md hidden-lg text-center row content-row">
-              <OneButton
-                @size="sm"
-                @type="primary"
-                @disabled={{or
-                  memberProxy.privilegesProxy.saving
-                  (not memberProxy.privilegesProxy.isModified)
-                }}
-                @onClick={{action "savePrivileges" memberProxy}}
-              >
-                {{tt this "save"}}
-              </OneButton>
-              <OneButton
-                @size="sm"
-                @type="warning"
-                class="discard-btn"
-                @disabled={{or
-                  memberProxy.privilegesProxy.saving
-                  (not memberProxy.privilegesProxy.isModified)
-                }}
-                @onClick={{action "discardChanges" memberProxy}}
-              >
-                {{tt this "discard"
-              }}
-              </OneButton>
-            </div>
-            {{#if (or
-              memberProxy.isOwner
-              (and memberProxy.isYou hasCurrentUserSomeAdminPrivileges)
-            )}}
-              <div class="alert alert-warning privileges-warning">
-                {{#if memberProxy.isOwner}}
-                  <p class="privileges-of-owner-warning">
-                    {{#if memberProxy.isYou}}
-                      {{tt this "youAreOwnerWarning"
-                        model=(tt this
-                          (concat "ownerPrivilegesWarningModels." recordType)
-                        )
-                      }}
-                    {{else}}
-                      {{tt this "userAreOwnerWarning"
-                        model=(tt this
-                          (concat "ownerPrivilegesWarningModels." recordType)
-                        )
-                      }}
-                    {{/if}}
-                    {{tt this "ownerPrivilegesWarning"}}
-                  </p>
-                {{/if}}
-                {{#if (and
-                  memberProxy.isOwner
-                  (and memberProxy.isYou hasCurrentUserSomeAdminPrivileges)
-                )}}
-                  <hr class="content-separator">
-                {{/if}}
-                {{#if (and memberProxy.isYou hasCurrentUserSomeAdminPrivileges)}}
-                  <p class="admin-privileges-warning">
-                    {{tt this "adminPrivilegesWarning"
-                      pluralEntityType=(tt this
-                        (concat
-                          "adminPrivilegesWarningPluralModels."
-                          recordTypeForTranslation
-                        )
-                      )
-                      privileges=adminPrivForWarningTranslation
-                    }}
-                  </p>
-                {{/if}}
               </div>
-            {{/if}}
-            <div class="member-content">
-              <PromiseProxyContainer @proxy={{effPrivilegesOfCurrentUserProxy}}>
-                <MemberPrivileges::MemberPrivilegesTable
-                  @privilegesGroups={{groupedPrivilegesFlags}}
-                  @privilegeGroupsTranslationsPath={{privilegeGroupsTranslationsPath}}
-                  @privilegesTranslationsPath={{privilegesTranslationsPath}}
-                  @recordDirectProxy={{if memberProxy.isDirect
-                    memberProxy.privilegesProxy
-                    null
-                  }}
-                  @recordEffectiveProxy={{memberProxy.effectivePrivilegesProxy}}
-                  @modelTypeTranslation={{modelTypeTranslation}}
-                  @areEffPrivilegesRecalculated={{record.areEffPrivilegesRecalculated}}
-                  @arePrivilegesJustSaved={{arePrivilegesJustSaved}}
-                  @contextRecord={{memberProxy.member}}
-                  @targetRecord={{record}}
-                  @directGroupMembers={{directGroupsProxyList}}
-                  @highlightMemberships={{action "highlightMemberships"}}
-                  @isPrivilegesToggleDisabled={{isPrivilegesToggleDisabled}}
-                />
-              </PromiseProxyContainer>
-              <div class="memberships-container">
-                <div class="header-memberships-container">
-                  <div class="header-memberships">
-                    <div>{{tt this "memberships"}}</div>
-                    <OneLabelTip @title={{tt this "membershipsTip"
-                        entityType=modelTypeTranslation
-                      }} />
+              {{#if (or
+                memberProxy.isOwner
+                (and memberProxy.isYou hasCurrentUserSomeAdminPrivileges)
+              )}}
+                <div class="alert alert-warning privileges-warning">
+                  {{#if memberProxy.isOwner}}
+                    <p class="privileges-of-owner-warning">
+                      {{#if memberProxy.isYou}}
+                        {{tt this "youAreOwnerWarning"
+                          model=(tt this
+                            (concat "ownerPrivilegesWarningModels." recordType)
+                          )
+                        }}
+                      {{else}}
+                        {{tt this "userAreOwnerWarning"
+                          model=(tt this
+                            (concat "ownerPrivilegesWarningModels." recordType)
+                          )
+                        }}
+                      {{/if}}
+                      {{tt this "ownerPrivilegesWarning"}}
+                    </p>
+                  {{/if}}
+                  {{#if (and
+                    memberProxy.isOwner
+                    (and memberProxy.isYou hasCurrentUserSomeAdminPrivileges)
+                  )}}
+                    <hr class="content-separator">
+                  {{/if}}
+                  {{#if (and memberProxy.isYou hasCurrentUserSomeAdminPrivileges)}}
+                    <p class="admin-privileges-warning">
+                      {{tt this "adminPrivilegesWarning"
+                        pluralEntityType=(tt this
+                          (concat
+                            "adminPrivilegesWarningPluralModels."
+                            recordTypeForTranslation
+                          )
+                        )
+                        privileges=adminPrivForWarningTranslation
+                      }}
+                    </p>
+                  {{/if}}
+                </div>
+              {{/if}}
+              <div class="member-content">
+                <PromiseProxyContainer @proxy={{effPrivilegesOfCurrentUserProxy}}>
+                  <MemberPrivileges::MemberPrivilegesTable
+                    @privilegesGroups={{groupedPrivilegesFlags}}
+                    @privilegeGroupsTranslationsPath={{privilegeGroupsTranslationsPath}}
+                    @privilegesTranslationsPath={{privilegesTranslationsPath}}
+                    @recordDirectProxy={{if memberProxy.isDirect
+                      memberProxy.privilegesProxy
+                      null
+                    }}
+                    @recordEffectiveProxy={{memberProxy.effectivePrivilegesProxy}}
+                    @modelTypeTranslation={{modelTypeTranslation}}
+                    @areEffPrivilegesRecalculated={{record.areEffPrivilegesRecalculated}}
+                    @arePrivilegesJustSaved={{arePrivilegesJustSaved}}
+                    @contextRecord={{memberProxy.member}}
+                    @targetRecord={{record}}
+                    @directGroupMembers={{directGroupsProxyList}}
+                    @highlightMemberships={{action "highlightMemberships"}}
+                    @isPrivilegesToggleDisabled={{isPrivilegesToggleDisabled}}
+                  />
+                </PromiseProxyContainer>
+                <div class="memberships-container">
+                  <div class="header-memberships-container">
+                    <div class="header-memberships">
+                      <div>{{tt this "memberships"}}</div>
+                      <OneLabelTip @title={{tt this "membershipsTip"
+                          entityType=modelTypeTranslation
+                        }} />
+                    </div>
+                    <div class="show-descriptions-toggle">
+                      <label
+                        for={{concat
+                          "members-show-descriptions-"
+                          memberProxy.member.entityId
+                        }}
+                        class="inline-label"
+                      >
+                        {{tt this "showDescriptions"}}
+                      </label>
+                      <OneWayToggle
+                        @inputId={{concat
+                          "members-show-descriptions-"
+                          memberProxy.member.entityId
+                        }}
+                        @checked={{showMembershipDescription}}
+                        @update={{action (mut showMembershipDescription)}}
+                      />
+                    </div>
                   </div>
-                  <div class="show-descriptions-toggle">
-                    <label
-                      for={{concat
-                        "members-show-descriptions-"
-                        memberProxy.member.entityId
-                      }}
-                      class="inline-label"
-                    >
-                      {{tt this "showDescriptions"}}
-                    </label>
-                    <OneWayToggle
-                      @inputId={{concat
-                        "members-show-descriptions-"
-                        memberProxy.member.entityId
-                      }}
-                      @checked={{showMembershipDescription}}
-                      @update={{action (mut showMembershipDescription)}}
+                  <div class="body-memberships">
+                    <MembershipVisualiser
+                      @contextRecord={{memberProxy.member}}
+                      @targetRecord={{record}}
+                      @showDescription={{showMembershipDescription}}
+                      @highlightedMembers={{highlightedMembers}}
                     />
                   </div>
                 </div>
-                <div class="body-memberships">
-                  <MembershipVisualiser
-                    @contextRecord={{memberProxy.member}}
-                    @targetRecord={{record}}
-                    @showDescription={{showMembershipDescription}}
-                    @highlightedMembers={{highlightedMembers}}
-                  />
-                </div>
               </div>
-            </div>
-          </RenderLater>
-        </listItem.content>
-      </list.item>
-    {{else}}
-      {{yield list}}
-    {{/each}}
-    {{#if isPagesControlShown}}
-      <PagesControl
-        @activePageNumber={{paginator.activePageNumber}}
-        @pagesCount={{paginator.pagesCount}}
-        @pageSize={{paginator.pageSize}}
-        @hasPageNumberInput={{not (or (media "isTablet") (media "isMobile"))}}
-        @onPageChange={{paginator.changeActivePageNumber}}
-        @customPerPageText={{tt this "perPage" type=membersTypeText}}
-        @customFilteredText={{tt this "filteredResults"}}
-        @isFiltered={{isFiltered}}
-        @changePerPage={{action "changePerPage"}}
-        @isPerPageDropdownVisible={{true}}
-      />
-    {{/if}}
-  </OneCollapsibleList>
+            </RenderLater>
+          </listItem.content>
+        </list.item>
+      {{else}}
+        {{yield list}}
+      {{/each}}
+      {{#if isPagesControlShown}}
+        <PagesControl
+          @activePageNumber={{paginator.activePageNumber}}
+          @pagesCount={{paginator.pagesCount}}
+          @pageSize={{paginator.pageSize}}
+          @hasPageNumberInput={{not (or (media "isTablet") (media "isMobile"))}}
+          @onPageChange={{paginator.changeActivePageNumber}}
+          @customPerPageText={{tt this "perPage" type=membersTypeText}}
+          @customFilteredText={{tt this "filteredResults"}}
+          @isFiltered={{isFiltered}}
+          @changePerPage={{action "changePerPage"}}
+          @isPerPageDropdownVisible={{true}}
+        />
+      {{/if}}
+    </OneCollapsibleList>
+  {{/if}}
 </PromiseProxyContainer>
