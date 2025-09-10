@@ -159,8 +159,9 @@
  *     rendered components (e.g. real height of rendered group box) - all values
  *     are fixed in Workspace and properties computed in utils.
  *
- * @author Michał Borzęcki
+ * @author Michał Borzęcki, Jakub Liput
  * @copyright (C) 2018-2024 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -212,6 +213,7 @@ export default Component.extend(I18n, {
   globalNotify: service(),
   navigationState: service(),
   router: service(),
+  recordManager: service(),
 
   /**
    * @override
@@ -601,9 +603,10 @@ export default Component.extend(I18n, {
     let promise;
     if (get(parentGroup, 'hasViewPrivilege')) {
       promise = (async () => {
-        const childList = await parentGroup.belongsTo('childList').reload();
-        await childList.hasMany('list').reload();
-        return childList;
+        await parentGroup.reloadList('childList', {
+          reloadRecords: true,
+        });
+        return await parentGroup.childList;
       })();
     } else {
       promise = reject({ id: 'forbidden' });
@@ -620,9 +623,10 @@ export default Component.extend(I18n, {
     let promise;
     if (get(childGroup, 'hasViewPrivilege')) {
       promise = (async () => {
-        const childList = await childGroup.belongsTo('parentList').reload();
-        await childList.hasMany('list').reload();
-        return childList;
+        await childGroup.reloadList('parentList', {
+          reloadRecords: true,
+        });
+        return await childGroup.parentList;
       })();
     } else {
       promise = reject({ id: 'forbidden' });

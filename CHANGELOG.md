@@ -5,6 +5,7 @@
 ### Latest changes
 
 * VFS-12771 Added batch fetching for members page
+* VFS-12981 Fixed loading group hierarchy view when there are non-owned groups on the list
 * VFS-12807 Added top sidebar loading spinner
 * VFS-12985 Fixed infinite loading of shares sidebar when shares of some space cannot be fetched
 * VFS-12984 Optimized time of removing and leaving spaces/groups when there is a large number of spaces/groups
