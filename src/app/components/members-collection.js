@@ -252,9 +252,9 @@ export default Component.extend(I18n, {
   searchQuery: undefined,
 
   /**
-   * @type {Map<TargetRecordOption, BatchRecordsLoader>}
+   * @type {Map<string, BatchRecordsLoader>}
    */
-  targetRecordsLoaders: undefined,
+  batchRecordsLoaders: undefined,
 
   /**
    * @type {string}
@@ -500,37 +500,36 @@ export default Component.extend(I18n, {
   members: reads('membersProxy.content'),
 
   /**
-   * @type {ComputedProperty<PromiseObject<undefined>>}
+   * @type {ComputedProperty<PromiseObject<BatchRecordsLoader>>}
    */
-  targetRecordOptionsLoaderProxy: computed(
+  batchRecordsLoaderProxy: computed(
     'record',
     'subjectType',
-    function targetRecordOptionsLoaderProxy() {
+    function batchRecordsLoaderProxy() {
       const listName = `eff${_.upperFirst(this.subjectType)}List`;
-      const batchRecordsLoader = this.getBatchTargetRecordsLoader(listName);
+      const batchRecordsLoader = this.getBatchRecordsLoader(listName);
       return promiseObject(batchRecordsLoader);
     }
   ),
 
-  targetRecordOptionsLoaderEff: reads('targetRecordOptionsLoaderProxy.content'),
+  /**
+   * @type {ComputedProperty<BatchRecordsLoader>}
+   */
+  batchRecordsLoader: reads('batchRecordsLoaderProxy.content'),
 
-  targetRecordOptionsLoaderProxy2: computed(
-    'targetRecordOptionsLoaderEff',
-    function targetRecordOptionsLoaderProxy2() {
-      return promiseObject((async () => {
-        const tmp = this.targetRecordOptionsLoaderEff;
-        const targetRecords = await tmp.getPromise();
-        return targetRecords;
-      })());
+  recordsLoadedProxy: computed(
+    'batchRecordsLoader',
+    function recordsLoadedProxy() {
+      return promiseObject(this.batchRecordsLoader.getPromise());
     }),
 
   /**
-   * @type {ComputedProperty<ProgressTracker|null>}
+   * @type {ComputedProperty<ProgressTracker>}
    */
-  progressTrackerEff: computed(
-    'targetRecordOptionsLoaderEff',
+  progressTracker: computed(
+    'batchRecordsLoader',
     function progressTracker() {
-      return this.targetRecordOptionsLoaderEff.progressTracker;
+      return this.batchRecordsLoader.progressTracker;
     }
   ),
 
@@ -708,7 +707,7 @@ export default Component.extend(I18n, {
 
   init() {
     this._super(...arguments);
-    this.set('targetRecordsLoaders', new Map());
+    this.set('batchRecordsLoaders', new Map());
     this.membersObserver();
     this.groupsObserver();
     this.set('privilegesRecordProxyCache', []);
@@ -749,11 +748,12 @@ export default Component.extend(I18n, {
    */
   getMembers(listName) {
     const record = this.record;
-    const effListName = listName.startsWith('eff') ? listName : `eff${_.upperFirst(listName)}`;
+    const effListName = listName.startsWith('eff') ?
+      listName : `eff${_.upperFirst(listName)}`;
     let promise;
     if (get(record, 'hasViewPrivilege') !== false) {
       promise = (async () => {
-        const batchRecordsLoader = await this.getBatchTargetRecordsLoader(effListName);
+        const batchRecordsLoader = await this.getBatchRecordsLoader(effListName);
         await batchRecordsLoader.getPromise();
 
         return get(record, listName).then(sgl =>
@@ -800,10 +800,10 @@ export default Component.extend(I18n, {
   },
 
   /**
-   * @param {TargetModelOption} targetModelOption
+   * @param {string} listName
    * @returns {BatchRecordsLoader}
    */
-  async createBatchTargetRecordsLoader(listName) {
+  async createBatchRecordsLoader(listName) {
     const {
       batchRequestRegistry,
       record,
@@ -823,7 +823,7 @@ export default Component.extend(I18n, {
         await listRecord.list;
       } catch {
         console.warn(
-          'MemberCollection.createBatchTargetRecordsLoader: list cannot be fully resolved, some records may be missing'
+          'MemberCollection.createBatchRecordsLoader: list cannot be fully resolved, some records may be missing'
         );
       }
       return listRecord.list.toArray();
@@ -836,17 +836,17 @@ export default Component.extend(I18n, {
   },
 
   /**
-   * @param {TargetModelOption} targetModelOption
-   * @returns {BatchRecordsLoader}
+   * @param {string} listName
+   * @returns {PromiseObject<BatchRecordsLoader>}
    */
-  getBatchTargetRecordsLoader(listName) {
-    if (!this.targetRecordsLoaders.has(listName)) {
-      this.targetRecordsLoaders.set(
+  getBatchRecordsLoader(listName) {
+    if (!this.batchRecordsLoaders.has(listName)) {
+      this.batchRecordsLoaders.set(
         listName,
-        promiseObject(this.createBatchTargetRecordsLoader(listName))
+        promiseObject(this.createBatchRecordsLoader(listName))
       );
     }
-    return this.targetRecordsLoaders.get(listName);
+    return this.batchRecordsLoaders.get(listName);
   },
 
   actions: {

@@ -1,11 +1,10 @@
-
-<PromiseProxyContainer @proxy={{targetRecordOptionsLoaderProxy}}>
-  {{#if (or this.targetRecordOptionsLoaderProxy2.isPending this.allMembersLoadingProxy.isPending)}}
+<PromiseProxyContainer @proxy={{this.batchRecordsLoaderProxy}}>
+  {{#if (or this.recordsLoadedProxy.isPending this.allMembersLoadingProxy.isPending)}}
     <div class="loader">
-      <SpinSpinnerBlock @sizeClass="xs" />
+      <SpinSpinnerBlock @sizeClass="sm" />
       <div class="loader-text truncate">
         {{tt this "loadingFilters"
-          progress=this.progressTrackerEff.progressText
+          progress=this.progressTracker.progressText
         }}
       </div>
     </div>
