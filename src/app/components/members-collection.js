@@ -808,7 +808,12 @@ export default Component.extend(I18n, {
       batchRequestRegistry,
       record,
     } = this;
-    const listRecord = await record.getRelation(listName);
+    let listRecord;
+    if (listName === 'effGroupList' && record.entityType === 'group') {
+      listRecord = await record.getRelation('effChildList');
+    } else {
+      listRecord = await record.getRelation(listName);
+    }
     const itemsGris = listRecord.hasMany('list').ids();
 
     const listResolver = async () => {
