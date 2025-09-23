@@ -212,16 +212,9 @@
     padding: $padding-base-vertical 0;
   }
 
-  .loader {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: $padding-base-vertical 0;
-    .loader-text {
-      font-size: $font-size-small;
-      margin-top: $padding-base-vertical;
-    }
+  .spin-spinner-block {
+    height: 100px;
+    margin-top: $padding-large-vertical;
   }
 
   @media (min-width: $screen-sm-min) {

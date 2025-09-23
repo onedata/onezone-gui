@@ -4,6 +4,7 @@
  *
  * @author Michał Borzęcki
  * @copyright (C) 2018-2024 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -517,9 +518,9 @@ export default Component.extend(I18n, {
    */
   batchRecordsLoader: reads('batchRecordsLoaderProxy.content'),
 
-  recordsLoadedProxy: computed(
+  areRecordsLoadedProxy: computed(
     'batchRecordsLoader',
-    function recordsLoadedProxy() {
+    function areRecordsLoadedProxy() {
       return promiseObject(this.batchRecordsLoader.getPromise());
     }),
 
@@ -823,7 +824,7 @@ export default Component.extend(I18n, {
         await listRecord.list;
       } catch {
         console.warn(
-          'MemberCollection.createBatchRecordsLoader: list cannot be fully resolved, some records may be missing'
+          'MembersCollection.createBatchRecordsLoader: list cannot be fully resolved, some records may be missing'
         );
       }
       return listRecord.list.toArray();

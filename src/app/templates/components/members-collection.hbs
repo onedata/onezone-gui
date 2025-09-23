@@ -1,14 +1,16 @@
 <PromiseProxyContainer @proxy={{this.batchRecordsLoaderProxy}}>
-  {{#if (or this.recordsLoadedProxy.isPending this.allMembersLoadingProxy.isPending)}}
-    <div class="loader">
-      <SpinSpinnerBlock @sizeClass="sm" />
-      <div class="loader-text truncate">
-        {{tt this "loadingFilters"
-          progress=this.progressTracker.progressText
-        }}
-      </div>
-    </div>
-  {{else}}
+  <LoadingContainer
+    @isLoading={{
+      or this.areRecordsLoadedProxy.isPending this.allMembersLoadingProxy.isPending
+    }}
+    @loadingLabel={{
+      tt this "loadingFilters"
+      progress=this.progressTracker.progressText
+      type=membersTypeText
+    }}
+    @sizeClass="md"
+    @absoluteCentered={{false}}
+  >
     <OneCollapsibleList
       @hasCheckboxes={{true}}
       class={{concat subjectType "-list"}}
@@ -261,5 +263,5 @@
         />
       {{/if}}
     </OneCollapsibleList>
-  {{/if}}
+  </LoadingContainer>
 </PromiseProxyContainer>

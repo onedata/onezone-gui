@@ -28,5 +28,5 @@ export default {
   membershipsTip: 'Visualization of effective membership paths, showing via what groups this member inherits membership in this {{entityType}}.',
   perPage: '{{type}} per page',
   filteredResults: 'matching names',
-  loadingFilters: 'Loading... {{progress}}',
+  loadingFilters: 'Loading {{type}}... {{progress}}',
 };
