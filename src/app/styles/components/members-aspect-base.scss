@@ -212,6 +212,11 @@
     padding: $padding-base-vertical 0;
   }
 
+  .spin-spinner-block {
+    height: 100px;
+    margin-top: $padding-large-vertical;
+  }
+
   @media (min-width: $screen-sm-min) {
     .item-modified-header {
       padding-right: 230px;
