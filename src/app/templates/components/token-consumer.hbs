@@ -96,7 +96,7 @@
       <PromiseProxyContainer @proxy={{joiningRecordSelectorOptionsProxy}} @sizeClass="sm">
         <p class="selector-description">{{joiningRecordSelectorDescription}}</p>
         <div class="joining-record-selector">
-          <OneDropdown
+          <AdaptiveDropdown
             @options={{joiningRecordSelectorOptionsProxy}}
             @onChange={{action (mut selectedJoiningRecordOption)}}
             @selected={{selectedJoiningRecordOption}}
@@ -104,6 +104,7 @@
               (concat "recordSelectorPlaceholder." joiningRecordSelectorModelName)
             }}
             @searchEnabled={{true}}
+            @searchField="searchableName"
             as |recordOption|
           >
             <div class="option-container">
@@ -112,7 +113,7 @@
                 <NameConflict @item={{recordOption.value}} />
               </TruncatedString>
             </div>
-          </OneDropdown>
+          </AdaptiveDropdown>
         </div>
       </PromiseProxyContainer>
     </div>
