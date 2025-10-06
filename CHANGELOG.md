@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12932 Added infinite-scrollable dropdowns
 * VFS-12771 Added batch fetching for members page
 * VFS-12981 Fixed loading group hierarchy view when there are non-owned groups on the list
 * VFS-12807 Added top sidebar loading spinner
