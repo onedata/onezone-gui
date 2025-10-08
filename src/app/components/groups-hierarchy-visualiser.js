@@ -605,6 +605,7 @@ export default Component.extend(I18n, {
       promise = (async () => {
         await parentGroup.reloadList('childList', {
           reloadRecords: true,
+          forceInit: true,
         });
         return await parentGroup.childList;
       })();
@@ -625,6 +626,7 @@ export default Component.extend(I18n, {
       promise = (async () => {
         await childGroup.reloadList('parentList', {
           reloadRecords: true,
+          forceInit: true,
         });
         return await childGroup.parentList;
       })();
