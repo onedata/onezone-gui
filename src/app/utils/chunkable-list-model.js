@@ -102,7 +102,7 @@ export class ChunkableListModel {
       return;
     }
     this.chunkableListModelFetcher.setFilter({ expression, advanced });
-    this.chunkableListModelReloader.handleListChange({ reset: true });
+    this.chunkableListModelReloader.reload({ reset: true });
   }
 }
 

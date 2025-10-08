@@ -49,12 +49,17 @@ export default class VirtualListReloader extends EmberObject {
     this.removeObserver(this.observedProperty, this, 'handleListChange', false);
   }
 
+  async handleListChange() {
+    const reset = this.chunksArray.startIndex === 0;
+    return this.reload({ reset });
+  }
+
   /**
    * @param {boolean} reset If set to true, the list will be reloaded from start to the
    *   initial length (like the new array), forgetting about previous start/end indexes.
    * @returns {Promise<void>}
    */
-  async handleListChange({ reset = false }) {
+  async reload({ reset = false }) {
     if (this.chunksArray) {
       if (reset) {
         this.chunksArray.setIndices(0, this.initialArraySize);
