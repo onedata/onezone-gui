@@ -1,4 +1,4 @@
-<OneDropdown
+<AdaptiveDropdown
   @options={{authorizers}}
   @onChange={{action "authorizerSelected"}}
   @selected={{selectedAuthorizer}}
@@ -18,6 +18,6 @@
     @iconPath={{authorizer.iconPath}}
     @iconBackgroundColor={{authorizer.iconBackgroundColor}}
   />
-  {{authorizer.displayName}}
-</OneDropdown>
+  <TruncatedString>{{authorizer.displayName}}</TruncatedString>
+</AdaptiveDropdown>
 {{yield}}

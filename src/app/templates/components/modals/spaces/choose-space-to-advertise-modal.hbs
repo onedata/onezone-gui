@@ -19,7 +19,7 @@
         <p>{{tt this "allAdvertisedText"}}</p>
       {{else}}
         <p>{{tt this "introText"}}</p>
-        <OneDropdown
+        <AdaptiveDropdown
           @triggerClass="spaces-dropdown-trigger"
           @options={{nonAdvertisedSpaces}}
           @selected={{selectedSpace}}
@@ -34,7 +34,7 @@
               <NameConflict @item={{space}} />
             </TruncatedString>
           </div>
-        </OneDropdown>
+        </AdaptiveDropdown>
       {{/if}}
     </PromiseProxyContainer>
   </modal.body>

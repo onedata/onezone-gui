@@ -28,26 +28,26 @@
   <div class="target-filter-row filter-row">
     <label class="filter-label">{{tt this "targetFilter.label"}}:</label>
     <div class="filter-control target-filter">
-      <OneDropdown
-        class="target-model-filter"
-        @tagName="div"
-        @triggerClass="small"
-        @dropdownClass="small"
-        @options={{this.targetModelOptions}}
-        @onChange={{action "targetModelChanged"}}
-        @selected={{this.selectedTargetModelOption}}
-        @renderInPlace={{true}}
-        as |option|
-      >
-        <TruncatedString class="option-container">
-          {{#if option.icon}}
-            <OneIcon class="model-icon" @icon={{option.icon}} />
-          {{/if}}
-          <span
-            class="text model-name"
-          >{{tt this (concat "targetFilter.model.options." option.modelName)}}</span>
-        </TruncatedString>
-      </OneDropdown>
+      <div class="target-model-filter">
+        <OneDropdown
+          @triggerClass="small"
+          @dropdownClass="small"
+          @options={{this.targetModelOptions}}
+          @onChange={{action "targetModelChanged"}}
+          @selected={{this.selectedTargetModelOption}}
+          @renderInPlace={{false}}
+          as |option|
+        >
+          <TruncatedString class="option-container">
+            {{#if option.icon}}
+              <OneIcon class="model-icon" @icon={{option.icon}} />
+            {{/if}}
+            <span
+              class="text model-name"
+            >{{tt this (concat "targetFilter.model.options." option.modelName)}}</span>
+          </TruncatedString>
+        </OneDropdown>
+      </div>
       {{#if this.targetRecordOptionsLoaderProxy.isPending}}
         <div class="dropdown-loader">
           <SpinSpinnerBlock @sizeClass="xs" />
@@ -62,28 +62,33 @@
           </div>
         </div>
       {{else}}
-        <OneDropdown
-          class="target-record-filter"
-          @tagName="div"
-          @triggerClass="small"
-          @dropdownClass="small"
-          @options={{this.targetRecordOptions}}
-          @onChange={{action "targetRecordChanged"}}
-          @selected={{this.effSelectedTargetRecordOption}}
-          @renderInPlace={{true}}
-          @disabled={{this.isTargetRecordDisabled}}
-          @searchEnabled={{true}}
-          @searchField="name"
-          as |option|
-        >
-          <TruncatedString>
-            {{#if option.record}}
-              <NameConflict @item={{option.record}} />
-            {{else}}
-              {{option.name}}
-            {{/if}}
-          </TruncatedString>
-        </OneDropdown>
+        {{!-- TODO: VFS-13072 change to adaptive dropdown after fixing loader --}}
+        <div class="target-record-filter">
+          <OneDropdown
+            @triggerClass="small"
+            @dropdownClass="small"
+            @options={{this.targetRecordOptions}}
+            @onChange={{action "targetRecordChanged"}}
+            @selected={{this.effSelectedTargetRecordOption}}
+            {{!--
+              renderInPlace causes strange behavior: scrolling the dropdown causes
+              scrolling the sidebar
+            --}}
+            @renderInPlace={{false}}
+            @disabled={{this.isTargetRecordDisabled}}
+            @searchEnabled={{true}}
+            @searchField="name"
+            as |option|
+          >
+            <TruncatedString>
+              {{#if option.record}}
+                <NameConflict @item={{option.record}} />
+              {{else}}
+                {{option.name}}
+              {{/if}}
+            </TruncatedString>
+          </OneDropdown>
+        </div>
       {{/if}}
     </div>
   </div>

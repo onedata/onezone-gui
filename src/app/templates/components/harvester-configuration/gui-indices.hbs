@@ -51,18 +51,18 @@
                 <div>
                   {{#if (eq mode "edit")}}
                     <BsForm class="row form-horizontal without-labels" as |bsForm|>
-                      <OneDropdown
-                        class="col-xs-12 col-sm-6"
-                        @tagName="div"
-                        @options={{assignIndexMethods}}
-                        @selected={{get selectedAssignMethods guiPluginIndex.name}}
-                        @onChange={{action "changeAssignMethod" guiPluginIndex.name}}
-                        @renderInPlace={{true}}
-                        @disabled={{isSaving}}
-                        as |assignMethod|
-                      >
-                        {{tt this (concat "assignMethods." assignMethod)}}
-                      </OneDropdown>
+                      <div class="col-xs-12 col-sm-6">
+                        <OneDropdown
+                          @options={{assignIndexMethods}}
+                          @selected={{get selectedAssignMethods guiPluginIndex.name}}
+                          @onChange={{action "changeAssignMethod" guiPluginIndex.name}}
+                          @renderInPlace={{true}}
+                          @disabled={{isSaving}}
+                          as |assignMethod|
+                        >
+                          {{tt this (concat "assignMethods." assignMethod)}}
+                        </OneDropdown>
+                      </div>
                       <bsForm.group
                         class={{concat-classes
                           "col-xs-12 col-sm-6"
@@ -79,7 +79,7 @@
                             class="form-control"
                             disabled={{isSaving}}>
                         {{else if (eq (get selectedAssignMethods guiPluginIndex.name) "reuse")}}
-                          <OneDropdown
+                          <AdaptiveDropdown
                             @tagName="div"
                             @options={{harvesterIndicesProxy}}
                             @selected={{get selectedIndices guiPluginIndex.name}}
@@ -88,8 +88,8 @@
                             @disabled={{isSaving}}
                             as |index|
                           >
-                            {{index.name}}
-                          </OneDropdown>
+                            <TruncatedString>{{index.name}}</TruncatedString>
+                          </AdaptiveDropdown>
                         {{/if}}
                         <div class="form-message">{{get guiIndicesErrors guiPluginIndex.name}}</div>
                       </bsForm.group>
