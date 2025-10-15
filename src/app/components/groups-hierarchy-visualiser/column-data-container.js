@@ -21,7 +21,7 @@ import { all as allFulfilled } from 'rsvp';
 
 /**
  * @typedef {Object} ColumnDataContainerArgs
- * @property {GroupHierarchyColumnDataModel} columnDataModel
+ * @property {GroupsHierarchyColumnDataModel} columnDataModel
  */
 
 /** @extends {Component<ColumnDataContainerSignature>} */

@@ -652,11 +652,10 @@ export default Component.extend(I18n, {
     return column;
   },
 
-  // FIXME: type
   /**
    * Creates column model using column relation specification
-   * @param {Utils/GroupsHierarchyVisualiser/Column} column
-   * @returns {PromiseObject<GroupHierarchyColumnDataModel>}
+   * @param {Utils.GroupsHierarchyVisualiser.Column} column
+   * @returns {PromiseObject<GroupsHierarchyColumnDataModel>}
    */
   createColumnDataModel(relationType, relatedGroup) {
     switch (relationType) {

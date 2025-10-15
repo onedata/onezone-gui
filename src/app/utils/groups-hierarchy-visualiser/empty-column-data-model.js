@@ -11,7 +11,7 @@ import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve } from 'rsvp';
 
 /**
- * @implements {GroupHierarchyColumnDataModel}
+ * @implements {GroupsHierarchyColumnDataModel}
  */
 export default class SingleGroupColumnDataModel {
   constructor() {

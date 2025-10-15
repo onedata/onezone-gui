@@ -18,7 +18,7 @@ import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 /** @import BatchRequestContainer from '../../lib/onedata-gui-websocket-client/addon/utils/batch-request-container' */
 
 /**
- * @implements {GroupHierarchyColumnDataModel}
+ * @implements {GroupsHierarchyColumnDataModel}
  */
 export default class RelatedGroupsDataModel {
   /**
