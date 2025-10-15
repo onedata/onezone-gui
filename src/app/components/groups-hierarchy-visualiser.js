@@ -702,32 +702,18 @@ export default Component.extend(I18n, {
    * Reloads model of all columns
    * @returns {undefined}
    */
-  // FIXME: do przepisania albo usunięcia (bazowanie na pushach? - ale to będzie wprowadzać opóźnienie w widoku)
-  reloadModel() {
-    const columns = this.get('columnManager.columns');
-    // There may be many columns with the same relatedGroup.
-    // Using map instead of array to minimize the number of requests.
-    const relatedGroupsReloadPromises = new Map();
-    columns
-      .forEach(column => {
-        const relatedGroup = get(column, 'relatedGroup');
-        let relatedGroupReloadPromise;
-        if (!relatedGroup) {
-          relatedGroupReloadPromise = resolve();
-        } else if (relatedGroupsReloadPromises.has(relatedGroup)) {
-          relatedGroupReloadPromise = relatedGroupsReloadPromises.get(relatedGroup);
-        } else {
-          relatedGroupReloadPromise = relatedGroup.reload();
-          relatedGroupsReloadPromises.set(relatedGroup, relatedGroupReloadPromise);
-        }
-        relatedGroupReloadPromise.then(relatedGroup => {
-          // FIXME: jeśli przeniosę instancjonowanie column data model do column to efekt powinien być ten sam?
-          // FIXME: ale czy to w ogóle jest potrzebne?
-          column.setDataModel(
-            this.createColumnDataModel(column.relationType, relatedGroup)
-          );
-        });
-      });
+  reloadRelatedGroups() {
+    const columns = this.columnManager.columns;
+    // There may be many columns with the same relatedGroup - to not invoke reload
+    // multiple times.
+    const reloadingGroups = new Set();
+    for (const column of columns) {
+      const relatedGroup = column.relatedGroup;
+      if (relatedGroup && !reloadingGroups.has(relatedGroup)) {
+        relatedGroup.reload();
+        reloadingGroups.add(relatedGroup);
+      }
+    }
   },
 
   /**
@@ -832,7 +818,7 @@ export default Component.extend(I18n, {
       });
       try {
         await action.execute();
-        safeExec(this, 'reloadModel');
+        safeExec(this, 'reloadRelatedGroups');
       } finally {
         safeExec(this, 'setProperties', {
           isGroupConsumingToken: false,
@@ -848,7 +834,7 @@ export default Component.extend(I18n, {
       const result = await action.execute();
       action.destroy();
       if (result.status === 'done') {
-        safeExec(this, 'reloadModel');
+        safeExec(this, 'reloadRelatedGroups');
       }
     },
     joinGroup() {
@@ -875,7 +861,7 @@ export default Component.extend(I18n, {
         .then(() => {
           const willRedirect = this.redirectOnGroupDeletion();
           if (!willRedirect) {
-            safeExec(this, 'reloadModel');
+            safeExec(this, 'reloadRelatedGroups');
           }
         })
         .finally(() =>
@@ -915,7 +901,7 @@ export default Component.extend(I18n, {
           get(relationToRemove, 'parent'),
           get(relationToRemove, 'child')
         )
-        .then(() => safeExec(this, 'reloadModel'))
+        .then(() => safeExec(this, 'reloadRelatedGroups'))
         .finally(() =>
           safeExec(this, 'setProperties', {
             isRemovingRelation: false,
