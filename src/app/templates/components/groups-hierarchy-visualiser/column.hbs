@@ -1,39 +1,35 @@
 <TruncatedString class="column-header">
-  {{#if (eq column.relationType "parents")}}
-    {{tt this "parentsOfGroup" groupName=column.relatedGroup.name}}
-  {{else if (eq column.relationType "children")}}
-    {{tt this "childrenOfGroup" groupName=column.relatedGroup.name}}
-  {{else if (eq column.relationType "startPoint")}}
-    {{column.model.content.list.content.[0].name}}
-  {{/if}}
+  {{this.columnTitle}}
 </TruncatedString>
 <PerfectScrollbarElement
   class="group-boxes-container"
   @onScroll={{action "scroll"}}
-  @supressScrollY={{column.model.isPending}}
+  @supressScrollY={{column.groupsProxy.isPending}}
 >
-  {{#each column.groupBoxes key="groupId" as |groupBox|}}
-    <GroupsHierarchyVisualiser::GroupBox
-      @groupBox={{groupBox}}
-      @parentsRelationActive={{eq groupBox column.parentsRelationGroupBox}}
-      @childrenRelationActive={{eq groupBox column.childrenRelationGroupBox}}
-      @showParents={{action showParents column groupBox.group}}
-      @showChildren={{action showChildren column groupBox.group}}
-      @viewGroup={{action viewGroup groupBox.group}}
-      @renameGroup={{action renameGroup groupBox.group}}
-      @createRelativeGroup={{action createRelativeGroup groupBox.group}}
-      @addYourGroup={{action addYourGroup groupBox.group}}
-      @joinUsingToken={{action joinUsingToken groupBox.group}}
-      @leaveGroup={{action leaveGroup groupBox.group}}
-      @joinGroup={{action joinGroup groupBox.group}}
-      @removeGroup={{action removeGroup groupBox.group}}
-      @modifyPrivileges={{modifyPrivileges}}
-      @removeRelation={{removeRelation}}
-    />
-  {{/each}}
+  <GroupsHierarchyVisualiser::ColumnDataContainer @columnDataModel={{this.column.columnDataModel}}>
+    {{#each column.groupBoxes key="groupId" as |groupBox|}}
+      <GroupsHierarchyVisualiser::GroupBox
+        @groupBox={{groupBox}}
+        @parentsRelationActive={{eq groupBox column.parentsRelationGroupBox}}
+        @childrenRelationActive={{eq groupBox column.childrenRelationGroupBox}}
+        @showParents={{action showParents column groupBox.group}}
+        @showChildren={{action showChildren column groupBox.group}}
+        @viewGroup={{action viewGroup groupBox.group}}
+        @renameGroup={{action renameGroup groupBox.group}}
+        @createRelativeGroup={{action createRelativeGroup groupBox.group}}
+        @addYourGroup={{action addYourGroup groupBox.group}}
+        @joinUsingToken={{action joinUsingToken groupBox.group}}
+        @leaveGroup={{action leaveGroup groupBox.group}}
+        @joinGroup={{action joinGroup groupBox.group}}
+        @removeGroup={{action removeGroup groupBox.group}}
+        @modifyPrivileges={{modifyPrivileges}}
+        @removeRelation={{removeRelation}}
+      />
+    {{/each}}
+  </GroupsHierarchyVisualiser::ColumnDataContainer>
 </PerfectScrollbarElement>
-{{#if (or (not column.model.isFulfilled) column.model.isForbidden)}}
+{{#if (or (not column.groupsProxy.isFulfilled) column.groupsProxy.isForbidden)}}
   <div class="column-loader">
-    <PromiseProxyContainer @proxy={{column.model}} />
+    <PromiseProxyContainer @proxy={{column.groupsProxy}} />
   </div>
 {{/if}}

@@ -7,8 +7,9 @@
  *   * exposes methods to manipulate columns from the outside: insertColumnBefore,
  *     insertColumnAfter, replaceColumn.
  *
- * @author Michał Borzęcki
+ * @author Michał Borzęcki, Jakub Liput
  * @copyright (C) 2018 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -22,8 +23,9 @@ import { A } from '@ember/array';
 import { next, later, debounce } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import Column from 'onezone-gui/utils/groups-hierarchy-visualiser/column';
+import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 
-export default EmberObject.extend({
+export default EmberObject.extend(OwnerInjector, {
   /**
    * @type {Utils/GroupHierarchyVisualiser/Workspace}
    * @virtual
@@ -169,12 +171,12 @@ export default EmberObject.extend({
     switch (relationType) {
       case 'parents':
         for (let i = oldColumnIndex - 1; i >= 0; i--) {
-          this.replaceColumnObject(i, Column.create());
+          this.replaceColumnObject(i, Column.create({ ownerSource: this }));
         }
         break;
       case 'children':
         for (let i = oldColumnIndex + 1, l = get(columns, 'length'); i < l; i++) {
-          this.replaceColumnObject(i, Column.create());
+          this.replaceColumnObject(i, Column.create({ ownerSource: this }));
         }
         break;
     }
@@ -238,6 +240,7 @@ export default EmberObject.extend({
     const availableColNum = get(columns, 'length');
     for (let i = availableColNum; i < this.get('workspace.columnsNumber'); i++) {
       const column = Column.create({
+        ownerSource: this,
         workspace: this.get('workspace'),
         relationType: 'empty',
       });

@@ -2,13 +2,14 @@
  * Shows number of groups in relation (parents or children) in groups hierarchy
  * visualiser. Also shows status of loading relation data (spinner or error).
  *
- * @author Michał Borzęcki
+ * @author Michał Borzęcki, Jakub Liput
  * @copyright (C) 2018 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Component from '@ember/component';
-import { observer, get, computed, trySet } from '@ember/object';
+import { observer, computed, trySet } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/i18n';
@@ -62,11 +63,6 @@ export default Component.extend(I18n, {
   isExpanded: false,
 
   /**
-   * @type {GroupList|undefined}
-   */
-  relation: undefined,
-
-  /**
    * @type {boolean}
    */
   renderTooltip: false,
@@ -89,22 +85,24 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<undefined|Object>}
    */
-  relationError: reads('relation.reason'),
+  relationError: reads('relationProxy.reason'),
 
   /**
    * @type {Ember.ComputedProperty<boolean>}
    */
-  relationIsRejected: reads('relation.isRejected'),
+  relationIsRejected: reads('relationProxy.isRejected'),
 
   /**
    * @type {Ember.ComputedProperty<boolean>}
    */
-  relationIsLoading: reads('relation.isPending'),
+  relationIsLoading: reads('relationProxy.isPending'),
 
   /**
    * @type {Ember.ComputedProperty<boolean>}
    */
-  relationIsFulfilled: reads('relation.isFulfilled'),
+  relationIsFulfilled: reads('relationProxy.isFulfilled'),
+
+  relationLength: reads('relationProxy.length'),
 
   /**
    * @type {Ember.ComputedProperty<string>}
@@ -122,13 +120,7 @@ export default Component.extend(I18n, {
         relationIsLoading,
         relationType,
         isExpanded,
-      } = this.getProperties(
-        'hasViewPrivilege',
-        'relationIsRejected',
-        'relationIsLoading',
-        'relationType',
-        'isExpanded'
-      );
+      } = this;
       if (!hasViewPrivilege) {
         return this.t(relationType === 'children' ?
           'childGroupsNoPermissions' : 'parentGroupsNoPermissions'
@@ -162,32 +154,23 @@ export default Component.extend(I18n, {
     return () => this.get('expandRelation')();
   }),
 
-  relationLoader: observer(
+  relationProxy: computed(
     'group',
     'relationType',
     'hasViewPrivilege',
     function relationLoader() {
-      const {
-        relationType,
-        hasViewPrivilege,
-        group,
-      } = this.getProperties('relationType', 'hasViewPrivilege', 'group');
-      if (hasViewPrivilege) {
-        let relation;
-        switch (relationType) {
-          case 'parents':
-            relation = get(group, 'parentList');
-            break;
-          case 'children':
-            relation = get(group, 'childList');
-            break;
-        }
-        this.set('relation', relation);
-      } else {
-        this.set('relation', undefined);
+      if (!this.hasViewPrivilege) {
+        return null;
       }
+      const listName = {
+        parents: 'parentList',
+        children: 'childList',
+      } [this.relationType];
+      return listName ? this.group[listName] : null;
     }
   ),
+
+  relation: reads('relationProxy.content'),
 
   clickHandlerObserver: observer(
     'isExpanded',
@@ -197,7 +180,7 @@ export default Component.extend(I18n, {
         isExpanded,
         relationIsFulfilled,
         clickHandler,
-      } = this.getProperties('isExpanded', 'relationIsFulfilled', 'clickHandler');
+      } = this;
       const handler = (isExpanded || relationIsFulfilled) ?
         clickHandler : undefined;
       this.setProperties({
@@ -209,7 +192,6 @@ export default Component.extend(I18n, {
 
   init() {
     this._super(...arguments);
-    this.relationLoader();
     this.clickHandlerObserver();
   },
 
@@ -217,10 +199,10 @@ export default Component.extend(I18n, {
    * @override
    */
   doubleClick() {
-    if (this.get('relationIsRejected')) {
-      this.get('globalNotify').backendError(
+    if (this.relationIsRejected) {
+      this.globalNotify.backendError(
         this.t('relationFetch'),
-        this.get('relationError')
+        this.relationError
       );
     }
   },

@@ -167,25 +167,19 @@
 
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
-import EmberObject, {
+import {
   computed,
   get,
-  getProperties,
   set,
   setProperties,
   observer,
 } from '@ember/object';
-import { A } from '@ember/array';
 import I18n from 'onedata-gui-common/mixins/i18n';
-import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
-import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { resolve, reject } from 'rsvp';
 import ColumnManager from 'onezone-gui/utils/groups-hierarchy-visualiser/column-manager';
 import Workspace from 'onezone-gui/utils/groups-hierarchy-visualiser/workspace';
-import {
-  createEmptyColumnModel,
-  default as Column,
-} from 'onezone-gui/utils/groups-hierarchy-visualiser/column';
+import Column from 'onezone-gui/utils/groups-hierarchy-visualiser/column';
 import { next } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
@@ -199,6 +193,9 @@ import {
   initDestroyableCache,
 } from 'onedata-gui-common/utils/destroyable-computed';
 import AddYourGroupAction from 'onezone-gui/utils/add-your-group-action';
+import EmptyColumnDataModel from 'onezone-gui/utils/groups-hierarchy-visualiser/empty-column-data-model';
+import SingleGroupColumnDataModel from 'onezone-gui/utils/groups-hierarchy-visualiser/single-group-column-data-model';
+import RelatedGroupsDataModel from 'onezone-gui/utils/groups-hierarchy-visualiser/related-groups-column-data-model';
 
 export default Component.extend(I18n, {
   classNames: ['groups-hierarchy-visualiser'],
@@ -214,6 +211,7 @@ export default Component.extend(I18n, {
   navigationState: service(),
   router: service(),
   recordManager: service(),
+  batchRequestRegistry: service(),
 
   /**
    * @override
@@ -335,6 +333,7 @@ export default Component.extend(I18n, {
    */
   columnManager: destroyableComputed('workspace', function columnManager() {
     return ColumnManager.create({
+      ownerSource: this,
       workspace: this.get('workspace'),
     });
   }),
@@ -506,7 +505,8 @@ export default Component.extend(I18n, {
             relationType: 'empty',
           });
           // recalculate model according to above new specification
-          set(column, 'model', this.createColumnModel(column));
+          // FIXME: nadaje się na to, żeby ColumnDataModelem zarządało Column
+          column.setDataModel(this.createColumnDataModel('empty'));
         }
       });
     }
@@ -594,59 +594,42 @@ export default Component.extend(I18n, {
     });
   },
 
+  // FIXME: zasadność loadGroupChildren i loadGroupParents?
+
   /**
    * Returns model for children column for specified group
    * @param {Group} parentGroup
-   * @returns {PromiseArray<ManyArray<Group>>}
+   * @returns {PromiseObject<ManyArray<Group>>}
    */
   loadGroupChildren(parentGroup) {
     let promise;
     if (get(parentGroup, 'hasViewPrivilege')) {
       promise = (async () => {
-        await parentGroup.reloadList('childList', {
-          reloadRecords: true,
-          forceInit: true,
-        });
+        await parentGroup.loadList('childList');
         return await parentGroup.childList;
       })();
     } else {
       promise = reject({ id: 'forbidden' });
     }
-    return PromiseObject.create({ promise });
+    return promiseObject(promise);
   },
 
   /**
    * Returns model for parents column for specified group
    * @param {Group} childGroup
-   * @returns {PromiseArray<ManyArray<Group>>}
+   * @returns {PromiseObject<ManyArray<Group>>}
    */
   loadGroupParents(childGroup) {
     let promise;
     if (get(childGroup, 'hasViewPrivilege')) {
       promise = (async () => {
-        await childGroup.reloadList('parentList', {
-          reloadRecords: true,
-          forceInit: true,
-        });
+        await childGroup.loadList('parentList');
         return await childGroup.parentList;
       })();
     } else {
       promise = reject({ id: 'forbidden' });
     }
-    return PromiseObject.create({ promise });
-  },
-
-  /**
-   * Returns model for start-point column
-   * @returns {PromiseArray<Ember.A<Group>>}
-   */
-  loadThisGroupAsArray() {
-    return PromiseObject.create({
-      promise: this.get('group').reload()
-        .then(groupProxy => EmberObject.create({
-          list: PromiseArray.create({ promise: resolve(A([groupProxy])) }),
-        })),
-    });
+    return promiseObject(promise);
   },
 
   /**
@@ -660,33 +643,40 @@ export default Component.extend(I18n, {
    */
   createColumn(relationType = 'empty', relatedGroup = null) {
     const column = Column.create({
+      ownerSource: this,
       relationType: relationType,
       relatedGroup,
+      columnDataModel: this.createColumnDataModel(relationType, relatedGroup),
     });
     this.createdColumnsSet.add(column);
-    column.set('model', this.createColumnModel(column));
     return column;
   },
 
+  // FIXME: type
   /**
    * Creates column model using column relation specification
    * @param {Utils/GroupsHierarchyVisualiser/Column} column
-   * @returns {PromiseArray<Array<Group>>}
+   * @returns {PromiseObject<GroupHierarchyColumnDataModel>}
    */
-  createColumnModel(column) {
-    const {
-      relatedGroup,
-      relationType,
-    } = getProperties(column, 'relatedGroup', 'relationType');
+  createColumnDataModel(relationType, relatedGroup) {
     switch (relationType) {
       case 'startPoint':
-        return this.loadThisGroupAsArray();
+        return new SingleGroupColumnDataModel(this.group);
       case 'parents':
-        return this.loadGroupParents(relatedGroup);
+        return new RelatedGroupsDataModel(
+          relatedGroup,
+          'parent',
+          this.batchRequestRegistry
+        );
       case 'children':
-        return this.loadGroupChildren(relatedGroup);
+        return new RelatedGroupsDataModel(
+          relatedGroup,
+          'child',
+          this.batchRequestRegistry
+        );
       case 'empty':
-        return createEmptyColumnModel();
+      default:
+        return new EmptyColumnDataModel();
     }
   },
 
@@ -712,6 +702,7 @@ export default Component.extend(I18n, {
    * Reloads model of all columns
    * @returns {undefined}
    */
+  // FIXME: do przepisania albo usunięcia (bazowanie na pushach? - ale to będzie wprowadzać opóźnienie w widoku)
   reloadModel() {
     const columns = this.get('columnManager.columns');
     // There may be many columns with the same relatedGroup.
@@ -729,9 +720,13 @@ export default Component.extend(I18n, {
           relatedGroupReloadPromise = relatedGroup.reload();
           relatedGroupsReloadPromises.set(relatedGroup, relatedGroupReloadPromise);
         }
-        const modelPromise = relatedGroupReloadPromise
-          .then(() => this.createColumnModel(column));
-        set(column, 'model', PromiseObject.create({ promise: modelPromise }));
+        relatedGroupReloadPromise.then(relatedGroup => {
+          // FIXME: jeśli przeniosę instancjonowanie column data model do column to efekt powinien być ten sam?
+          // FIXME: ale czy to w ogóle jest potrzebne?
+          column.setDataModel(
+            this.createColumnDataModel(column.relationType, relatedGroup)
+          );
+        });
       });
   },
 

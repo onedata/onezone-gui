@@ -19,8 +19,9 @@
  *  To read more about column types, see documentation for
  *  components/groups-hierarchy-visualiser.
  *
- * @author Michał Borzęcki
+ * @author Michał Borzęcki, Jakub Liput
  * @copyright (C) 2018 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -34,13 +35,13 @@ import EmberObject, {
 } from '@ember/object';
 import { reads, sort, filterBy, bool } from '@ember/object/computed';
 import { A } from '@ember/array';
-import { resolve } from 'rsvp';
 import GroupBox from 'onezone-gui/utils/groups-hierarchy-visualiser/group-box';
 import ColumnSeparator from 'onezone-gui/utils/groups-hierarchy-visualiser/column-separator';
-import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
-import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { next } from '@ember/runloop';
+import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
+import { inject as service } from '@ember/service';
+import EmptyColumnDataModel from './empty-column-data-model';
 
 let nextColumnId = 0;
 
@@ -48,10 +49,11 @@ function getNextColumnId() {
   return nextColumnId++;
 }
 
-export default EmberObject.extend({
+export default EmberObject.extend(OwnerInjector, {
+  batchRequestRegistry: service(),
+
   /**
-   * One of: children, parents, startPoint, empty
-   * @type {string}
+   * @type {'children'|'parents'|'startPoint'|'empty'}
    * @virtual
    */
   relationType: 'empty',
@@ -107,6 +109,14 @@ export default EmberObject.extend({
   createdGroupBoxes: undefined,
 
   /**
+   * @type {ColumnDataModel}
+   */
+  columnDataModel: undefined,
+
+  // FIXME: zmiana nazewnictwa na groupListProxy?
+  groupsProxy: reads('columnDataModel.groupsProxy'),
+
+  /**
    * Column width
    * @type {Ember.ComputedProperty<number>}
    */
@@ -159,18 +169,10 @@ export default EmberObject.extend({
    */
   hasParentsLines: bool('nextColumn.parentsRelationGroupBox'),
 
-  /**
-   * Array of groups
-   * @type {PromiseArray<Group>}
-   */
-  model: computed({
-    get() {
-      return createEmptyColumnModel();
-    },
-    set(key, value) {
-      return value ? value : createEmptyColumnModel();
-    },
-  }),
+  setDataModel(columnDataModel) {
+    this.columnDataModel?.destroy();
+    this.set('columnDataModel', columnDataModel);
+  },
 
   /**
    * Group boxes sort order. Filter sort is more important than name sort
@@ -361,9 +363,9 @@ export default EmberObject.extend({
     true
   ),
 
-  modelObserver: observer(
-    'model.content.list.content.[]',
-    function modelObserver() {
+  groupsProxyObserver: observer(
+    'groupsProxy.content.list.content.[]',
+    function groupsProxyObserver() {
       next(() => safeExec(this, 'recalculateGroupBoxes'));
     }
   ),
@@ -465,6 +467,9 @@ export default EmberObject.extend({
 
   init() {
     this._super(...arguments);
+    if (!this.columnDataModel) {
+      this.setDataModel(new EmptyColumnDataModel());
+    }
     this.setProperties({
       createdGroupBoxes: new Set(),
       columnId: getNextColumnId(),
@@ -472,7 +477,7 @@ export default EmberObject.extend({
     if (!this.groupBoxes) {
       this.set('groupBoxes', A());
     }
-    this.modelObserver();
+    this.groupsProxyObserver();
     this.prevColumnObserver();
   },
 
@@ -482,6 +487,7 @@ export default EmberObject.extend({
   willDestroy() {
     try {
       this.createdGroupBoxes.forEach((box) => box.destroy());
+      this.setDataModel(null);
     } finally {
       this._super(...arguments);
     }
@@ -493,7 +499,7 @@ export default EmberObject.extend({
    * @returns {undefined}
    */
   recalculateGroupBoxes() {
-    const incomingGroups = this.get('model.content.list.content') || A();
+    const incomingGroups = this.get('groupsProxy.content.list.content') || A();
     const existingGroupBoxes = this.get('groupBoxes')
       .filter(groupBox => incomingGroups.indexOf(get(groupBox, 'group') !== -1));
     const existingGroups = existingGroupBoxes.map(groupBox =>
@@ -564,11 +570,3 @@ export default EmberObject.extend({
     }
   },
 });
-
-export function createEmptyColumnModel() {
-  return PromiseObject.create({
-    promise: resolve(EmberObject.create({
-      list: PromiseArray.create({ promise: resolve(A()) }),
-    })),
-  });
-}

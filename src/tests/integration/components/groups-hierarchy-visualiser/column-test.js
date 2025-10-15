@@ -10,7 +10,7 @@ import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { A } from '@ember/array';
 import { resolve } from 'rsvp';
-import { createEmptyColumnModel } from 'onezone-gui/utils/groups-hierarchy-visualiser/column';
+import { createEmptyColumnGroupsProxy } from 'onezone-gui/utils/groups-hierarchy-visualiser/column';
 
 describe(
   'Integration | Component | groups-hierarchy-visualiser/column',
@@ -64,13 +64,15 @@ describe(
       expect(find('.column-header')).to.contain.text('testname');
     });
 
+    // FIXME: poprawić testy po tym jak zmieniony został format column.model
+
     it('shows group name in header for children type', async function () {
       const column = EmberObject.create({
         relationType: 'children',
         relatedGroup: EmberObject.create({
           name: 'testname',
         }),
-        model: createEmptyColumnModel(),
+        model: createEmptyColumnGroupsProxy(),
       });
 
       this.set('column', column);
@@ -85,7 +87,7 @@ describe(
         relatedGroup: EmberObject.create({
           name: 'testname',
         }),
-        model: createEmptyColumnModel(),
+        model: createEmptyColumnGroupsProxy(),
       });
 
       this.set('column', column);

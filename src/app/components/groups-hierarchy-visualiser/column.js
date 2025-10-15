@@ -2,8 +2,9 @@
  * Draws column in groups hierarchy visualiser. Deals with scroll change and
  * passes group/relation actions down to the group boxes.
  *
- * @author Michał Borzęcki
+ * @author Michał Borzęcki, Jakub Liput
  * @copyright (C) 2018 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -180,6 +181,26 @@ export default Component.extend(I18n, {
     );
     return htmlSafe(`width: ${width}px; left: ${x}px;`);
   }),
+
+  columnTitle: computed(
+    'column.{relationType,relatedGroup.name,groupsProxy.content.list.content.0.name}',
+    function columnTitle() {
+      switch (this.column.relationType) {
+        case 'parents':
+          return this.t('parentsOfGroup', {
+            groupName: this.column.relatedGroup.name,
+          });
+        case 'children':
+          return this.t('childrenOfGroup', {
+            groupName: this.column.relatedGroup.name,
+          });
+        case 'startPoint':
+          return this.column.groupsProxy.content?.list.content?.[0]?.name;
+        default:
+          break;
+      }
+    }
+  ),
 
   scrollTopObserver: observer('column.scrollTop', function scrollTopObserver() {
     const element = this.get('element');
