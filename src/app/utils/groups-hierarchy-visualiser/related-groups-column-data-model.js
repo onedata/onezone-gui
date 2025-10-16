@@ -13,6 +13,7 @@ import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { entityType as groupEntityType } from 'onezone-gui/models/group';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
+import BatchRecordsLoader from '../batch-records-loader';
 
 /** @import BatchRequestRegistryService from '../../lib/onedata-gui-websocket-client/addon/services/batch-request-registry' */
 /** @import BatchRequestContainer from '../../lib/onedata-gui-websocket-client/addon/utils/batch-request-container' */
@@ -30,9 +31,9 @@ export default class RelatedGroupsDataModel {
     this.group = group;
     this.batchRequestRegistry = batchRequestRegistry;
     this.relationName = relationName;
-    this.listContainerProxy = promiseObject(this.#resolveListBatchContainer());
-    this.childrenContainerProxy = this.#resolveChildrenBatchContainer();
-    this.parentsContainerProxy = this.#resolveParentsBatchContainer();
+    this.listLoaderProxy = promiseObject(this.#resolveListLoader());
+    this.childrenLoaderProxy = promiseObject(this.#resolveChildrenLoader());
+    this.parentsLoaderProxy = promiseObject(this.#resolveParentsLoader());
     this.groupsProxy = this.#createGroupsProxy();
   }
 
@@ -41,42 +42,22 @@ export default class RelatedGroupsDataModel {
     return this.group[listName];
   }
 
-  /** @override */
-  destroy() {
-    const containers = [
-      this.listContainerProxy.content,
-      this.childrenContainerProxy.content,
-      this.parentsContainerProxy.content,
-    ].filter(Boolean);
-    for (const container of containers) {
-      try {
-        this.batchRequestRegistry.destroyContainer(container);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  }
-
   #createGroupsProxy() {
     const groupsPromise = (async () => {
-      const listContainer = await this.listContainerProxy;
-      const listProxy = (await this.groupListProxy).list;
-      this.batchRequestRegistry.flushAndDestroy(listContainer);
-      listContainer.scheduleFlush();
-      await listProxy;
+      const listLoader = await this.listLoaderProxy;
+      await listLoader.getPromise();
+      // We want to return a GroupList instance - the loader returns an array of groups.
       return await this.groupListProxy;
     })();
     return promiseObject(groupsPromise);
   }
 
-  // FIXME: usunąć redundancję w tworzeniu kontenterów
-
-  async #resolveListBatchContainer() {
-    return this.#resolveBatchContainer();
+  async #resolveListLoader() {
+    return this.#resolveLoader();
   }
 
-  async #resolveChildrenBatchContainer() {
-    return this.#resolveBatchContainer((id) => {
+  async #resolveChildrenLoader() {
+    return this.#resolveLoader((id) => {
       return gri({
         entityType: groupEntityType,
         entityId: parseGri(id).entityId,
@@ -86,8 +67,8 @@ export default class RelatedGroupsDataModel {
     });
   }
 
-  async #resolveParentsBatchContainer() {
-    return this.#resolveBatchContainer((id) => {
+  async #resolveParentsLoader() {
+    return this.#resolveLoader((id) => {
       return gri({
         entityType: groupEntityType,
         entityId: parseGri(id).entityId,
@@ -100,27 +81,18 @@ export default class RelatedGroupsDataModel {
   /**
    * @param {(gri: string) => string} griGenerator Convert group instance GRI into target
    *   GRI (eg. child list of the group).
-   * @returns {Promise<BatchRequestContainer>}
+   * @returns {Promise<BatchRecordsLoader>}
    */
-  async #resolveBatchContainer(griGenerator = (id) => id) {
+  async #resolveLoader(griGenerator = (id) => id) {
     const groupList = await this.groupListProxy;
     const groupGris = groupList.hasMany('list').ids();
-    const targetGris = groupGris.map(id => griGenerator(id));
-    const containerSpec = new GrisBatchContainerSpec(
-      OwsGraphOperation.Get,
-      targetGris
-    );
-    return await this.batchRequestRegistry.createContainer(
-      containerSpec,
-      DebouncedBatchFlushStrategy
-    );
+    const itemsGris = groupGris.map(id => griGenerator(id));
+    return new BatchRecordsLoader({
+      batchRequestRegistry: this.batchRequestRegistry,
+      itemsGris,
+      listResolver: async () => {
+        return (await groupList.list).toArray();
+      },
+    });
   }
-
-  // FIXME: ta klasa mogłaby robić wzsystko sama na podstawie przekanaznego group (lub groupList) i relationName
-  // - groupsProxy: (await group[listName]).list -> ale przed jego ewaluacją należy użyć containera
-  // - listBatchContainer: container zawierający idki powyższych grup, używany wewnętrznie, może być użyty do pokazania progressu w przyszłości
-  // - childrenBatchContainer: container zawierający idki list children dla powyższych grup
-  //   w swoim cyklu życia jest inicjalizowany od razu przy konstrukcji, więc zacznie od razu zbierać requesty
-  //   trzeba uruchomić jego flush, najlepiej kiedy zakończy się render całej listy grup
-  // - parentsBatchContainer: jw. tylko dla parentów
 }

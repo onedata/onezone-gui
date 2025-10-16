@@ -18,8 +18,6 @@ export default class SingleGroupColumnDataModel {
     this.groupsProxy = this.#createSingleGroupProxy(group);
   }
 
-  destroy() {}
-
   // FIXME: nie wiem czy trzeba robić reload - w related groups nie robimy
   /**
    * Returns model for start-point column

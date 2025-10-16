@@ -32,6 +32,7 @@ export default {
   column: {
     childrenOfGroup: 'Children of {{groupName}}',
     parentsOfGroup: 'Parents of {{groupName}}',
+    loading: 'Loading {{total}} groups...<br>{{percentage}}',
   },
   groupLeaving: 'leaving group',
   privilegesTreeRootText: 'Group "{{childName}}" in group "{{parentName}}"',

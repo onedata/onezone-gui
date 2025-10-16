@@ -30,6 +30,9 @@
 </PerfectScrollbarElement>
 {{#if (or (not column.groupsProxy.isFulfilled) column.groupsProxy.isForbidden)}}
   <div class="column-loader">
-    <PromiseProxyContainer @proxy={{column.groupsProxy}} />
+    <PromiseProxyContainer
+      @proxy={{this.column.groupsProxy}}
+      @loadingLabel={{this.loadingLabel}}
+    />
   </div>
 {{/if}}

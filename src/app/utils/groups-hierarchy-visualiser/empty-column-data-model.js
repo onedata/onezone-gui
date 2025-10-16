@@ -18,8 +18,6 @@ export default class SingleGroupColumnDataModel {
     this.groupsProxy = this.#createEmptyGroupProxy();
   }
 
-  destroy() {}
-
   /**
    * @returns {PromiseObject<{ list: Array<Group> }>}
    */

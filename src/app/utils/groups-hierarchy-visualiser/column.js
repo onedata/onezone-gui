@@ -43,6 +43,11 @@ import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import { inject as service } from '@ember/service';
 import EmptyColumnDataModel from './empty-column-data-model';
 
+/**
+ * @typedef {Object} GroupsHierarchyColumnDataModel
+ * @property {PromiseObject<Array<Models.Group>>} groupsProxy
+ */
+
 let nextColumnId = 0;
 
 function getNextColumnId() {
@@ -109,12 +114,16 @@ export default EmberObject.extend(OwnerInjector, {
   createdGroupBoxes: undefined,
 
   /**
-   * @type {ColumnDataModel}
+   * @type {GroupsHierarchyColumnDataModel}
    */
   columnDataModel: undefined,
 
   // FIXME: zmiana nazewnictwa na groupListProxy?
   groupsProxy: reads('columnDataModel.groupsProxy'),
+
+  percentageProgressText: reads(
+    'columnDataModel.listLoaderProxy.content.progressTracker.progressText'
+  ),
 
   /**
    * Column width
@@ -170,7 +179,6 @@ export default EmberObject.extend(OwnerInjector, {
   hasParentsLines: bool('nextColumn.parentsRelationGroupBox'),
 
   setDataModel(columnDataModel) {
-    this.columnDataModel?.destroy();
     this.set('columnDataModel', columnDataModel);
   },
 

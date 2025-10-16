@@ -41,14 +41,14 @@ export default class ColumnDataContainerComponent extends Component {
 
   @action
   async didRenderContent() {
-    await waitForRender();
     if (this.columnDataModel instanceof RelatedGroupsDataModel) {
-      const containers = await allFulfilled([
-        this.columnDataModel.childrenContainerProxy,
-        this.columnDataModel.parentsContainerProxy,
+      const loaders = await allFulfilled([
+        this.columnDataModel.childrenLoaderProxy,
+        this.columnDataModel.parentsLoaderProxy,
       ]);
-      for (const container of containers) {
-        this.batchRequestRegistry.flushAndDestroy(container);
+      await waitForRender();
+      for (const loader of loaders) {
+        loader.getPromise();
       }
     }
   }
