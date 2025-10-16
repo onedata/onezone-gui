@@ -36,6 +36,9 @@ export default class BatchRecordsLoader {
   /** @type {Promise<Array>} */
   #promise;
 
+  /**
+   * @param {FetchBatchRecordsArgs} fetchBatchRecordsArgs
+   */
   constructor(fetchBatchRecordsArgs) {
     this.validateArgs(fetchBatchRecordsArgs);
 

@@ -1,8 +1,9 @@
 /**
  * Asks for token, display info about it and allows to consume an invite token.
  *
- * @author Michał Borzęcki
+ * @author Michał Borzęcki, Jakub Liput
  * @copyright (C) 2020 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -23,7 +24,7 @@ import {
   not,
 } from 'ember-awesome-macros';
 import RecordOptionsArrayProxy from 'onedata-gui-common/utils/record-options-array-proxy';
-import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
+import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import {
   tokenInviteTypeToTargetModelMapping,
 } from 'onezone-gui/models/token';
@@ -545,11 +546,13 @@ export default Component.extend(I18n, {
    * @returns {PromiseArray<FieldOption>}
    */
   getRecordOptionsForModel(modelName) {
-    return PromiseArray.create({
-      promise: this.get('recordManager').getUserRecordList(modelName)
-        .then(recordsList => get(recordsList, 'list'))
-        .then(records => RecordOptionsArrayProxy.create({ records })),
-    });
+    const promise = (async () => {
+      const recordsList = await this.recordManager.getUserRecordList(modelName);
+      return RecordOptionsArrayProxy.create({
+        records: recordsList.list.content.toArray(),
+      });
+    })();
+    return promiseArray(promise);
   },
 
   resetState() {
