@@ -6,17 +6,15 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { OwsGraphOperation } from 'onedata-gui-websocket-client/services/onedata-graph';
-import { DebouncedBatchFlushStrategy } from 'onedata-gui-websocket-client/utils/batch-flush-strategies';
-import GrisBatchContainerSpec from 'onedata-gui-websocket-client/utils/gris-batch-container-spec';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { entityType as groupEntityType } from 'onezone-gui/models/group';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import BatchRecordsLoader from '../batch-records-loader';
+import { reject } from 'rsvp';
+import { computed } from '@ember/object';
 
 /** @import BatchRequestRegistryService from '../../lib/onedata-gui-websocket-client/addon/services/batch-request-registry' */
-/** @import BatchRequestContainer from '../../lib/onedata-gui-websocket-client/addon/utils/batch-request-container' */
 
 /**
  * @implements {GroupsHierarchyColumnDataModel}
@@ -34,20 +32,30 @@ export default class RelatedGroupsDataModel {
     this.listLoaderProxy = promiseObject(this.#resolveListLoader());
     this.childrenLoaderProxy = promiseObject(this.#resolveChildrenLoader());
     this.parentsLoaderProxy = promiseObject(this.#resolveParentsLoader());
-    this.groupsProxy = this.#createGroupsProxy();
+    this.groupListProxy = this.#createGroupListProxy();
   }
 
-  get groupListProxy() {
+  /**
+   * Resolves groupList from provided group. Only for internal use, because public
+   * groupListProxy should use batch loading.
+   * @type {PromiseObject<GroupList>}
+   */
+  @computed('group.{hasViewPrivilege,childList,parentList}')
+  get groupListRelationProxy() {
     const listName = `${this.relationName}List`;
-    return this.group[listName];
+    const listModelProxy = this.group[listName];
+    if (!this.group.hasViewPrivilege || !listModelProxy) {
+      return reject({ id: 'forbidden' });
+    }
+    return listModelProxy;
   }
 
-  #createGroupsProxy() {
+  #createGroupListProxy() {
     const groupsPromise = (async () => {
       const listLoader = await this.listLoaderProxy;
       await listLoader.getPromise();
       // We want to return a GroupList instance - the loader returns an array of groups.
-      return await this.groupListProxy;
+      return await this.groupListRelationProxy;
     })();
     return promiseObject(groupsPromise);
   }
@@ -84,8 +92,8 @@ export default class RelatedGroupsDataModel {
    * @returns {Promise<BatchRecordsLoader>}
    */
   async #resolveLoader(griGenerator = (id) => id) {
-    const groupList = await this.groupListProxy;
-    const groupGris = groupList.hasMany('list').ids();
+    const groupList = await this.groupListRelationProxy;
+    const groupGris = groupList?.hasMany('list').ids() ?? [];
     const itemsGris = groupGris.map(id => griGenerator(id));
     return new BatchRecordsLoader({
       batchRequestRegistry: this.batchRequestRegistry,

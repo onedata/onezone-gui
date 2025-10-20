@@ -1,5 +1,18 @@
 /**
- * FIXME: jsdoc
+ * An enclosing component intended to render multiple GroupBoxes with management of a
+ * GroupsHierarchyColumnDataModel instance.
+ *
+ * Each GroupBox fetches some data. When there are large number of GroupBoxes, there will
+ * be multiple requests and we can predict GRIs of that records.
+ *
+ * This component:
+ * - initializes batch containers in loading containers before inserting GroupBoxes,
+ * - yields a place to render GroupBoxes when loading containers are initialized,
+ * - flushes loading containers after GroupBoxes are rendered.
+ *
+ * It provides API with `onGroupBoxRendered` method, that can be invoked by GroupBox
+ * components on insert. Loading containers are flushed after all needed GroupBoxes report
+ * their insertion.
  *
  * @author Jakub Liput
  * @copyright (C) 2025 Onedata (onedata.org)
@@ -9,7 +22,7 @@
 import Component from '@glimmer/component';
 import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
-import RelatedGroupsDataModel from '../../utils/groups-hierarchy-visualiser/related-groups-column-data-model';
+import RelatedGroupsDataModel from 'onezone-gui/utils/groups-hierarchy-visualiser/related-groups-column-data-model';
 import { all as allFulfilled } from 'rsvp';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 
@@ -54,7 +67,6 @@ export default class ColumnDataContainerComponent extends Component {
         !this.areLoadersActivated() &&
         this.columnDataModel instanceof RelatedGroupsDataModel
       ) {
-        console.log('ColumnDataContainer: force activate');
         this.activateLoaders();
       }
     }, 10000);
@@ -87,10 +99,10 @@ export default class ColumnDataContainerComponent extends Component {
     return promiseObject(promise);
   }
 
-  @computed('columnDataModel.groupsProxy')
+  @computed('columnDataModel.groupListProxy.length')
   get groupsCountProxy() {
     const promise = (async () => {
-      const groupList = await this.columnDataModel.groupsProxy;
+      const groupList = await this.columnDataModel.groupListProxy;
       return groupList.length;
     })();
     return promiseObject(promise);

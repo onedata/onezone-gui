@@ -15,6 +15,8 @@
  *      creating group boxes according to given model. Automatically infers
  *      context using previous and next column and calculates position values,
  *      that are common for many elements inside column (to optimize calculations).
+ *    - ColumnDataModel (GroupsHierarchyColumnDataModel type) - provides groups data
+ *      loading. It is implemented by various classes according to the column type.
  *    - ColumnSeparator - calculates position of column separator elements.
  *    - GroupBox - calculates position for group box.
  *    - GroupBoxLine (including GroupBoxRightLine and GroupBoxLeftLine) - calculates
@@ -30,8 +32,8 @@
  *                Workspace                     ColumnManager
  *                                                    |
  *                                                    |1-n
- *                                                    |
- *                                                  Column
+ *                                                    |        1-1
+ *                                                  Column--------------ColumnDataModel
  *                                                    |
  *                                    +---------------+---------------+
  *                                    |                               |
@@ -91,12 +93,14 @@
  * Column types:
  *   There are four types of columns:
  *     * empty - column used as a placeholder. It does not represent any
- *       relation/group.
+ *       relation/group. Data model is realized by EmptyColumnDataModel class.
  *     * startPoint - column used to initialize graph. It always contains only
  *       one group, which is the same as passed to GroupsHierarchyVisualiser
- *       component.
+ *       component. Data model is realized by SingleGroupColumnDataModel.
  *     * children - column with children of some group.
+ *       Data model is realized by RelatedGroupsColumnDataModel.
  *     * parents - column with parents of some group.
+ *       Data model is realized by RelatedGroupsColumnDataModel.
  *   To fully describe these types there are tree fields in Column class:
  *     * relationType - string name of the type: `empty`, `startPoint`,
  *       `children`, `parents`.
@@ -104,7 +108,7 @@
  *       null for children and parents types, and null for empty and startPoint.
  *       For children it is a parent group for those children, for parents it
  *       is a children group of those parents.
- *     * model - ProxyObject with with group-list model. For empty type it should
+ *     * columnDataModel - object with group-list model. For empty type it should
  *       be a model with an empty array, for startPoint it must contain an array
  *       with exactly one group, for children/parents there are no requirements -
  *       can contain many groups, or be an empty array.
@@ -126,7 +130,7 @@
  *     and placed in tree using ColumnManager methods.
  *   * GroupsHierarchyVisualiser renders columns using
  *     GroupsHierarchyVisualiser/Column component.
- *   * Column observes model, and when there are new groups available, it creates
+ *   * Column observes data model, and when there are new groups available, it creates
  *     new GroupBox objects.
  *   * According to searchString in Workspace and groupName in GroupBox Column
  *     sorts group boxes. Sorted array is then used to render group boxes using
@@ -175,8 +179,7 @@ import {
   observer,
 } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/i18n';
-import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
-import { resolve, reject } from 'rsvp';
+import { reject } from 'rsvp';
 import ColumnManager from 'onezone-gui/utils/groups-hierarchy-visualiser/column-manager';
 import Workspace from 'onezone-gui/utils/groups-hierarchy-visualiser/workspace';
 import Column from 'onezone-gui/utils/groups-hierarchy-visualiser/column';
@@ -193,9 +196,6 @@ import {
   initDestroyableCache,
 } from 'onedata-gui-common/utils/destroyable-computed';
 import AddYourGroupAction from 'onezone-gui/utils/add-your-group-action';
-import EmptyColumnDataModel from 'onezone-gui/utils/groups-hierarchy-visualiser/empty-column-data-model';
-import SingleGroupColumnDataModel from 'onezone-gui/utils/groups-hierarchy-visualiser/single-group-column-data-model';
-import RelatedGroupsDataModel from 'onezone-gui/utils/groups-hierarchy-visualiser/related-groups-column-data-model';
 
 export default Component.extend(I18n, {
   classNames: ['groups-hierarchy-visualiser'],
@@ -473,7 +473,7 @@ export default Component.extend(I18n, {
       // Actual first column, which is empty
       const actualFirstColumn = columns.objectAt(0);
       // Load start-point column (with one group from `group` field)
-      const startPointColumn = this.createColumn('startPoint');
+      const startPointColumn = this.createColumn('startPoint', this.group);
 
       if (columnsNumber >= 3) {
         const parentsColumn = this.createColumn('parents', group);
@@ -504,9 +504,6 @@ export default Component.extend(I18n, {
             relatedGroup: null,
             relationType: 'empty',
           });
-          // recalculate model according to above new specification
-          // FIXME: nadaje się na to, żeby ColumnDataModelem zarządało Column -> po testach
-          column.setDataModel(this.createColumnDataModel('empty'));
         }
       });
     }
@@ -596,44 +593,6 @@ export default Component.extend(I18n, {
 
   // FIXME: jeśli relatedGroup nie ma hasViewPrivileges to powinniśmy wyświetlać forbidden w kolumnie obok
 
-  // FIXME: zasadność loadGroupChildren i loadGroupParents?
-
-  /**
-   * Returns model for children column for specified group
-   * @param {Group} parentGroup
-   * @returns {PromiseObject<ManyArray<Group>>}
-   */
-  loadGroupChildren(parentGroup) {
-    let promise;
-    if (get(parentGroup, 'hasViewPrivilege')) {
-      promise = (async () => {
-        await parentGroup.loadList('childList');
-        return await parentGroup.childList;
-      })();
-    } else {
-      promise = reject({ id: 'forbidden' });
-    }
-    return promiseObject(promise);
-  },
-
-  /**
-   * Returns model for parents column for specified group
-   * @param {Group} childGroup
-   * @returns {PromiseObject<ManyArray<Group>>}
-   */
-  loadGroupParents(childGroup) {
-    let promise;
-    if (get(childGroup, 'hasViewPrivilege')) {
-      promise = (async () => {
-        await childGroup.loadList('parentList');
-        return await childGroup.parentList;
-      })();
-    } else {
-      promise = reject({ id: 'forbidden' });
-    }
-    return promiseObject(promise);
-  },
-
   /**
    * Creates new column
    * @param {string} relationType One of `empty`, `startPoint`, `children`,
@@ -648,37 +607,9 @@ export default Component.extend(I18n, {
       ownerSource: this,
       relationType: relationType,
       relatedGroup,
-      columnDataModel: this.createColumnDataModel(relationType, relatedGroup),
     });
     this.createdColumnsSet.add(column);
     return column;
-  },
-
-  /**
-   * Creates column model using column relation specification
-   * @param {Utils.GroupsHierarchyVisualiser.Column} column
-   * @returns {PromiseObject<GroupsHierarchyColumnDataModel>}
-   */
-  createColumnDataModel(relationType, relatedGroup) {
-    switch (relationType) {
-      case 'startPoint':
-        return new SingleGroupColumnDataModel(this.group);
-      case 'parents':
-        return new RelatedGroupsDataModel(
-          relatedGroup,
-          'parent',
-          this.batchRequestRegistry
-        );
-      case 'children':
-        return new RelatedGroupsDataModel(
-          relatedGroup,
-          'child',
-          this.batchRequestRegistry
-        );
-      case 'empty':
-      default:
-        return new EmptyColumnDataModel();
-    }
   },
 
   /**

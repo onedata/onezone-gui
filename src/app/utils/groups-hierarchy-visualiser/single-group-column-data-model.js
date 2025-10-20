@@ -1,5 +1,6 @@
 /**
- * FIXME:
+ * Implementation of ColumnDataModel for column containing single group which is a start
+ * point.
  *
  * @author Jakub Liput
  * @copyright (C) 2025 Onedata (onedata.org)
@@ -15,22 +16,20 @@ import { resolve } from 'rsvp';
  */
 export default class SingleGroupColumnDataModel {
   constructor(group) {
-    this.groupsProxy = this.#createSingleGroupProxy(group);
+    this.groupListProxy = this.#createSingleGroupProxy(group);
   }
 
-  // FIXME: nie wiem czy trzeba robić reload - w related groups nie robimy
   /**
    * Returns model for start-point column
-   * @returns {PromiseObject<{ list: Array<Group> }>}
+   * @returns {PromiseObject<{ list: Array<Group>, length: number }>}
    */
   #createSingleGroupProxy(group) {
-    const singleGroupModelPromise = group.reload()
-      .then(() => ({
-        list: promiseArray(resolve([group])),
-        get length() {
-          return 1;
-        },
-      }));
-    return promiseObject(singleGroupModelPromise);
+    const listModel = {
+      list: promiseArray(resolve([group])),
+      get length() {
+        return 1;
+      },
+    };
+    return promiseObject(resolve(listModel));
   }
 }

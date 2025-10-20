@@ -42,10 +42,12 @@ import { next } from '@ember/runloop';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import { inject as service } from '@ember/service';
 import EmptyColumnDataModel from './empty-column-data-model';
+import SingleGroupColumnDataModel from './single-group-column-data-model';
+import RelatedGroupsColumnDataModel from './related-groups-column-data-model';
 
 /**
  * @typedef {Object} GroupsHierarchyColumnDataModel
- * @property {PromiseObject<Array<Models.Group>>} groupsProxy
+ * @property {PromiseObject<Array<Models.Group>>} groupListProxy
  */
 
 let nextColumnId = 0;
@@ -113,13 +115,8 @@ export default EmberObject.extend(OwnerInjector, {
    */
   createdGroupBoxes: undefined,
 
-  /**
-   * @type {GroupsHierarchyColumnDataModel}
-   */
-  columnDataModel: undefined,
-
   // FIXME: zmiana nazewnictwa na groupListProxy?
-  groupsProxy: reads('columnDataModel.groupsProxy'),
+  groupListProxy: reads('columnDataModel.groupListProxy'),
 
   percentageProgressText: reads(
     'columnDataModel.listLoaderProxy.content.progressTracker.progressText'
@@ -178,9 +175,12 @@ export default EmberObject.extend(OwnerInjector, {
    */
   hasParentsLines: bool('nextColumn.parentsRelationGroupBox'),
 
-  setDataModel(columnDataModel) {
-    this.set('columnDataModel', columnDataModel);
-  },
+  /**
+   * @type {ComputedProperty<GroupsHierarchyColumnDataModel>}
+   */
+  columnDataModel: computed('relationType', 'relatedGroup', function dataModel() {
+    return this.createColumnDataModel(this.relationType, this.relatedGroup);
+  }),
 
   /**
    * Group boxes sort order. Filter sort is more important than name sort
@@ -371,9 +371,9 @@ export default EmberObject.extend(OwnerInjector, {
     true
   ),
 
-  groupsProxyObserver: observer(
-    'groupsProxy.content.list.content.[]',
-    function groupsProxyObserver() {
+  groupListProxyObserver: observer(
+    'groupListProxy.content.list.content.[]',
+    function groupListProxyObserver() {
       next(() => safeExec(this, 'recalculateGroupBoxes'));
     }
   ),
@@ -475,9 +475,6 @@ export default EmberObject.extend(OwnerInjector, {
 
   init() {
     this._super(...arguments);
-    if (!this.columnDataModel) {
-      this.setDataModel(new EmptyColumnDataModel());
-    }
     this.setProperties({
       createdGroupBoxes: new Set(),
       columnId: getNextColumnId(),
@@ -485,7 +482,7 @@ export default EmberObject.extend(OwnerInjector, {
     if (!this.groupBoxes) {
       this.set('groupBoxes', A());
     }
-    this.groupsProxyObserver();
+    this.groupListProxyObserver();
     this.prevColumnObserver();
   },
 
@@ -495,9 +492,34 @@ export default EmberObject.extend(OwnerInjector, {
   willDestroy() {
     try {
       this.createdGroupBoxes.forEach((box) => box.destroy());
-      this.setDataModel(null);
     } finally {
       this._super(...arguments);
+    }
+  },
+
+  /**
+   * Creates column model using column relation specification
+   * @returns {PromiseObject<GroupsHierarchyColumnDataModel>}
+   */
+  createColumnDataModel(relationType, relatedGroup) {
+    switch (relationType) {
+      case 'startPoint':
+        return new SingleGroupColumnDataModel(relatedGroup);
+      case 'parents':
+        return new RelatedGroupsColumnDataModel(
+          relatedGroup,
+          'parent',
+          this.batchRequestRegistry
+        );
+      case 'children':
+        return new RelatedGroupsColumnDataModel(
+          relatedGroup,
+          'child',
+          this.batchRequestRegistry
+        );
+      case 'empty':
+      default:
+        return new EmptyColumnDataModel();
     }
   },
 
@@ -507,7 +529,7 @@ export default EmberObject.extend(OwnerInjector, {
    * @returns {undefined}
    */
   recalculateGroupBoxes() {
-    const incomingGroups = this.get('groupsProxy.content.list.content') || A();
+    const incomingGroups = this.get('groupListProxy.content.list.content') || A();
     const existingGroupBoxes = this.get('groupBoxes')
       .filter(groupBox => incomingGroups.indexOf(get(groupBox, 'group') !== -1));
     const existingGroups = existingGroupBoxes.map(groupBox =>

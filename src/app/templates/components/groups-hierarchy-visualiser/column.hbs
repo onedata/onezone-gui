@@ -4,7 +4,7 @@
 <PerfectScrollbarElement
   class="group-boxes-container"
   @onScroll={{action "scroll"}}
-  @supressScrollY={{this.column.groupsProxy.isPending}}
+  @supressScrollY={{this.column.groupListProxy.isPending}}
 >
   <GroupsHierarchyVisualiser::ColumnDataContainer
     @columnDataModel={{this.column.columnDataModel}}
@@ -32,10 +32,10 @@
     {{/each}}
   </GroupsHierarchyVisualiser::ColumnDataContainer>
 </PerfectScrollbarElement>
-{{#if (or (not column.groupsProxy.isFulfilled) column.groupsProxy.isForbidden)}}
+{{#if (or (not column.groupListProxy.isFulfilled) column.groupListProxy.isForbidden)}}
   <div class="column-loader">
     <PromiseProxyContainer
-      @proxy={{this.column.groupsProxy}}
+      @proxy={{this.column.groupListProxy}}
       @loadingLabel={{this.loadingLabel}}
     />
   </div>

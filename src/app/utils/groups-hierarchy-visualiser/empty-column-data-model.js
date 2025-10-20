@@ -15,7 +15,7 @@ import { resolve } from 'rsvp';
  */
 export default class SingleGroupColumnDataModel {
   constructor() {
-    this.groupsProxy = this.#createEmptyGroupProxy();
+    this.groupListProxy = this.#createEmptyGroupProxy();
   }
 
   /**

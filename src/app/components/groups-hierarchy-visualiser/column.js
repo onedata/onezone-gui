@@ -186,7 +186,7 @@ export default Component.extend(I18n, {
   }),
 
   columnTitle: computed(
-    'column.{relationType,relatedGroup.name,groupsProxy.content.list.content.0.name}',
+    'column.{relationType,relatedGroup.name,groupListProxy.content.list.content.0.name}',
     function columnTitle() {
       switch (this.column.relationType) {
         case 'parents':
@@ -198,7 +198,7 @@ export default Component.extend(I18n, {
             groupName: this.column.relatedGroup.name,
           });
         case 'startPoint':
-          return this.column.groupsProxy.content?.list.content?.[0]?.name;
+          return this.column.groupListProxy.content?.list.content?.[0]?.name;
         default:
           break;
       }
