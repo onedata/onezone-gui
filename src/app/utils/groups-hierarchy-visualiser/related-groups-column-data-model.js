@@ -1,5 +1,6 @@
 /**
- * FIXME:
+ * Implementation of ColumnDataModel for column containing list of groups related to other
+ * groups. Eg. children groups of a group.
  *
  * @author Jakub Liput
  * @copyright (C) 2025 Onedata (onedata.org)

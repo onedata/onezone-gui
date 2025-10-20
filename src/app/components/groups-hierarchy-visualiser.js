@@ -591,8 +591,6 @@ export default Component.extend(I18n, {
     });
   },
 
-  // FIXME: jeśli relatedGroup nie ma hasViewPrivileges to powinniśmy wyświetlać forbidden w kolumnie obok
-
   /**
    * Creates new column
    * @param {string} relationType One of `empty`, `startPoint`, `children`,

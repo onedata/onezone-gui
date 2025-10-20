@@ -1,5 +1,5 @@
 /**
- * FIXME:
+ * Implementation of ColumnDataModel for empty column.
  *
  * @author Jakub Liput
  * @copyright (C) 2025 Onedata (onedata.org)

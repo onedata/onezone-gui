@@ -115,7 +115,6 @@ export default EmberObject.extend(OwnerInjector, {
    */
   createdGroupBoxes: undefined,
 
-  // FIXME: zmiana nazewnictwa na groupListProxy?
   groupListProxy: reads('columnDataModel.groupListProxy'),
 
   percentageProgressText: reads(
