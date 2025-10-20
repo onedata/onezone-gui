@@ -54,6 +54,12 @@ export default Component.extend(I18n, {
   childrenRelationActive: undefined,
 
   /**
+   * Callback, that should be invoked on component first render.
+   * @type {() => void}
+   */
+  onRendered: undefined,
+
+  /**
    * True if actions popover is opened
    * @type {boolean}
    */
@@ -406,12 +412,19 @@ export default Component.extend(I18n, {
     );
   }),
 
+  /** @override */
   willDestroyElement() {
     try {
       this.cacheFor('generateInviteTokenAction')?.destroy();
     } finally {
       this._super(...arguments);
     }
+  },
+
+  /** @override */
+  didInsertElement() {
+    this._super(...arguments);
+    this.onRendered?.();
   },
 
   actions: {

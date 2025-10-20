@@ -4,26 +4,30 @@
 <PerfectScrollbarElement
   class="group-boxes-container"
   @onScroll={{action "scroll"}}
-  @supressScrollY={{column.groupsProxy.isPending}}
+  @supressScrollY={{this.column.groupsProxy.isPending}}
 >
-  <GroupsHierarchyVisualiser::ColumnDataContainer @columnDataModel={{this.column.columnDataModel}}>
-    {{#each column.groupBoxes key="groupId" as |groupBox|}}
+  <GroupsHierarchyVisualiser::ColumnDataContainer
+    @columnDataModel={{this.column.columnDataModel}}
+    as |dataContainer|
+  >
+    {{#each this.column.groupBoxes key="groupId" as |groupBox|}}
       <GroupsHierarchyVisualiser::GroupBox
         @groupBox={{groupBox}}
-        @parentsRelationActive={{eq groupBox column.parentsRelationGroupBox}}
-        @childrenRelationActive={{eq groupBox column.childrenRelationGroupBox}}
-        @showParents={{action showParents column groupBox.group}}
-        @showChildren={{action showChildren column groupBox.group}}
-        @viewGroup={{action viewGroup groupBox.group}}
-        @renameGroup={{action renameGroup groupBox.group}}
-        @createRelativeGroup={{action createRelativeGroup groupBox.group}}
-        @addYourGroup={{action addYourGroup groupBox.group}}
-        @joinUsingToken={{action joinUsingToken groupBox.group}}
-        @leaveGroup={{action leaveGroup groupBox.group}}
-        @joinGroup={{action joinGroup groupBox.group}}
-        @removeGroup={{action removeGroup groupBox.group}}
-        @modifyPrivileges={{modifyPrivileges}}
-        @removeRelation={{removeRelation}}
+        @parentsRelationActive={{eq groupBox this.column.parentsRelationGroupBox}}
+        @childrenRelationActive={{eq groupBox this.column.childrenRelationGroupBox}}
+        @showParents={{action this.showParents this.column groupBox.group}}
+        @showChildren={{action this.showChildren this.column groupBox.group}}
+        @viewGroup={{action this.viewGroup groupBox.group}}
+        @renameGroup={{action this.renameGroup groupBox.group}}
+        @createRelativeGroup={{action this.createRelativeGroup groupBox.group}}
+        @addYourGroup={{action this.addYourGroup groupBox.group}}
+        @joinUsingToken={{action this.joinUsingToken groupBox.group}}
+        @leaveGroup={{action this.leaveGroup groupBox.group}}
+        @joinGroup={{action this.joinGroup groupBox.group}}
+        @removeGroup={{action this.removeGroup groupBox.group}}
+        @modifyPrivileges={{this.modifyPrivileges}}
+        @removeRelation={{this.removeRelation}}
+        @onRendered={{dataContainer.onGroupBoxRendered}}
       />
     {{/each}}
   </GroupsHierarchyVisualiser::ColumnDataContainer>

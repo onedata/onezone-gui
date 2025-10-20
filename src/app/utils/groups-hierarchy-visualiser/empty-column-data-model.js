@@ -24,6 +24,9 @@ export default class SingleGroupColumnDataModel {
   #createEmptyGroupProxy() {
     const emptyModelPromise = (async () => ({
       list: promiseArray(resolve([])),
+      get length() {
+        return 0;
+      },
     }))();
     return promiseObject(emptyModelPromise);
   }

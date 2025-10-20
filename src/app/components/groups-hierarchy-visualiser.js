@@ -505,7 +505,7 @@ export default Component.extend(I18n, {
             relationType: 'empty',
           });
           // recalculate model according to above new specification
-          // FIXME: nadaje się na to, żeby ColumnDataModelem zarządało Column
+          // FIXME: nadaje się na to, żeby ColumnDataModelem zarządało Column -> po testach
           column.setDataModel(this.createColumnDataModel('empty'));
         }
       });
@@ -593,6 +593,8 @@ export default Component.extend(I18n, {
       height: this.element ? dom.height(this.element, dom.LayoutBox.ContentBox) : 0,
     });
   },
+
+  // FIXME: jeśli relatedGroup nie ma hasViewPrivileges to powinniśmy wyświetlać forbidden w kolumnie obok
 
   // FIXME: zasadność loadGroupChildren i loadGroupParents?
 

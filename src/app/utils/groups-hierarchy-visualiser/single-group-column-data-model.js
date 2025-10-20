@@ -27,6 +27,9 @@ export default class SingleGroupColumnDataModel {
     const singleGroupModelPromise = group.reload()
       .then(() => ({
         list: promiseArray(resolve([group])),
+        get length() {
+          return 1;
+        },
       }));
     return promiseObject(singleGroupModelPromise);
   }

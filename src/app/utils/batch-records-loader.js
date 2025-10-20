@@ -3,6 +3,7 @@
  *
  * @author Jakub Liput
  * @copyright (C) 2025 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -35,6 +36,12 @@ export const defaultBatchFetchSize = 50;
 export default class BatchRecordsLoader {
   /** @type {Promise<Array>} */
   #promise;
+
+  /** @type {Array<BatchRequestContainer>} */
+  #containers;
+
+  /** @type {boolean} */
+  #flushStarted = false;
 
   /**
    * @param {FetchBatchRecordsArgs} fetchBatchRecordsArgs
@@ -69,15 +76,13 @@ export default class BatchRecordsLoader {
     return this.#promise;
   }
 
-  /**
-   * @private
-   * @returns {Promise<Array>}
-   */
-  async fetch() {
-    if (this.#promise) {
-      throw new Error(
-        'BatchRecordsLoader: cannot invoke fetch more than once for single instance'
-      );
+  get areContainersInitialized() {
+    return Boolean(this.#containers);
+  }
+
+  async initContainers() {
+    if (this.#containers) {
+      throw new Error('BatchRecordsLoader: containers are already initialized');
     }
     const griArrayChunks = _.chunk(this.itemsGris, this.batchFetchSize);
     const containerPromises = griArrayChunks.map(async (grisChunk) => {
@@ -87,11 +92,21 @@ export default class BatchRecordsLoader {
         DebouncedBatchFlushStrategy
       );
     });
-    const containers = await allFulfilled(containerPromises);
+    this.#containers = await allFulfilled(containerPromises);
     this.progressTracker.reset(this.itemsGris.length);
+  }
+
+  async startFlush() {
+    if (!this.#containers) {
+      throw new Error('BatchRecordsLoader: containers not initialized');
+    }
+    if (this.#flushStarted) {
+      throw new Error('BatchRecordsLoader: flush has been already started');
+    }
+    this.#flushStarted = true;
     try {
       const listPromise = this.listResolver();
-      for (const container of containers) {
+      for (const container of this.#containers) {
         const doneCount = container.containerSpec.gris.length;
         try {
           await container.flush();
@@ -106,10 +121,19 @@ export default class BatchRecordsLoader {
       // destroyed.
       return list.filter((r) => !r?.isDestroyed);
     } finally {
-      for (const container of containers) {
+      for (const container of this.#containers) {
         this.batchRequestRegistry.destroyContainer(container);
       }
     }
+  }
+
+  /**
+   * @private
+   * @returns {Promise<Array>}
+   */
+  async fetch() {
+    await this.initContainers();
+    return await this.startFlush();
   }
 
   /**
