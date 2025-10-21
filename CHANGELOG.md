@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12896 Added loaders with batch fetching to groups hierarchy view
 * VFS-12932 Added infinite-scrollable dropdowns
 * VFS-13018 Fixed truncated items list in sidebar when items are added live
 * VFS-12771 Added batch fetching for members page
