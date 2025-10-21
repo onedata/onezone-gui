@@ -64,6 +64,8 @@ export default class ColumnDataContainerComponent extends Component {
     // time if not activated yet.
     this.#activationTimeoutId = setTimeout(() => {
       if (
+        !this.isDestroyed &&
+        !this.isDestroying &&
         !this.areLoadersActivated() &&
         this.columnDataModel instanceof RelatedGroupsDataModel
       ) {
@@ -125,6 +127,15 @@ export default class ColumnDataContainerComponent extends Component {
       return [childrenLoader, parentsLoader];
     })();
     return promiseObject(promise);
+  }
+
+  /** @override */
+  willDestroy() {
+    try {
+      clearTimeout(this.#activationTimeoutId);
+    } finally {
+      super.willDestroy(...arguments);
+    }
   }
 
   onGroupBoxRendered() {
