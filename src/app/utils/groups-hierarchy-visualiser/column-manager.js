@@ -171,12 +171,12 @@ export default EmberObject.extend(OwnerInjector, {
     switch (relationType) {
       case 'parents':
         for (let i = oldColumnIndex - 1; i >= 0; i--) {
-          this.replaceColumnObject(i, Column.create({ ownerSource: this }));
+          this.replaceColumnObject(i, this.createEmptyColumn());
         }
         break;
       case 'children':
         for (let i = oldColumnIndex + 1, l = get(columns, 'length'); i < l; i++) {
-          this.replaceColumnObject(i, Column.create({ ownerSource: this }));
+          this.replaceColumnObject(i, this.createEmptyColumn());
         }
         break;
     }
@@ -239,11 +239,7 @@ export default EmberObject.extend(OwnerInjector, {
     const columns = this.get('columns');
     const availableColNum = get(columns, 'length');
     for (let i = availableColNum; i < this.get('workspace.columnsNumber'); i++) {
-      const column = Column.create({
-        ownerSource: this,
-        workspace: this.get('workspace'),
-        relationType: 'empty',
-      });
+      const column = this.createEmptyColumn();
       this.createdColumnsSet.add(column);
       columns.pushObject(column);
     }
@@ -258,5 +254,17 @@ export default EmberObject.extend(OwnerInjector, {
     this.createdColumnsSet.delete(columns[index]);
     columns[index].destroy();
     columns.replace(index, 1, [newColumn]);
+  },
+
+  /**
+   * @protected
+   * @returns {Column}
+   */
+  createEmptyColumn() {
+    return Column.create({
+      ownerSource: this,
+      workspace: this.workspace,
+      relationType: 'empty',
+    });
   },
 });

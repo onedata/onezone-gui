@@ -11,7 +11,7 @@ import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { entityType as groupEntityType } from 'onezone-gui/models/group';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
-import BatchRecordsLoader from '../batch-records-loader';
+import BatchRecordsLoader from 'onezone-gui/utils/batch-records-loader';
 import { reject } from 'rsvp';
 import { computed } from '@ember/object';
 

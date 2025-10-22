@@ -2,8 +2,8 @@
  * An enclosing component intended to render multiple GroupBoxes with management of a
  * GroupsHierarchyColumnDataModel instance.
  *
- * Each GroupBox fetches some data. When there are large number of GroupBoxes, there will
- * be multiple requests and we can predict GRIs of that records.
+ * Each GroupBox fetches some data.When there is a large number of GroupBoxes, there will
+ * be multiple requests, and we can predict the GRIs of those records.
  *
  * This component:
  * - initializes batch containers in loading containers before inserting GroupBoxes,
@@ -48,13 +48,23 @@ export default class ColumnDataContainerComponent extends Component {
    * request parents and children. When we are sure, that all components are rendered, we
    * can flush batch containers to proceed children and parents loading.
    *
-   * This property maps ColumnDataModel -> number of rendered GroupBoxes to watch number of rendered components. When they are loaded, it launches `activateLoaders` method that flushes containers. It sets a special 'activated' string
-   * meaning that loaders has been activated for the column and we are .
+   * This property maps ColumnDataModel -> number of rendered GroupBoxes to watch number
+   * of rendered components. When they are loaded, it launches `activateLoaders` method
+   * that flushes containers. It sets a special 'activated' string meaning that loaders
+   * has been activated for the column.
+   *
+   * This is a map with ColumnDataModel key, because `@columnDataModel` could change in
+   * component lifetime.
    * @type {Map<RelatedGroupsDataModel, number|'activated'>}
    */
   #renderedGroupBoxesState = new Map();
 
-  /** @type {number} */
+  /**
+   * ID of setTimeout that activates loaders (flushes) if it is not done within some time
+   * after this component construction. It is done, because in rare cases, waiting for
+   * GroupBoxes to render can hang.
+   * @type {number}
+   */
   #activationTimeoutId;
 
   constructor() {
@@ -138,6 +148,11 @@ export default class ColumnDataContainerComponent extends Component {
     }
   }
 
+  /**
+   * Should be invoked on render of a single GroupBox in the container. It increases the
+   * counter of rendere GroupBoxes, which could cause loaders flush if there are required
+   * number of rendered boxes.
+   */
   onGroupBoxRendered() {
     if (!(this.columnDataModel instanceof RelatedGroupsDataModel)) {
       return;
@@ -159,6 +174,10 @@ export default class ColumnDataContainerComponent extends Component {
     }
   }
 
+  /**
+   * Starts flush of loaders, which should be done after all needed GroupBoxes are
+   * rendered.
+   */
   async activateLoaders() {
     const loaders = await this.initializedLoadersProxy;
     for (const loader of loaders) {
@@ -167,11 +186,19 @@ export default class ColumnDataContainerComponent extends Component {
     this.markLoadersActivated();
   }
 
+  /**
+   * Sets information, that we started flush of loaders for GroupBoxes for the current
+   * columnDataModel.
+   */
   markLoadersActivated() {
     this.#renderedGroupBoxesState.set(this.columnDataModel, 'activated');
     clearTimeout(this.#activationTimeoutId);
   }
 
+  /**
+   * @returns `true` if we started flush of loaders for GroupBoxes for the current
+   * columnDataModel.
+   */
   areLoadersActivated() {
     return this.#renderedGroupBoxesState.get(this.columnDataModel) === 'activated';
   }

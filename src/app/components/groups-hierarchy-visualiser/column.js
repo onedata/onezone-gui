@@ -20,7 +20,7 @@ import { htmlSafe } from '@ember/string';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import $ from 'jquery';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
-import RelatedGroupsDataModel from '../../utils/groups-hierarchy-visualiser/related-groups-column-data-model';
+import RelatedGroupsDataModel from 'onezone-gui/utils/groups-hierarchy-visualiser/related-groups-column-data-model';
 
 /** @import ProgressTracker from '../../../lib/onedata-gui-common/addon/utils/progress-tracker'; */
 

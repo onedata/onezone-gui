@@ -1,6 +1,16 @@
 /**
  * Uses batch requests to fetch records with provided GRIs with progress watch.
  *
+ * There are two typical usages of this class:
+ *
+ * 1. Via `getPromise` - when you just want to init, start loaders, and wait for loader
+ *    fulfillment (in the meantime using the progressTracker). This is the most common use
+ *    case.
+ * 2. Using first `initContainers` (initialize containers), then use some code that want
+ *    to use loaded data, and then use `startFlush` to start actual loading (and use eg.
+ *    progressTracker as in the first use case). Used when you must control when
+ *    containers are created and flushed.
+ *
  * @author Jakub Liput
  * @copyright (C) 2025 ACK CYFRONET AGH
  * @copyright (C) 2025 Onedata (onedata.org)
@@ -66,6 +76,10 @@ export default class BatchRecordsLoader {
     this.progressTracker = customProgressTracker ?? new ProgressTracker();
   }
 
+  get areContainersInitialized() {
+    return Boolean(this.#containers);
+  }
+
   /**
    * @returns {Promise<Array>}
    */
@@ -74,10 +88,6 @@ export default class BatchRecordsLoader {
       this.#promise = this.fetch();
     }
     return this.#promise;
-  }
-
-  get areContainersInitialized() {
-    return Boolean(this.#containers);
   }
 
   async initContainers() {
@@ -128,7 +138,7 @@ export default class BatchRecordsLoader {
   }
 
   /**
-   * @private
+   * @protected
    * @returns {Promise<Array>}
    */
   async fetch() {
