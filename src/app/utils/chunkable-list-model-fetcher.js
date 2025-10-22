@@ -129,7 +129,7 @@ export default class ChunkableListModelFetcher {
       batchFetchSize,
       listModel,
     } = this;
-    const itemsGris = this.listModel.belongsTo('list').ids();
+    const itemsGris = this.listModel.hasMany('list').ids();
     const listResolver = async () => {
       try {
         // Awaiting for list might fail when some single records cannot be fetched,

@@ -42,6 +42,15 @@ export default Component.extend(I18n, {
   groupBox: undefined,
 
   /**
+   * Callback, that should be invoked on component first render.
+   * It is optional (tests, rendering single GroupBox, etc.), but should be used when
+   * rendered inside ColumnDataContainer.
+   * @type {() => void}
+   * @virtual
+   */
+  onRendered: undefined,
+
+  /**
    * True if parents relation is expanded
    * @type {boolean}
    */
@@ -406,12 +415,19 @@ export default Component.extend(I18n, {
     );
   }),
 
+  /** @override */
   willDestroyElement() {
     try {
       this.cacheFor('generateInviteTokenAction')?.destroy();
     } finally {
       this._super(...arguments);
     }
+  },
+
+  /** @override */
+  didInsertElement() {
+    this._super(...arguments);
+    this.onRendered?.();
   },
 
   actions: {

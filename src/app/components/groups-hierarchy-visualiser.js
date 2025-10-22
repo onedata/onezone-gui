@@ -15,6 +15,8 @@
  *      creating group boxes according to given model. Automatically infers
  *      context using previous and next column and calculates position values,
  *      that are common for many elements inside column (to optimize calculations).
+ *    - ColumnDataModel (GroupsHierarchyColumnDataModel type) - provides groups data
+ *      loading. It is implemented by various classes according to the column type.
  *    - ColumnSeparator - calculates position of column separator elements.
  *    - GroupBox - calculates position for group box.
  *    - GroupBoxLine (including GroupBoxRightLine and GroupBoxLeftLine) - calculates
@@ -30,8 +32,8 @@
  *                Workspace                     ColumnManager
  *                                                    |
  *                                                    |1-n
- *                                                    |
- *                                                  Column
+ *                                                    |        1-1
+ *                                                  Column--------------ColumnDataModel
  *                                                    |
  *                                    +---------------+---------------+
  *                                    |                               |
@@ -91,12 +93,14 @@
  * Column types:
  *   There are four types of columns:
  *     * empty - column used as a placeholder. It does not represent any
- *       relation/group.
+ *       relation/group. Data model is realized by EmptyColumnDataModel class.
  *     * startPoint - column used to initialize graph. It always contains only
  *       one group, which is the same as passed to GroupsHierarchyVisualiser
- *       component.
+ *       component. Data model is realized by SingleGroupColumnDataModel.
  *     * children - column with children of some group.
+ *       Data model is realized by RelatedGroupsColumnDataModel.
  *     * parents - column with parents of some group.
+ *       Data model is realized by RelatedGroupsColumnDataModel.
  *   To fully describe these types there are tree fields in Column class:
  *     * relationType - string name of the type: `empty`, `startPoint`,
  *       `children`, `parents`.
@@ -104,7 +108,7 @@
  *       null for children and parents types, and null for empty and startPoint.
  *       For children it is a parent group for those children, for parents it
  *       is a children group of those parents.
- *     * model - ProxyObject with with group-list model. For empty type it should
+ *     * columnDataModel - object with group-list model. For empty type it should
  *       be a model with an empty array, for startPoint it must contain an array
  *       with exactly one group, for children/parents there are no requirements -
  *       can contain many groups, or be an empty array.
@@ -126,7 +130,7 @@
  *     and placed in tree using ColumnManager methods.
  *   * GroupsHierarchyVisualiser renders columns using
  *     GroupsHierarchyVisualiser/Column component.
- *   * Column observes model, and when there are new groups available, it creates
+ *   * Column observes data model, and when there are new groups available, it creates
  *     new GroupBox objects.
  *   * According to searchString in Workspace and groupName in GroupBox Column
  *     sorts group boxes. Sorted array is then used to render group boxes using
@@ -167,25 +171,18 @@
 
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
-import EmberObject, {
+import {
   computed,
   get,
-  getProperties,
   set,
   setProperties,
   observer,
 } from '@ember/object';
-import { A } from '@ember/array';
 import I18n from 'onedata-gui-common/mixins/i18n';
-import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
-import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
-import { resolve, reject } from 'rsvp';
+import { reject } from 'rsvp';
 import ColumnManager from 'onezone-gui/utils/groups-hierarchy-visualiser/column-manager';
 import Workspace from 'onezone-gui/utils/groups-hierarchy-visualiser/workspace';
-import {
-  createEmptyColumnModel,
-  default as Column,
-} from 'onezone-gui/utils/groups-hierarchy-visualiser/column';
+import Column from 'onezone-gui/utils/groups-hierarchy-visualiser/column';
 import { next } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
@@ -214,6 +211,7 @@ export default Component.extend(I18n, {
   navigationState: service(),
   router: service(),
   recordManager: service(),
+  batchRequestRegistry: service(),
 
   /**
    * @override
@@ -335,6 +333,7 @@ export default Component.extend(I18n, {
    */
   columnManager: destroyableComputed('workspace', function columnManager() {
     return ColumnManager.create({
+      ownerSource: this,
       workspace: this.get('workspace'),
     });
   }),
@@ -474,7 +473,7 @@ export default Component.extend(I18n, {
       // Actual first column, which is empty
       const actualFirstColumn = columns.objectAt(0);
       // Load start-point column (with one group from `group` field)
-      const startPointColumn = this.createColumn('startPoint');
+      const startPointColumn = this.createColumn('startPoint', this.group);
 
       if (columnsNumber >= 3) {
         const parentsColumn = this.createColumn('parents', group);
@@ -505,8 +504,6 @@ export default Component.extend(I18n, {
             relatedGroup: null,
             relationType: 'empty',
           });
-          // recalculate model according to above new specification
-          set(column, 'model', this.createColumnModel(column));
         }
       });
     }
@@ -595,59 +592,6 @@ export default Component.extend(I18n, {
   },
 
   /**
-   * Returns model for children column for specified group
-   * @param {Group} parentGroup
-   * @returns {PromiseArray<ManyArray<Group>>}
-   */
-  loadGroupChildren(parentGroup) {
-    let promise;
-    if (get(parentGroup, 'hasViewPrivilege')) {
-      promise = (async () => {
-        await parentGroup.reloadList('childList', {
-          reloadRecords: true,
-        });
-        return await parentGroup.childList;
-      })();
-    } else {
-      promise = reject({ id: 'forbidden' });
-    }
-    return PromiseObject.create({ promise });
-  },
-
-  /**
-   * Returns model for parents column for specified group
-   * @param {Group} childGroup
-   * @returns {PromiseArray<ManyArray<Group>>}
-   */
-  loadGroupParents(childGroup) {
-    let promise;
-    if (get(childGroup, 'hasViewPrivilege')) {
-      promise = (async () => {
-        await childGroup.reloadList('parentList', {
-          reloadRecords: true,
-        });
-        return await childGroup.parentList;
-      })();
-    } else {
-      promise = reject({ id: 'forbidden' });
-    }
-    return PromiseObject.create({ promise });
-  },
-
-  /**
-   * Returns model for start-point column
-   * @returns {PromiseArray<Ember.A<Group>>}
-   */
-  loadThisGroupAsArray() {
-    return PromiseObject.create({
-      promise: this.get('group').reload()
-        .then(groupProxy => EmberObject.create({
-          list: PromiseArray.create({ promise: resolve(A([groupProxy])) }),
-        })),
-    });
-  },
-
-  /**
    * Creates new column
    * @param {string} relationType One of `empty`, `startPoint`, `children`,
    *   `parents`
@@ -658,34 +602,12 @@ export default Component.extend(I18n, {
    */
   createColumn(relationType = 'empty', relatedGroup = null) {
     const column = Column.create({
+      ownerSource: this,
       relationType: relationType,
       relatedGroup,
     });
     this.createdColumnsSet.add(column);
-    column.set('model', this.createColumnModel(column));
     return column;
-  },
-
-  /**
-   * Creates column model using column relation specification
-   * @param {Utils/GroupsHierarchyVisualiser/Column} column
-   * @returns {PromiseArray<Array<Group>>}
-   */
-  createColumnModel(column) {
-    const {
-      relatedGroup,
-      relationType,
-    } = getProperties(column, 'relatedGroup', 'relationType');
-    switch (relationType) {
-      case 'startPoint':
-        return this.loadThisGroupAsArray();
-      case 'parents':
-        return this.loadGroupParents(relatedGroup);
-      case 'children':
-        return this.loadGroupChildren(relatedGroup);
-      case 'empty':
-        return createEmptyColumnModel();
-    }
   },
 
   /**
@@ -710,27 +632,18 @@ export default Component.extend(I18n, {
    * Reloads model of all columns
    * @returns {undefined}
    */
-  reloadModel() {
-    const columns = this.get('columnManager.columns');
-    // There may be many columns with the same relatedGroup.
-    // Using map instead of array to minimize the number of requests.
-    const relatedGroupsReloadPromises = new Map();
-    columns
-      .forEach(column => {
-        const relatedGroup = get(column, 'relatedGroup');
-        let relatedGroupReloadPromise;
-        if (!relatedGroup) {
-          relatedGroupReloadPromise = resolve();
-        } else if (relatedGroupsReloadPromises.has(relatedGroup)) {
-          relatedGroupReloadPromise = relatedGroupsReloadPromises.get(relatedGroup);
-        } else {
-          relatedGroupReloadPromise = relatedGroup.reload();
-          relatedGroupsReloadPromises.set(relatedGroup, relatedGroupReloadPromise);
-        }
-        const modelPromise = relatedGroupReloadPromise
-          .then(() => this.createColumnModel(column));
-        set(column, 'model', PromiseObject.create({ promise: modelPromise }));
-      });
+  reloadRelatedGroups() {
+    const columns = this.columnManager.columns;
+    // There may be many columns with the same relatedGroup - to not invoke reload
+    // multiple times.
+    const reloadingGroups = new Set();
+    for (const column of columns) {
+      const relatedGroup = column.relatedGroup;
+      if (relatedGroup && !reloadingGroups.has(relatedGroup)) {
+        relatedGroup.reload();
+        reloadingGroups.add(relatedGroup);
+      }
+    }
   },
 
   /**
@@ -835,7 +748,7 @@ export default Component.extend(I18n, {
       });
       try {
         await action.execute();
-        safeExec(this, 'reloadModel');
+        safeExec(this, 'reloadRelatedGroups');
       } finally {
         safeExec(this, 'setProperties', {
           isGroupConsumingToken: false,
@@ -851,7 +764,7 @@ export default Component.extend(I18n, {
       const result = await action.execute();
       action.destroy();
       if (result.status === 'done') {
-        safeExec(this, 'reloadModel');
+        safeExec(this, 'reloadRelatedGroups');
       }
     },
     joinGroup() {
@@ -878,7 +791,7 @@ export default Component.extend(I18n, {
         .then(() => {
           const willRedirect = this.redirectOnGroupDeletion();
           if (!willRedirect) {
-            safeExec(this, 'reloadModel');
+            safeExec(this, 'reloadRelatedGroups');
           }
         })
         .finally(() =>
@@ -918,7 +831,7 @@ export default Component.extend(I18n, {
           get(relationToRemove, 'parent'),
           get(relationToRemove, 'child')
         )
-        .then(() => safeExec(this, 'reloadModel'))
+        .then(() => safeExec(this, 'reloadRelatedGroups'))
         .finally(() =>
           safeExec(this, 'setProperties', {
             isRemovingRelation: false,

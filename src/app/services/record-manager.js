@@ -86,7 +86,7 @@ export default Service.extend({
 
   /**
    * @param {UserListModelName} listItemModelName
-   * @returns {BatchRecordsLoader}
+   * @returns {Promise<BatchRecordsLoader>}
    */
   async resolveUserRecordListLoader(listItemModelName) {
     const { batchRequestRegistry } = this;

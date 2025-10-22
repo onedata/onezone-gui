@@ -1,8 +1,19 @@
 /**
  * Uses batch requests to fetch records with provided GRIs with progress watch.
  *
+ * There are two typical usages of this class:
+ *
+ * 1. Via `getPromise` - when you just want to init, start loaders, and wait for loader
+ *    fulfillment (in the meantime using the progressTracker). This is the most common use
+ *    case.
+ * 2. Using first `initContainers` (initialize containers), then use some code that want
+ *    to use loaded data, and then use `startFlush` to start actual loading (and use eg.
+ *    progressTracker as in the first use case). Used when you must control when
+ *    containers are created and flushed.
+ *
  * @author Jakub Liput
  * @copyright (C) 2025 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -36,6 +47,15 @@ export default class BatchRecordsLoader {
   /** @type {Promise<Array>} */
   #promise;
 
+  /** @type {Array<BatchRequestContainer>} */
+  #containers;
+
+  /** @type {boolean} */
+  #flushStarted = false;
+
+  /**
+   * @param {FetchBatchRecordsArgs} fetchBatchRecordsArgs
+   */
   constructor(fetchBatchRecordsArgs) {
     this.validateArgs(fetchBatchRecordsArgs);
 
@@ -56,6 +76,10 @@ export default class BatchRecordsLoader {
     this.progressTracker = customProgressTracker ?? new ProgressTracker();
   }
 
+  get areContainersInitialized() {
+    return Boolean(this.#containers);
+  }
+
   /**
    * @returns {Promise<Array>}
    */
@@ -66,15 +90,9 @@ export default class BatchRecordsLoader {
     return this.#promise;
   }
 
-  /**
-   * @private
-   * @returns {Promise<Array>}
-   */
-  async fetch() {
-    if (this.#promise) {
-      throw new Error(
-        'BatchRecordsLoader: cannot invoke fetch more than once for single instance'
-      );
+  async initContainers() {
+    if (this.#containers) {
+      throw new Error('BatchRecordsLoader: containers are already initialized');
     }
     const griArrayChunks = _.chunk(this.itemsGris, this.batchFetchSize);
     const containerPromises = griArrayChunks.map(async (grisChunk) => {
@@ -84,11 +102,21 @@ export default class BatchRecordsLoader {
         DebouncedBatchFlushStrategy
       );
     });
-    const containers = await allFulfilled(containerPromises);
+    this.#containers = await allFulfilled(containerPromises);
     this.progressTracker.reset(this.itemsGris.length);
+  }
+
+  async startFlush() {
+    if (!this.#containers) {
+      throw new Error('BatchRecordsLoader: containers not initialized');
+    }
+    if (this.#flushStarted) {
+      throw new Error('BatchRecordsLoader: flush has been already started');
+    }
+    this.#flushStarted = true;
     try {
       const listPromise = this.listResolver();
-      for (const container of containers) {
+      for (const container of this.#containers) {
         const doneCount = container.containerSpec.gris.length;
         try {
           await container.flush();
@@ -103,10 +131,19 @@ export default class BatchRecordsLoader {
       // destroyed.
       return list.filter((r) => !r?.isDestroyed);
     } finally {
-      for (const container of containers) {
+      for (const container of this.#containers) {
         this.batchRequestRegistry.destroyContainer(container);
       }
     }
+  }
+
+  /**
+   * @protected
+   * @returns {Promise<Array>}
+   */
+  async fetch() {
+    await this.initContainers();
+    return await this.startFlush();
   }
 
   /**

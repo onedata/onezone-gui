@@ -2,8 +2,9 @@
  * Draws column in groups hierarchy visualiser. Deals with scroll change and
  * passes group/relation actions down to the group boxes.
  *
- * @author Michał Borzęcki
+ * @author Michał Borzęcki, Jakub Liput
  * @copyright (C) 2018 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -19,6 +20,9 @@ import { htmlSafe } from '@ember/string';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import $ from 'jquery';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
+import RelatedGroupsDataModel from 'onezone-gui/utils/groups-hierarchy-visualiser/related-groups-column-data-model';
+
+/** @import ProgressTracker from '../../../lib/onedata-gui-common/addon/utils/progress-tracker'; */
 
 export default Component.extend(I18n, {
   classNames: ['column'],
@@ -180,6 +184,43 @@ export default Component.extend(I18n, {
     );
     return htmlSafe(`width: ${width}px; left: ${x}px;`);
   }),
+
+  columnTitle: computed(
+    'column.{relationType,relatedGroup.name,groupListProxy.content.list.content.0.name}',
+    function columnTitle() {
+      switch (this.column.relationType) {
+        case 'parents':
+          return this.t('parentsOfGroup', {
+            groupName: this.column.relatedGroup.name,
+          });
+        case 'children':
+          return this.t('childrenOfGroup', {
+            groupName: this.column.relatedGroup.name,
+          });
+        case 'startPoint':
+          return this.column.groupListProxy.content?.list.content?.[0]?.name;
+        default:
+          break;
+      }
+    }
+  ),
+
+  loadingLabel: computed(
+    'column.columnDataModel.listLoaderProxy.content.progressTracker.{totalCount,progressText}',
+    function loadingLabel() {
+      const columnDataModel = this.column.columnDataModel;
+      if (columnDataModel instanceof RelatedGroupsDataModel) {
+        /** @type {ProgressTracker} */
+        const progressTracker = columnDataModel.listLoaderProxy.content?.progressTracker;
+        if (progressTracker) {
+          return this.t('loading', {
+            total: progressTracker.totalCount,
+            percentage: progressTracker.progressText,
+          });
+        }
+      }
+    }
+  ),
 
   scrollTopObserver: observer('column.scrollTop', function scrollTopObserver() {
     const element = this.get('element');
