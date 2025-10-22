@@ -62,9 +62,8 @@
           </div>
         </div>
       {{else}}
-        {{!-- TODO: VFS-13072 change to adaptive dropdown after fixing loader --}}
         <div class="target-record-filter">
-          <OneDropdown
+          <AdaptiveDropdown
             @triggerClass="small"
             @dropdownClass="small"
             @options={{this.targetRecordOptions}}
@@ -87,7 +86,7 @@
                 {{option.name}}
               {{/if}}
             </TruncatedString>
-          </OneDropdown>
+          </AdaptiveDropdown>
         </div>
       {{/if}}
     </div>
