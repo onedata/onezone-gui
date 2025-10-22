@@ -163,10 +163,10 @@ export default Component.extend(I18n, {
     'collection',
     'selectedTargetModelOption',
     'allModelOption',
-    'type',
+    'selectedType',
     function targetRecordOptionsLoaderProxy() {
       if (
-        this.type !== 'invite' ||
+        this.selectedType !== 'invite' ||
         this.selectedTargetModelOption === this.allModelOption
       ) {
         return promiseObject(resolve());
@@ -190,10 +190,10 @@ export default Component.extend(I18n, {
     'collection',
     'selectedTargetModelOption',
     'allModelOption',
-    'type',
+    'selectedType',
     function inviteProgressTracker() {
       if (
-        this.type !== 'invite' ||
+        this.selectedType !== 'invite' ||
         this.selectedTargetModelOption === this.allModelOption
       ) {
         return null;
