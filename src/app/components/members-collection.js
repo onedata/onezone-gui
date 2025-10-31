@@ -327,6 +327,23 @@ export default Component.extend(I18n, {
   ),
 
   /**
+   * Direct groups
+   * @type {Ember.ComputedProperty<PromiseArray<DS.ManyArray<GraphSingleModel>>>}
+   */
+  directGroupsProxy: computed(
+    'record',
+    'subjectType',
+    function directGroupsProxy() {
+      if (this.subjectType === 'group') {
+        return this.directMembersProxy;
+      }
+      return this.getMembers('groupList');
+    }
+  ),
+
+  directGroups: reads('directGroupsProxy.content'),
+
+  /**
    * Promise proxy used to load all members
    * @type {Ember.ComputedProperty<PromiseObject>}
    */

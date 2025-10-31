@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-13118 Fixed tooltip display for effective privileges in the Members privileges table
 * VFS-13072 Fixed non-batched target groups/spaces/etc. fetching in tokens sidebar advanced filter
 * VFS-12896 Added loaders with batch fetching to groups hierarchy view
 * VFS-12932 Added infinite-scrollable dropdowns
