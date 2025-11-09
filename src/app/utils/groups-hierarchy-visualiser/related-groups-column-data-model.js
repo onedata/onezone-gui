@@ -20,7 +20,7 @@ import { computed } from '@ember/object';
 /**
  * @implements {GroupsHierarchyColumnDataModel}
  */
-export default class RelatedGroupsDataModel {
+export default class RelatedGroupsColumnDataModel {
   /**
    * @param {Models.Group} group
    * @param {'parent'|'child'} relationName

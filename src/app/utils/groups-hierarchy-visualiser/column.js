@@ -177,7 +177,7 @@ export default EmberObject.extend(OwnerInjector, {
   /**
    * @type {ComputedProperty<GroupsHierarchyColumnDataModel>}
    */
-  columnDataModel: computed('relationType', 'relatedGroup', function dataModel() {
+  columnDataModel: computed('relationType', 'relatedGroup', function columnDataModel() {
     return this.createColumnDataModel(this.relationType, this.relatedGroup);
   }),
 
