@@ -252,10 +252,10 @@ export default Service.extend({
    * Creates parent for specified child group
    * @param {string} childEntityId
    * @param {Object} parentGroupRepresentation
-   * @returns {Promise}
+   * @returns {Promise<void>}
    */
-  createParent(childEntityId, parentGroupRepresentation) {
-    return this.get('onedataGraph').request({
+  async createParent(childEntityId, parentGroupRepresentation) {
+    await this.onedataGraph.request({
       gri: gri({
         entityType: groupEntityType,
         aspect: 'instance',
@@ -263,49 +263,49 @@ export default Service.extend({
       operation: 'create',
       data: parentGroupRepresentation,
       authHint: ['asGroup', childEntityId],
-    }).then(() => {
-      return Promise.all([
-        this.reloadList(),
-        this.reloadParentList(childEntityId).catch(ignoreForbiddenError),
-      ]);
+      // FIXME: subscribe false?
     });
+    await Promise.all([
+      this.reloadList(),
+      this.reloadParentList(childEntityId).catch(ignoreForbiddenError),
+    ]);
   },
 
   /**
    * Creates child for specified parent group
    * @param {string} parentEntityId
    * @param {Object} childGroupRepresentation
-   * @returns {Promise}
+   * @returns {Promise<void>}
    */
-  createChild(parentEntityId, childGroupRepresentation) {
-    return this.get('currentUser').getCurrentUserRecord()
-      .then(user => this.get('onedataGraph').request({
-        gri: gri({
-          entityType: groupEntityType,
-          entityId: parentEntityId,
-          aspect: 'child',
-          scope: 'auto',
-        }),
-        operation: 'create',
-        data: childGroupRepresentation,
-        authHint: ['asUser', get(user, 'entityId')],
-      }).then(() => {
-        return Promise.all([
-          this.reloadList(),
-          this.reloadChildList(parentEntityId).catch(ignoreForbiddenError),
-          this.reloadEffChildList(parentEntityId).catch(ignoreForbiddenError),
-        ]);
-      }));
+  async createChild(parentEntityId, childGroupRepresentation) {
+    const user = await this.currentUser.getCurrentUserRecord();
+    await this.onedataGraph.request({
+      gri: gri({
+        entityType: groupEntityType,
+        entityId: parentEntityId,
+        aspect: 'child',
+        scope: 'auto',
+      }),
+      operation: 'create',
+      data: childGroupRepresentation,
+      authHint: ['asUser', user.entityId],
+      // FIXME: subscribe false?
+    });
+    await Promise.all([
+      this.reloadList(),
+      this.reloadChildList(parentEntityId).catch(ignoreForbiddenError),
+      this.reloadEffChildList(parentEntityId).catch(ignoreForbiddenError),
+    ]);
   },
 
   /**
    * Adds group to the children of another group
    * @param {string} groupEntityId
    * @param {string} futureChildEntityId
-   * @returns {Promise}
+   * @returns {Promise<void>}
    */
-  addChild(groupEntityId, futureChildEntityId) {
-    return this.get('onedataGraph').request({
+  async addChild(groupEntityId, futureChildEntityId) {
+    await this.onedataGraph.request({
       gri: gri({
         entityType: groupEntityType,
         entityId: groupEntityId,
@@ -314,15 +314,15 @@ export default Service.extend({
         scope: 'auto',
       }),
       operation: 'create',
-    }).then(() => {
-      return Promise.all([
-        this.reloadList(),
-        this.reloadParentList(futureChildEntityId).catch(ignoreForbiddenError),
-        this.reloadSpaceList(futureChildEntityId).catch(ignoreForbiddenError),
-        this.reloadChildList(groupEntityId).catch(ignoreForbiddenError),
-        this.reloadEffChildList(groupEntityId).catch(ignoreForbiddenError),
-      ]);
+      subscribe: false,
     });
+    await Promise.all([
+      this.reloadList(),
+      this.reloadParentList(futureChildEntityId).catch(ignoreForbiddenError),
+      this.reloadSpaceList(futureChildEntityId).catch(ignoreForbiddenError),
+      this.reloadChildList(groupEntityId).catch(ignoreForbiddenError),
+      this.reloadEffChildList(groupEntityId).catch(ignoreForbiddenError),
+    ]);
   },
 
   /**
