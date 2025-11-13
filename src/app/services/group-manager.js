@@ -263,7 +263,6 @@ export default Service.extend({
       operation: 'create',
       data: parentGroupRepresentation,
       authHint: ['asGroup', childEntityId],
-      // FIXME: subscribe false?
     });
     await Promise.all([
       this.reloadList(),
@@ -289,7 +288,6 @@ export default Service.extend({
       operation: 'create',
       data: childGroupRepresentation,
       authHint: ['asUser', user.entityId],
-      // FIXME: subscribe false?
     });
     await Promise.all([
       this.reloadList(),
