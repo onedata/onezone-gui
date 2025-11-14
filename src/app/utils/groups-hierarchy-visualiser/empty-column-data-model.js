@@ -13,7 +13,7 @@ import { resolve } from 'rsvp';
 /**
  * @implements {GroupsHierarchyColumnDataModel}
  */
-export default class SingleGroupColumnDataModel {
+export default class EmptyColumnDataModel {
   constructor() {
     this.groupListProxy = this.#createEmptyGroupProxy();
   }

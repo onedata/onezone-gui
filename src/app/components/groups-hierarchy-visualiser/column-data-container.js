@@ -22,7 +22,7 @@
 import Component from '@glimmer/component';
 import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
-import RelatedGroupsDataModel from 'onezone-gui/utils/groups-hierarchy-visualiser/related-groups-column-data-model';
+import RelatedGroupsColumnDataModel from 'onezone-gui/utils/groups-hierarchy-visualiser/related-groups-column-data-model';
 import { all as allFulfilled } from 'rsvp';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 
@@ -55,7 +55,7 @@ export default class ColumnDataContainerComponent extends Component {
    *
    * This is a map with ColumnDataModel key, because `@columnDataModel` could change in
    * component lifetime.
-   * @type {Map<RelatedGroupsDataModel, number|'activated'>}
+   * @type {Map<RelatedGroupsColumnDataModel, number|'activated'>}
    */
   #renderedGroupBoxesState = new Map();
 
@@ -77,7 +77,7 @@ export default class ColumnDataContainerComponent extends Component {
         !this.isDestroyed &&
         !this.isDestroying &&
         !this.areLoadersActivated() &&
-        this.columnDataModel instanceof RelatedGroupsDataModel
+        this.columnDataModel instanceof RelatedGroupsColumnDataModel
       ) {
         this.activateLoaders();
       }
@@ -103,7 +103,7 @@ export default class ColumnDataContainerComponent extends Component {
   @computed('columnDataModel', 'initializedLoadersProxy', 'groupsCountProxy')
   get shouldRenderProxy() {
     const promise = (async () => {
-      if (this.columnDataModel instanceof RelatedGroupsDataModel) {
+      if (this.columnDataModel instanceof RelatedGroupsColumnDataModel) {
         await this.initializedLoadersProxy;
       }
       return Boolean(await this.groupsCountProxy);
@@ -123,7 +123,7 @@ export default class ColumnDataContainerComponent extends Component {
   @computed('columnDataModel')
   get initializedLoadersProxy() {
     const promise = (async () => {
-      if (!(this.columnDataModel instanceof RelatedGroupsDataModel)) {
+      if (!(this.columnDataModel instanceof RelatedGroupsColumnDataModel)) {
         return;
       }
       const [childrenLoader, parentsLoader] = await allFulfilled([
@@ -154,7 +154,7 @@ export default class ColumnDataContainerComponent extends Component {
    * number of rendered boxes.
    */
   onGroupBoxRendered() {
-    if (!(this.columnDataModel instanceof RelatedGroupsDataModel)) {
+    if (!(this.columnDataModel instanceof RelatedGroupsColumnDataModel)) {
       return;
     }
     if (this.areLoadersActivated()) {

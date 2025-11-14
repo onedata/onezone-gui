@@ -155,10 +155,10 @@ export default Component.extend(I18n, {
   }),
 
   relationProxy: computed(
-    'group',
+    'group.{parentList,childList}',
     'relationType',
     'hasViewPrivilege',
-    function relationLoader() {
+    function relationProxy() {
       if (!this.hasViewPrivilege) {
         return null;
       }
