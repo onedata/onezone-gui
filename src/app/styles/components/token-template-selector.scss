@@ -146,4 +146,29 @@
       font-size: 1.7em;
     }
   }
+
+  .info-token-slide {
+    margin-bottom: 60px;
+  }
+
+  .single-step-template-tile .tile-content-inner {
+    margin-bottom: 60px;
+  }
+  .one-tile .main-figure {
+    transform: translateY(-50%) translateY(7px);
+  }
+
+  .template-subtext {
+    font-size: 90%;
+    text-align: left;
+
+    position: absolute;
+    bottom: -60px;
+  }
+
+  .template-info-icon {
+    font-size: 150%;
+    vertical-align: middle;
+    color: #7b7b7b;
+  }
 }

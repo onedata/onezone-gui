@@ -3,10 +3,17 @@
   @onClick={{if (eq activeSlideId "intro") (action "onIntroClick")}}
 >
   <OneCarousel @activeSlideId={{activeSlideId}} as |carousel|>
-    <carousel.slide @slideId="intro">
+    <carousel.slide @slideId="intro" class="info-token-slide">
       <figure class="main-figure">
         <img class="main-image" src={{imagePath}}>
       </figure>
+      <div class="template-subtext">
+    <span class="subtext">Dodatkowy tekst fgsd dfsgdfsg dfgdgsg sdfggf</span>
+    <span>
+      <OneIcon @icon="browser-info" class="template-info-icon" />
+      <OneTooltip @title="details details details details details details details details details..." />
+    </span>
+  </div>
     </carousel.slide>
     <carousel.slide @slideId="selector" class="record-selector-slide">
       <div class="top-bar">

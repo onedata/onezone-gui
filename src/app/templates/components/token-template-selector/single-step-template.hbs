@@ -1,9 +1,17 @@
 <TokenTemplateSelector::TemplateTile
   @templateName={{templateName}}
   @onClick={{action "onSelected"}}
+  @templateTileClasses="single-step-template-tile"
 >
   <figure class="main-figure">
     <img class="main-image" src={{imagePath}}>
   </figure>
+  <div class="template-subtext">
+    <span class="subtext">Dodatkowy tekst fgsd dfsgdfsg dfgdgsg sdfggf</span>
+    <span>
+      <OneIcon @icon="browser-info" class="template-info-icon" />
+      <OneTooltip @title="details details details details details details details details details..." />
+    </span>
+  </div>
   {{yield}}
 </TokenTemplateSelector::TemplateTile>
