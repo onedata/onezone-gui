@@ -82,7 +82,7 @@ import { groupedFlags as spaceFlags } from 'onedata-gui-websocket-client/utils/s
 import { groupedFlags as harvesterFlags } from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
 import { groupedFlags as clusterFlags } from 'onedata-gui-websocket-client/utils/cluster-privileges-flags';
 import { groupedFlags as atmInventoryFlags } from 'onedata-gui-websocket-client/utils/atm-inventory-privileges-flags';
-import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import MembershipPath from 'onezone-gui/utils/membership-visualiser/membership-path';
 import {
   destroyDestroyableComputedValues,
@@ -90,6 +90,7 @@ import {
   initDestroyableCache,
 } from 'onedata-gui-common/utils/destroyable-computed';
 import BatchRecordsLoader from 'onezone-gui/utils/batch-records-loader';
+import { htmlSafe } from '@ember/string';
 
 export default Component.extend(I18n, {
   classNames: ['membership-visualiser'],
@@ -151,6 +152,13 @@ export default Component.extend(I18n, {
    * @type {number}
    */
   visibleBlocks: 0,
+
+  /**
+   * Current minimum number of possible paths to show with loading indicator.
+   * Reset when starting loading paths and updated on loading next level.
+   * @type {number}
+   */
+  loadingPossibilitesCount: undefined,
 
   /**
    * If true, paths will be rendered in more condensed and static way
@@ -319,6 +327,19 @@ export default Component.extend(I18n, {
       }
     }
   ),
+
+  pathsLoadingLabel: computed('loadingPossibilitesCount', function pathsLoadingLabel() {
+    if (this.loadingPossibilitesCount > 50) {
+      return htmlSafe(
+        [
+          String(this.t('loadingPaths')),
+          String(this.t('loadingAnalysing', { count: this.loadingPossibilitesCount })),
+        ].join('<br>')
+      );
+    } else {
+      return this.t('loadingPaths');
+    }
+  }),
 
   /**
    * Privileges model for relation privileges editor
@@ -519,9 +540,7 @@ export default Component.extend(I18n, {
       .finally(() => safeExec(this, 'set', 'suppressNodesObserver', false));
     if (!silent) {
       // allows to render spinner
-      this.set('pathsLoadingProxy', PromiseObject.create({
-        promise,
-      }));
+      this.set('pathsLoadingProxy', promiseObject(promise));
     }
     return promise;
   },
@@ -541,9 +560,8 @@ export default Component.extend(I18n, {
     /** @type {Array<{ membershipGri: string, intermediaryGri: string }>} */
     const newLevel = [];
     parentLevel.forEach(parentMembership => {
-      if (!get(parentMembership, 'isForbidden') &&
-        !get(parentMembership, 'isDeleted')) {
-        get(parentMembership, 'intermediaries').forEach(intermediaryGri => {
+      if (!parentMembership.isForbidden && !parentMembership.isDeleted) {
+        parentMembership.intermediaries.forEach(intermediaryGri => {
           const parsedIntermediaryGri = parseGri(intermediaryGri);
           if (parsedIntermediaryGri.entityId !== contextRecordEntityId) {
             if (!allNodesMap.has(intermediaryGri)) {
@@ -562,6 +580,13 @@ export default Component.extend(I18n, {
         });
       }
     });
+    const levelIntermediariesSum = parentLevel.reduce((sum, membership) => {
+      return sum + (membership.intermediaries?.length || 0);
+    }, 0);
+    this.set(
+      'loadingPossibilitesCount',
+      Math.max(this.loadingPossibilitesCount, levelIntermediariesSum)
+    );
     const loader = new BatchRecordsLoader({
       batchRequestRegistry: this.batchRequestRegistry,
       itemsGris: newLevel.map(it => it.membershipGri),
@@ -602,26 +627,26 @@ export default Component.extend(I18n, {
    * }
    * ```
    */
-  findPaths(silent = false) {
+  async findPaths(silent = false) {
+    this.set('loadingPossibilitesCount', 1);
     const allNodesMap = new Map();
-    const rootNode = this.get('rootMembership');
-    allNodesMap.set(this.get('targetRecord.gri'), rootNode);
-    return this.findPathsForDeeperLevel(
+    const rootNode = this.rootMembership;
+    allNodesMap.set(this.targetRecord.gri, rootNode);
+    const paths = await this.findPathsForDeeperLevel(
       [rootNode],
       allNodesMap,
       silent
-    ).then(paths => {
-      const allNodesArray = A();
-      allNodesMap.forEach(value => allNodesArray.pushObject(value));
-      allNodesArray.pushObject(rootNode);
-      return {
-        allNodes: allNodesArray,
-        paths: paths.map(path => ({
-          id: path.join('|'),
-          griPath: path,
-        })),
-      };
-    });
+    );
+    const allNodesArray = A();
+    allNodesMap.forEach(value => allNodesArray.pushObject(value));
+    allNodesArray.pushObject(rootNode);
+    return {
+      allNodes: allNodesArray,
+      paths: paths.map(path => ({
+        id: path.join('|'),
+        griPath: path,
+      })),
+    };
   },
 
   /**
@@ -631,24 +656,22 @@ export default Component.extend(I18n, {
    * @param {Array<Membership>} parentLevel
    * @param {Map<string,Membership>} allNodesMap
    * @param {boolean} silent
-   * @returns {promise<Array<Array<string>>>} array of paths
+   * @returns {Promise<Array<Array<string>>>} array of paths
    *   (each path is an array of gri)
    */
-  findPathsForDeeperLevel(parentLevel, allNodesMap, silent) {
-    const maxPathsNumber = this.get('maxPathsNumber');
-    return this.fetchGraphLevel(parentLevel, allNodesMap, silent)
-      .then(childLevel => {
-        const paths = this.calculatePaths(allNodesMap, maxPathsNumber);
-        if (paths.length >= maxPathsNumber || childLevel.length === 0) {
-          return paths.slice(0, maxPathsNumber);
-        } else {
-          return this.findPathsForDeeperLevel(
-            childLevel,
-            allNodesMap,
-            silent
-          );
-        }
-      });
+  async findPathsForDeeperLevel(parentLevel, allNodesMap, silent) {
+    const maxPathsNumber = this.maxPathsNumber;
+    const childLevel = await this.fetchGraphLevel(parentLevel, allNodesMap, silent);
+    const paths = this.calculatePaths(allNodesMap, maxPathsNumber);
+    if (paths.length >= maxPathsNumber || childLevel.length === 0) {
+      return paths.slice(0, maxPathsNumber);
+    } else {
+      return this.findPathsForDeeperLevel(
+        childLevel,
+        allNodesMap,
+        silent
+      );
+    }
   },
 
   /**
