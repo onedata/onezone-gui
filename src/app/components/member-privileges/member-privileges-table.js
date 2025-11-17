@@ -12,15 +12,20 @@ import { scheduleOnce } from '@ember/runloop';
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import { promise } from 'ember-awesome-macros';
-import { Promise } from 'rsvp';
+import { all as allFulfilled } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { inject as service } from '@ember/service';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
+import _ from 'lodash';
+import BatchRecordsLoader from 'onezone-gui/utils/batch-records-loader';
+import sleep from 'onedata-gui-common/utils/sleep';
 
 export default Component.extend(I18n, {
   classNames: ['member-privileges-table'],
 
   recordManager: service(),
+  batchRequestRegistry: service(),
 
   /**
    * @override
@@ -189,7 +194,7 @@ export default Component.extend(I18n, {
     'recordEffectiveProxy.models',
     async function privilegesLoadingProxy() {
       if (this.get('recordDirectProxy')) {
-        return Promise.all([
+        return allFulfilled([
           this.get('recordDirectProxy.models'),
           this.get('recordEffectiveProxy.models'),
         ]);
@@ -293,24 +298,34 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<PromiseObject>}
    */
-  effPrivilegesAffectorInfos: promise.object(computed(
+  effPrivilegesAffectorInfos: computed(
     'directGroupMembers',
     'membership.intermediaries',
-    async function effPrivilegesAffectorInfos() {
-      return Promise.all(this.membership.intermediaries.map(groupId => {
+    function effPrivilegesAffectorInfos() {
+      const affectorsInfos = [];
+      for (const groupId of this.membership.intermediaries) {
         const affectorInfo = this.directGroupMembers.find(
           member => groupId === member.id
         );
-        if (!affectorInfo.effectivePrivilegesProxy.isLoaded) {
-          return affectorInfo.effectivePrivilegesProxy.reloadRecords().then(
-            () => affectorInfo
-          );
-        } else {
-          return affectorInfo;
-        }
-      }));
+        affectorsInfos.push(affectorInfo);
+      }
+      const loader = new BatchRecordsLoader({
+        batchRequestRegistry: this.batchRequestRegistry,
+        itemsGris: _.flatten(
+          affectorsInfos.map(it => it.effectivePrivilegesProxy.griArray)
+        ),
+        listResolver: async () => {
+          return await allFulfilled(affectorsInfos.map(async (affectorInfo) => {
+            if (!affectorInfo.effectivePrivilegesProxy.isLoaded) {
+              await affectorInfo.effectivePrivilegesProxy.reloadRecords();
+            }
+            return affectorInfo;
+          }));
+        },
+      });
+      return promiseObject(loader.getPromise());
     }
-  )),
+  ),
 
   arePrivilegesUpToDateSetter: observer(
     'areEffPrivilegesRecalculated',

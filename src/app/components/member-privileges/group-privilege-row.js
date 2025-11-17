@@ -177,7 +177,7 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<PromiseObject<boolean>>}
    */
-  isUnknownEffPrivStatus: computed(
+  isUnknownEffPrivStatusProxy: computed(
     'previousDirectPrivilegeValues',
     'privileges',
     'effectivePrivilegeValues',
@@ -185,7 +185,7 @@ export default Component.extend(I18n, {
     'isModified',
     'effPrivilegesAffectorInfos',
     'privilegesGroup.name',
-    function isUnknownEffPrivStatus() {
+    function isUnknownEffPrivStatusProxy() {
       return promiseObject((async () => {
         if (!this.arePrivilegesUpToDate &&
           this.isUnknownEffPrivStatusCache !== undefined

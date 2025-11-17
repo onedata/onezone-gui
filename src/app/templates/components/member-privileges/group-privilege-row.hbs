@@ -32,7 +32,15 @@
   <td class="toggle-column direct group na">{{tt this "na"}}</td>
 {{/if}}
 {{#if (not isBulkEdit)}}
-  <PromiseProxyContainer @proxy={{isUnknownEffPrivStatus}} @sizeClass="xxs">
+  {{#if this.isUnknownEffPrivStatusProxy.isPending}}
+    <td class="group-privileges-cell">
+      <LoadingContainer
+        @isLoading={{true}}
+        @sizeClass="xxs"
+        @spinnerBlockClass="effective-loading-container"
+      />
+    </td>
+  {{else}}
     <MemberPrivileges::GroupPrivilegesCell
       @privileges={{effectivePrivilegeValues}}
       @groupPrivilegeName={{privilegesGroup.text}}
@@ -45,5 +53,5 @@
       @isPrivilegesToggleDisabled={{isPrivilegesToggleDisabled}}
       @targetRecordType={{targetRecordType}}
     />
-  </PromiseProxyContainer>
+  {{/if}}
 {{/if}}

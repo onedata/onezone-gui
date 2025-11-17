@@ -26,6 +26,9 @@
     {{grantedText}}/{{privilegesCount}}
   </span>
   {{#if (not arePrivilegesUpToDate)}}
-    <SpinSpinnerBlock @sizeClass="xxs" />
+    <SpinSpinnerBlock
+      @sizeClass="xxs"
+      class="members-updating-privileges-spinner"
+    />
   {{/if}}
 {{/if}}

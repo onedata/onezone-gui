@@ -33,19 +33,24 @@
     onmouseover={{action "highlightMemberships"}}
     onmouseleave={{action "resetHighlights"}}
   >
-    <PromiseProxyContainer @proxy={{effPrivilegesRealAffectorRecords}} @sizeClass="xxs">
-      {{#if (eq effPrivilegeState 2)}}
-        <div class="priv-unknown">?</div>
-        <OneTooltip @title={{tt this "unknownPrivilege"}} />
-      {{else if effPrivilegeState}}
-        <OneIcon @icon="checked" />
-        <OneTooltip @title={{tooltipText}} />
-      {{else}}
-        <div class="priv-revoke">–</div>
+    <div class="effective-cell-container">
+      <PromiseProxyContainer @proxy={{effPrivilegesRealAffectorRecords}} @sizeClass="xxs">
+        {{#if (eq effPrivilegeState 2)}}
+          <div class="priv-unknown">?</div>
+          <OneTooltip @title={{tt this "unknownPrivilege"}} />
+        {{else if effPrivilegeState}}
+          <OneIcon @icon="checked" />
+          <OneTooltip @title={{tooltipText}} />
+        {{else}}
+          <div class="priv-revoke">–</div>
+        {{/if}}
+      </PromiseProxyContainer>
+      {{#if (not arePrivilegesUpToDate)}}
+        <SpinSpinnerBlock
+          @sizeClass="xxs"
+          class="members-updating-privileges-spinner"
+        />
       {{/if}}
-    </PromiseProxyContainer>
-    {{#if (not arePrivilegesUpToDate)}}
-      <SpinSpinnerBlock @sizeClass="xxs" />
-    {{/if}}
+    </div>
   </td>
 {{/if}}
