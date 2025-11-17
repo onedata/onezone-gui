@@ -286,8 +286,15 @@ export default Component.extend(DisabledPaths, I18n, {
     'effPrivilegesRealAffectorRecords',
     'directPrivilegeValue',
     function tooltipText() {
-      const groupsText = (this.effPrivilegesRealAffectorRecords.content ?? [])
-        .map((g) => g.name).join(', ');
+      const displayedGroupsLimit = 10;
+      /** @type {Array} */
+      const allGroups = this.effPrivilegesRealAffectorRecords.content ?? [];
+      const displayedGroups = allGroups.slice(0, displayedGroupsLimit);
+      const moreCount = Math.max(allGroups.length - displayedGroupsLimit, 0);
+      let groupsText = displayedGroups.map((g) => g.name).join(', ');
+      if (moreCount) {
+        groupsText = `${groupsText} ${String(this.t('andMore', { count: moreCount }))}`;
+      }
       if (this.directPrivilegeValue && groupsText === '') {
         return this.tt('onlyDirectTooltip');
       }
