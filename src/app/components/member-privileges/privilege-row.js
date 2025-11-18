@@ -17,6 +17,7 @@ import { promise } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
+import { camelize } from '@ember/string';
 
 /**
  * @typedef {Object} PrivilegeInfo
@@ -282,7 +283,7 @@ export default Component.extend(DisabledPaths, I18n, {
    */
   resourceTypeTranslation: computed('targetRecord.entityType',
     function resourceTypeTranslation() {
-      return this.i18n.t(`common.modelNames.${this.targetRecord.entityType}`);
+      return this.i18n.t(`common.modelNames.${camelize(this.targetRecord.entityType)}`);
     }
   ),
 
