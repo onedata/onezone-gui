@@ -39,6 +39,9 @@
         @sizeClass="xxs"
         @spinnerBlockClass="effective-loading-container"
       />
+      {{#if this.effectiveLoadingTip}}
+        <OneTooltip @title={{this.effectiveLoadingTip}} />
+      {{/if}}
     </td>
   {{else}}
     <MemberPrivileges::GroupPrivilegesCell
@@ -52,6 +55,7 @@
       @isUnknownEffPrivStatus={{isUnknownEffPrivStatus.content}}
       @isPrivilegesToggleDisabled={{isPrivilegesToggleDisabled}}
       @targetRecordType={{targetRecordType}}
+      @effectiveLoadingTip={{this.effectiveLoadingTip}}
     />
   {{/if}}
 {{/if}}

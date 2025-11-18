@@ -52,5 +52,8 @@
         />
       {{/if}}
     </div>
+    {{#if (and this.effectiveLoadingTip this.effPrivilegesRealAffectorRecords.isPending)}}
+      <OneTooltip @title={{this.effectiveLoadingTip}} />
+    {{/if}}
   </td>
 {{/if}}

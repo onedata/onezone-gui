@@ -136,6 +136,12 @@ export default Component.extend(DisabledPaths, I18n, {
   targetRecord: undefined,
 
   /**
+   * @virtual
+   * @type {SafeString|string}
+   */
+  effectiveLoadingTip: '',
+
+  /**
    * @virtual optional
    * @type {Function}
    */

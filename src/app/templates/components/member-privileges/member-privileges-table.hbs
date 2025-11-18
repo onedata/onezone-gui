@@ -34,6 +34,7 @@
             @effPrivilegesAffectorInfos={{effPrivilegesAffectorInfos}}
             @isPrivilegesToggleDisabled={{isPrivilegesToggleDisabled}}
             @targetRecordType={{targetRecord.entityType}}
+            @effectiveLoadingTip={{this.effectiveLoadingTip}}
           />
           {{#if (get groupsOpenState groupPrivileges.name)}}
             {{#each groupPrivileges.subtree as |privilege|}}
@@ -69,6 +70,7 @@
                 @targetRecord={{targetRecord}}
                 @effPrivilegesAffectorInfos={{effPrivilegesAffectorInfos}}
                 @isPrivilegesToggleDisabled={{isPrivilegesToggleDisabled}}
+                @effectiveLoadingTip={{this.effectiveLoadingTip}}
               />
             {{/each}}
           {{/if}}

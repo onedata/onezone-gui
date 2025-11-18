@@ -93,6 +93,12 @@ export default Component.extend(I18n, {
   targetRecordType: '',
 
   /**
+   * @virtual
+   * @type {SafeString|string}
+   */
+  effectiveLoadingTip: '',
+
+  /**
    * @virtual optional
    * @type {boolean}
    */

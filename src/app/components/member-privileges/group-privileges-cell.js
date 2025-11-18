@@ -83,6 +83,12 @@ export default Component.extend(I18n, {
    */
   inputChanged: () => {},
 
+  /**
+   * @virtual
+   * @type {SafeString|string}
+   */
+  effectiveLoadingTip: '',
+
   insufficientPrivilegesTip: computed(
     'targetRecordType',
     function insufficientPrivilegesTip() {
