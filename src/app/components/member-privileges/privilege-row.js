@@ -3,8 +3,9 @@
  * This includes such cell like: name privileges, toggle to change direct privilege and
  * status for effective privileges.
  *
- * @author Agnieszka Warchoł
+ * @author Agnieszka Warchoł, Jakub Liput
  * @copyright (C) 2023 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 

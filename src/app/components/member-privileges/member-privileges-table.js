@@ -346,11 +346,17 @@ export default Component.extend(I18n, {
         return;
       }
       const progressTracker = this.effPrivilegesAffectorsLoader.progressTracker;
-      return this.t('effectiveLoadingTip', {
-        count: progressTracker.totalCount,
-        // Do not show progress if it is reloading, because reload bases on pushes.
-        progress: this.firstLoadDone ? '' : progressTracker.progressText,
-      });
+      if (!progressTracker.totalCount) {
+        this.t('effectiveLoadingTip.zero');
+      } else {
+        const translationKey =
+          `effectiveLoadingTip.${progressTracker.totalCount === 1 ? 'singular' : 'plural'}`;
+        return this.t(translationKey, {
+          count: progressTracker.totalCount,
+          // Do not show progress if it is reloading, because reload bases on pushes.
+          progress: this.firstLoadDone ? '' : progressTracker.progressText,
+        });
+      }
     }
   ),
 

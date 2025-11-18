@@ -2,8 +2,9 @@
  * Show cell with group privileges status for effective privileges or toggle to edit for
  * direct privileges group.
  *
- * @author Agnieszka Warchoł
+ * @author Agnieszka Warchoł, Jakub Liput
  * @copyright (C) 2023 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 

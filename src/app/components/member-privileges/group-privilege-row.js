@@ -1,8 +1,9 @@
 /**
  * Show row with group privileges for direct member.
  *
- * @author Agnieszka Warchoł
+ * @author Agnieszka Warchoł, Jakub Liput
  * @copyright (C) 2023 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
