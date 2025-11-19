@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, find, findAll } from '@ember/test-helpers';
+import { render, find, findAll, settled } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import EmberObject, { get, setProperties } from '@ember/object';
 import { registerService, lookupService } from '../../helpers/stub-service';
@@ -102,6 +102,7 @@ describe('Integration | Component | membership-visualiser', function () {
       @contextRecord={{user}}
       @targetRecord={{groups.[0]}}
     />`);
+    await settled();
 
     expect(findAll('.membership')).to.have.length(4);
   });
@@ -112,6 +113,7 @@ describe('Integration | Component | membership-visualiser', function () {
       @contextRecord={{user}}
       @targetRecord={{groups.[0]}}
     />`);
+    await settled();
 
     expect(findAll('.membership')).to.have.length(3);
     expect(find('.limit-info')).to.exist;
@@ -122,6 +124,7 @@ describe('Integration | Component | membership-visualiser', function () {
       @contextRecord={{user}}
       @targetRecord={{groups.[0]}}
     />`);
+    await settled();
 
     let prevBlocksNumber = 2;
     findAll('.membership').forEach((membership) => {
@@ -137,6 +140,7 @@ describe('Integration | Component | membership-visualiser', function () {
       @visibleBlocks={{2}}
       @targetRecord={{groups.[0]}}
     />`);
+    await settled();
 
     expect(findAll('.membership')).to.have.length(4);
   });

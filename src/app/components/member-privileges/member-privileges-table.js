@@ -110,11 +110,6 @@ export default Component.extend(I18n, {
   isPrivilegesToggleDisabled: false,
 
   /**
-   * @type {Membership}
-   */
-  membership: undefined,
-
-  /**
    * True if first load of effPrivilegesAffectorInfos after init has been settled.
    * @type {boolean}
    */
@@ -303,12 +298,17 @@ export default Component.extend(I18n, {
     'directGroupMembers',
     'membership.intermediaries',
     function effPrivilegesAffectorsLoader() {
+      if (!this.membership) {
+        return null;
+      }
       const affectorsInfos = [];
       for (const groupId of this.membership.intermediaries) {
         const affectorInfo = this.directGroupMembers.find(
           member => groupId === member.id
         );
-        affectorsInfos.push(affectorInfo);
+        if (affectorInfo) {
+          affectorsInfos.push(affectorInfo);
+        }
       }
       return new BatchRecordsLoader({
         batchRequestRegistry: this.batchRequestRegistry,
@@ -332,9 +332,13 @@ export default Component.extend(I18n, {
    */
   effPrivilegesAffectorInfos: computed(
     'directGroupMembers',
+    'membershipProxy',
     'membership.intermediaries',
     function effPrivilegesAffectorInfos() {
-      return promiseObject(this.effPrivilegesAffectorsLoader.getPromise());
+      return promiseObject(
+        this.membershipProxy
+        .then(() => this.effPrivilegesAffectorsLoader.getPromise())
+      );
     }
   ),
 
@@ -369,6 +373,19 @@ export default Component.extend(I18n, {
     }
   ),
 
+  membershipProxy: computed('contextRecord', 'targetRecord', function membershipProxy() {
+    const promise = this.recordManager.getMembership(
+      this.contextRecord,
+      this.targetRecord, {
+        reload: true,
+      }
+    );
+    return promiseObject(promise);
+  }),
+
+  /** @type {ComputedProperty<Membership>} */
+  membership: reads('membershipProxy.content'),
+
   directPrivilegesObserver: observer(
     'directPrivileges',
     function directPrivilegesObserver() {
@@ -383,7 +400,6 @@ export default Component.extend(I18n, {
 
     scheduleOnce('afterRender', this, 'recordEffectiveProxyObserver');
     scheduleOnce('afterRender', this, 'recordDirectProxyObserver');
-    const membershipFetching = this.fetchMembership();
 
     const isOpened = {};
     for (const entry of this.privilegesGroups) {
@@ -392,22 +408,10 @@ export default Component.extend(I18n, {
     this.set('groupsOpenState', isOpened);
 
     (async () => {
-      await membershipFetching;
+      await this.membershipProxy;
       await this.effPrivilegesAffectorInfos;
       this.set('firstLoadDone', true);
     })();
-  },
-
-  async fetchMembership() {
-    const membership = await this.recordManager.getMembership(
-      this.contextRecord,
-      this.targetRecord, {
-        reload: true,
-      }
-    );
-    safeExec(this, () => {
-      this.set('membership', membership);
-    });
   },
 
   actions: {
