@@ -14,7 +14,6 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import { promise } from 'ember-awesome-macros';
 import { all as allFulfilled } from 'rsvp';
-import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { inject as service } from '@ember/service';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
