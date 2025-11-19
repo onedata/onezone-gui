@@ -114,7 +114,15 @@ export default Component.extend({
       await waitForRender();
       if (isCustomFrontpageAvailable) {
         const iframe = this.getCustomFrontpageIframeElement();
-        iframe.addEventListener('load', () => this.onIframeLoad(iframe));
+        if (!iframe) {
+          console.error('OnezoneLogin: no iframe element available for custom frontpage');
+        } else {
+          if (iframe.contentDocument?.readyState === 'complete') {
+            this.onIframeLoad(iframe);
+          } else {
+            iframe.addEventListener('load', () => this.onIframeLoad(iframe));
+          }
+        }
       }
     })();
   },
@@ -123,6 +131,7 @@ export default Component.extend({
     this.injectFrontpageIntegrationScript(iframe);
   },
 
+  /** @returns {HTMLIFrameElement|null} */
   getCustomFrontpageIframeElement() {
     return this.element?.querySelector(`#${this.customFrontpageIframeId}`);
   },
