@@ -4,22 +4,20 @@
  *
  * @author Jakub Liput
  * @copyright (C) 2024 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Component from '@ember/component';
-import { computed } from '@ember/object';
+import { action, computed } from '@ember/object';
 import { bool, reads } from '@ember/object/computed';
 import globals from 'onedata-gui-common/utils/globals';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
-import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 import { inject as service } from '@ember/service';
 import OnezoneLoginViewModel from 'onezone-gui/utils/onezone-login-view-model';
 import { htmlSafe } from '@ember/template';
+import { classNameBindings, classNames } from '@ember-decorators/component';
 
-/**
- * Changes must be synchronized with custom-page-integration.js script.
- */
 const FrontpageState = Object.freeze({
   Init: 'Init',
   Buttons: 'Buttons',
@@ -30,111 +28,98 @@ const FrontpageState = Object.freeze({
   FormError: 'FormError',
 });
 
-export default Component.extend({
-  classNames: ['onezone-login'],
-  classNameBindings: ['isCustomFrontpageShown:frontpage-iframe-container'],
-
-  i18n: service(),
+@classNames('onezone-login')
+@classNameBindings('isCustomFrontpageShown:frontpage-iframe-container')
+export default class OnezoneLogin extends Component {
+  @service i18n;
 
   /**
    * @virtual
    * @type {AuthenticationErrorReason}
    */
-  authenticationErrorReason: undefined,
+  authenticationErrorReason = undefined;
 
   /**
    * @virtual
    * @type {AuthenticationErrorState}
    */
-  authenticationErrorState: undefined,
+  authenticationErrorState = undefined;
 
   //#region state
 
   /**
    * @type {Utils.OnezoneLoginViewModel}
    */
-  loginViewModel: undefined,
+  loginViewModel = undefined;
 
   //#endregion
 
-  isCustomFrontpageShown: bool('isCustomFrontpageAvailable'),
+  @bool('isCustomFrontpageAvailable') isCustomFrontpageShown;
 
-  isCustomFrontpageAvailableProxy: computed(
-    'frontpagePath',
-    function isCustomFrontpageAvailableProxy() {
-      return promiseObject((async () => {
-        /** @type {Response} */
-        let response;
-        try {
-          response = await globals.fetch(this.frontpagePath);
-        } catch {
-          return false;
-        }
-        return response.ok;
-      })());
-    }
-  ),
+  @computed('frontpagePath')
+  get isCustomFrontpageAvailableProxy() {
+    return promiseObject((async () => {
+      let response;
+      try {
+        response = await globals.fetch(this.frontpagePath);
+      } catch {
+        return false;
+      }
+      return response.ok;
+    })());
+  }
 
-  isCustomFrontpageAvailable: bool('isCustomFrontpageAvailableProxy.content'),
+  @bool('isCustomFrontpageAvailableProxy.content') isCustomFrontpageAvailable;
 
-  customFrontpageIframeId: computed('elementId', function customFrontpageIframeId() {
+  @computed('elementId')
+  get customFrontpageIframeId() {
     return `${this.elementId}-custom-frontpage-iframe`;
-  }),
+  }
 
-  availableAuthenticatorsProxy: reads('loginViewModel.availableAuthenticatorsProxy'),
+  @reads('loginViewModel.availableAuthenticatorsProxy') availableAuthenticatorsProxy;
+  @reads('loginViewModel.signInNotificationProxy') signInNotificationProxy;
 
-  signInNotificationProxy: reads('loginViewModel.signInNotificationProxy'),
-
-  /**
-   * @type {ComputerProperty<string>}
-   */
-  frontpagePath: computed('loginViewModel.testMode', function frontpagePath() {
+  @computed('loginViewModel.testMode')
+  get frontpagePath() {
     const frontpageDir = this.loginViewModel.testMode ? 'frontpage-test' : 'frontpage';
     return noCacheUrl(`custom/${frontpageDir}/index.html`);
-  }),
+  }
 
-  init() {
-    this._super(...arguments);
-    this.setProperties({
-      loginViewModel: OnezoneLoginViewModel.create({
-        ownerSource: this,
-        authenticationErrorReason: this.authenticationErrorReason,
-        authenticationErrorState: this.authenticationErrorState,
-      }),
+  constructor() {
+    super(...arguments);
+    this.loginViewModel = OnezoneLoginViewModel.create({
+      ownerSource: this,
+      authenticationErrorReason: this.authenticationErrorReason,
+      authenticationErrorState: this.authenticationErrorState,
     });
-  },
-
-  /**
-   * @override
-   */
-  didInsertElement() {
-    this._super(...arguments);
-    (async () => {
-      const isCustomFrontpageAvailable = await this.isCustomFrontpageAvailableProxy;
-      await waitForRender();
-      if (isCustomFrontpageAvailable) {
-        const iframe = this.getCustomFrontpageIframeElement();
-        if (!iframe) {
-          console.error('OnezoneLogin: no iframe element available for custom frontpage');
-        } else {
-          if (iframe.contentDocument?.readyState === 'complete') {
-            this.onIframeLoad(iframe);
-          } else {
-            iframe.addEventListener('load', () => this.onIframeLoad(iframe));
-          }
-        }
-      }
-    })();
-  },
+  }
 
   onIframeLoad(iframe) {
     this.injectFrontpageIntegrationScript(iframe);
-  },
+  }
+
+  /**
+   * @param {HTMLIFrameElement} iframe
+   */
+  @action
+  onIframeInserted(iframe) {
+    const { contentDocument } = iframe;
+    if (
+      // Sometimes the iframe gets loaded as soon as the element is inserted and the load
+      // event will not be triggered. Manually invoke the handling method then.
+      contentDocument.location?.href === iframe.src &&
+      contentDocument.readyState === 'complete'
+    ) {
+      this.onIframeLoad(iframe);
+    } else {
+      iframe.addEventListener('load', () => this.onIframeLoad(iframe));
+    }
+  }
 
   /** @returns {HTMLIFrameElement|null} */
   getCustomFrontpageIframeElement() {
     return this.element?.querySelector(`#${this.customFrontpageIframeId}`);
-  },
+  }
 
   async getCustomFrontpageModel() {
     const self = this;
@@ -217,7 +202,7 @@ export default Component.extend({
         signInTestMode: t('components.loginBox.loginFormContainer.signInTestMode'),
       },
     };
-  },
+  }
 
   async iframeAuthenticate(authenticatorName) {
     this.frontpageApi.setState(FrontpageState.ButtonAuthenticating, {
@@ -230,15 +215,15 @@ export default Component.extend({
       // using a modal, so we just go back to buttons view state.
       this.frontpageApi.setState(FrontpageState.Buttons);
     }
-  },
+  }
 
   iframeSetFormState() {
     this.frontpageApi.setState(FrontpageState.Form);
-  },
+  }
 
   iframeRegisterFrontpageApi(frontpageApi) {
     this.set('frontpageApi', frontpageApi);
-  },
+  }
 
   async iframeUsernameAuthenticate(username, password) {
     this.frontpageApi.setState(FrontpageState.FormAuthenticating);
@@ -256,7 +241,7 @@ export default Component.extend({
         });
       }
     }
-  },
+  }
 
   /**
    * @returns {{message: string, refId: string, isContactInfo: boolean}}
@@ -271,7 +256,7 @@ export default Component.extend({
     } else {
       return null;
     }
-  },
+  }
 
   async injectFrontpageIntegrationScript(iframe) {
     iframe.contentWindow.customFrontpageModel = await this.getCustomFrontpageModel();
@@ -289,8 +274,8 @@ export default Component.extend({
 
     iframeDocument.body.prepend(script);
     iframeDocument.head.prepend(style);
-  },
-});
+  }
+}
 
 function noCacheUrl(url) {
   const timestamp = new Date().getTime();
