@@ -7,10 +7,23 @@
     <img class="main-image" src={{imagePath}}>
   </figure>
   <div class="template-subtext">
-    <span class="subtext">Dodatkowy tekst fgsd dfsgdfsg dfgdgsg sdfggf</span>
-    <span>
-      <OneIcon @icon="browser-info" class="template-info-icon" />
-      <OneTooltip @title="details details details details details details details details details..." />
+    <span class="subtext">{{tt this "text"}}</span>&nbsp;<span class="info-icon">
+      <OneIcon
+        @icon="browser-info"
+        class="template-info-icon"
+        id={{tokenTemplateInfoTriggerId}}
+      />
+      <OneWebuiPopover
+        @popoverStyle="token-template-type-info"
+        @padding={{true}}
+        @triggerSelector={{concat "#" tokenTemplateInfoTriggerId}}
+        @placement={{if (media "isMobile") "bottom-right" "auto"}}
+        as |popover|
+      >
+        <p class="api-command-tip-intro">
+          {{tt this "tooltip"}}{{#if this.isLink1Present}}<a href={{tt this "link1"}} target="_blank">{{tt this "linkName1"}}</a>{{tt this "tooltip2"}}{{/if}}{{#if this.isLink2Present}}<a href={{tt this "link2"}} target="_blank">{{tt this "linkName2"}}</a>{{tt this "tooltip3"}}{{/if}}
+        </p>
+      </OneWebuiPopover>
     </span>
   </div>
   {{yield}}
