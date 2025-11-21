@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-13153 Fixed broken custom frontpage after logging out in the another web browser tab
 * VFS-12982 Fixed displaying parents/children lists after adding parent/children from groups hierarchy view or by live update
 * VFS-13118 Fixed tooltip display for effective privileges in the Members privileges table
 * VFS-13072 Fixed non-batched target groups/spaces/etc. fetching in tokens sidebar advanced filter
