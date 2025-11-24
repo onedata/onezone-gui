@@ -20,7 +20,7 @@ import { htmlSafe } from '@ember/string';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import $ from 'jquery';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
-import RelatedGroupsDataModel from 'onezone-gui/utils/groups-hierarchy-visualiser/related-groups-column-data-model';
+import RelatedGroupsColumnDataModel from 'onezone-gui/utils/groups-hierarchy-visualiser/related-groups-column-data-model';
 
 /** @import ProgressTracker from '../../../lib/onedata-gui-common/addon/utils/progress-tracker'; */
 
@@ -209,7 +209,7 @@ export default Component.extend(I18n, {
     'column.columnDataModel.listLoaderProxy.content.progressTracker.{totalCount,progressText}',
     function loadingLabel() {
       const columnDataModel = this.column.columnDataModel;
-      if (columnDataModel instanceof RelatedGroupsDataModel) {
+      if (columnDataModel instanceof RelatedGroupsColumnDataModel) {
         /** @type {ProgressTracker} */
         const progressTracker = columnDataModel.listLoaderProxy.content?.progressTracker;
         if (progressTracker) {

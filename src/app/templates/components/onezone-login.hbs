@@ -1,14 +1,15 @@
-<PromiseProxyContainer @proxy={{isCustomFrontpageAvailableProxy}}>
-  {{#if isCustomFrontpageShown}}
+<PromiseProxyContainer @proxy={{this.isCustomFrontpageAvailableProxy}}>
+  {{#if this.isCustomFrontpageShown}}
     <iframe
-      id={{customFrontpageIframeId}}
-      src={{frontpagePath}}
+      id={{this.customFrontpageIframeId}}
+      src={{this.frontpagePath}}
       frameborder="0"
       class="onezone-custom-frontpage-iframe"
+      {{did-insert this.onIframeInserted}}
     ></iframe>
   {{else}}
-    <LoginLayout @loginViewModel={{loginViewModel}}>
-      <LoginBox @loginViewModel={{loginViewModel}} />
+    <LoginLayout @loginViewModel={{this.loginViewModel}}>
+      <LoginBox @loginViewModel={{this.loginViewModel}} />
     </LoginLayout>
   {{/if}}
 </PromiseProxyContainer>
