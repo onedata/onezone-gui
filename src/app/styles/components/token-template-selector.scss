@@ -156,20 +156,12 @@
     }
   }
 
-  .info-icon .oneicon {
-    margin-left: -3px;
-  }
-
-  .info-icon {
-    white-space: nowrap;
-  }
-
   .tile-title {
     height: 2 * $font-size-base;
     flex-shrink: 0;
   }
 
-  .template-subtext {
+  .tile-text-info {
     font-size: 90%;
     text-align: left;
     position: absolute;
