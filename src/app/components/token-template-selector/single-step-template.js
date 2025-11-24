@@ -12,7 +12,6 @@ import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignor
 import I18n from 'onedata-gui-common/mixins/i18n';
 import { inject as service } from '@ember/service';
 import { tag } from 'ember-awesome-macros';
-import { computed } from '@ember/object';
 
 export default Component.extend(I18n, {
   tagName: '',
