@@ -40,13 +40,4 @@ export default class TileTextInfoComponent extends Component {
   get isLink2Present() {
     return typeof this.locale.t('link2') === 'object';
   }
-
-  @computed()
-  get tooltipText() {
-    const link1 = this.locale.t('link1') ? '<a href="' + this.t('link1') + '">' +
-      this.t('linkName1') + '</a>' : '';
-    const link2 = this.locale.t('link2') ? '<a href="' + this.t('link2') + '">' +
-      this.t('linkName2') + '</a>' : '';
-    return this.t('tooltip', { link1, link2 });
-  }
 }

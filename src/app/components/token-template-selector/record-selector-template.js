@@ -58,36 +58,6 @@ export default Component.extend(I18n, {
    */
   onSelected: notImplementedIgnore,
 
-  tokenTemplateInfoTriggerId: computed(
-    'templateName',
-    function tokenTemplateInfoTriggerId() {
-      return `token-template-info-${this.templateName}`;
-    }
-  ),
-
-  isLink1Present: computed(
-    function isLink1Present() {
-      return typeof this.t('link1') === 'object';
-    }
-  ),
-
-  isLink2Present: computed(
-    function isLink1Present() {
-      return typeof this.t('link2') === 'object';
-    }
-  ),
-
-  tooltipText: computed(
-    function tooltipText() {
-      console.log(typeof this.t('link1'));
-      const link1 = this.t('link1') ? '<a href="' + this.t('link1') + '">' +
-        this.t('linkName1') + '</a>' : '';
-      const link2 = this.t('link2') ? '<a href="' + this.t('link2') + '">' +
-        this.t('linkName2') + '</a>' : '';
-      return this.t('tooltip', { link1, link2 });
-    }
-  ),
-
   /**
    * @type {String}
    */

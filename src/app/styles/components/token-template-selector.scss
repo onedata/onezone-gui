@@ -40,10 +40,31 @@
 
     .tile-title {
       @include font-semibold();
+      height: 2 * $font-size-base;
+      flex-shrink: 0;
     }
 
     .main-image {
       max-width: 110px;
+      height: 5.5em;
+    }
+
+    .main-figure {
+      transform: translateY(-50%) translateY(calc(-1.5 * $font-size-base));
+    }
+
+    .tile-text-info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      font-size: 90%;
+      text-align: left;
+    }
+
+    .template-info-icon {
+      font-size: 150%;
+      vertical-align: middle;
+      color: #7b7b7b;
     }
   }
 
@@ -145,33 +166,5 @@
       line-height: 0;
       font-size: 1.7em;
     }
-  }
-
-  .one-tile {
-    .main-figure {
-      transform: translateY(-50%) translateY(calc(-1 * ($font-size-base + $font-size-base / 2)));
-    }
-    .main-image {
-      height: 5.5em;
-    }
-  }
-
-  .tile-title {
-    height: 2 * $font-size-base;
-    flex-shrink: 0;
-  }
-
-  .tile-text-info {
-    font-size: 90%;
-    text-align: left;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-  }
-
-  .template-info-icon {
-    font-size: 150%;
-    vertical-align: middle;
-    color: #7b7b7b;
   }
 }
