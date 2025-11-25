@@ -2,6 +2,12 @@
   position: relative;
   margin: $padding-base-vertical $padding-base-horizontal;
 
+  .member-privileges-table-main-spinner {
+    // Adjust non-absolutely positioned spinner to match visually Memberships table on the
+    // right and make some minimal height on loading.
+    height: 200px;
+  }
+
   .table-privileges {
     margin-bottom: 0;
     border: 1px solid $table-border-color;

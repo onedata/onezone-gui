@@ -677,21 +677,44 @@ export default Service.extend({
     targetRecordId,
     loadOptions
   ) {
+    const membershipGri = this.generateMembershipGri(
+      memberModelName,
+      memberRecordId,
+      targetModelName,
+      targetRecordId
+    );
+    return this.getRecord('membership', membershipGri, loadOptions);
+  },
+
+  /**
+   * Generates GRI for membership record of the member record (specified by
+   * `memberModelName` and `memberRecordId`) record in the target record (specified by
+   * `targetModelName` and `targetRecordId`).
+   * @public
+   * @param {string} memberModelName
+   * @param {string} memberRecordId
+   * @param {string} targetModelName
+   * @param {string} targetRecordId
+   * @returns {string}
+   */
+  generateMembershipGri(
+    memberModelName,
+    memberRecordId,
+    targetModelName,
+    targetRecordId
+  ) {
     let griMembershipType;
     if (memberModelName === 'group' && targetModelName === 'group') {
       griMembershipType = 'child';
     } else {
       griMembershipType = this.getEntityTypeForModelName(memberModelName);
     }
-
-    const membershipGri = gri({
+    return gri({
       entityType: this.getEntityTypeForModelName(targetModelName),
       entityId: targetRecordId,
       aspect: `eff_${griMembershipType}_membership`,
       aspectId: memberRecordId,
       scope: 'private',
     });
-
-    return this.getRecord('membership', membershipGri, loadOptions);
   },
 });

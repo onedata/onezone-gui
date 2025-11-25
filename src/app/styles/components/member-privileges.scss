@@ -1,3 +1,11 @@
+// Common style of spinner positioned on the right of effective privileges indicator.
+.members-updating-privileges-spinner {
+  position: absolute;
+  top: 50%;
+  right: 9px;
+  transform: translateY(-50%);
+}
+
 @import 'member-privileges/privilege-row';
 @import 'member-privileges/group-privileges-cell';
 @import 'member-privileges/member-privileges-table';

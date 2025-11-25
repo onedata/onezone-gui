@@ -7,6 +7,8 @@ export default {
   cluster: 'cluster',
   atmInventory: 'automation inventory',
   showingFirstNPaths: 'Limit reached — showing first {{limit}} results.',
+  loadingPaths: 'Loading membership paths...',
+  loadingAnalysing: '(analysing over {{count}} possibilities)',
   membershipBlock: {
     viewUser: 'View user',
     viewGroup: 'View group',

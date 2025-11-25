@@ -24,7 +24,11 @@
 {{#if silentReloadError}}
   <ResourceLoadError @errorReason={{silentReloadError}} />
 {{else}}
-  <PromiseProxyContainer @proxy={{pathsLoadingProxy}} @sizeClass="sm" />
+  <PromiseProxyContainer
+    @proxy={{this.pathsLoadingProxy}}
+    @sizeClass="sm"
+    @loadingLabel={{this.pathsLoadingLabel}}
+  />
 {{/if}}
 {{#unless isCondensed}}
   {{#if relationToRemove}}

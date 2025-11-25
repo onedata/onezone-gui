@@ -36,7 +36,6 @@ import { formatNumber } from 'onedata-gui-common/helpers/format-number';
 import { later, cancel } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import joinStrings from 'onedata-gui-common/utils/i18n/join-strings';
-import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import ArrayPaginator from 'onedata-gui-common/utils/array-paginator';
 import globals from 'onedata-gui-common/utils/globals';
 import BatchRecordsLoader from 'onezone-gui/utils/batch-records-loader';
@@ -428,9 +427,7 @@ export default Component.extend(I18n, {
         false,
         'user',
       );
-      return PromiseObject.create({
-        promise: this.store.findRecord('privilege', effectivePrivilegesGri),
-      });
+      return promiseObject(this.store.findRecord('privilege', effectivePrivilegesGri));
     }
   ),
 

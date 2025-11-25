@@ -41,6 +41,14 @@
 
     .membership-visualiser {
       min-height: 50px;
+      &.loading {
+        min-height: 120px;
+        margin-top: -10px;
+        margin-bottom: 40px;
+        .loading-container-label.loading-container-label-sm {
+          --loading-container-label-additional-space: 7em;
+        }
+      }
 
       .membership-block {
         padding-left: 1.45em;
