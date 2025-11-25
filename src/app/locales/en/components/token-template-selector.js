@@ -18,14 +18,16 @@ export default {
       title: 'Oneclient access',
       newTokenNamePrefix: 'Oneclient',
       text: 'Mount Onedata in Linux filesystems natively (FUSE)',
-      hint: 'Access token suitable for the Oneclient application, which mounts your Onedata spaces in a Linux filesystem. This way, the data can be accessed as if it resided in the local filesystem. Oneclient is based on the FUSE library and proves useful in many scenarios, including HPC, cloud, and local (personal computer) data processing.',
+      hintIntro: 'Access token suitable for the Oneclient application, which mounts your Onedata spaces in a Linux filesystem. This way, the data can be accessed as if it resided in the local filesystem.',
+      hint: 'Oneclient is based on the FUSE library and proves useful in many scenarios, including HPC, cloud, and local (personal computer) data processing.',
       learnMore: 'Learn more',
     },
     s3: {
       title: 'S3 access',
       newTokenNamePrefix: 'S3',
       text: 'Access spaces like buckets via S3-compatible API',
-      hint: 'Access token for any standard S3 client or S3-compatible application to interact with your data via Onedata\'s S3-compatible API (currently in Beta). The files are emulated as objects residing in buckets corresponding to spaces. Note that currently the token must be passed as both access_key_id and secret_key, which will be reworked in upcoming releases.',
+      hintIntro: 'Access token for any standard S3 client or S3-compatible application to interact with your data via Onedata\'s S3-compatible API (currently in Beta). The files are emulated as objects residing in buckets corresponding to spaces.',
+      hint: 'Note that currently the token must be passed as both <span class="monospace">access_key_id</span> and <span class="monospace">secret_key</span>, which will be reworked in upcoming releases.',
     },
     oneproviderRest: {
       title: 'Oneprovider REST/CDMI access',

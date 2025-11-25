@@ -11,14 +11,9 @@ import Locale from 'onedata-gui-common/utils/locale';
 import { computed } from '@ember/object';
 
 export default class OneclientTemplateHintComponent extends Component {
-  /**
-   * @override
-   */
-  constructor() {
-    super(...arguments);
-
-    /** @type {string} */
-    this.templateName = this.args.templateName;
+  /** @type {string} */
+  get templateName() {
+    return this.args.templateName;
   }
 
   @computed('templateName')

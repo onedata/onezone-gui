@@ -21,7 +21,7 @@ export default SingleStepTemplate.extend({
   /**
    * @override
    */
-  imagePath: 'assets/images/token-templates/oneclient.svg',
+  imagePath: 'assets/images/token-templates/s3.svg',
 
   /**
    * @override
