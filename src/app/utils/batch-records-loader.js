@@ -153,7 +153,7 @@ export default class BatchRecordsLoader {
   validateArgs(args) {
     if (!(args.batchRequestRegistry instanceof BatchRequestRegistryService)) {
       throw new Error(
-        'fetchBatchRecords: batchRequestRegistry must be an instance of ProgressTracker BatchRequestRegistry'
+        'fetchBatchRecords: batchRequestRegistry must be an instance of BatchRequestRegistry'
       );
     }
     if (

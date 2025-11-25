@@ -1,8 +1,9 @@
 /**
  * Table for member with privileges and memberships.
  *
- * @author Agnieszka Warchoł
+ * @author Agnieszka Warchoł, Jakub Liput
  * @copyright (C) 2023 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -12,15 +13,18 @@ import { scheduleOnce } from '@ember/runloop';
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import { promise } from 'ember-awesome-macros';
-import { Promise } from 'rsvp';
-import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import { all as allFulfilled } from 'rsvp';
 import { inject as service } from '@ember/service';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
+import _ from 'lodash';
+import BatchRecordsLoader from 'onezone-gui/utils/batch-records-loader';
 
 export default Component.extend(I18n, {
   classNames: ['member-privileges-table'],
 
   recordManager: service(),
+  batchRequestRegistry: service(),
 
   /**
    * @override
@@ -105,14 +109,10 @@ export default Component.extend(I18n, {
   isPrivilegesToggleDisabled: false,
 
   /**
+   * True if first load of effPrivilegesAffectorInfos after init has been settled.
    * @type {boolean}
    */
-  arePrivilegesUpToDate: true,
-
-  /**
-   * @type {Membership}
-   */
-  membership: undefined,
+  firstLoadDone: false,
 
   /**
    * Object with name of group privileges with information about
@@ -189,7 +189,7 @@ export default Component.extend(I18n, {
     'recordEffectiveProxy.models',
     async function privilegesLoadingProxy() {
       if (this.get('recordDirectProxy')) {
-        return Promise.all([
+        return allFulfilled([
           this.get('recordDirectProxy.models'),
           this.get('recordEffectiveProxy.models'),
         ]);
@@ -291,37 +291,99 @@ export default Component.extend(I18n, {
   ),
 
   /**
-   * @type {ComputedProperty<PromiseObject>}
+   * @type {ComputedProperty<BatchRecordsLoader>}
    */
-  effPrivilegesAffectorInfos: promise.object(computed(
+  effPrivilegesAffectorsLoader: computed(
     'directGroupMembers',
     'membership.intermediaries',
-    async function effPrivilegesAffectorInfos() {
-      return Promise.all(this.membership.intermediaries.map(groupId => {
+    function effPrivilegesAffectorsLoader() {
+      if (!this.membership) {
+        return null;
+      }
+      const affectorsInfos = [];
+      for (const groupId of this.membership.intermediaries) {
         const affectorInfo = this.directGroupMembers.find(
           member => groupId === member.id
         );
-        if (!affectorInfo.effectivePrivilegesProxy.isLoaded) {
-          return affectorInfo.effectivePrivilegesProxy.reloadRecords().then(
-            () => affectorInfo
-          );
-        } else {
-          return affectorInfo;
+        if (affectorInfo) {
+          affectorsInfos.push(affectorInfo);
         }
-      }));
+      }
+      return new BatchRecordsLoader({
+        batchRequestRegistry: this.batchRequestRegistry,
+        itemsGris: _.flatten(
+          affectorsInfos.map(it => it.effectivePrivilegesProxy.griArray)
+        ),
+        listResolver: async () => {
+          return await allFulfilled(affectorsInfos.map(async (affectorInfo) => {
+            if (!affectorInfo.effectivePrivilegesProxy.isLoaded) {
+              await affectorInfo.effectivePrivilegesProxy.reloadRecords();
+            }
+            return affectorInfo;
+          }));
+        },
+      });
     }
-  )),
+  ),
 
-  arePrivilegesUpToDateSetter: observer(
-    'areEffPrivilegesRecalculated',
-    'arePrivilegesJustSaved',
-    function arePrivilegesUpToDateSetter() {
-      this.set(
-        'arePrivilegesUpToDate',
-        !this.arePrivilegesJustSaved && this.areEffPrivilegesRecalculated
+  /**
+   * @type {ComputedProperty<PromiseObject>}
+   */
+  effPrivilegesAffectorInfos: computed(
+    'directGroupMembers',
+    'membershipProxy',
+    'membership.intermediaries',
+    function effPrivilegesAffectorInfos() {
+      return promiseObject(
+        this.membershipProxy
+        .then(() => this.effPrivilegesAffectorsLoader.getPromise())
       );
     }
   ),
+
+  effectiveLoadingTip: computed(
+    'effPrivilegesAffectorsLoader.progressTracker.{totalCount,progressText}',
+    'firstLoadDone',
+    function effectiveLoadingTip() {
+      if (!this.effPrivilegesAffectorsLoader) {
+        return;
+      }
+      const progressTracker = this.effPrivilegesAffectorsLoader.progressTracker;
+      if (!progressTracker.totalCount) {
+        this.t('effectiveLoadingTip.zero');
+      } else {
+        const translationKey =
+          `effectiveLoadingTip.${progressTracker.totalCount === 1 ? 'singular' : 'plural'}`;
+        return this.t(translationKey, {
+          count: progressTracker.totalCount,
+          // Do not show progress if it is reloading, because reload bases on pushes.
+          progress: this.firstLoadDone ? '' : progressTracker.progressText,
+        });
+      }
+    }
+  ),
+
+  /** @type {ComputedProperty<boolean>} */
+  arePrivilegesUpToDate: computed(
+    'areEffPrivilegesRecalculated',
+    'arePrivilegesJustSaved',
+    function arePrivilegesUpToDate() {
+      return !this.arePrivilegesJustSaved && this.areEffPrivilegesRecalculated;
+    }
+  ),
+
+  membershipProxy: computed('contextRecord', 'targetRecord', function membershipProxy() {
+    const promise = this.recordManager.getMembership(
+      this.contextRecord,
+      this.targetRecord, {
+        reload: true,
+      }
+    );
+    return promiseObject(promise);
+  }),
+
+  /** @type {ComputedProperty<Membership>} */
+  membership: reads('membershipProxy.content'),
 
   directPrivilegesObserver: observer(
     'directPrivileges',
@@ -337,25 +399,18 @@ export default Component.extend(I18n, {
 
     scheduleOnce('afterRender', this, 'recordEffectiveProxyObserver');
     scheduleOnce('afterRender', this, 'recordDirectProxyObserver');
-    this.fetchMembership();
 
     const isOpened = {};
     for (const entry of this.privilegesGroups) {
       isOpened[entry.groupName] = false;
     }
     this.set('groupsOpenState', isOpened);
-  },
 
-  async fetchMembership() {
-    const membership = await this.recordManager.getMembership(
-      this.contextRecord,
-      this.targetRecord, {
-        reload: true,
-      }
-    );
-    safeExec(this, () => {
-      this.set('membership', membership);
-    });
+    (async () => {
+      await this.membershipProxy;
+      await this.effPrivilegesAffectorInfos;
+      this.set('firstLoadDone', true);
+    })();
   },
 
   actions: {

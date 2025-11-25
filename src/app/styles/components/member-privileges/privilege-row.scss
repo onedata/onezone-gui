@@ -25,23 +25,20 @@ tr.privilege-row {
   }
 
   .effective {
-    display: flex;
-    justify-content: center;
-    padding: $padding-xs-horizontal;
-    position: relative;
+    padding: 0;
+    .effective-cell-container {
+      display: flex;
+      justify-content: center;
+      padding: $padding-xs-horizontal;
+      position: relative;
+      &.revoke {
+        padding-top: $padding-small-vertical;
+        padding-bottom: $padding-small-vertical;
+      }
+    }
 
     span {
       display: block;
-    }
-
-    &.revoke {
-      padding-top: $padding-small-vertical;
-      padding-bottom: $padding-small-vertical;
-    }
-    .spin-spinner-block {
-      position: absolute;
-      top: 14px;
-      right: 9px;
     }
   }
   .oneicon-checked {

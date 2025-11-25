@@ -13,6 +13,7 @@ import computedT from 'onedata-gui-common/utils/computed-t';
 import Action from 'onedata-gui-common/utils/action';
 import ActionResult from 'onedata-gui-common/utils/action-result';
 import { computed } from '@ember/object';
+import { camelize } from '@ember/string';
 
 export default Action.extend({
   modalManager: service(),
@@ -55,7 +56,7 @@ export default Action.extend({
     function messageText() {
       return this.t('modalDescription', {
         relation: this.t(this.relation),
-        recordType: this.t(this.relatedRecord.entityType),
+        recordType: this.t(camelize(this.relatedRecord.entityType)),
         recordName: this.relatedRecord.name,
       });
     }

@@ -3,8 +3,9 @@
  * This includes such cell like: name privileges, toggle to change direct privilege and
  * status for effective privileges.
  *
- * @author Agnieszka Warchoł
+ * @author Agnieszka Warchoł, Jakub Liput
  * @copyright (C) 2023 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -16,6 +17,7 @@ import { promise } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
+import { camelize } from '@ember/string';
 
 /**
  * @typedef {Object} PrivilegeInfo
@@ -134,6 +136,12 @@ export default Component.extend(DisabledPaths, I18n, {
    * @type {Group|Space|Cluster|Provider}
    */
   targetRecord: undefined,
+
+  /**
+   * @virtual
+   * @type {SafeString|string}
+   */
+  effectiveLoadingTip: '',
 
   /**
    * @virtual optional
@@ -275,7 +283,7 @@ export default Component.extend(DisabledPaths, I18n, {
    */
   resourceTypeTranslation: computed('targetRecord.entityType',
     function resourceTypeTranslation() {
-      return this.i18n.t(`common.modelNames.${this.targetRecord.entityType}`);
+      return this.i18n.t(`common.modelNames.${camelize(this.targetRecord.entityType)}`);
     }
   ),
 
@@ -286,8 +294,15 @@ export default Component.extend(DisabledPaths, I18n, {
     'effPrivilegesRealAffectorRecords',
     'directPrivilegeValue',
     function tooltipText() {
-      const groupsText = (this.effPrivilegesRealAffectorRecords.content ?? [])
-        .map((g) => g.name).join(', ');
+      const displayedGroupsLimit = 10;
+      /** @type {Array} */
+      const allGroups = this.effPrivilegesRealAffectorRecords.content ?? [];
+      const displayedGroups = allGroups.slice(0, displayedGroupsLimit);
+      const moreCount = Math.max(allGroups.length - displayedGroupsLimit, 0);
+      let groupsText = displayedGroups.map((g) => g.name).join(', ');
+      if (moreCount) {
+        groupsText = `${groupsText} ${String(this.t('andMore', { count: moreCount }))}`;
+      }
       if (this.directPrivilegeValue && groupsText === '') {
         return this.tt('onlyDirectTooltip');
       }

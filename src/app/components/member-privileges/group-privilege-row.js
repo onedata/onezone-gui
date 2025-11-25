@@ -1,8 +1,9 @@
 /**
  * Show row with group privileges for direct member.
  *
- * @author Agnieszka Warchoł
+ * @author Agnieszka Warchoł, Jakub Liput
  * @copyright (C) 2023 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -93,6 +94,12 @@ export default Component.extend(I18n, {
   targetRecordType: '',
 
   /**
+   * @virtual
+   * @type {SafeString|string}
+   */
+  effectiveLoadingTip: '',
+
+  /**
    * @virtual optional
    * @type {boolean}
    */
@@ -177,7 +184,7 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<PromiseObject<boolean>>}
    */
-  isUnknownEffPrivStatus: computed(
+  isUnknownEffPrivStatusProxy: computed(
     'previousDirectPrivilegeValues',
     'privileges',
     'effectivePrivilegeValues',
@@ -185,7 +192,7 @@ export default Component.extend(I18n, {
     'isModified',
     'effPrivilegesAffectorInfos',
     'privilegesGroup.name',
-    function isUnknownEffPrivStatus() {
+    function isUnknownEffPrivStatusProxy() {
       return promiseObject((async () => {
         if (!this.arePrivilegesUpToDate &&
           this.isUnknownEffPrivStatusCache !== undefined
