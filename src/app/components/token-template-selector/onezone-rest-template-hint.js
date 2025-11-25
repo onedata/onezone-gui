@@ -1,5 +1,5 @@
 /**
- * Component displaying textual information about token template
+ * Hint for onezone REST token template.
  *
  * @author Agnieszka Raczek
  * @copyright(C) 2025 Onedata (onedata.org)
@@ -10,7 +10,7 @@ import Component from '@glimmer/component';
 import Locale from 'onedata-gui-common/utils/locale';
 import { computed } from '@ember/object';
 
-export default class TileTextInfoComponent extends Component {
+export default class OnezoneRestTemplateHintComponent extends Component {
   /**
    * @override
    */
@@ -24,20 +24,5 @@ export default class TileTextInfoComponent extends Component {
   @computed('templateName')
   get locale() {
     return new Locale(`components.tokenTemplateSelector.templates.${this.templateName}`);
-  }
-
-  /** @type {string} */
-  @computed('templateName')
-  get tokenTemplateInfoTriggerId() {
-    return `token-template-info-${this.templateName}`;
-  }
-
-  /** @type {string} */
-  @computed('templateName')
-  get hintComponentPath() {
-    const formattedTemplateName = this.templateName
-      .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-      .toLowerCase();
-    return `token-template-selector/${formattedTemplateName}-template-hint`;
   }
 }
