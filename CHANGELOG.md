@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-13177 Fixed crashing bulk privileges editor
 * VFS-13104 Added batch loading and progress info to membership and privileges table on members view
 * VFS-13153 Fixed broken custom frontpage after logging out in the another web browser tab
 * VFS-12982 Fixed displaying parents/children lists after adding parent/children from groups hierarchy view or by live update
