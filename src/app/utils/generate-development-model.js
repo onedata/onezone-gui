@@ -640,6 +640,7 @@ function createGroupsRecords(store) {
   return allFulfilled(_.range(NUMBER_OF_GROUPS).map((index) => {
     const name = `group${index}`;
     return store.createRecord('group', {
+      id: GriGenerator.nextInstanceGri('group'),
       name,
       index: name,
       scope: 'private',
@@ -697,6 +698,7 @@ function createHarvesterRecords(store) {
   return allFulfilled(_.range(NUMBER_OF_HARVESTERS).map((index) => {
     const name = `Harvester ${index}`;
     return store.createRecord('harvester', {
+      id: GriGenerator.nextInstanceGri('harvester'),
       name,
       index: name,
       scope: 'private',
@@ -767,6 +769,7 @@ function createAtmInventoryRecords(store) {
   return allFulfilled(_.range(NUMBER_OF_ATM_INVENTORIES).map((index) => {
     const name = `Inventory ${index}`;
     return store.createRecord('atmInventory', {
+      id: GriGenerator.nextInstanceGri('atm_inventory'),
       name,
       index: name,
       scope: 'private',
@@ -1324,4 +1327,18 @@ async function generateMarketplaceMock(store, listRecords) {
 
 function getShareIndex(share) {
   return `${share.hasHandle ? '1' : '0'}\u0000${share.name.toLowerCase()}\u0000${share.name}`;
+}
+
+class GriGenerator {
+  static entityIdNumber = 0;
+
+  static nextInstanceGri(entityType, scope = 'auto') {
+    GriGenerator.entityIdNumber += 1;
+    return gri({
+      entityType,
+      entityId: String(GriGenerator.entityIdNumber),
+      aspect: 'instance',
+      scope,
+    });
+  }
 }
