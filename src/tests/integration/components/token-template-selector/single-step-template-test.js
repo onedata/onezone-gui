@@ -15,7 +15,7 @@ describe(
     beforeEach(function () {
       const tStub = sinon.stub(lookupService(this, 'i18n'), 't');
       tStub.callsFake(function (...args) {
-        if (args[0] === 'components.tokenTemplateSelector.templates.custom.title') {
+        if (args[0] === 'components.tokenTemplateSelector.templates.identity.title') {
           return htmlSafe('Custom');
         } else {
           return tStub.wrappedMethod.apply(this, args);
@@ -25,16 +25,16 @@ describe(
 
     it('renders template-tile dedicated for specified template', async function () {
       await render(hbs `<TokenTemplateSelector::SingleStepTemplate
-        @templateName="custom"
+        @templateName="identity"
       />`);
 
-      expect(find('.template-custom')).to.exist;
+      expect(find('.template-identity')).to.exist;
       expect(find('.tile-title')).to.have.trimmed.text('Custom');
     });
 
     it('renders template image', async function () {
       await render(hbs `<TokenTemplateSelector::SingleStepTemplate
-        @templateName="custom"
+        @templateName="identity"
         @imagePath="some-path.svg"
       />`);
 
@@ -45,7 +45,7 @@ describe(
       const selectedSpy = this.set('selectedSpy', sinon.spy());
 
       await render(hbs `<TokenTemplateSelector::SingleStepTemplate
-        @templateName="custom"
+        @templateName="identity"
         @onSelected={{selectedSpy}}
       />`);
 

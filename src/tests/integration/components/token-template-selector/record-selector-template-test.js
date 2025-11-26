@@ -20,9 +20,10 @@ describe(
       const tStub = sinon.stub(lookupService(this, 'i18n'), 't');
       tStub.callsFake(function (...args) {
         switch (args[0]) {
-          case 'components.tokenTemplateSelector.templates.custom.title':
+          case 'components.tokenTemplateSelector.templates.identity.title':
             return htmlSafe('Custom');
-          case 'components.tokenTemplateSelector.templates.custom.noRecordsInfo':
+          case 'components.tokenTemplateSelector.templates.identity.noRecordsInfo':
+          case 'components.tokenTemplateSelector.templates.oneclientInOneprovider.noRecordsInfo':
             return htmlSafe('No records');
           default:
             return tStub.wrappedMethod.apply(this, args);
@@ -32,16 +33,16 @@ describe(
 
     it('renders template-tile dedicated for specified template', async function () {
       await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
-        @templateName="custom"
+        @templateName="identity"
       />`);
 
-      expect(find('.template-custom')).to.exist;
+      expect(find('.template-identity')).to.exist;
       expect(find('.tile-title')).to.have.trimmed.text('Custom');
     });
 
     it('renders first slide with template image, which is active on init', async function () {
       await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
-        @templateName="custom"
+        @templateName="oneclientInOneprovider"
         @imagePath="some-path.svg"
       />`);
 
@@ -51,14 +52,18 @@ describe(
     });
 
     it('shows selector slide on click', async function () {
-      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate />`);
+      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
+        @templateName="oneclientInOneprovider"
+      />`);
       await click('.one-tile');
 
       expect(isSlideActive('selector')).to.be.true;
     });
 
     it('does not change slide on click when selector slide is active', async function () {
-      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate />`);
+      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
+        @templateName="oneclientInOneprovider"
+      />`);
       await click('.one-tile');
       await click('.one-tile');
 
@@ -66,7 +71,9 @@ describe(
     });
 
     it('allows to come back to the intro slide using "Back" link', async function () {
-      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate />`);
+      await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
+        @templateName="oneclientInOneprovider"
+      />`);
       await click('.one-tile');
 
       const link = getSlide('selector').querySelector('.template-back');
@@ -80,6 +87,7 @@ describe(
       const fetchRecordsSpy = this.set('fetchRecordsSpy', sinon.spy());
 
       await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
+        @templateName="oneclientInOneprovider"
         @fetchRecords={{fetchRecordsSpy}}
       />`);
 
@@ -95,6 +103,7 @@ describe(
 
       await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
         @fetchRecords={{fetchRecordsSpy}}
+        @templateName="oneclientInOneprovider"
       />`);
       await click('.one-tile');
 
@@ -112,6 +121,7 @@ describe(
 
         await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
           @fetchRecords={{fetchRecordsSpy}}
+          @templateName="oneclientInOneprovider"
         />`);
         await click('.one-tile');
         await click('.template-back');
@@ -131,6 +141,7 @@ describe(
 
         await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
           @fetchRecords={{fetchRecordsSpy}}
+          @templateName="oneclientInOneprovider"
         />`);
         await click('.one-tile');
         await click('.template-back');
@@ -155,6 +166,7 @@ describe(
 
       await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
         @fetchRecords={{fetchRecords}}
+        @templateName="oneclientInOneprovider"
       />`);
       await click('.one-tile');
 
@@ -172,7 +184,7 @@ describe(
       this.set('fetchRecords', () => resolve([]));
 
       await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
-        @templateName="custom"
+        @templateName="oneclientInOneprovider"
         @fetchRecords={{fetchRecords}}
       />`);
       await click('.one-tile');
@@ -191,7 +203,7 @@ describe(
       });
 
       await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
-        @templateName="custom"
+        @templateName="oneclientInOneprovider"
         @fetchRecords={{fetchRecords}}
         @onSelected={{selectedSpy}}
       />`);
@@ -199,7 +211,7 @@ describe(
       await click('.record-item');
 
       expect(selectedSpy).to.be.calledOnce
-        .and.to.be.calledWith('custom', sinon.match({ record }));
+        .and.to.be.calledWith('oneclientInOneprovider', sinon.match({ record }));
     });
 
     it('comes back to intro slide after record selection', async function () {
@@ -207,6 +219,7 @@ describe(
 
       await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
         @fetchRecords={{fetchRecords}}
+        @templateName="oneclientInOneprovider"
       />`);
       await click('.one-tile');
       await click('.record-item');
@@ -223,6 +236,7 @@ describe(
 
       await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
         @fetchRecords={{fetchRecords}}
+        @templateName="oneclientInOneprovider"
       />`);
       await click('.one-tile');
       const selectorSlide = getSlide('selector');
@@ -249,6 +263,7 @@ describe(
       await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
         @filterMatcher={{filterMatcher}}
         @fetchRecords={{fetchRecords}}
+        @templateName="oneclientInOneprovider"
       />`);
       await click('.one-tile');
       const selectorSlide = getSlide('selector');
@@ -268,6 +283,7 @@ describe(
 
       await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
         @fetchRecords={{fetchRecords}}
+        @templateName="oneclientInOneprovider"
       />`);
       await click('.one-tile');
       const selectorSlide = getSlide('selector');
@@ -296,6 +312,7 @@ describe(
         @filterDependentKeys={{array "otherName"}}
         @filterMatcher={{filterMatcher}}
         @fetchRecords={{fetchRecords}}
+        @templateName="oneclientInOneprovider"
       />`);
       await click('.one-tile');
       const selectorSlide = getSlide('selector');
@@ -318,6 +335,7 @@ describe(
 
       await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
         @fetchRecords={{fetchRecordsSpy}}
+        @templateName="oneclientInOneprovider"
       />`);
       await click('.one-tile');
       rejectPromise('recordserror');
@@ -341,6 +359,7 @@ describe(
 
         await render(hbs `<TokenTemplateSelector::RecordSelectorTemplate
           @fetchRecords={{fetchRecordsSpy}}
+          @templateName="oneclientInOneprovider"
         />`);
         await click('.one-tile');
         rejectPromise('recordserror');
