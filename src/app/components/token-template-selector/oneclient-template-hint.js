@@ -2,22 +2,18 @@
  * Hint for oneclient token template.
  *
  * @author Agnieszka Raczek
- * @copyright(C) 2025 Onedata (onedata.org)
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Component from '@glimmer/component';
-import Locale from 'onedata-gui-common/utils/locale';
-import { computed } from '@ember/object';
+import TemplateHint from './template-hint';
+import { inject as service } from '@ember/service';
 
-export default class OneclientTemplateHintComponent extends Component {
+export default class OneclientTemplateHintComponent extends TemplateHint {
+  @service homepageUrl;
+
   /** @type {string} */
-  get templateName() {
-    return this.args.templateName;
-  }
-
-  @computed('templateName')
-  get locale() {
-    return new Locale(`components.tokenTemplateSelector.templates.${this.templateName}`);
+  get oneclientLink() {
+    return this.homepageUrl.generateDocumentationUrl({ topic: 'oneclient' });
   }
 }

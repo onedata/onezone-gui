@@ -18,9 +18,10 @@ export default {
       title: 'Oneclient access',
       newTokenNamePrefix: 'Oneclient',
       text: 'Mount Onedata in Linux filesystems natively (FUSE)',
-      hintIntro: 'Access token suitable for the Oneclient application, which mounts your Onedata spaces in a Linux filesystem. This way, the data can be accessed as if it resided in the local filesystem.',
+      accessToken: 'Access token suitable for the ',
+      hintIntro: 'application, which mounts your Onedata spaces in a Linux filesystem. This way, the data can be accessed as if it resided in the local filesystem.',
       hint: 'Oneclient is based on the FUSE library and proves useful in many scenarios, including HPC, cloud, and local (personal computer) data processing.',
-      learnMore: 'Learn more',
+      oneclient: 'Oneclient',
     },
     s3: {
       title: 'S3 access',

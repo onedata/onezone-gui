@@ -2,16 +2,18 @@
  * Component displaying textual information about token template
  *
  * @author Agnieszka Raczek
- * @copyright(C) 2025 Onedata (onedata.org)
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Component from '@glimmer/component';
 import Locale from 'onedata-gui-common/utils/locale';
 import { computed } from '@ember/object';
+import { dasherize } from '@ember/string';
 
 export default class TileTextInfoComponent extends Component {
   /** @type {string} */
+  @computed('args.templateName')
   get templateName() {
     return this.args.templateName;
   }
@@ -30,9 +32,7 @@ export default class TileTextInfoComponent extends Component {
   /** @type {string} */
   @computed('templateName')
   get hintComponentPath() {
-    const formattedTemplateName = this.templateName
-      .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-      .toLowerCase();
+    const formattedTemplateName = dasherize(this.templateName);
     return `token-template-selector/${formattedTemplateName}-template-hint`;
   }
 }
