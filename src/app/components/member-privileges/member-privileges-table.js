@@ -373,6 +373,9 @@ export default Component.extend(I18n, {
   ),
 
   membershipProxy: computed('contextRecord', 'targetRecord', function membershipProxy() {
+    if (!this.contextRecord || !this.targetRecord) {
+      return promiseObject((async () => null)());
+    }
     const promise = this.recordManager.getMembership(
       this.contextRecord,
       this.targetRecord, {
