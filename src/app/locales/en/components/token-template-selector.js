@@ -87,7 +87,7 @@ export default {
     identity: {
       title: 'Identity proof',
       text: 'Prove your identity without granting access',
-      hint: 'Identity token that proves your identity, but carries no authorization to perform any operation in the system. Proving identity with an identity token is required to satisfy a consumer caveat in another token (e.g. READ-ONLY ACCESS FOR SPECIFIC USER).',
+      hint: 'Identity token that proves your identity, but carries no authorization to perform any operation in the system. Proving identity with an identity token is required to satisfy a consumer caveat in another token (e.g. READ-ONLY DATA ACCESS FOR SPECIFIC USER).',
     },
     custom: {
       title: 'Custom',
