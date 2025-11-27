@@ -1,0 +1,21 @@
+<div class="tile-text-info">
+  <span class="subtext">
+    {{tt this "text"}}
+  </span>
+  <OneIcon
+    @icon="browser-info"
+    class="template-info-icon"
+    id={{this.tokenTemplateInfoTriggerId}}
+  />
+  <OneWebuiPopover
+    @popoverStyle="token-template-type-info"
+    @padding={{true}}
+    @triggerSelector={{concat "#" this.tokenTemplateInfoTriggerId}}
+    @placement={{if (media "isMobile") "bottom-right" "auto"}}
+    as |popover|
+  >
+    {{#let (component this.hintComponentPath) as |hintContent|}}
+      <hintContent @templateName={{this.templateName}} />
+    {{/let}}
+  </OneWebuiPopover>
+</div>

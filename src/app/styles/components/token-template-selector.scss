@@ -40,16 +40,46 @@
 
     .tile-title {
       @include font-semibold();
+      height: 2 * $font-size-base;
+      flex-shrink: 0;
     }
 
     .main-image {
       max-width: 110px;
+      height: 5.5em;
+    }
+
+    .main-figure {
+      transform: translateY(-50%) translateY(calc(-1.5 * $font-size-base));
+    }
+
+    .tile-main:hover .template-info-icon {
+      opacity: 0.8;
+    }
+
+    .tile-text-info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      font-size: 90%;
+      text-align: left;
+    }
+
+    .template-info-icon {
+      font-size: 150%;
+      vertical-align: middle;
+      color: $color-one-dark-gray;
+      opacity: $disabled-opacity;
+
+      &:hover {
+        color: $color-one-mint;
+        opacity: 1;
+      }
     }
   }
 
   .template-oneproviderRest .main-image {
     max-width: 101px;
-    margin-top: -17px;
   }
 
   .template-oneclientInOneprovider .main-image {

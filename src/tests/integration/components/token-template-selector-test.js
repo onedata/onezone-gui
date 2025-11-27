@@ -12,6 +12,9 @@ const templates = [{
   name: 'oneclient',
   category: basicCategory,
 }, {
+  name: 's3',
+  category: basicCategory,
+}, {
   name: 'oneproviderRest',
   category: basicCategory,
 }, {

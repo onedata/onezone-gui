@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-13136 Added additional info in token templates
 * VFS-13177 Fixed crashing bulk privileges editor
 * VFS-13077 Fixed mock of groups/harvesters/automation inventories selected from sidebar
 * VFS-13104 Added batch loading and progress info to membership and privileges table on members view
