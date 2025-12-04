@@ -111,7 +111,8 @@ export default Component.extend(
       }
     )),
 
-    oneproviderHrefProxy: computed('dataProviderProxy.releaseVersion',
+    oneproviderHrefProxy: computed(
+      'dataProviderProxy.releaseVersion',
       function oneproviderHrefProxy() {
         const {
           guiUtils,
@@ -120,7 +121,7 @@ export default Component.extend(
           spaceId,
           dataProviderProxy,
         } = this;
-        const promise = async () => {
+        const promise = (async () => {
           const dataProvider = await dataProviderProxy;
           const oneproviderId = guiUtils.getRoutableIdFor(dataProvider);
           if (isStandaloneGuiOneprovider(dataProvider.releaseVersion)) {
@@ -142,7 +143,7 @@ export default Component.extend(
               }
             );
           }
-        };
+        })();
 
         return promiseObject(promise);
       }
