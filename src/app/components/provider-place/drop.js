@@ -4,6 +4,7 @@
  *
  * @author Jakub Liput, Michał Borzęcki
  * @copyright (C) 2017-2025 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -51,7 +52,7 @@ export default Component.extend(I18n, {
    */
   infiniteScroll: undefined,
 
-  providerVersion: reads('provider.version'),
+  providerVersion: reads('provider.releaseVersion'),
 
   oneproviderStatusClass: conditional(
     'provider.online',

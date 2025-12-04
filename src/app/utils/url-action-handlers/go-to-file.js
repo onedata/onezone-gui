@@ -95,8 +95,10 @@ export default EmberObject.extend(...mixins, {
         // Filter out providers that handle download link feature to prefer one of
         // these providers.
         const applicableProviders = providers.filter(provider => {
-          return get(provider, 'online') &&
-            Version.isRequiredVersion(get(provider, 'version'), minSupportedVersion);
+          return get(provider, 'online') && Version.isRequiredVersion(
+            get(provider, 'releaseVersion'),
+            minSupportedVersion
+          );
         });
         provider = findCurrentDefaultOneprovider(applicableProviders);
       } catch (providersError) {

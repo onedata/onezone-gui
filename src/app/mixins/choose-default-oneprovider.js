@@ -4,6 +4,7 @@
  *
  * @author Jakub Liput
  * @copyright (C) 2020-2023 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -47,8 +48,7 @@ export default Mixin.create({
     if (requiredVersion) {
       applicableProviders = applicableProviders.filter(provider => {
         try {
-          const providerVersion = get(provider, 'version');
-          return Version.isRequiredVersion(providerVersion, requiredVersion);
+          return Version.isRequiredVersion(provider.releaseVersion, requiredVersion);
         } catch {
           return false;
         }
@@ -78,8 +78,8 @@ export function findCurrentDefaultOneprovider(applicableOneproviders) {
   const sortedApplicableOneproviders = [...applicableOneproviders.toArray()]
     .sort((providerA, providerB) => {
       const versionCompareResult = -Version.compareVersions(
-        get(providerA, 'version'),
-        get(providerB, 'version')
+        providerA.releaseVersion,
+        providerB.releaseVersion,
       );
       if (versionCompareResult === 0) {
         return nameComparator(providerA, providerB);
@@ -92,8 +92,7 @@ export function findCurrentDefaultOneprovider(applicableOneproviders) {
   }
   // prefer embeddable (20.02+) providers as default
   const oneprovider = sortedApplicableOneproviders.find(provider => {
-    const version = get(provider, 'version');
-    return !isStandaloneGuiOneprovider(version);
+    return !isStandaloneGuiOneprovider(provider.releaseVersion);
   });
   if (oneprovider) {
     return oneprovider;

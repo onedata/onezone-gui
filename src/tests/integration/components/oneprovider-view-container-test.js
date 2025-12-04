@@ -23,7 +23,8 @@ describe('Integration | Component | oneprovider-view-container', function () {
       const provider = {
         entityId: oneproviderId,
         name: oneproviderName,
-        version: modernVersion,
+        releaseVersion: modernVersion,
+        buildVersion: '389-g3ba8e7fe4f',
         online: true,
       };
       const providerListPromise = promiseObject(resolve({
@@ -148,14 +149,16 @@ describe('Integration | Component | oneprovider-view-container', function () {
       const provider1 = {
         entityId: oneproviderId1,
         name: 'Alpha',
-        version: modernVersion,
+        releaseVersion: modernVersion,
+        buildVersion: '389-g3ba8e7fe4f',
         online: true,
         onezoneHostedBaseUrl: 'https://op1.onedata.org',
       };
       const provider2 = {
         entityId: oneproviderId2,
         name: 'Beta',
-        version: modernVersion,
+        releaseVersion: modernVersion,
+        buildVersion: '389-g3ba8e7fe4f',
         online: true,
         onezoneHostedBaseUrl: 'https://op2.onedata.org',
       };

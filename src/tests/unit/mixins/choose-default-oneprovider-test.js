@@ -14,22 +14,26 @@ describe('Unit | Mixin | choose-default-oneprovider', function () {
     const providers = [{
         name: 'one',
         online: false,
-        version: '20.02.0-beta1',
+        releaseVersion: '20.02.0-beta1',
+        buildVersion: '389-g3ba8e7fe4f',
       },
       {
         name: 'two',
         online: true,
-        version: '19.02.1',
+        releaseVersion: '19.02.1',
+        buildVersion: '389-g3ba8e7fe4f',
       },
       {
         name: 'three',
         online: true,
-        version: '20.02.0-beta1',
+        releaseVersion: '20.02.0-beta1',
+        buildVersion: '389-g3ba8e7fe4f',
       },
       {
         name: 'four',
         online: true,
-        version: '20.02.0-beta1',
+        releaseVersion: '20.02.0-beta1',
+        buildVersion: '389-g3ba8e7fe4f',
       },
     ];
 
@@ -46,17 +50,20 @@ describe('Unit | Mixin | choose-default-oneprovider', function () {
     const providers = [{
         name: 'one',
         online: false,
-        version: '20.02.0-beta1',
+        releaseVersion: '20.02.0-beta1',
+        buildVersion: '389-g3ba8e7fe4f',
       },
       {
         name: 'two',
         online: true,
-        version: '19.02.1',
+        releaseVersion: '19.02.1',
+        buildVersion: '389-g3ba8e7fe4f',
       },
       {
         name: 'three',
         online: false,
-        version: '20.02.0-beta1',
+        releaseVersion: '20.02.0-beta1',
+        buildVersion: '389-g3ba8e7fe4f',
       },
     ];
 
@@ -73,13 +80,15 @@ describe('Unit | Mixin | choose-default-oneprovider', function () {
     const providersOne = [{
       name: 'one',
       online: true,
-      version: '20.02.0-beta1',
+      releaseVersion: '20.02.0-beta1',
+      buildVersion: '389-g3ba8e7fe4f',
     }];
 
     const providersTwo = [{
       name: 'two',
       online: true,
-      version: '20.02.0-beta1',
+      releaseVersion: '20.02.0-beta1',
+      buildVersion: '389-g3ba8e7fe4f',
     }];
 
     const obj = EmberObject.extend(chooseDefaultOneprovider).create({
