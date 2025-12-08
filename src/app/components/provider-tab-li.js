@@ -4,6 +4,7 @@
  *
  * @author Agnieszka Warchoł
  * @copyright (C) 2022 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -46,11 +47,11 @@ export default TabBarLi.extend(I18n, {
 
   provider: reads('providerProxy.content'),
 
-  providerVersion: reads('provider.version'),
+  providerVersion: reads('provider.releaseVersion'),
 
   isInRequiredVersion: computed(
     'requiredVersion',
-    'provider.version',
+    'providerVersion',
     function isInRequiredVersion() {
       if (!this.providerVersion) {
         return false;

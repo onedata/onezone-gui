@@ -4,6 +4,7 @@
  *
  * @author Jakub Liput
  * @copyright (C) 2019-2020 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -77,7 +78,8 @@ const OneproviderTabItem = EmberObject.extend({
   id: reads('provider.entityId'),
   type: 'provider',
   name: reads('provider.name'),
-  version: reads('provider.version'),
+  releaseVersion: reads('provider.releaseVersion'),
+  buildVersion: reads('provider.buildVersion'),
   domain: reads('provider.domain'),
   entityId: reads('provider.entityId'),
   disabled: and(not('shouldBeEnabledWhenOffline'), not('provider.online')),
@@ -407,13 +409,13 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   ),
 
   showSelectedProviderIsOld: computed(
-    'selectedProvider.version',
+    'selectedProvider.releaseVersion',
     'minOneproviderRequiredVersion',
     function showSelectedProviderIsOld() {
       return this.selectedProvider &&
         this.minOneproviderRequiredVersion &&
         !Version.isRequiredVersion(
-          get(this.selectedProvider, 'version'),
+          this.selectedProvider.releaseVersion,
           this.minOneproviderRequiredVersion
         );
     },
@@ -450,7 +452,7 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   isEmbeddableOneproviderProxy: promise.object(
     computed(
       'initialProvidersListProxy',
-      'selectedProvider.version',
+      'selectedProvider.releaseVersion',
       function isEmbeddableOneproviderProxy() {
         return this.get('initialProvidersListProxy').then(() => {
           const selectedProvider = this.get('selectedProvider');
@@ -458,8 +460,7 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
             if (get(selectedProvider, 'id') === 'overview') {
               return selectedProvider;
             }
-            const version = get(selectedProvider, 'version');
-            return !isStandaloneGuiOneprovider(version);
+            return !isStandaloneGuiOneprovider(selectedProvider.releaseVersion);
           } else {
             return null;
           }
@@ -471,7 +472,7 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
 
   providersInRequiredVersion: computed(
     'minOneproviderRequiredVersion',
-    'providers.@each.version',
+    'providers.@each.releaseVersion',
     function providersInRequiredVersion() {
       if (!this.providers?.length) {
         return [];
@@ -482,8 +483,7 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
       }
 
       return this.providers.filter((provider) => {
-        const providerVersion = get(provider, 'version');
-        return Version.isRequiredVersion(providerVersion, requiredVersion);
+        return Version.isRequiredVersion(provider.releaseVersion, requiredVersion);
       });
     },
   ),

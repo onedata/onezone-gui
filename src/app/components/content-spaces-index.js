@@ -3,6 +3,7 @@
  *
  * @author Jakub Liput, Michał Borzęcki
  * @copyright (C) 2018-2020 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -110,48 +111,42 @@ export default Component.extend(
       }
     )),
 
-    oneproviderHrefProxy: promise.object(
-      computed(
-        'dataProviderProxy.version',
-        function oneproviderHrefProxy() {
-          const {
-            guiUtils,
-            router,
-            space,
-            spaceId,
-            dataProviderProxy,
-          } = this.getProperties(
-            'guiUtils',
-            'router',
-            'space',
-            'spaceId',
-            'dataProviderProxy'
-          );
-          return dataProviderProxy.then(dataProvider => {
-            const oneproviderId = guiUtils.getRoutableIdFor(dataProvider);
-            const version = get(dataProvider, 'version');
-            if (isStandaloneGuiOneprovider(version)) {
-              return router.urlFor(
-                'provider-redirect',
-                oneproviderId, {
-                  queryParams: { space_id: spaceId },
-                }
-              );
-            } else {
-              return router.urlFor(
-                'onedata.sidebar.content.aspect',
-                'spaces',
-                guiUtils.getRoutableIdFor(space),
-                'data', {
-                  queryParams: {
-                    options: serializeAspectOptions({ oneproviderId }),
-                  },
-                }
-              );
-            }
-          });
-        }
-      )
+    oneproviderHrefProxy: computed(
+      'dataProviderProxy.releaseVersion',
+      function oneproviderHrefProxy() {
+        const {
+          guiUtils,
+          router,
+          space,
+          spaceId,
+          dataProviderProxy,
+        } = this;
+        const promise = (async () => {
+          const dataProvider = await dataProviderProxy;
+          const oneproviderId = guiUtils.getRoutableIdFor(dataProvider);
+          if (isStandaloneGuiOneprovider(dataProvider.releaseVersion)) {
+            return router.urlFor(
+              'provider-redirect',
+              oneproviderId, {
+                queryParams: { space_id: spaceId },
+              }
+            );
+          } else {
+            return router.urlFor(
+              'onedata.sidebar.content.aspect',
+              'spaces',
+              guiUtils.getRoutableIdFor(space),
+              'data', {
+                queryParams: {
+                  options: serializeAspectOptions({ oneproviderId }),
+                },
+              }
+            );
+          }
+        })();
+
+        return promiseObject(promise);
+      }
     ),
 
     /**

@@ -37,7 +37,8 @@ describe('Integration | Component | content-spaces-index', function () {
       id: 'provider.op1.instance:private',
       entityId: 'op1',
       name: 'Gamma',
-      version: '20.02.1',
+      releaseVersion: '20.02.1',
+      buildVersion: '389-g3ba8e7fe4f',
       online: true,
       onezoneHostedBaseUrl: 'https://op1.onedata.org',
     };
@@ -45,7 +46,8 @@ describe('Integration | Component | content-spaces-index', function () {
       id: 'provider.op2.instance:private',
       entityId: 'op2',
       name: 'Beta',
-      version: '20.02.1',
+      releaseVersion: '20.02.1',
+      buildVersion: '389-g3ba8e7fe4f',
       online: true,
       onezoneHostedBaseUrl: 'https://op2.onedata.org',
     };
@@ -53,7 +55,8 @@ describe('Integration | Component | content-spaces-index', function () {
       id: 'provider.op3.instance:private',
       entityId: 'op3',
       name: 'Alpha',
-      version: '20.02.1',
+      releaseVersion: '20.02.1',
+      buildVersion: '389-g3ba8e7fe4f',
       online: true,
       onezoneHostedBaseUrl: 'https://op3.onedata.org',
     };

@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12892 Added build version to provider popover information
 * VFS-13136 Added additional info in token templates
 * VFS-13177 Fixed crashing bulk privileges editor
 * VFS-13077 Fixed mock of groups/harvesters/automation inventories selected from sidebar

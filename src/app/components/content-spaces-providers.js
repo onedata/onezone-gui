@@ -4,11 +4,12 @@
  *
  * @author Jakub Liput
  * @copyright (C) 2018 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import { reads } from '@ember/object/computed';
-import { computed, get } from '@ember/object';
+import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
@@ -134,7 +135,7 @@ export default ContentOneproviderContainerBase.extend(...mixins, {
         return true;
       }
       return !Version.isRequiredVersion(
-        get(provider, 'version'),
+        provider.releaseVersion,
         this.minOneproviderRequiredVersion
       );
     },

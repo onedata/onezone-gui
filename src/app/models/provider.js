@@ -1,11 +1,11 @@
 /**
  * @author Jakub Liput
  * @copyright (C) 2017-2023 ACK CYFRONET AGH
+ * @copyright (C) 2025 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { alias } from '@ember/object/computed';
-
+import { reads } from '@ember/object/computed';
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import { computed } from '@ember/object';
@@ -23,7 +23,9 @@ export default Model.extend(GraphSingleModelMixin, {
   latitude: attr('number', { defaultValue: 0 }),
   online: attr('boolean'),
   domain: attr('string'),
-  version: attr('string'),
+  releaseVersion: attr('string'),
+  buildVersion: attr('string'),
+
   cluster: belongsTo('cluster'),
 
   spaceList: belongsTo('space-list'),
@@ -45,11 +47,17 @@ export default Model.extend(GraphSingleModelMixin, {
     return `${this.name}\0${this.entityId}`;
   }),
 
-  //#region Aliases and backward-compatibility
-  host: alias('domain'),
-  status: computed('online', function getStatus() {
+  //#region Aliases and compatibility
+
+  /**
+   * @type {ComputedProperty<string>}
+   */
+  version: reads('releaseVersion'),
+
+  status: computed('online', function status() {
     return this.get('online') ? 'online' : 'offline';
   }),
+
   //#endregion
 
 }).reopenClass(StaticGraphModelMixin);

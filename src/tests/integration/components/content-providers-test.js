@@ -42,7 +42,8 @@ describe('Integration | Component | content-providers', function () {
         latitude: 10,
         longitude: 20,
         online: true,
-        version: '19.02.1',
+        releaseVersion: '19.02.1',
+        buildVersion: '389-g3ba8e7fe4f',
         spaceList,
       }).save();
       const providerList = await store.createRecord('providerList', {
