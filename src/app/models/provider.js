@@ -58,6 +58,8 @@ export default Model.extend(GraphSingleModelMixin, {
     return this.get('online') ? 'online' : 'offline';
   }),
 
+  host: reads('domain'),
+
   //#endregion
 
 }).reopenClass(StaticGraphModelMixin);
