@@ -15,10 +15,10 @@
     <OneCollapsibleList
       @hasCheckboxes={{true}}
       class={{concat subjectType "-list"}}
-      @selectionChanged={{recordsSelected}}
       @isListCollapsed={{isListCollapsed}}
       @listCollapsed={{action "listCollapsed"}}
       @resetSelectionTrigger={{membersProxy}}
+      @hasCheckboxes={{false}}
       as |list|
     >
       <list.header
@@ -26,6 +26,11 @@
         @searchVisible={{false}}
         @withPlaceForDots={{true}}
       >
+        <OneCheckbox
+          class="items-checkbox"
+          @checked={{eq members.length selectedMembers.length}}
+          @update={{action "recordsSelected" "all"}}
+        />
         {{#if members.length}}
           <div class={{concat-classes
             "form-group form-group-sm form-group-light search-group collapse-animation collapse-small"
@@ -63,6 +68,11 @@
             @disableToggleIcon={{true}}
             class={{if memberProxy.privilegesProxy.isModified "item-modified-header"}}
           >
+            <OneCheckbox
+              class="item-checkbox"
+              @checked={{contains memberProxy selectedMembers}}
+              @update={{action "recordsSelected" memberProxy}}
+            />
             <RecordInfoWithIcon @record={{memberProxy.member}} />
             <div class="right-container">
               {{#if memberProxy.privilegesProxy.isModified}}

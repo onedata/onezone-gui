@@ -115,6 +115,11 @@ export default Component.extend(I18n, {
   recordsSelected: notImplementedWarn,
 
   /**
+   * @virtual
+   */
+  selectedMembers: undefined,
+
+  /**
    * Header of the records list.
    * @virtual
    * @type {string}
@@ -895,6 +900,24 @@ export default Component.extend(I18n, {
     changePerPage(number) {
       this.set('pageSize', number);
       globals.localStorage.setItem(this.persistedPageSizeKey, number);
+    },
+    recordsSelected(member) {
+      if (member === 'all') {
+        if (this.selectedMembers?.length === this.members?.length) {
+          this.recordsSelected([]);
+        } else {
+          const allMembers = this.membersProxyList || [];
+          this.recordsSelected(allMembers);
+        }
+      } else {
+        const selectedMembers = this.selectedMembers.slice() || [];
+        if (selectedMembers.includes(member)) {
+          selectedMembers.removeObject(member);
+          this.recordsSelected(selectedMembers);
+        } else {
+          this.recordsSelected([...selectedMembers, member]);
+        }
+      }
     },
   },
 });
