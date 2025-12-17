@@ -201,7 +201,7 @@
                     @contextRecord={{memberProxy.member}}
                     @targetRecord={{record}}
                     @directGroupMembers={{directGroupsProxyList}}
-                    @highlightMemberships={{action "highlightMemberships"}}
+                    @highlightMemberships={{action "highlightMemberships" memberProxy.member}}
                     @isPrivilegesToggleDisabled={{isPrivilegesToggleDisabled}}
                   />
                 </PromiseProxyContainer>
@@ -238,7 +238,10 @@
                       @contextRecord={{memberProxy.member}}
                       @targetRecord={{record}}
                       @showDescription={{showMembershipDescription}}
-                      @highlightedMembers={{highlightedMembers}}
+                      @highlightedMembers={{if
+                        (eq highlightInitiatorMemberId memberProxy.member.entityId)
+                        highlightedMembers
+                      }}
                     />
                   </div>
                 </div>

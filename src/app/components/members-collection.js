@@ -199,6 +199,11 @@ export default Component.extend(I18n, {
   highlightedMembers: undefined,
 
   /**
+   * @type {string}
+   */
+  highlightInitiatorMemberId: undefined,
+
+  /**
    * @virtual
    * @type {Function}
    * @param {Models.User|Models.Group} member
@@ -886,8 +891,9 @@ export default Component.extend(I18n, {
     listCollapsed(isCollapsed) {
       this.set('isListCollapsed', isCollapsed);
     },
-    highlightMemberships(groups) {
+    highlightMemberships(highlightInitiatorMember, groups) {
       this.set('highlightedMembers', groups);
+      this.set('highlightInitiatorMemberId', highlightInitiatorMember.entityId);
     },
     onSearchInput(value) {
       this.set('searchQuery', value);
