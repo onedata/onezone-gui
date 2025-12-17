@@ -896,27 +896,27 @@ export default Component.extend(I18n, {
     },
     onSearchInput(value) {
       this.set('searchQuery', value);
+      this.recordsSelected([]);
     },
     changePerPage(number) {
       this.set('pageSize', number);
       globals.localStorage.setItem(this.persistedPageSizeKey, number);
     },
     recordsSelected(member) {
-      if (member === 'all') {
-        if (this.selectedMembers?.length === this.members?.length) {
-          this.recordsSelected([]);
-        } else {
-          const allMembers = this.membersProxyList || [];
-          this.recordsSelected(allMembers);
-        }
+      const selectedMembers = this.selectedMembers.slice() || [];
+      if (selectedMembers.includes(member)) {
+        selectedMembers.removeObject(member);
+        this.recordsSelected(selectedMembers);
       } else {
-        const selectedMembers = this.selectedMembers.slice() || [];
-        if (selectedMembers.includes(member)) {
-          selectedMembers.removeObject(member);
-          this.recordsSelected(selectedMembers);
-        } else {
-          this.recordsSelected([...selectedMembers, member]);
-        }
+        this.recordsSelected([...selectedMembers, member]);
+      }
+    },
+    allRecordsSelected() {
+      if (this.selectedMembers?.length === this.directMembers?.length) {
+        this.recordsSelected([]);
+      } else {
+        const allMembers = this.membersProxyList || [];
+        this.recordsSelected(allMembers.filter(member => member.isDirect));
       }
     },
   },

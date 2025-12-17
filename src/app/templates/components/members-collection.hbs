@@ -13,12 +13,11 @@
     @absoluteCentered={{false}}
   >
     <OneCollapsibleList
-      @hasCheckboxes={{true}}
+      @hasCheckboxes={{false}}
       class={{concat subjectType "-list"}}
       @isListCollapsed={{isListCollapsed}}
       @listCollapsed={{action "listCollapsed"}}
       @resetSelectionTrigger={{membersProxy}}
-      @hasCheckboxes={{false}}
       as |list|
     >
       <list.header
@@ -28,8 +27,8 @@
       >
         <OneCheckbox
           class="items-checkbox"
-          @checked={{eq members.length selectedMembers.length}}
-          @update={{action "recordsSelected" "all"}}
+          @checked={{eq directMembers.length selectedMembers.length}}
+          @update={{action "allRecordsSelected"}}
         />
         {{#if members.length}}
           <div class={{concat-classes
@@ -72,6 +71,7 @@
               class="item-checkbox"
               @checked={{contains memberProxy selectedMembers}}
               @update={{action "recordsSelected" memberProxy}}
+              @isReadOnly={{not (contains memberProxy.member directMembers)}}
             />
             <RecordInfoWithIcon @record={{memberProxy.member}} />
             <div class="right-container">
