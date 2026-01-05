@@ -12,8 +12,8 @@ import Component from '@ember/component';
 import EmberObject, {
   get,
   computed,
-  observer,
 } from '@ember/object';
+import { asyncObserver } from 'onedata-gui-common/utils/observer';
 import { reads } from '@ember/object/computed';
 import {
   promise,
@@ -26,9 +26,10 @@ import {
   not,
   or,
   eq,
+  bool,
 } from 'ember-awesome-macros';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import { next } from '@ember/runloop';
+import { next, scheduleOnce } from '@ember/runloop';
 import { inject as service } from '@ember/service';
 import createPropertyComparator from 'onedata-gui-common/utils/create-property-comparator';
 import I18n from 'onedata-gui-common/mixins/i18n';
@@ -373,9 +374,9 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
     not('showAllVersionsOld'),
     not('showAllRequiredVersionsOffline'),
     not('showSelectedProviderIsOld'),
-    'oneproviderViewProxy.isFulfilled',
-    'isEmbeddableOneprovider',
-    'selectedProvider.online',
+    bool('oneproviderViewProxy.isFulfilled'),
+    bool('isEmbeddableOneprovider'),
+    bool('selectedProvider.online'),
   ),
 
   /**
@@ -495,29 +496,18 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
    * we should observe the list to set the first online Oneprovider when it is
    * async added.
    */
-  observeOnlineProvider: observer('providers.[]', function observeOnlineProvider() {
-    const {
-      selectedProvider,
-      providers,
-    } = this.getProperties('selectedProvider', 'providers');
-    if (!providers.includes(selectedProvider)) {
+  observeOnlineProvider: asyncObserver('providers.[]', function observeOnlineProvider() {
+    if (!this.providers.includes(this.selectedProvider)) {
       return this.selectDefaultProvider();
     }
   }),
 
-  iframeStateObserver: observer(
+  iframeStateObserver: asyncObserver(
     'isOneproviderIframeShown',
     function iframeStateObserver() {
+      scheduleOnce('afterRender', this, 'setPointerNoneToMainContent');
       next(() => {
         safeExec(this, () => {
-          if (
-            this.pointerEvents.pointerNoneToMainContent !== this.isOneproviderIframeShown
-          ) {
-            this.set(
-              'pointerEvents.pointerNoneToMainContent',
-              this.isOneproviderIframeShown,
-            );
-          }
           if (typeof this.hasEmbeddedIframesChanged === 'function') {
             this.hasEmbeddedIframesChanged(this.isOneproviderIframeShown);
           } else {
@@ -533,12 +523,15 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   init() {
     this._super(...arguments);
 
-    this.initialProvidersListProxy.then(async (list) => {
-      if (!this.oneproviderId) {
-        await this.selectDefaultProvider(list);
-      }
-      this.iframeStateObserver();
-    });
+    this.initialProvidersListProxy
+      .then(async (list) => {
+        if (!this.oneproviderId) {
+          await this.selectDefaultProvider(list);
+        }
+      })
+      .finally(() => {
+        this.iframeStateObserver();
+      });
   },
 
   willDestroyElement() {
@@ -546,6 +539,17 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
     next(() => {
       safeExec(this, 'set', 'pointerEvents.pointerNoneToMainContent', false);
     });
+  },
+
+  setPointerNoneToMainContent() {
+    if (
+      this.pointerEvents.pointerNoneToMainContent !== this.isOneproviderIframeShown
+    ) {
+      this.pointerEvents.set(
+        'pointerNoneToMainContent',
+        this.isOneproviderIframeShown
+      );
+    }
   },
 
   async selectDefaultProvider(providers = this.providers) {
