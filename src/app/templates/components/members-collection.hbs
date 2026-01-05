@@ -27,10 +27,11 @@
       >
         <OneCheckbox
           class="items-checkbox"
-          @checked={{
-            and (eq directMembers.length selectedMembers.length) (gt directMembers.length 0)
+          @checked={{and
+            (eq directMembers.length selectedMembers.length)
+            (gt directMembers.length 0)
           }}
-          @update={{action "allRecordsSelected"}}
+          @update={{action "toggleSelectAllRecords"}}
         />
         {{#if members.length}}
           <div class={{concat-classes
@@ -68,7 +69,7 @@
             <OneCheckbox
               class="item-checkbox"
               @checked={{contains memberProxy selectedMembers}}
-              @update={{action "recordsSelected" memberProxy}}
+              @update={{action "toggleSelectRecord" memberProxy}}
               @isReadOnly={{not (contains memberProxy.member directMembers)}}
             />
             <RecordInfoWithIcon @record={{memberProxy.member}} />

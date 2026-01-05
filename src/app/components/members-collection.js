@@ -112,10 +112,11 @@ export default Component.extend(I18n, {
    * @param {Array<PrivilegeRecordProxy>} recordsProxies array of selected records
    * @returns {any}
    */
-  recordsSelected: notImplementedWarn,
+  toggleSelectRecord: notImplementedWarn,
 
   /**
    * @virtual
+   * @type {Ember.Array<Utils/MembersCollection/ItemProxy>}
    */
   selectedMembers: undefined,
 
@@ -896,27 +897,27 @@ export default Component.extend(I18n, {
     },
     onSearchInput(value) {
       this.set('searchQuery', value);
-      this.recordsSelected([]);
+      this.toggleSelectRecord([]);
     },
     changePerPage(number) {
       this.set('pageSize', number);
       globals.localStorage.setItem(this.persistedPageSizeKey, number);
     },
-    recordsSelected(member) {
-      const selectedMembers = this.selectedMembers.slice() || [];
+    toggleSelectRecord(member) {
+      const selectedMembers = this.selectedMembers.slice();
       if (selectedMembers.includes(member)) {
         selectedMembers.removeObject(member);
-        this.recordsSelected(selectedMembers);
+        this.toggleSelectRecord(selectedMembers);
       } else {
-        this.recordsSelected([...selectedMembers, member]);
+        this.toggleSelectRecord([...selectedMembers, member]);
       }
     },
-    allRecordsSelected() {
+    toggleSelectAllRecords() {
       if (this.selectedMembers?.length === this.directMembers?.length) {
-        this.recordsSelected([]);
+        this.toggleSelectRecord([]);
       } else {
-        const allMembers = this.membersProxyList || [];
-        this.recordsSelected(allMembers.filter(member => member.isDirect));
+        const allMembers = this.membersProxyList ?? [];
+        this.toggleSelectRecord(allMembers.filter(member => member.isDirect));
       }
     },
   },

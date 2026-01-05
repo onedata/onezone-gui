@@ -39,7 +39,7 @@
       @listCollapseScreenHeight={{800}}
       @subjectType="group"
       @griGroupAspects={{griAspects.group}}
-      @recordsSelected={{action "recordsSelected" "group"}}
+      @toggleSelectRecord={{action "recordsSelected" "group"}}
       @selectedMembers={{selectedGroupsProxies}}
       @membersLoaded={{action "recordsLoaded"}}
       @listHeader={{tt this "groups"}}
@@ -85,7 +85,7 @@
       @showMembershipDescription={{showMembershipDescription}}
       @subjectType="user"
       @owners={{owners}}
-      @recordsSelected={{action "recordsSelected" "user"}}
+      @toggleSelectRecord={{action "recordsSelected" "user"}}
       @selectedMembers={{selectedUsersProxies}}
       @membersLoaded={{action "recordsLoaded"}}
       @listHeader={{tt this "users"}}
