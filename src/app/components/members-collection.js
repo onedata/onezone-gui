@@ -283,6 +283,24 @@ export default Component.extend(I18n, {
     );
   }),
 
+  effListSubtitle: computed(
+    'selectedMembers.length',
+    'directMembers.length',
+    function effListSubtitle() {
+      const selectedMembersLength = this.selectedMembers?.length ?? 0;
+      const directMembersLength = this.directMembers?.length ?? 0;
+      const membersLength = this.members?.length ?? 0;
+      if (
+        directMembersLength > 0 &&
+        selectedMembersLength === directMembersLength &&
+        membersLength !== selectedMembersLength
+      ) {
+        return `(${formatNumber(selectedMembersLength)} ${this.tt('selected')})`;
+      }
+      return '';
+    }
+  ),
+
   isFiltered: computed(
     'members.length',
     'membersProxyList.length',
