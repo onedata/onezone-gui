@@ -295,7 +295,7 @@ export default Component.extend(I18n, {
         selectedMembersLength === directMembersLength &&
         membersLength !== selectedMembersLength
       ) {
-        return `(${formatNumber(selectedMembersLength)} ${this.tt('selected')})`;
+        return `(${formatNumber(selectedMembersLength)} ${this.t('selected')})`;
       }
       return '';
     }
