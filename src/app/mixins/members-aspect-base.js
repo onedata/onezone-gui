@@ -216,10 +216,15 @@ export default Mixin.create({
    */
   batchPrivilegesEditAction: computed(
     'batchPrivilegesEditEnabled',
+    'selectedMembersProxies.length',
     function batchPrivilegesEditAction() {
+      let titleText = this.t('multiedit');
+      if (this.selectedMembersProxies.length) {
+        titleText += ` (${this.selectedMembersProxies.length})`;
+      }
       return {
         action: () => this.send('batchPrivilegesEdit'),
-        title: this.t('multiedit'),
+        title: titleText,
         class: 'batch-edit',
         icon: 'browser-rename',
         disabled: !this.get('batchPrivilegesEditEnabled'),

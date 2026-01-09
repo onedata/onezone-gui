@@ -4,6 +4,8 @@
 
 ### Latest changes
 
+* VFS-13178 Fixed privileges bulk edit to support selecting groups from multiple pages
+* VFS-13221 Added support for new Calendar Versioning scheme in Onedata (e.g. version 25.0)
 * VFS-13213 Fixed blank Oneprovider domain in providers map popover
 * VFS-12892 Added build version to provider popover information
 * VFS-13136 Added additional info in token templates

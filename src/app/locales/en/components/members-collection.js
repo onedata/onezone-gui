@@ -29,4 +29,6 @@ export default {
   perPage: '{{type}} per page',
   filteredResults: 'matching names',
   loadingFilters: 'Loading {{type}}... {{progress}}',
+  selectedMembersHint: 'Only direct {{type}} are selected.',
+  selected: 'selected',
 };

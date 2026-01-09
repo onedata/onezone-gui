@@ -13,9 +13,8 @@
     @absoluteCentered={{false}}
   >
     <OneCollapsibleList
-      @hasCheckboxes={{true}}
+      @hasCheckboxes={{false}}
       class={{concat subjectType "-list"}}
-      @selectionChanged={{recordsSelected}}
       @isListCollapsed={{isListCollapsed}}
       @listCollapsed={{action "listCollapsed"}}
       @resetSelectionTrigger={{membersProxy}}
@@ -25,7 +24,17 @@
         @title={{effListHeader}}
         @searchVisible={{false}}
         @withPlaceForDots={{true}}
+        @subtitle={{effListSubtitle}}
+        @subtitleTip={{tt this "selectedMembersHint" type=membersTypeText}}
       >
+        <OneCheckbox
+          class="items-checkbox"
+          @checked={{and
+            (eq directMembers.length selectedMembers.length)
+            (gt directMembers.length 0)
+          }}
+          @update={{action "toggleSelectAllRecords"}}
+        />
         {{#if members.length}}
           <div class={{concat-classes
             "form-group form-group-sm form-group-light search-group collapse-animation collapse-small"
@@ -53,16 +62,18 @@
             "member-item"
             (concat "member-" memberProxy.member.entityId)
           }}
-          @selectionValue={{if (and (not onlyDirect) (not (contains memberProxy.member directMembers)))
-            null
-            memberProxy
-          }}
           as |listItem|
         >
           <listItem.header
             @disableToggleIcon={{true}}
             class={{if memberProxy.privilegesProxy.isModified "item-modified-header"}}
           >
+            <OneCheckbox
+              class="item-checkbox"
+              @checked={{contains memberProxy selectedMembers}}
+              @update={{action "toggleSelectRecord" memberProxy}}
+              @isReadOnly={{not (contains memberProxy.member directMembers)}}
+            />
             <RecordInfoWithIcon @record={{memberProxy.member}} />
             <div class="right-container">
               {{#if memberProxy.privilegesProxy.isModified}}

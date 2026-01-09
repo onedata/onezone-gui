@@ -112,7 +112,13 @@ export default Component.extend(I18n, {
    * @param {Array<PrivilegeRecordProxy>} recordsProxies array of selected records
    * @returns {any}
    */
-  recordsSelected: notImplementedWarn,
+  toggleSelectRecord: notImplementedWarn,
+
+  /**
+   * @virtual
+   * @type {Ember.Array<Utils/MembersCollection/ItemProxy>}
+   */
+  selectedMembers: undefined,
 
   /**
    * Header of the records list.
@@ -281,6 +287,24 @@ export default Component.extend(I18n, {
       `${typeof this.listHeader === 'string' ? _.escape(this.listHeader) : this.listHeader} (${membersCount})`
     );
   }),
+
+  effListSubtitle: computed(
+    'selectedMembers.length',
+    'directMembers.length',
+    function effListSubtitle() {
+      const selectedMembersLength = this.selectedMembers?.length ?? 0;
+      const directMembersLength = this.directMembers?.length ?? 0;
+      const membersLength = this.members?.length ?? 0;
+      if (
+        directMembersLength > 0 &&
+        selectedMembersLength === directMembersLength &&
+        membersLength !== selectedMembersLength
+      ) {
+        return `(${formatNumber(selectedMembersLength)} ${this.t('selected')})`;
+      }
+      return '';
+    }
+  ),
 
   isFiltered: computed(
     'members.length',
@@ -897,10 +921,28 @@ export default Component.extend(I18n, {
     },
     onSearchInput(value) {
       this.set('searchQuery', value);
+      this.toggleSelectRecord([]);
     },
     changePerPage(number) {
       this.set('pageSize', number);
       globals.localStorage.setItem(this.persistedPageSizeKey, number);
+    },
+    toggleSelectRecord(member) {
+      const selectedMembers = this.selectedMembers.slice();
+      if (selectedMembers.includes(member)) {
+        selectedMembers.removeObject(member);
+        this.toggleSelectRecord(selectedMembers);
+      } else {
+        this.toggleSelectRecord([...selectedMembers, member]);
+      }
+    },
+    toggleSelectAllRecords() {
+      if (this.selectedMembers?.length === this.directMembers?.length) {
+        this.toggleSelectRecord([]);
+      } else {
+        const allMembers = this.membersProxyList ?? [];
+        this.toggleSelectRecord(allMembers.filter(member => member.isDirect));
+      }
     },
   },
 });

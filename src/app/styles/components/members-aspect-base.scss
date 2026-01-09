@@ -112,6 +112,27 @@
     }
   }
 
+  li.one-collapsible-list-item-header {
+    position: relative;
+
+    .list-title {
+      padding-left: 34px;
+    }
+
+    @media (min-width: $screen-sm-min) {
+      .one-checkbox {
+        top: 50%;
+      }
+    }
+
+    .one-checkbox {
+      position: absolute;
+      left: 22px;
+      top: 2.2em;
+      transform: translateY(-50%);
+    }
+  }
+
   .member-item .one-collapsible-list-item-header {
     padding-right: 190px;
     .btn-toolbar {
