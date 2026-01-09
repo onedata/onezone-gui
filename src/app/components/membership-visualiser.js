@@ -691,7 +691,10 @@ export default Component.extend(I18n, {
         const lastNode = allNodesMap.get(lastNodeGri);
         if (lastNode && get(lastNode, 'isDeleted')) {
           return [];
-        } else if (!lastNode || get(lastNode, 'isForbidden')) {
+        } else if (!lastNode) {
+          donePaths.push(workingPath.slice().reverse());
+          return [];
+        } else if (get(lastNode, 'isForbidden')) {
           donePaths.push(workingPath.concat([null]).reverse());
           return [];
         } else {
