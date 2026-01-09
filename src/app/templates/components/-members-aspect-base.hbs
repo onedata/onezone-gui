@@ -9,6 +9,9 @@
           @disabled={{not batchPrivilegesEditEnabled}}
         >
           {{tt this "multiedit"}}
+          {{#if selectedMembersProxies.length}}
+            ({{selectedMembersProxies.length}})
+          {{/if}}
         </OneButton>
       </div>
       <div class="show-only-direct">
@@ -36,7 +39,8 @@
       @listCollapseScreenHeight={{800}}
       @subjectType="group"
       @griGroupAspects={{griAspects.group}}
-      @recordsSelected={{action "recordsSelected" "group"}}
+      @toggleSelectRecord={{action "recordsSelected" "group"}}
+      @selectedMembers={{selectedGroupsProxies}}
       @membersLoaded={{action "recordsLoaded"}}
       @listHeader={{tt this "groups"}}
       @modelTypeTranslation={{modelTypeTranslation}}
@@ -81,7 +85,8 @@
       @showMembershipDescription={{showMembershipDescription}}
       @subjectType="user"
       @owners={{owners}}
-      @recordsSelected={{action "recordsSelected" "user"}}
+      @toggleSelectRecord={{action "recordsSelected" "user"}}
+      @selectedMembers={{selectedUsersProxies}}
       @membersLoaded={{action "recordsLoaded"}}
       @listHeader={{tt this "users"}}
       @fallbackPageSize={{50}}
