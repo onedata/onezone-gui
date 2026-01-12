@@ -67,25 +67,29 @@ export default Component.extend(I18n, {
   recordDirectProxy: Object.freeze({}),
 
   /**
-   * @virtual
+   * Only used when isBulkEdit is false.
+   * @virtual optional
    * @type {string}
    */
   modelTypeTranslation: undefined,
 
   /**
-   * @virtual
+   * Only used when isBulkEdit is false.
+   * @virtual optional
    * @type {User|Group}
    */
   contextRecord: null,
 
   /**
-   * @virtual
+   * Only used when isBulkEdit is false.
+   * @virtual optional
    * @type {Group|Space|Cluster|Provider}
    */
   targetRecord: null,
 
   /**
-   * @virtual
+   * Only used when isBulkEdit is false.
+   * @virtual optional
    * @type {Array<Utils/MembersCollection/ItemProxy>}
    */
   directGroupMembers: undefined,
@@ -296,13 +300,14 @@ export default Component.extend(I18n, {
   effPrivilegesAffectorsLoader: computed(
     'directGroupMembers',
     'membership.intermediaries',
+    'isBulkEdit',
     function effPrivilegesAffectorsLoader() {
-      if (!this.membership) {
+      if (this.isBulkEdit || !this.membership) {
         return null;
       }
       const affectorsInfos = [];
       for (const groupId of this.membership.intermediaries) {
-        const affectorInfo = this.directGroupMembers.find(
+        const affectorInfo = this.directGroupMembers?.find(
           member => groupId === member.id
         );
         if (affectorInfo) {
@@ -333,7 +338,11 @@ export default Component.extend(I18n, {
     'directGroupMembers',
     'membershipProxy',
     'membership.intermediaries',
+    'isBulkEdit',
     function effPrivilegesAffectorInfos() {
+      if (this.isBulkEdit) {
+        return promiseObject((async () => null)());
+      }
       return promiseObject(
         this.membershipProxy
         .then(() => this.effPrivilegesAffectorsLoader.getPromise())
@@ -344,8 +353,9 @@ export default Component.extend(I18n, {
   effectiveLoadingTip: computed(
     'effPrivilegesAffectorsLoader.progressTracker.{totalCount,progressText}',
     'firstLoadDone',
+    'isBulkEdit',
     function effectiveLoadingTip() {
-      if (!this.effPrivilegesAffectorsLoader) {
+      if (this.isBulkEdit || !this.effPrivilegesAffectorsLoader) {
         return;
       }
       const progressTracker = this.effPrivilegesAffectorsLoader.progressTracker;
@@ -372,18 +382,22 @@ export default Component.extend(I18n, {
     }
   ),
 
-  membershipProxy: computed('contextRecord', 'targetRecord', function membershipProxy() {
-    if (!this.contextRecord || !this.targetRecord) {
-      return promiseObject((async () => null)());
-    }
-    const promise = this.recordManager.getMembership(
-      this.contextRecord,
-      this.targetRecord, {
-        reload: true,
+  membershipProxy: computed(
+    'contextRecord',
+    'targetRecord',
+    'isBulkEdit',
+    function membershipProxy() {
+      if (this.isBulkEdit || !this.contextRecord || !this.targetRecord) {
+        return promiseObject((async () => null)());
       }
-    );
-    return promiseObject(promise);
-  }),
+      const promise = this.recordManager.getMembership(
+        this.contextRecord,
+        this.targetRecord, {
+          reload: true,
+        }
+      );
+      return promiseObject(promise);
+    }),
 
   /** @type {ComputedProperty<Membership>} */
   membership: reads('membershipProxy.content'),
@@ -432,6 +446,9 @@ export default Component.extend(I18n, {
       this.get('recordDirectProxy').setNewPrivileges(privileges);
     },
     highlightMemberships(groups) {
+      if (this.isBulkEdit) {
+        return;
+      }
       this.get('highlightMemberships')(groups);
     },
   },
