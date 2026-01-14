@@ -345,7 +345,7 @@ export default Component.extend(I18n, {
       }
       return promiseObject(
         this.membershipProxy
-        .then(() => this.effPrivilegesAffectorsLoader.getPromise())
+        .then(() => this.effPrivilegesAffectorsLoader?.getPromise())
       );
     }
   ),

@@ -916,8 +916,10 @@ export default Component.extend(I18n, {
       this.set('isListCollapsed', isCollapsed);
     },
     highlightMemberships(highlightInitiatorMember, groups) {
-      this.set('highlightedMembers', groups);
-      this.set('highlightInitiatorMemberId', highlightInitiatorMember.entityId);
+      this.setProperties({
+        highlightedMembers: groups,
+        highlightInitiatorMemberId: highlightInitiatorMember.entityId,
+      });
     },
     onSearchInput(value) {
       this.set('searchQuery', value);

@@ -692,7 +692,6 @@ export default Component.extend(I18n, {
         if (lastNode && get(lastNode, 'isDeleted')) {
           return [];
         } else if (!lastNode) {
-          donePaths.push(workingPath.slice().reverse());
           return [];
         } else if (get(lastNode, 'isForbidden')) {
           donePaths.push(workingPath.concat([null]).reverse());
