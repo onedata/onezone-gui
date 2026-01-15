@@ -681,7 +681,7 @@ export default Component.extend(I18n, {
    * Looks for all possible paths in the set of allNodesMap memberships.
    * @param {Map<string,Membership>} allNodesMap
    * @param {number} limit limit of paths
-   * @returns {Array<Array<string>>}
+   * @returns {{isMissingNodes: boolean, donePaths: Array<Array<string>>}}
    */
   calculatePaths(allNodesMap, limit) {
     const donePaths = [];
