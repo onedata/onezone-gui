@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-13044 Added search input for harvester spaces
 * VFS-13155 Fixed display of longer membership paths when the display limit is reached
 * VFS-13178 Fixed privileges bulk edit to support selecting groups from multiple pages
 * VFS-13221 Added support for new Calendar Versioning scheme in Onedata (e.g. version 25.0)
