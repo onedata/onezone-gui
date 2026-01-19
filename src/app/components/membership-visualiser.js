@@ -662,8 +662,11 @@ export default Component.extend(I18n, {
   async findPathsForDeeperLevel(parentLevel, allNodesMap, silent) {
     const maxPathsNumber = this.maxPathsNumber;
     const childLevel = await this.fetchGraphLevel(parentLevel, allNodesMap, silent);
-    const paths = this.calculatePaths(allNodesMap, maxPathsNumber);
-    if (paths.length >= maxPathsNumber || childLevel.length === 0) {
+    const {
+      isMissingNodes,
+      donePaths: paths,
+    } = this.calculatePaths(allNodesMap, maxPathsNumber);
+    if ((isMissingNodes && paths.length >= maxPathsNumber) || childLevel.length === 0) {
       return paths.slice(0, maxPathsNumber);
     } else {
       return this.findPathsForDeeperLevel(
@@ -678,20 +681,27 @@ export default Component.extend(I18n, {
    * Looks for all possible paths in the set of allNodesMap memberships.
    * @param {Map<string,Membership>} allNodesMap
    * @param {number} limit limit of paths
-   * @returns {Array<Array<string>>}
+   * @returns {{isMissingNodes: boolean, donePaths: Array<Array<string>>}}
+   *   Returns found paths and information if some nodes are missing and
+   *   should be fetched at a deeper level.
    */
   calculatePaths(allNodesMap, limit) {
     const donePaths = [];
     let workingPaths = [
       [this.get('targetRecord.gri')],
     ];
+    let isMissingNodes = true;
     while (donePaths.length < limit && workingPaths.length > 0) {
       workingPaths = _.flatten(workingPaths.map(workingPath => {
         const lastNodeGri = workingPath[workingPath.length - 1];
         const lastNode = allNodesMap.get(lastNodeGri);
         if (lastNode && get(lastNode, 'isDeleted')) {
           return [];
-        } else if (!lastNode || get(lastNode, 'isForbidden')) {
+        } else if (!lastNode) {
+          donePaths.push(workingPath.concat([null]).reverse());
+          isMissingNodes = false;
+          return [];
+        } else if (get(lastNode, 'isForbidden')) {
           donePaths.push(workingPath.concat([null]).reverse());
           return [];
         } else {
@@ -708,7 +718,7 @@ export default Component.extend(I18n, {
         }
       }));
     }
-    return donePaths;
+    return { isMissingNodes, donePaths };
   },
 
   actions: {
