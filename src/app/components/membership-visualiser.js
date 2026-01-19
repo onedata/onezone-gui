@@ -682,6 +682,8 @@ export default Component.extend(I18n, {
    * @param {Map<string,Membership>} allNodesMap
    * @param {number} limit limit of paths
    * @returns {{isMissingNodes: boolean, donePaths: Array<Array<string>>}}
+   *   Returns found paths and information if some nodes are missing and
+   *   should be fetched at a deeper level.
    */
   calculatePaths(allNodesMap, limit) {
     const donePaths = [];
