@@ -3,6 +3,7 @@
  *
  * @author Jakub Liput
  * @copyright (C) 2020-2024 ACK CYFRONET AGH
+ * @copyright (C) 2026 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -19,8 +20,18 @@ export default Mixin.create({
 
   actions: {
     updateDirId(dirId) {
-      return this.get('navigationState').changeRouteAspectOptions({
+      return this.navigationState.changeRouteAspectOptions({
         dirId,
+      });
+    },
+
+    /**
+     * @param {ShareShowTabId} tabId
+     * @returns {Transitino}
+     */
+    updateTabId(tabId) {
+      return this.navigationState.changeRouteAspectOptions({
+        tabId,
       });
     },
 
