@@ -3,6 +3,7 @@
  *
  * @author Jakub Liput
  * @copyright (C) 2019-2024 ACK CYFRONET AGH
+ * @copyright (C) 2026 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -78,6 +79,7 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
    */
   callParentActionNames: Object.freeze([
     'updateDirId',
+    'updateTabId',
     // TODO: VFS-11156 This method will be needed to implement shared files links
     // 'getFileGoToUrl',
   ]),
