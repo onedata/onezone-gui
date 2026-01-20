@@ -40,6 +40,11 @@ export default Component.extend(I18n, GlobalActions, {
   harvester: undefined,
 
   /**
+   * @type {string}
+   */
+  searchString: '',
+
+  /**
    * @type {ComputedProperty<PromiseArray<Models.Space>>}
    */
   harvesterSpacesProxy: promise.array(computed(
@@ -66,6 +71,19 @@ export default Component.extend(I18n, GlobalActions, {
       record: space,
     }));
   }),
+
+  /**
+   * @type {ComputedProperty<Array<SpaceListItem>>}
+   */
+  filteredSpaceItems: computed(
+    'spaceItems.[]',
+    'searchString',
+    function filteredSpaceItems() {
+      return this.spaceItems.filter(item =>
+        item.record.name.toLowerCase().includes(this.searchString.toLowerCase())
+      );
+    }
+  ),
 
   addYourSpaceAction: destroyableComputed('harvester', function addYourSpaceAction() {
     return AddYourSpaceAction.create({
