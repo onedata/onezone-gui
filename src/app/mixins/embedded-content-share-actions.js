@@ -27,7 +27,7 @@ export default Mixin.create({
 
     /**
      * @param {ShareShowTabId} tabId
-     * @returns {Transitino}
+     * @returns {Transition}
      */
     updateTabId(tabId) {
       return this.navigationState.changeRouteAspectOptions({
