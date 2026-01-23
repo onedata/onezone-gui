@@ -335,9 +335,11 @@ export default Service.extend(I18n, {
     });
   },
 
+  // FIXME: wprowadzenie typu file (jak w arrayu files niżej)
+
   /**
-   * @param {Object} newUpload
-   * @param {Models.Provider} oneprovider
+   * @param {Object} updateData
+   * @param {Models.Provider} updateData.oneprovider
    * @param {number} updateData.uploadId
    * @param {Array<{ path: string, size: number, fileId: string, spaceId: string }>} updateData.files
    * @returns {undefined}
@@ -348,21 +350,12 @@ export default Service.extend(I18n, {
       floatingUploads,
       navigationState,
       uploadsForGlobalProgress,
-    } = this.getProperties(
-      'uploadRootObjects',
-      'floatingUploads',
-      'navigationState',
-      'uploadsForGlobalProgress'
-    );
+    } = this;
 
     const {
       activeResourceType,
       activeResource,
-    } = getProperties(
-      navigationState,
-      'activeResourceType',
-      'activeResource'
-    );
+    } = navigationState;
 
     // Determine space (upload target) from navigationState
     let space;
@@ -428,7 +421,7 @@ export default Service.extend(I18n, {
       objectType: 'root',
       children: {},
     };
-    files.forEach(({ path, size, fileId, spaceId }) => {
+    files.forEach(({ path, size, fileId, spaceId, onedataReplacedFile }) => {
       const pathElements = path.split('/').filter(element => element);
       // path without possible surrounding `/` characters
       const strippedPath = pathElements.join('/');
@@ -455,6 +448,9 @@ export default Service.extend(I18n, {
                 fileId,
                 spaceId,
               });
+              if (onedataReplacedFile) {
+                set(node, 'onedataReplacedFile', onedataReplacedFile);
+              }
             }
             nextElementParent.children[pathElements[i]] = node;
           }
@@ -483,15 +479,8 @@ export default Service.extend(I18n, {
       fileId,
       spaceId,
       children,
-    } = getProperties(
-      treeSchema,
-      'objectPath',
-      'objectType',
-      'objectSize',
-      'fileId',
-      'spaceId',
-      'children'
-    );
+      onedataReplacedFile,
+    } = treeSchema;
 
     const uploadObject = UploadObject.create({
       objectPath,
@@ -500,6 +489,10 @@ export default Service.extend(I18n, {
       spaceId,
       parent,
     });
+
+    if (onedataReplacedFile !== undefined) {
+      set(uploadObject, 'targetName', onedataReplacedFile.name);
+    }
 
     if (objectSize !== undefined) {
       set(uploadObject, 'objectSize', objectSize);

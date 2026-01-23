@@ -93,6 +93,15 @@ export default EmberObject.extend({
   spaceId: undefined,
 
   /**
+   * Name of target file in the space. Provided optionally if the name distincts
+   * from name of file uploaded from the user's device, e.g., if the file content
+   * gets replaced.
+   * @virtual optional
+   * @type {string}
+   */
+  targetName: undefined,
+
+  /**
    * Start upload timestamp (in ms)
    * @type {number}
    */
