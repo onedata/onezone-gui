@@ -1,6 +1,6 @@
 <div class="upload-object-nesting-space" style={{nestingSpaceWidthStyle}}></div>
 <div
-  class="upload-object-nesting-container clickable"
+  class="upload-object-nesting-container {{if this.isExpandable "clickable"}}"
   onclick={{action "toggleExpand" value="target"}}
 >
   <div class="upload-object-heading-row {{if isExpandable "clickable"}}">
