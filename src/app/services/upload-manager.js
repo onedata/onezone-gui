@@ -335,8 +335,6 @@ export default Service.extend(I18n, {
     });
   },
 
-  // FIXME: wprowadzenie typu file (jak w arrayu files niżej)
-
   /**
    * @param {Object} updateData
    * @param {Models.Provider} updateData.oneprovider
