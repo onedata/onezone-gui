@@ -1,6 +1,6 @@
 <div class="upload-object-nesting-space" style={{nestingSpaceWidthStyle}}></div>
 <div
-  class="upload-object-nesting-container clickable"
+  class="upload-object-nesting-container {{if this.isExpandable "clickable"}}"
   onclick={{action "toggleExpand" value="target"}}
 >
   <div class="upload-object-heading-row {{if isExpandable "clickable"}}">
@@ -8,15 +8,21 @@
       class={{concat uploadObject.objectType "-icon upload-object-icon"}}
       @icon={{objectIcon}}
     />
+    {{#if uploadObject.targetName}}
+      <TruncatedString class="upload-object-name">
+        {{uploadObject.objectName}}
+      </TruncatedString>
+      <OneIcon @icon="arrow-right-full" class="target-name-arrow" />
+    {{/if}}
     {{#if fileUrl}}
       <TruncatedString class="upload-object-name">
         <a href={{fileUrl}} class="black upload-object-link">
-          {{uploadObject.objectName}}
+          {{or uploadObject.targetName uploadObject.objectName}}
         </a>
       </TruncatedString>
     {{else}}
       <TruncatedString class="upload-object-name">
-        {{uploadObject.objectName}}
+        {{or uploadObject.targetName uploadObject.objectName}}
       </TruncatedString>
     {{/if}}
     <div class="upload-object-icons">
