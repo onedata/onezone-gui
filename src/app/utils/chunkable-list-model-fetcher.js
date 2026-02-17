@@ -163,6 +163,11 @@ export default class ChunkableListModelFetcher {
       return items;
     }
     const queryRegExp = new RegExp(this.filterExpression, 'i');
-    return items.filter(item => queryRegExp.test(item.name));
+    return items.filter(item => {
+      if (item.conflictLabel) {
+        return queryRegExp.test(item.name + '@' + item.conflictLabel);
+      }
+      return queryRegExp.test(item.name);
+    });
   }
 }
