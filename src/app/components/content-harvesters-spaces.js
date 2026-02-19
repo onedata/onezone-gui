@@ -79,9 +79,13 @@ export default Component.extend(I18n, GlobalActions, {
     'spaceItems.[]',
     'searchString',
     function filteredSpaceItems() {
-      return this.spaceItems.filter(item =>
-        item.record.name.toLowerCase().includes(this.searchString.toLowerCase())
-      );
+      return this.spaceItems.filter(item => {
+        let searchableName = item.record.name;
+        if (item.record.conflictLabel) {
+          searchableName = item.record.name + '@' + item.record.conflictLabel;
+        }
+        return searchableName.toLowerCase().includes(this.searchString.toLowerCase());
+      });
     }
   ),
 
