@@ -1,8 +1,8 @@
-<PromiseProxyContainer @proxy={{this.isCustomFrontpageAvailableProxy}}>
+<PromiseProxyContainer @proxy={{this.customFrontpagePathProxy}}>
   {{#if this.isCustomFrontpageShown}}
     <iframe
       id={{this.customFrontpageIframeId}}
-      src={{this.frontpagePath}}
+      src={{this.customFrontpagePath}}
       frameborder="0"
       class="onezone-custom-frontpage-iframe"
       {{did-insert this.onIframeInserted}}
