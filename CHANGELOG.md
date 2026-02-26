@@ -5,6 +5,8 @@
 ### Latest changes
 
 * VFS-12570 Added support for searching by conflict label in menu search box and on harvesters spaces page
+* VFS-13310 Added validation to pages control
+* VFS-13314 Using the main custom frontpage template in login test mode if the testing template is not available
 * VFS-13176 Added support for the replaced file name in the upload
 * VFS-13143 Added support for changing share's tab in the URL from the embedded Oneprovider
 * VFS-13044 Added search input for harvester spaces

@@ -4,7 +4,7 @@
  *
  * @author Jakub Liput
  * @copyright (C) 2024 ACK CYFRONET AGH
- * @copyright (C) 2025 Onedata (onedata.org)
+ * @copyright (C) 2025-2026 Onedata (onedata.org)
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -56,20 +56,27 @@ export default class OnezoneLogin extends Component {
 
   @bool('isCustomFrontpageAvailable') isCustomFrontpageShown;
 
-  @computed('frontpagePath')
-  get isCustomFrontpageAvailableProxy() {
+  /** @type {'frontpage-test'|'frontpage'|null} */
+  @computed('loginViewModel.testMode')
+  get customFrontpagePathProxy() {
+    const isTestMode = this.loginViewModel.testMode;
     return promiseObject((async () => {
-      let response;
-      try {
-        response = await globals.fetch(this.frontpagePath);
-      } catch {
-        return false;
+      if (isTestMode) {
+        const testFrontpagePath = this.generateCustomFrontpagePath('frontpage-test');
+        const testPathAvailable = await this.testPath(testFrontpagePath);
+        if (testPathAvailable) {
+          return testFrontpagePath;
+        }
+        // if there is no test custom frontpage, try to use main custom frontpage
       }
-      return response.ok;
+      const mainFrontpagePath = this.generateCustomFrontpagePath('frontpage');
+      const mainPathAvailable = await this.testPath(mainFrontpagePath);
+      return mainPathAvailable ? mainFrontpagePath : null;
     })());
   }
 
-  @bool('isCustomFrontpageAvailableProxy.content') isCustomFrontpageAvailable;
+  @bool('customFrontpagePath') isCustomFrontpageAvailable;
+  @reads('customFrontpagePathProxy.content') customFrontpagePath;
 
   @computed('elementId')
   get customFrontpageIframeId() {
@@ -79,12 +86,6 @@ export default class OnezoneLogin extends Component {
   @reads('loginViewModel.availableAuthenticatorsProxy') availableAuthenticatorsProxy;
   @reads('loginViewModel.signInNotificationProxy') signInNotificationProxy;
 
-  @computed('loginViewModel.testMode')
-  get frontpagePath() {
-    const frontpageDir = this.loginViewModel.testMode ? 'frontpage-test' : 'frontpage';
-    return noCacheUrl(`custom/${frontpageDir}/index.html`);
-  }
-
   constructor() {
     super(...arguments);
     this.loginViewModel = OnezoneLoginViewModel.create({
@@ -92,6 +93,21 @@ export default class OnezoneLogin extends Component {
       authenticationErrorReason: this.authenticationErrorReason,
       authenticationErrorState: this.authenticationErrorState,
     });
+  }
+
+  generateCustomFrontpagePath(frontpageDir) {
+    return noCacheUrl(`custom/${frontpageDir}/index.html`);
+  }
+
+  async testPath(path) {
+    /** @type {Response} */
+    let response;
+    try {
+      response = await globals.fetch(path);
+    } catch {
+      return false;
+    }
+    return response.ok;
   }
 
   onIframeLoad(iframe) {
