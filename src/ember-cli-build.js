@@ -24,6 +24,8 @@ const BabelTranspiler = require('broccoli-babel-transpiler');
 const Funnel = require('broccoli-funnel');
 const mergeTrees = require('broccoli-merge-trees');
 
+const fs = require('fs');
+
 const environment = EmberApp.env();
 const customHasher = new CustomBroccoliHasher('onezone-gui');
 const customHash = customHasher.hash.bind(customHasher);
@@ -165,7 +167,27 @@ module.exports = function (defaults) {
     ],
   });
 
+  const customCss = '/var/www/html/oz_worker/custom/frontpage/ala-ma-kota.css';
   const appTree = app.toTree();
+  console.log('Checking if custom CSS file exists at path:', customCss);
+
+  if (fs.existsSync(customCss)) {
+    console.log('Custom CSS file found. Integrating it into the build.');
+    const href = 'custom/frontpage/ala-ma-kota.css';
+    const customFiles = new Funnel('/var/www/html/oz_worker/custom/frontpage', {
+      files: ['ala-ma-kota.css'],
+      destDir: 'custom/frontpage',
+    });
+
+    app.options.contentFor = app.options.contentFor || {};
+    app.options.contentFor.head = (app.options.contentFor.head || '') +
+      `<link rel="stylesheet" href="${href}">\n`;
+
+    return mergeTrees([appTree, transpiledScripts, customFiles], {
+      overwrite: true,
+    });
+  }
+
   return mergeTrees([appTree, transpiledScripts], {
     overwrite: true,
   });
