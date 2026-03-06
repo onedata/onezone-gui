@@ -13,6 +13,7 @@ import ProgressTracker from 'onedata-gui-common/utils/progress-tracker';
 import fetchBatchRecords from './fetch-batch-records';
 import _ from 'lodash';
 import { defaultBatchFetchSize } from './batch-records-loader';
+import { getNameWithConflictLabel } from '../../lib/onedata-gui-common/addon/components/name-conflict';
 
 /**
  * @typedef {InfiniteScrollItem} ChunkableListModelFetcherItem
@@ -164,10 +165,10 @@ export default class ChunkableListModelFetcher {
     }
     const queryRegExp = new RegExp(this.filterExpression, 'i');
     return items.filter(item => {
-      if (item.conflictLabel) {
-        return queryRegExp.test(item.name + '@' + item.conflictLabel);
-      }
-      return queryRegExp.test(item.name);
+      return queryRegExp.test(getNameWithConflictLabel(
+        item.name,
+        item.conflictLabel
+      ));
     });
   }
 }
