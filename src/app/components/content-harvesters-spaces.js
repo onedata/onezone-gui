@@ -22,7 +22,7 @@ import {
   destroyableComputed,
   initDestroyableCache,
 } from 'onedata-gui-common/utils/destroyable-computed';
-import { getNameWithConflictLabel } from '../../lib/onedata-gui-common/addon/components/name-conflict';
+import { getNameWithConflictLabel } from 'onedata-gui-common/components/name-conflict';
 
 export default Component.extend(I18n, GlobalActions, {
   classNames: ['content-harvesters-spaces'],

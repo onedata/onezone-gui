@@ -13,7 +13,7 @@ import ProgressTracker from 'onedata-gui-common/utils/progress-tracker';
 import fetchBatchRecords from './fetch-batch-records';
 import _ from 'lodash';
 import { defaultBatchFetchSize } from './batch-records-loader';
-import { getNameWithConflictLabel } from '../../lib/onedata-gui-common/addon/components/name-conflict';
+import { getNameWithConflictLabel } from 'onedata-gui-common/components/name-conflict';
 
 /**
  * @typedef {InfiniteScrollItem} ChunkableListModelFetcherItem
