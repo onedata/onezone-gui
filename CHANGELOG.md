@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-12570 Added support for searching by conflict label in menu search box and on harvesters spaces page
 * VFS-13310 Added validation to pages control
 * VFS-13314 Using the main custom frontpage template in login test mode if the testing template is not available
 * VFS-13176 Added support for the replaced file name in the upload

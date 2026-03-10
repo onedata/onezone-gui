@@ -22,6 +22,7 @@ import {
   destroyableComputed,
   initDestroyableCache,
 } from 'onedata-gui-common/utils/destroyable-computed';
+import { getNameWithConflictLabel } from 'onedata-gui-common/components/name-conflict';
 
 export default Component.extend(I18n, GlobalActions, {
   classNames: ['content-harvesters-spaces'],
@@ -79,9 +80,13 @@ export default Component.extend(I18n, GlobalActions, {
     'spaceItems.[]',
     'searchString',
     function filteredSpaceItems() {
-      return this.spaceItems.filter(item =>
-        item.record.name.toLowerCase().includes(this.searchString.toLowerCase())
-      );
+      return this.spaceItems.filter(item => {
+        const searchableName = getNameWithConflictLabel(
+          item.record.name,
+          item.record.conflictLabel
+        );
+        return searchableName.toLowerCase().includes(this.searchString.toLowerCase());
+      });
     }
   ),
 
