@@ -79,7 +79,7 @@
     padding: $padding-xs-horizontal;
 
     &:hover {
-      color: $color-one-red;
+      color: var(--primary-sidebar-color);
     }
 
     .token-copy-icon {
