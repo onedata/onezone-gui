@@ -4,7 +4,7 @@
   .one-list {
     > .main-menu-upload-item {
       position: relative;
-      background-color: var(--primary-sidebar-color);
+      background-color: var(--upload-sidebar-color);
       transition: transition-ease(background-color, .4s);
 
       &.selected, &.active {
@@ -20,7 +20,7 @@
       }
 
       &.minimize-target-animation {
-        background-color: darken-custom(primary-sidebar-color, 25%);
+        background-color: darken-custom(upload-sidebar-color, 25%);
         .item-header {
           .one-icon {
             transform: scale(1.2);
