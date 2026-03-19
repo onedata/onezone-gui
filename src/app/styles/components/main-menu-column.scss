@@ -4,7 +4,7 @@
   }
   .powered-by-container {
     visibility: hidden;
-    $powered-by-color: #BEBEBE;
+    $powered-by-color: $color-one-light-gray;
 
     display: flex;
     justify-content: center;
