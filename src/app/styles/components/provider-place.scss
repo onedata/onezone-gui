@@ -192,12 +192,12 @@ $provider-place-circle-size: 64px;
 
     &.online {
       .state-indicator {
-        color: $color-one-mint;
+        color: $color-one-success;
       }
     }
     &.offline {
       .state-indicator {
-        color: $color-one-red;
+        color: $color-one-danger;
       }
     }
     &.offline {

@@ -118,25 +118,25 @@
     transition: transition-ease(background-color, .4s);
 
     &.cancelled {
-      background-color: lighten($color-one-yellow, 40%);
+      background-color: lighten($color-one-warning, 40%);
     }
 
     &.failed {
-      background-color: lighten($color-one-red, 38%);
+      background-color: lighten($color-one-danger, 38%);
       .progress-bar {
-        background-color: lighten($color-one-red, 30%);
+        background-color: lighten($color-one-danger, 30%);
       }
     }
 
     &.uploaded {
-      background-color: lighten($color-one-mint, 30%);
+      background-color: lighten($color-one-success, 30%);
       .progress-bar {
-        background-color: lighten($color-one-mint, 30%);
+        background-color: lighten($color-one-success, 30%);
     }}
 
     .progress-bar {
       box-shadow: none;
-      background-color: $color-one-light-blue;
+      background-color: $color-one-default;
       transition: transition-ease(background-color, .4s), transition-ease(width, .6s);
     }
   }

@@ -166,6 +166,7 @@ module.exports = function (defaults) {
   });
 
   const appTree = app.toTree();
+
   return mergeTrees([appTree, transpiledScripts], {
     overwrite: true,
   });
