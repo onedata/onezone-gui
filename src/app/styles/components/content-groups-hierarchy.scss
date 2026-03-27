@@ -10,7 +10,7 @@
   .ghv-outer-container {
     position: absolute;
     // -1px for top border
-    top: calc(2 * $onedata-logo-margin-top + var(--onedata-logo-height) - 1px);
+    top: calc(2 * #{$onedata-logo-margin-top} + var(--onedata-logo-height) - 1px);
     left: 0;
     right: 0;
     bottom: 0;
