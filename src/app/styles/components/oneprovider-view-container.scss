@@ -78,7 +78,7 @@
 
     .map-selector {
       position: fixed;
-      top: calc(var(--content-header-row-height) + $-one-tab-bar-height + $padding-base-vertical);
+      top: calc(var(--content-header-row-height) + #{$-one-tab-bar-height} + #{$padding-base-vertical});
       left: 0;
       right: 0;
       bottom: 0;
@@ -86,7 +86,7 @@
 
     @media(max-width: $screen-sm-max) {
       .map-selector {
-        top: calc(var(--content-header-row-mobile-height) + $-one-tab-bar-height + $padding-base-vertical);
+        top: calc(var(--content-header-row-mobile-height) + #{$-one-tab-bar-height} + #{$padding-base-vertical});
       }
     }
 
