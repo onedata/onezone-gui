@@ -164,11 +164,17 @@ export default class ChunkableListModelFetcher {
       return items;
     }
     const queryRegExp = new RegExp(this.filterExpression, 'i');
+    // TODO
+    const isIdSearch = this.filterExpression.length > 0;
     return items.filter(item => {
-      return queryRegExp.test(getNameWithConflictLabel(
+      const result = queryRegExp.test(getNameWithConflictLabel(
         item.name,
         item.conflictLabel
       ));
+      if (!result && isIdSearch) {
+        return queryRegExp.test(item.entityId);
+      }
+      return result;
     });
   }
 }
