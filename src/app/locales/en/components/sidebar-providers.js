@@ -4,5 +4,6 @@ export default {
     totalSupportHint: 'Total support size: {{size}}',
     providerDomain: 'provider domain',
     copyDomainAction: 'Copy domain',
+    domainTooltip: '<strong>Domain:</strong> {{domain}}',
   },
 };

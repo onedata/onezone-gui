@@ -4,9 +4,17 @@
   @tagIcon={{if this.offline "x"}}
   @shadowType="none"
 />
-<TruncatedString class="sidebar-item-title">
-  <NameConflict @item={{this.item}} @tagName="span" class="one-label" />
-</TruncatedString>
+<div class="sidebar-item-title">
+  <TruncatedString class="sidebar-item-title-upper">
+    <NameConflict @item={{this.item}} @tagName="span" class="one-label" />
+  </TruncatedString>
+  <TruncatedString
+    class="sidebar-item-title-lower"
+    @customTooltipText={{tt this "domainTooltip" domain=this.item.domain}}
+  >
+    <span class="provider-domain">{{this.item.domain}}</span>
+  </TruncatedString>
+</div>
 {{#if (or this.isSpacesCountAvailable this.areSpacesLoaded)}}
   <StatusToolbar as |toolbar|>
     {{#if this.isSpacesCountAvailable}}
