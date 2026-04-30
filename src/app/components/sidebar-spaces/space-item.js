@@ -256,7 +256,7 @@ export default Component.extend(I18n, {
     'space.entityId',
     'sidebar.filter',
     function isIdMatchingFilter() {
-      const filter = this.sidebar.filter;
+      const filter = this.sidebar?.filter;
       if (filter && filter.length >= 2) {
         const queryRegExp = new RegExp('^' + filter, 'i');
         return queryRegExp.test(this.space.entityId);
