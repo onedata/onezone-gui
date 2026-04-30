@@ -12,7 +12,12 @@
   />
 {{else}}
   <div class="sidebar-item-title">
-    <TruncatedString class="sidebar-spaces-item-title sidebar-item-title-upper">
+    <TruncatedString
+      class={{concat-classes
+        "sidebar-spaces-item-title"
+        (if isIdMatchingFilter "sidebar-item-title-upper")
+      }}
+    >
       {{#if item.name}}
         <span class="item-name">
           {{emphasize-substring this.item.name this.sidebar.filter false "mark"}}
@@ -21,12 +26,16 @@
         <span class="one-label no-name">...</span>
       {{/if}}
     </TruncatedString>
-    <TruncatedString class="sidebar-item-title-lower">
-      {{log sidebar.filter}}
-      <span class="space-id">
-        {{emphasize-substring this.item.entityId this.sidebar.filter false "mark"}}
-      </span>
-    </TruncatedString>
+    {{#if isIdMatchingFilter}}
+      <TruncatedString class="sidebar-item-title-lower">
+        <span class="space-id">
+          {{tt this "id"}}
+          <span>
+            {{emphasize-substring this.item.entityId this.sidebar.filter false "mark"}}
+          </span>
+        </span>
+      </TruncatedString>
+    {{/if}}
   </div>
   {{#if isRecentlyUsedIconShown}}
     <OneIcon

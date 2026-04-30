@@ -8,6 +8,9 @@
     }
     .space-id {
       font-size: 80%;
+      span {
+        @include font-monospace();
+      }
     }
   }
   .recently-used-icon {

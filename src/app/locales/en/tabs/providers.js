@@ -1,5 +1,6 @@
 export default {
   menuItem: 'Providers',
+  searchPlaceholder: 'Search by provider name...',
   specialResources: {
     empty: 'Add support',
   },
