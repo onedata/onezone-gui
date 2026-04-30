@@ -20,7 +20,7 @@
     >
       {{#if item.name}}
         <span class="item-name">
-          {{emphasize-substring this.item.name this.sidebar.filter false "mark"}}
+          {{emphasize-substring this.displayedName this.sidebar.filter false "mark"}}
         </span>
       {{else}}
         <span class="one-label no-name">...</span>

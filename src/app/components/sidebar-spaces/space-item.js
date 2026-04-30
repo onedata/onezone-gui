@@ -17,6 +17,7 @@ import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
 import I18n from 'onedata-gui-common/mixins/i18n';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { htmlSafe } from '@ember/string';
+import { getNameWithConflictLabel } from 'onedata-gui-common/components/name-conflict';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -243,6 +244,13 @@ export default Component.extend(I18n, {
       }
     }
   ),
+
+  /**
+   * @type {ComputedProperty<string>}
+   */
+  displayedName: computed('space.{name,conflictLabel}', function displayedName() {
+    return getNameWithConflictLabel(this.space.name, this.space.conflictLabel);
+  }),
 
   isIdMatchingFilter: computed(
     'space.entityId',
