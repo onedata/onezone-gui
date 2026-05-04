@@ -40,6 +40,12 @@ export default class ChunkableListModelFetcher {
   filterExpression = '';
 
   /**
+   * @type {boolean}
+   */
+  @tracked
+  isSearchById = false;
+
+  /**
    * @type {any}
    */
   @tracked
@@ -94,9 +100,10 @@ export default class ChunkableListModelFetcher {
     };
   }
 
-  setFilter({ expression, advanced }) {
+  setFilter({ expression, advanced, isSearchById = false }) {
     this.filterExpression = expression;
     this.filterAdvanced = advanced;
+    this.isSearchById = isSearchById;
   }
 
   filterItems(items) {
@@ -164,7 +171,7 @@ export default class ChunkableListModelFetcher {
       return items;
     }
     const queryRegExp = new RegExp(this.filterExpression, 'i');
-    const isIdSearch = this.filterExpression.length >= 2 && items[0].entityType === 'space';
+    const isIdSearch = this.isSearchById && this.filterExpression.length >= 2;
     return items.filter(item => {
       const result = queryRegExp.test(getNameWithConflictLabel(
         item.name,

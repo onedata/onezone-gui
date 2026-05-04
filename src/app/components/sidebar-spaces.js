@@ -51,6 +51,11 @@ export default class extends ChunkableListModelSidebar.extend(UserProxyMixin) {
   sidebarType = 'spaces';
 
   /**
+   * @override
+   */
+  isSearchById = true;
+
+  /**
    * Number of items that can have MRU (most recently used) badge.
    * @type {ComputedProperty<number>}
    */
