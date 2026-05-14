@@ -6,7 +6,7 @@ export default {
     advertisedInMarketplace: 'This space is advertised in the Space Marketplace',
     spacePersistence: 'space persistence',
     recentlyUsed: 'Recently used',
-    id: 'Id: ',
+    id: 'ID: ',
   },
   secondLevelItems: {
     aspects: {

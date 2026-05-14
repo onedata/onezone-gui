@@ -6,9 +6,12 @@
     .item-header .status-toolbar.sidebar-spaces-status-toolbar {
       margin-left: auto;
     }
-    .space-id {
+    .sidebar-item-title-lower {
+      opacity: 0.8;
+    }
+    .space-id-text {
       font-size: 80%;
-      span {
+      .space-id {
         @include font-monospace();
       }
     }

@@ -9,7 +9,7 @@
 import ChunkableListModelSidebar from 'onedata-gui-common/components/chunkable-list-model-sidebar';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import { inject as service } from '@ember/service';
-import { computed } from '@ember/object';
+import { computed, setProperties } from '@ember/object';
 import { classNames } from '@ember-decorators/component';
 
 @classNames('sidebar-spaces')
@@ -56,6 +56,11 @@ export default class extends ChunkableListModelSidebar.extend(UserProxyMixin) {
   isSearchById = true;
 
   /**
+   * @type {number}
+   */
+  minIdSearchLength = 2;
+
+  /**
    * Number of items that can have MRU (most recently used) badge.
    * @type {ComputedProperty<number>}
    */
@@ -94,9 +99,18 @@ export default class extends ChunkableListModelSidebar.extend(UserProxyMixin) {
   init() {
     super.init(...arguments);
     this.addObserver('primaryItemSourceArrayIndex', this, 'forceFirstRowHeightRecompute', false);
+    setProperties(
+      this.model.collection.chunkableListModel.chunkableListModelFetcher, {
+        minIdSearchLength: this.minIdSearchLength,
+        idFilterRegExp: this.idFilterRegExp,
+      });
   }
 
   forceFirstRowHeightRecompute() {
     this.infiniteScroll.firstRowModel.notifyPropertyChange('height');
+  }
+
+  idFilterRegExp(filter) {
+    return new RegExp('^' + filter, 'i');
   }
 }

@@ -46,6 +46,18 @@ export default class ChunkableListModelFetcher {
   isSearchById = false;
 
   /**
+   * @type {number}
+   */
+  @tracked
+  minIdSearchLength = 0;
+
+  /**
+   * @type {RegExp|null}
+   */
+  @tracked
+  idFilterRegExp = null;
+
+  /**
    * @type {any}
    */
   @tracked
@@ -171,15 +183,16 @@ export default class ChunkableListModelFetcher {
       return items;
     }
     const queryRegExp = new RegExp(this.filterExpression, 'i');
-    const isIdSearch = this.isSearchById && this.filterExpression.length >= 2;
+    const isIdSearch = this.isSearchById &&
+      this.filterExpression.length >= this.minIdSearchLength;
     return items.filter(item => {
       const result = queryRegExp.test(getNameWithConflictLabel(
         item.name,
         item.conflictLabel
       ));
       if (!result && isIdSearch) {
-        const idQueryRegExp = new RegExp('^' + this.filterExpression, 'i');
-        return idQueryRegExp.test(item.entityId);
+        const idRegExp = this.idFilterRegExp(this.filterExpression);
+        return idRegExp.test(item.entityId);
       }
       return result;
     });

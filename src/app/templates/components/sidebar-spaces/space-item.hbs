@@ -15,7 +15,7 @@
     <TruncatedString
       class={{concat-classes
         "sidebar-spaces-item-title"
-        (if isIdMatchingFilter "sidebar-item-title-upper")
+        (if this.isIdMatchingFilter "sidebar-item-title-upper")
       }}
     >
       {{#if item.name}}
@@ -31,11 +31,11 @@
         <span class="one-label no-name">...</span>
       {{/if}}
     </TruncatedString>
-    {{#if isIdMatchingFilter}}
+    {{#if this.isIdMatchingFilter}}
       <TruncatedString class="sidebar-item-title-lower">
-        <span class="space-id">
+        <span class="space-id-text">
           {{tt this "id"}}
-          <span>
+          <span class="space-id">
             {{emphasize-substring
               this.item.entityId
               this.sidebar.filter

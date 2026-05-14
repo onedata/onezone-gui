@@ -254,11 +254,11 @@ export default Component.extend(I18n, {
 
   isIdMatchingFilter: computed(
     'space.entityId',
-    'sidebar.filter',
+    'sidebar.{filter,minIdSearchLength,idFilterRegExp}',
     function isIdMatchingFilter() {
       const filter = this.sidebar?.filter;
-      if (filter && filter.length >= 2) {
-        const queryRegExp = new RegExp('^' + filter, 'i');
+      if (filter && filter.length >= this.sidebar.minIdSearchLength) {
+        const queryRegExp = this.sidebar.idFilterRegExp(filter);
         return queryRegExp.test(this.space.entityId);
       }
       return false;
