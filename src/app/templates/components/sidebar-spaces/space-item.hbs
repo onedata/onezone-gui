@@ -20,7 +20,12 @@
     >
       {{#if item.name}}
         <span class="item-name">
-          {{emphasize-substring this.displayedName this.sidebar.filter false "mark"}}
+          {{emphasize-substring
+            this.displayedName
+            this.sidebar.filter
+            caseSensitive=false
+            htmlTag="mark"
+          }}
         </span>
       {{else}}
         <span class="one-label no-name">...</span>
@@ -31,7 +36,12 @@
         <span class="space-id">
           {{tt this "id"}}
           <span>
-            {{emphasize-substring this.item.entityId this.sidebar.filter false "mark"}}
+            {{emphasize-substring
+              this.item.entityId
+              this.sidebar.filter
+              caseSensitive=false
+              htmlTag="mark"
+            }}
           </span>
         </span>
       </TruncatedString>
