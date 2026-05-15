@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-13499 Fixed color in upload presenter
 * VFS-13448 Fixed styles for oneprovider map
 * VFS-13324 Added basic sidebar whitelabeling
 * VFS-12570 Added support for searching by conflict label in menu search box and on harvesters spaces page
