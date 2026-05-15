@@ -18,6 +18,7 @@ import I18n from 'onedata-gui-common/mixins/i18n';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { htmlSafe } from '@ember/string';
 import { getNameWithConflictLabel } from 'onedata-gui-common/components/name-conflict';
+import matchIdFilter from 'onezone-gui/utils/match-id-filter';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -254,14 +255,10 @@ export default Component.extend(I18n, {
 
   isIdMatchingFilter: computed(
     'space.entityId',
-    'sidebar.{filter,minIdSearchLength,idFilterRegExp}',
+    'sidebar.filter',
     function isIdMatchingFilter() {
       const filter = this.sidebar?.filter;
-      if (filter && filter.length >= this.sidebar.minIdSearchLength) {
-        const queryRegExp = this.sidebar.idFilterRegExp(filter);
-        return queryRegExp.test(this.space.entityId);
-      }
-      return false;
+      return matchIdFilter(this.space.entityId, filter);
     }
   ),
 

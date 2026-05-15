@@ -7,7 +7,8 @@
       margin-left: auto;
     }
     .sidebar-item-title-lower {
-      opacity: 0.8;
+      opacity: 1;
+      color: lighten($main-text-color, 20%)
     }
     .space-id-text {
       font-size: 80%;

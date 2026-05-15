@@ -20,7 +20,7 @@
     >
       {{#if item.name}}
         <span class="item-name">
-          {{emphasize-substring
+          {{tag-substring
             this.displayedName
             this.sidebar.filter
             caseSensitive=false
@@ -36,7 +36,7 @@
         <span class="space-id-text">
           {{tt this "id"}}
           <span class="space-id">
-            {{emphasize-substring
+            {{tag-substring
               this.item.entityId
               this.sidebar.filter
               caseSensitive=false
