@@ -9,7 +9,7 @@
 import ChunkableListModelSidebar from 'onedata-gui-common/components/chunkable-list-model-sidebar';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import { inject as service } from '@ember/service';
-import { computed, setProperties } from '@ember/object';
+import { computed } from '@ember/object';
 import { classNames } from '@ember-decorators/component';
 
 @classNames('sidebar-spaces')
