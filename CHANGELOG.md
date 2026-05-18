@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-13395 Added searching by id in space sidebar
 * VFS-13511 Fixed docs and API links for new homepage
 * VFS-13499 Fixed color in upload presenter
 * VFS-13448 Fixed styles for oneprovider map
