@@ -17,6 +17,9 @@ export default GuiUtils.extend(UserProxyMixin, {
 
   currentUser: service(),
 
+  /** @override */
+  productTypeId: 'onezone',
+
   /**
    * @override
    */
