@@ -1,5 +1,6 @@
 export default {
   menuItem: 'Clusters',
+  searchPlaceholder: 'Search by cluster name...',
   specialResources: {
     empty: 'No clusters',
     add: 'Create new Oneprovider cluster',

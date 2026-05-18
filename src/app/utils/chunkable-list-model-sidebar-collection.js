@@ -72,8 +72,8 @@ export class ChunkableListModelSidebarCollection {
     return this.chunkableListModel.progressTracker;
   }
 
-  setFilter({ expression, advanced }) {
-    this.chunkableListModel.setFilter({ expression, advanced });
+  setFilter({ expression, advanced, isSearchById = false }) {
+    this.chunkableListModel.setFilter({ expression, advanced, isSearchById });
   }
 }
 

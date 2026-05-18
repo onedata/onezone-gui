@@ -1,5 +1,6 @@
 export default {
   menuItem: 'Discovery',
+  searchPlaceholder: 'Search by harvester name...',
   specialResources: {
     empty: 'No harvesters',
     new: 'Create new harvester',
