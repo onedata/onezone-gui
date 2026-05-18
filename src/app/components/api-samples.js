@@ -21,11 +21,6 @@ export default ApiSamples.extend({
   i18nPrefix: 'components.apiSamples',
 
   /**
-   * @override
-   */
-  product: 'onezone',
-
-  /**
    * @type {String} URL to create access token view
    */
   accessTokenUrl: computed(function accessTokenUrl() {

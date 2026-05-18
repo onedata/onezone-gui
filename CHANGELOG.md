@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-13511 Fixed docs and API links for new homepage
 * VFS-13499 Fixed color in upload presenter
 * VFS-13448 Fixed styles for oneprovider map
 * VFS-13324 Added basic sidebar whitelabeling
