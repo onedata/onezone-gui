@@ -138,6 +138,8 @@ $provider-place-circle-size: 64px;
       padding: $padding-large-horizontal $padding-large-vertical;
       border-top: 1px solid $main-border-color;
       border-bottom: 1px solid $main-border-color;
+      cursor: pointer;
+
       .provider-host-text {
         height: $line-height-computed;
         width: 100%;
@@ -267,7 +269,7 @@ $provider-place-circle-size: 64px;
     .drop-host-divider {
       border-top: 1px solid $main-border-color;
       margin: 2px (-$padding-base-horizontal);
-      padding-bottom: 3px;
+      padding-bottom: 1px;
     }
 
     .drop-provider-host-container {
@@ -296,8 +298,8 @@ $provider-place-circle-size: 64px;
       }
       .provider-host-copy-btn {
         position: absolute;
-        top: 3px;
-        left: 0.2em;
+        top: 0;
+        left: 0.35em;
         padding: 0;
         border: 0;
         background: transparent;
@@ -319,8 +321,7 @@ $provider-place-circle-size: 64px;
       .provider-host-icon {
         position: absolute;
         left: 0.85em;
-        top: 50%;
-        transform: translateY(-50%);
+        top: 0.35em;
         font-size: 150%;
         color: $color-one-dark-gray;
       }
@@ -342,7 +343,7 @@ $provider-place-circle-size: 64px;
       }
       .spaces-list {
         position: absolute;
-        margin-top: 7px;
+        margin-top: 8px;
         top: 70px + $padding-large-vertical;
         bottom: 2 * $padding-large-vertical + $-btn-container-height;
         left: 0;

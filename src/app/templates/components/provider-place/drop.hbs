@@ -1,5 +1,5 @@
 <div class="drop-title-bar">
-  <OneIcon @icon="provider" class="state-indicator">
+  <OneIcon @icon="provider" class="state-indicator hidden-xs">
     <OneTooltip @title={{tt this (if this.provider.online "online" "offline")}} />
   </OneIcon>
   <TruncatedString class="provider-label">
@@ -29,8 +29,11 @@
   </OneIcon>
 </div>
 <hr class="drop-host-divider">
-<div class="drop-provider-host-container">
-  <OneIcon @icon="globe" class="provider-host-icon" />
+<div
+  class="drop-provider-host-container"
+  onclick={{action "copyHostToClipboard"}}
+>
+  <OneIcon @icon="globe" class="provider-host-icon hidden-xs" />
   <input
     class={{concat-classes
       "provider-host-text"
@@ -41,14 +44,7 @@
     readonly
   >
   <div class="provider-host-copy-btn-container">
-    <CopyButton
-      @clipboardTarget={{concat ".host-input-" (model-routable-id this.provider.id)}}
-      @success={{action "copySuccess"}}
-      @error={{action "copyError"}}
-      class="provider-host-copy-btn clickable"
-    >
-      <OneIcon @icon="browser-copy" />
-    </CopyButton>
+    <OneIcon @icon="browser-copy" class="provider-host-copy-btn clickable"/>
   </div>
 </div>
 <div class="drop-body">

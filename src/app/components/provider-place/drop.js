@@ -29,6 +29,7 @@ export default Component.extend(I18n, {
   guiUtils: service(),
   router: service(),
   providerResources: service(),
+  globalClipboard: service(),
 
   /**
    * @virtual
@@ -176,6 +177,9 @@ export default Component.extend(I18n, {
 
     copyError() {
       this.globalNotify.info(this.t('hostnameCopyError'));
+    },
+    copyHostToClipboard() {
+      this.globalClipboard.copy(this.provider.domain);
     },
   },
 });
