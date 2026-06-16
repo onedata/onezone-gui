@@ -171,13 +171,6 @@ export default Component.extend(I18n, {
   },
 
   actions: {
-    copySuccess() {
-      this.globalNotify.info(this.t('hostnameCopySuccess'));
-    },
-
-    copyError() {
-      this.globalNotify.info(this.t('hostnameCopyError'));
-    },
     copyHostToClipboard() {
       this.globalClipboard.copy(this.provider.domain);
     },
