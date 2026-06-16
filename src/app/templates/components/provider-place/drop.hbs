@@ -1,9 +1,9 @@
 <div class="drop-title-bar">
+  <OneIcon @icon="provider" class="state-indicator">
+    <OneTooltip @title={{tt this (if this.provider.online "online" "offline")}} />
+  </OneIcon>
   <TruncatedString class="provider-label">
     <span class="hidden-xs">
-      <OneIcon @icon="provider" class="state-indicator">
-        <OneTooltip @title={{tt this (if this.provider.online "online" "offline")}} />
-      </OneIcon>
       <TruncatedString><NameConflict
         @item={{this.provider}}
         @tagName="span"
@@ -14,8 +14,23 @@
   <div class="provider-label-secondary hidden-sm hidden-md hidden-lg">
     {{tt this (if this.provider.online "online" "offline")}}
   </div>
+  <div class="provider-version">
+    v{{this.provider.version}}
+  </div>
+  <OneIcon @icon="browser-info" class="provider-info">
+    <OneTooltip
+      @title={{tt
+        this
+        "versionTooltip"
+        version=this.provider.version
+        build=this.provider.buildVersion
+      }}
+    />
+  </OneIcon>
 </div>
+<hr class="drop-host-divider">
 <div class="drop-provider-host-container">
+  <OneIcon @icon="globe" class="provider-host-icon" />
   <input
     class={{concat-classes
       "provider-host-text"

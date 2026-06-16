@@ -1,6 +1,6 @@
-$popover-provider-details-width: 220px;
+$popover-provider-details-width: 320px;
 $popover-provider-list-width: 190px;
-$provider-place-drop-height: 306px;
+$provider-place-drop-height: 406px;
 $provider-place-circle-size: 64px;
 
 @include animation-fg-color-change(
@@ -190,6 +190,10 @@ $provider-place-circle-size: 64px;
       }
     }
 
+    .one-icon.state-indicator {
+      font-size: 180%;
+    }
+
     &.online {
       .state-indicator {
         color: $color-one-success;
@@ -211,18 +215,46 @@ $provider-place-circle-size: 64px;
     }
     .drop-title-bar {
       position: relative;
-      padding-left: 2em;
+      margin-left: -0.35em;
       padding-bottom: $padding-base-vertical;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
 
-      .one-icon {
-        position: absolute;
-        left: 0;
-        top: -0.05em;
-        font-size: 170%;
+      .provider-version {
+        color: darken($color-one-light-gray, 20%);
+        font-size: 80%;
+        padding-right: 0.4em;
+      }
+
+      .one-icon.provider-info {
+        font-size: 140%;
+        color: darken($color-one-light-gray, 20%);
+      }
+
+      .status-toolbar {
+        padding-top: 0;
+        padding-bottom: 0;
+        background-color: transparent;
+
+        .outer-text {
+          vertical-align: middle;
+          top: -0.1em;
+        }
+      }
+
+      .item-name {
+        font-size: 120%;
+      }
+
+      .state-indicator {
+        font-size: 200%;
       }
 
       .provider-label {
         @include font-bold();
+        flex-grow: 1;
+        padding-left: 0.35em;
       }
       .provider-label-secondary {
         position: absolute;
@@ -232,38 +264,46 @@ $provider-place-circle-size: 64px;
       }
     }
 
+    .drop-host-divider {
+      border-top: 1px solid $main-border-color;
+      margin: 2px (-$padding-base-horizontal);
+      padding-bottom: 3px;
+    }
+
     .drop-provider-host-container {
       $host-copy-btn-width: 28px;
       display: table;
       height: 28px;
       line-height: 28px;
-      background-color: $main-border-color;
+      width: $popover-provider-details-width;
+      background-color: $color-one-semiwhite;
       margin-left: -$padding-large-vertical;
       margin-right: -$padding-large-vertical;
-      margin-bottom: $padding-base-vertical;
+      position: relative;
 
       .provider-host-text {
         display: table-cell;
         padding: 0 $padding-large-vertical;
+        padding-left: 3.4em;
         margin: 0;
-        width: $popover-provider-details-width - $host-copy-btn-width - $padding-large-vertical;
+        width: 100%;
       }
       .provider-host-copy-btn-container {
         position: relative;
-        display: table-cell;
+        display: none;
         width: $host-copy-btn-width + $padding-large-vertical;
         padding-right: $padding-large-vertical;
       }
       .provider-host-copy-btn {
         position: absolute;
-        top: 0;
+        top: 3px;
         left: 0.2em;
         padding: 0;
         border: 0;
         background: transparent;
         line-height: inherit;
-        font-size: 28px;
-        color: $color-one-azure;
+        font-size: 22px;
+        color: $color-one-success;
 
         &:hover {
           background-color: darken($color-one-semiwhite, 20%);
@@ -276,6 +316,23 @@ $provider-place-circle-size: 64px;
           left: 0;
         }
       }
+      .provider-host-icon {
+        position: absolute;
+        left: 0.85em;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 150%;
+        color: $color-one-dark-gray;
+      }
+      &:hover {
+        .provider-host-copy-btn-container {
+          display: table-cell;
+        }
+
+        .provider-host-text {
+          padding-right: 0;
+        }
+      }
     }
 
     .drop-body {
@@ -285,10 +342,11 @@ $provider-place-circle-size: 64px;
       }
       .spaces-list {
         position: absolute;
+        margin-top: 7px;
         top: 70px + $padding-large-vertical;
         bottom: 2 * $padding-large-vertical + $-btn-container-height;
-        left: $padding-large-vertical;
-        right: $padding-large-vertical - 10px;
+        left: 0;
+        right: -10px;
       }
       .spaces-items {
         list-style-type: none;
@@ -307,6 +365,8 @@ $provider-place-circle-size: 64px;
           padding-bottom: 0;
           display: flex;
           align-items: center;
+          padding-left: 16px;
+          padding-right: $padding-large-vertical;
           .space-icon {
             .oneicon {
               font-size: 170%;
@@ -320,8 +380,22 @@ $provider-place-circle-size: 64px;
             text-align: right;
             text-overflow: clip;
             white-space: nowrap;
-            color: $color-one-light-gray;
             font-size: 80%;
+            .status-toolbar {
+              background-color: transparent;
+              padding-top: 0;
+              padding-bottom: 0;
+
+              .outer-text {
+                vertical-align: middle;
+                top: -0.1em;
+              }
+            }
+          }
+          background-color: darken($color-one-semiwhite, 3%);
+
+          &:nth-of-type(even) {
+            background-color: lighten($color-one-semiwhite, 2%);
           }
         }
       }

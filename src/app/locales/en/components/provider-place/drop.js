@@ -8,4 +8,5 @@ export default {
   hostnameCopyError: 'Failed to copy hostname to clipboard – please do it manually',
   loadingSpaces: 'Loading spaces...',
   loadingSpacesPercentage: 'Loading spaces... {{percentage}}%',
+  versionTooltip: '<strong>Release:</strong> {{version}}<br><strong>Build:</strong> {{build}}',
 };
