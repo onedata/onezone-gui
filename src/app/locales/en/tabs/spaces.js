@@ -1,5 +1,6 @@
 export default {
   menuItem: 'Data',
+  searchPlaceholder: 'Search by space name or ID...',
   specialResources: {
     empty: 'No spaces',
     new: 'Create new space',

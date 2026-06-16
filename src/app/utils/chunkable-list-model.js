@@ -94,14 +94,14 @@ export class ChunkableListModel {
     this.chunksArray?.destroy();
   }
 
-  setFilter({ expression, advanced }) {
+  setFilter({ expression, advanced, isSearchById = false }) {
     if (
       this.filterExpression === expression &&
       _.isEqual(this.filterAdvanced, advanced)
     ) {
       return;
     }
-    this.chunkableListModelFetcher.setFilter({ expression, advanced });
+    this.chunkableListModelFetcher.setFilter({ expression, advanced, isSearchById });
     this.chunkableListModelReloader.reload({ reset: true });
   }
 }

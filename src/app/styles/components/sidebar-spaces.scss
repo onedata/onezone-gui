@@ -6,6 +6,16 @@
     .item-header .status-toolbar.sidebar-spaces-status-toolbar {
       margin-left: auto;
     }
+    .sidebar-item-title-lower {
+      opacity: 1;
+      color: lighten($main-text-color, 20%)
+    }
+    .space-id-text {
+      font-size: 80%;
+      .space-id {
+        @include font-monospace();
+      }
+    }
   }
   .recently-used-icon {
     margin: auto 0.4em;

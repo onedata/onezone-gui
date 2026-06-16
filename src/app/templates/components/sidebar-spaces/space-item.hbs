@@ -11,13 +11,42 @@
     @click={{action "editorClick"}}
   />
 {{else}}
-  <TruncatedString class="sidebar-item-title sidebar-spaces-item-title">
-    {{#if item.name}}
-      <NameConflict @item={{item}} @tagName="span" class="one-label" />
-    {{else}}
-      <span class="one-label no-name">...</span>
+  <div class="sidebar-item-title">
+    <TruncatedString
+      class={{concat-classes
+        "sidebar-spaces-item-title"
+        (if this.isIdMatchingFilter "sidebar-item-title-upper")
+      }}
+    >
+      {{#if item.name}}
+        <span class="item-name">
+          {{tag-substring
+            this.displayedName
+            this.sidebar.filter
+            caseSensitive=false
+            htmlTag="mark"
+          }}
+        </span>
+      {{else}}
+        <span class="one-label no-name">...</span>
+      {{/if}}
+    </TruncatedString>
+    {{#if this.isIdMatchingFilter}}
+      <TruncatedString class="sidebar-item-title-lower">
+        <span class="space-id-text">
+          {{tt this "id"}}
+          <span class="space-id">
+            {{tag-substring
+              this.item.entityId
+              this.sidebar.filter
+              caseSensitive=false
+              htmlTag="mark"
+            }}
+          </span>
+        </span>
+      </TruncatedString>
     {{/if}}
-  </TruncatedString>
+  </div>
   {{#if isRecentlyUsedIconShown}}
     <OneIcon
       @icon="time-outline"

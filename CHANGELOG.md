@@ -4,6 +4,10 @@
 
 ### Latest changes
 
+* VFS-13513 Fixed white files option without privileges in space sidebar
+* VFS-13395 Added searching by id in space sidebar
+* VFS-13511 Fixed docs and API links for new homepage
+* VFS-13499 Fixed color in upload presenter
 * VFS-13448 Fixed styles for oneprovider map
 * VFS-13324 Added basic sidebar whitelabeling
 * VFS-12570 Added support for searching by conflict label in menu search box and on harvesters spaces page

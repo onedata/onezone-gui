@@ -14,6 +14,7 @@ import fetchBatchRecords from './fetch-batch-records';
 import _ from 'lodash';
 import { defaultBatchFetchSize } from './batch-records-loader';
 import { getNameWithConflictLabel } from 'onedata-gui-common/components/name-conflict';
+import matchIdFilter from './match-id-filter';
 
 /**
  * @typedef {InfiniteScrollItem} ChunkableListModelFetcherItem
@@ -38,6 +39,12 @@ export default class ChunkableListModelFetcher {
    */
   @tracked
   filterExpression = '';
+
+  /**
+   * @type {boolean}
+   */
+  @tracked
+  isSearchById = false;
 
   /**
    * @type {any}
@@ -94,9 +101,10 @@ export default class ChunkableListModelFetcher {
     };
   }
 
-  setFilter({ expression, advanced }) {
+  setFilter({ expression, advanced, isSearchById = false }) {
     this.filterExpression = expression;
     this.filterAdvanced = advanced;
+    this.isSearchById = isSearchById;
   }
 
   filterItems(items) {
@@ -165,10 +173,14 @@ export default class ChunkableListModelFetcher {
     }
     const queryRegExp = new RegExp(this.filterExpression, 'i');
     return items.filter(item => {
-      return queryRegExp.test(getNameWithConflictLabel(
+      const result = queryRegExp.test(getNameWithConflictLabel(
         item.name,
         item.conflictLabel
       ));
+      if (!result && this.isSearchById) {
+        return matchIdFilter(item.entityId, this.filterExpression);
+      }
+      return result;
     });
   }
 }

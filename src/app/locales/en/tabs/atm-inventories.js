@@ -1,5 +1,6 @@
 export default {
   menuItem: 'Automation',
+  searchPlaceholder: 'Search by inventory name...',
   specialResources: {
     empty: 'No automation inventories',
     new: 'Create new automation inventory',

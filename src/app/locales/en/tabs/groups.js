@@ -1,5 +1,6 @@
 export default {
   menuItem: 'Groups',
+  searchPlaceholder: 'Search by group name...',
   specialResources: {
     empty: 'No groups',
     new: 'Create new group',
