@@ -495,7 +495,7 @@ function createProvidersRecords(store) {
       online: index <= 1,
       releaseVersion: index === 1 ? '20.02.19' : '21.02.1',
       buildVersion: '389-g3ba8e7fe4f',
-      host: `${providerId}.local-onedata.org`,
+      domain: `${providerId}.local-onedata.org`,
     }).save();
   }));
 }
