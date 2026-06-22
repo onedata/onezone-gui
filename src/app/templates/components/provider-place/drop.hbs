@@ -41,15 +41,15 @@
   onclick={{action "copyHostToClipboard"}}
 >
   <OneIcon @icon="globe" class="provider-host-icon hidden-xs" />
-  <input
+  <TruncatedString
     class={{concat-classes
       "provider-host-text"
       "truncate"
       (concat "host-input-" (model-routable-id this.provider.id))
     }}
-    value={{this.provider.domain}}
-    readonly
   >
+    {{this.provider.domain}}
+  </TruncatedString>
   <div class="provider-host-copy-btn-container">
     <OneIcon @icon="browser-copy" class="provider-host-copy-btn clickable"/>
   </div>
