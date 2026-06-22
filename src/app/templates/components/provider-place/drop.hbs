@@ -2,31 +2,38 @@
   <OneIcon @icon="provider" class="state-indicator hidden-xs">
     <OneTooltip @title={{tt this (if this.provider.online "online" "offline")}} />
   </OneIcon>
-  <TruncatedString class="provider-label">
-    <span class="hidden-xs">
-      <TruncatedString><NameConflict
-        @item={{this.provider}}
-        @tagName="span"
-      /></TruncatedString>
-    </span>
-    <span class="hidden-sm hidden-md hidden-lg">{{tt this "status"}}</span>
-  </TruncatedString>
-  <div class="provider-label-secondary hidden-sm hidden-md hidden-lg">
-    {{tt this (if this.provider.online "online" "offline")}}
+  <div class="provider-status">
+    <TruncatedString class="provider-label">
+      <span class="hidden-xs">
+        <TruncatedString><NameConflict
+          @item={{this.provider}}
+          @tagName="span"
+        /></TruncatedString>
+      </span>
+      <span class="hidden-sm hidden-md hidden-lg">{{tt this "status"}}</span>
+    </TruncatedString>
+    <div class="provider-label-secondary hidden-sm hidden-md hidden-lg">
+      {{tt this (if this.provider.online "online" "offline")}}
+    </div>
   </div>
-  <div class="provider-version">
-    v{{this.provider.version}}
+  <div class="provider-version-container">
+    <div class="provider-version-label hidden-sm hidden-md hidden-lg">
+      {{tt this "version"}}
+    </div>
+    <div class="provider-version">
+      v{{this.provider.version}}
+      <OneIcon @icon="browser-info" class="provider-info">
+      <OneTooltip
+        @title={{tt
+          this
+          "versionTooltip"
+          version=this.provider.version
+          build=this.provider.buildVersion
+        }}
+      />
+    </OneIcon>
+    </div>
   </div>
-  <OneIcon @icon="browser-info" class="provider-info">
-    <OneTooltip
-      @title={{tt
-        this
-        "versionTooltip"
-        version=this.provider.version
-        build=this.provider.buildVersion
-      }}
-    />
-  </OneIcon>
 </div>
 <hr class="drop-host-divider">
 <div

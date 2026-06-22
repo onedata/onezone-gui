@@ -2,6 +2,7 @@ $popover-provider-details-width: 320px;
 $popover-provider-list-width: 190px;
 $provider-place-drop-height: 406px;
 $provider-place-circle-size: 64px;
+$space-around-provider-icon: 0.35em;
 
 @include animation-fg-color-change(
   pulse-red-mint,
@@ -126,10 +127,6 @@ $provider-place-circle-size: 64px;
         @include font-bold();
       }
       .provider-label-secondary {
-        position: absolute;
-        top: 50%;
-        right: $padding-large-horizontal;
-        transform: translateY(-50%);
         font-size: 90%;
       }
     }
@@ -138,7 +135,6 @@ $provider-place-circle-size: 64px;
       padding: $padding-large-horizontal $padding-large-vertical;
       border-top: 1px solid $main-border-color;
       border-bottom: 1px solid $main-border-color;
-      cursor: pointer;
 
       .provider-host-text {
         height: $line-height-computed;
@@ -171,6 +167,14 @@ $provider-place-circle-size: 64px;
           transform: translateX(-50%) translateY(-50%);
         }
       }
+    }
+    .provider-status, .provider-version-container {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .one-icon.provider-info {
+      font-size: 140%;
     }
   }
   &.outside-content {
@@ -217,20 +221,26 @@ $provider-place-circle-size: 64px;
     }
     .drop-title-bar {
       position: relative;
-      margin-left: -0.35em;
+      margin-left: -$space-around-provider-icon;
       padding-bottom: $padding-base-vertical;
       display: flex;
       justify-content: space-between;
       align-items: center;
 
+      .provider-status {
+        flex-grow: 1;
+      }
+
       .provider-version {
-        color: darken($color-one-light-gray, 20%);
         font-size: 80%;
-        padding-right: 0.4em;
       }
 
       .one-icon.provider-info {
         font-size: 140%;
+        padding-left: $padding-xs-horizontal;
+      }
+
+      .provider-version, .one-icon.provider-info {
         color: darken($color-one-light-gray, 20%);
       }
 
@@ -256,7 +266,7 @@ $provider-place-circle-size: 64px;
       .provider-label {
         @include font-bold();
         flex-grow: 1;
-        padding-left: 0.35em;
+        padding-left: $space-around-provider-icon;
       }
       .provider-label-secondary {
         position: absolute;
@@ -274,7 +284,7 @@ $provider-place-circle-size: 64px;
 
     .drop-provider-host-container {
       $host-copy-btn-width: 28px;
-      display: table;
+      display: flex;
       height: 28px;
       line-height: 28px;
       width: $popover-provider-details-width;
@@ -282,56 +292,42 @@ $provider-place-circle-size: 64px;
       margin-left: -$padding-large-vertical;
       margin-right: -$padding-large-vertical;
       position: relative;
+      cursor: pointer;
 
       .provider-host-text {
-        display: table-cell;
-        padding: 0 $padding-large-vertical;
-        padding-left: 3.4em;
         margin: 0;
         width: 100%;
+        padding-right: $padding-base-horizontal;
+        padding-left: 0.6em;
       }
       .provider-host-copy-btn-container {
         position: relative;
         display: none;
         width: $host-copy-btn-width + $padding-large-vertical;
-        padding-right: $padding-large-vertical;
+        padding-right: 1em;
       }
       .provider-host-copy-btn {
-        position: absolute;
-        top: 0;
-        left: 0.35em;
         padding: 0;
         border: 0;
         background: transparent;
         line-height: inherit;
         font-size: 22px;
         color: $color-one-success;
-
-        &:hover {
-          background-color: darken($color-one-semiwhite, 20%);
-        }
-        .oneicon {
-          position: absolute;
-          width: $host-copy-btn-width;
-          height: $host-copy-btn-width;
-          top: 0;
-          left: 0;
-        }
       }
       .provider-host-icon {
-        position: absolute;
-        left: 0.85em;
-        top: 0.35em;
+        align-self: center;
+        padding-left: 0.85em;
         font-size: 150%;
         color: $color-one-dark-gray;
       }
       &:hover {
         .provider-host-copy-btn-container {
-          display: table-cell;
+          display: flex;
         }
 
         .provider-host-text {
-          padding-right: 0;
+          padding-right: $padding-small-vertical;
+          cursor: pointer;
         }
       }
     }
@@ -429,10 +425,6 @@ $provider-place-circle-size: 64px;
       border-left: 1px solid $main-border-color;
       text-align: center;
       color: inherit;
-
-      &:hover {
-        background-color: darken($color-one-semiwhite, 20%);
-      }
     }
   }
 
@@ -442,6 +434,11 @@ $provider-place-circle-size: 64px;
 
   .resource-load-error {
     white-space: initial;
+  }
+
+  .provider-version {
+    display: flex;
+    align-items: center;
   }
 }
 

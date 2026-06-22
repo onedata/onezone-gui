@@ -9,4 +9,5 @@ export default {
   loadingSpaces: 'Loading spaces...',
   loadingSpacesPercentage: 'Loading spaces... {{percentage}}%',
   versionTooltip: '<strong>Release:</strong> {{version}}<br><strong>Build:</strong> {{build}}',
+  version: 'Version',
 };
