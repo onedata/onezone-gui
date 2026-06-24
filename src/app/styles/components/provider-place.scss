@@ -170,7 +170,8 @@ $space-around-provider-icon: 0.35em;
     }
     .provider-status, .provider-version-container {
       display: flex;
-      justify-content: space-between;
+      align-items: baseline;
+      gap: $padding-xs-horizontal;
     }
 
     .one-icon.provider-info {
@@ -236,7 +237,7 @@ $space-around-provider-icon: 0.35em;
       }
 
       .one-icon.provider-info {
-        font-size: 140%;
+        font-size: 180%;
         padding-left: $padding-xs-horizontal;
       }
 

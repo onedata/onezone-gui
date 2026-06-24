@@ -10,7 +10,7 @@
           @tagName="span"
         /></TruncatedString>
       </span>
-      <span class="hidden-sm hidden-md hidden-lg">{{tt this "status"}}</span>
+      <span class="hidden-sm hidden-md hidden-lg">{{tt this "status"}}:</span>
     </TruncatedString>
     <div class="provider-label-secondary hidden-sm hidden-md hidden-lg">
       {{tt this (if this.provider.online "online" "offline")}}
@@ -18,10 +18,10 @@
   </div>
   <div class="provider-version-container">
     <div class="provider-version-label hidden-sm hidden-md hidden-lg">
-      {{tt this "version"}}
+      {{tt this "version"}}:
     </div>
     <div class="provider-version">
-      v{{this.provider.version}}
+      <span class="provider-version-text">v{{this.provider.version}}</span>
       <OneIcon @icon="browser-info" class="provider-info">
       <OneTooltip
         @title={{tt
