@@ -1,7 +1,8 @@
-$popover-provider-details-width: 220px;
+$popover-provider-details-width: 320px;
 $popover-provider-list-width: 190px;
-$provider-place-drop-height: 306px;
+$provider-place-drop-height: 406px;
 $provider-place-circle-size: 64px;
+$space-around-provider-icon: 0.35em;
 
 @include animation-fg-color-change(
   pulse-red-mint,
@@ -122,14 +123,10 @@ $provider-place-circle-size: 64px;
       position: relative;
       padding: $padding-large-horizontal $padding-large-vertical;
       color: $color-one-white;
-      .provider-label {
+      .provider-label, .provider-version-label {
         @include font-bold();
       }
       .provider-label-secondary {
-        position: absolute;
-        top: 50%;
-        right: $padding-large-horizontal;
-        transform: translateY(-50%);
         font-size: 90%;
       }
     }
@@ -138,6 +135,7 @@ $provider-place-circle-size: 64px;
       padding: $padding-large-horizontal $padding-large-vertical;
       border-top: 1px solid $main-border-color;
       border-bottom: 1px solid $main-border-color;
+
       .provider-host-text {
         height: $line-height-computed;
         width: 100%;
@@ -170,6 +168,15 @@ $provider-place-circle-size: 64px;
         }
       }
     }
+    .provider-status, .provider-version-container {
+      display: flex;
+      align-items: baseline;
+      gap: $padding-xs-horizontal;
+    }
+
+    .one-icon.provider-info {
+      font-size: 140%;
+    }
   }
   &.outside-content {
     $drop-padding: $padding-xs-horizontal * 1.5;
@@ -188,6 +195,10 @@ $provider-place-circle-size: 64px;
           @extend .btn-sm;
         }
       }
+    }
+
+    .one-icon.state-indicator {
+      font-size: 180%;
     }
 
     &.online {
@@ -211,18 +222,52 @@ $provider-place-circle-size: 64px;
     }
     .drop-title-bar {
       position: relative;
-      padding-left: 2em;
+      margin-left: -$space-around-provider-icon;
       padding-bottom: $padding-base-vertical;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
 
-      .one-icon {
-        position: absolute;
-        left: 0;
-        top: -0.05em;
-        font-size: 170%;
+      .provider-status {
+        flex-grow: 1;
+      }
+
+      .provider-version {
+        font-size: 80%;
+      }
+
+      .one-icon.provider-info {
+        font-size: 180%;
+        padding-left: $padding-xs-horizontal;
+      }
+
+      .provider-version, .one-icon.provider-info {
+        color: darken($color-one-light-gray, 20%);
+      }
+
+      .status-toolbar {
+        padding-top: 0;
+        padding-bottom: 0;
+        background-color: transparent;
+
+        .outer-text {
+          vertical-align: middle;
+          top: -0.1em;
+        }
+      }
+
+      .item-name {
+        font-size: 120%;
+      }
+
+      .state-indicator {
+        font-size: 200%;
       }
 
       .provider-label {
         @include font-bold();
+        flex-grow: 1;
+        padding-left: $space-around-provider-icon;
       }
       .provider-label-secondary {
         position: absolute;
@@ -232,48 +277,58 @@ $provider-place-circle-size: 64px;
       }
     }
 
+    .drop-host-divider {
+      border-top: 1px solid $main-border-color;
+      margin: 2px (-$padding-base-horizontal);
+      padding-bottom: 1px;
+    }
+
     .drop-provider-host-container {
       $host-copy-btn-width: 28px;
-      display: table;
+      display: flex;
       height: 28px;
       line-height: 28px;
-      background-color: $main-border-color;
+      width: $popover-provider-details-width;
+      background-color: $color-one-semiwhite;
       margin-left: -$padding-large-vertical;
       margin-right: -$padding-large-vertical;
-      margin-bottom: $padding-base-vertical;
+      position: relative;
+      cursor: pointer;
 
       .provider-host-text {
-        display: table-cell;
-        padding: 0 $padding-large-vertical;
         margin: 0;
-        width: $popover-provider-details-width - $host-copy-btn-width - $padding-large-vertical;
+        width: 100%;
+        padding-right: $padding-base-horizontal;
+        padding-left: 0.6em;
       }
       .provider-host-copy-btn-container {
         position: relative;
-        display: table-cell;
+        display: none;
         width: $host-copy-btn-width + $padding-large-vertical;
-        padding-right: $padding-large-vertical;
+        padding-right: 1em;
       }
       .provider-host-copy-btn {
-        position: absolute;
-        top: 0;
-        left: 0.2em;
         padding: 0;
         border: 0;
         background: transparent;
         line-height: inherit;
-        font-size: 28px;
-        color: $color-one-azure;
-
-        &:hover {
-          background-color: darken($color-one-semiwhite, 20%);
+        font-size: 22px;
+        color: $color-one-success;
+      }
+      .provider-host-icon {
+        align-self: center;
+        padding-left: 0.85em;
+        font-size: 150%;
+        color: $color-one-dark-gray;
+      }
+      &:hover {
+        .provider-host-copy-btn-container {
+          display: flex;
         }
-        .oneicon {
-          position: absolute;
-          width: $host-copy-btn-width;
-          height: $host-copy-btn-width;
-          top: 0;
-          left: 0;
+
+        .provider-host-text {
+          padding-right: $padding-small-vertical;
+          cursor: pointer;
         }
       }
     }
@@ -285,10 +340,11 @@ $provider-place-circle-size: 64px;
       }
       .spaces-list {
         position: absolute;
+        margin-top: 8px;
         top: 70px + $padding-large-vertical;
         bottom: 2 * $padding-large-vertical + $-btn-container-height;
-        left: $padding-large-vertical;
-        right: $padding-large-vertical - 10px;
+        left: 0;
+        right: -10px;
       }
       .spaces-items {
         list-style-type: none;
@@ -307,6 +363,8 @@ $provider-place-circle-size: 64px;
           padding-bottom: 0;
           display: flex;
           align-items: center;
+          padding-left: 16px;
+          padding-right: $padding-large-vertical;
           .space-icon {
             .oneicon {
               font-size: 170%;
@@ -320,8 +378,22 @@ $provider-place-circle-size: 64px;
             text-align: right;
             text-overflow: clip;
             white-space: nowrap;
-            color: $color-one-light-gray;
             font-size: 80%;
+            .status-toolbar {
+              background-color: transparent;
+              padding-top: 0;
+              padding-bottom: 0;
+
+              .outer-text {
+                vertical-align: middle;
+                top: -0.1em;
+              }
+            }
+          }
+          background-color: darken($color-one-semiwhite, 3%);
+
+          &:nth-of-type(even) {
+            background-color: lighten($color-one-semiwhite, 2%);
           }
         }
       }
@@ -354,10 +426,6 @@ $provider-place-circle-size: 64px;
       border-left: 1px solid $main-border-color;
       text-align: center;
       color: inherit;
-
-      &:hover {
-        background-color: darken($color-one-semiwhite, 20%);
-      }
     }
   }
 
@@ -367,6 +435,11 @@ $provider-place-circle-size: 64px;
 
   .resource-load-error {
     white-space: initial;
+  }
+
+  .provider-version {
+    display: flex;
+    align-items: center;
   }
 }
 

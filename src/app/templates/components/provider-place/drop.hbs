@@ -1,39 +1,57 @@
 <div class="drop-title-bar">
-  <TruncatedString class="provider-label">
-    <span class="hidden-xs">
-      <OneIcon @icon="provider" class="state-indicator">
-        <OneTooltip @title={{tt this (if this.provider.online "online" "offline")}} />
-      </OneIcon>
-      <TruncatedString><NameConflict
-        @item={{this.provider}}
-        @tagName="span"
-      /></TruncatedString>
-    </span>
-    <span class="hidden-sm hidden-md hidden-lg">{{tt this "status"}}</span>
-  </TruncatedString>
-  <div class="provider-label-secondary hidden-sm hidden-md hidden-lg">
-    {{tt this (if this.provider.online "online" "offline")}}
+  <OneIcon @icon="provider" class="state-indicator hidden-xs">
+    <OneTooltip @title={{tt this (if this.provider.online "online" "offline")}} />
+  </OneIcon>
+  <div class="provider-status">
+    <TruncatedString class="provider-label">
+      <span class="hidden-xs">
+        <TruncatedString><NameConflict
+          @item={{this.provider}}
+          @tagName="span"
+        /></TruncatedString>
+      </span>
+      <span class="hidden-sm hidden-md hidden-lg">{{tt this "status"}}:</span>
+    </TruncatedString>
+    <div class="provider-label-secondary hidden-sm hidden-md hidden-lg">
+      {{tt this (if this.provider.online "online" "offline")}}
+    </div>
+  </div>
+  <div class="provider-version-container">
+    <div class="provider-version-label hidden-sm hidden-md hidden-lg">
+      {{tt this "version"}}:
+    </div>
+    <div class="provider-version">
+      <span class="provider-version-text">v{{this.provider.version}}</span>
+      <OneIcon @icon="browser-info" class="provider-info">
+      <OneTooltip
+        @title={{tt
+          this
+          "versionTooltip"
+          version=this.provider.version
+          build=this.provider.buildVersion
+        }}
+      />
+    </OneIcon>
+    </div>
   </div>
 </div>
-<div class="drop-provider-host-container">
-  <input
+<hr class="drop-host-divider">
+<div
+  class="drop-provider-host-container"
+  onclick={{action "copyHostToClipboard"}}
+>
+  <OneIcon @icon="globe" class="provider-host-icon hidden-xs" />
+  <TruncatedString
     class={{concat-classes
       "provider-host-text"
       "truncate"
       (concat "host-input-" (model-routable-id this.provider.id))
     }}
-    value={{this.provider.domain}}
-    readonly
   >
+    {{this.provider.domain}}
+  </TruncatedString>
   <div class="provider-host-copy-btn-container">
-    <CopyButton
-      @clipboardTarget={{concat ".host-input-" (model-routable-id this.provider.id)}}
-      @success={{action "copySuccess"}}
-      @error={{action "copyError"}}
-      class="provider-host-copy-btn clickable"
-    >
-      <OneIcon @icon="browser-copy" />
-    </CopyButton>
+    <OneIcon @icon="browser-copy" class="provider-host-copy-btn clickable"/>
   </div>
 </div>
 <div class="drop-body">

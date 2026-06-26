@@ -3,10 +3,6 @@ import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render, click, find } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
-import {
-  triggerCopyError,
-  triggerCopySuccess,
-} from 'ember-cli-clipboard/test-support';
 import GlobalNotifyStub from '../../helpers/global-notify-stub';
 import I18nStub from '../../helpers/i18n-stub';
 import { lookupService, registerService } from '../../helpers/stub-service';
@@ -14,17 +10,10 @@ import Service from '@ember/service';
 import globals from 'onedata-gui-common/utils/globals';
 import clearStore from '../../helpers/clear-store';
 import gri from 'onedata-gui-websocket-client/utils/gri';
+import sinon from 'sinon';
 
 const COPY_SUCCESS_MSG = 'copySuccess';
 const COPY_ERROR_MSG = 'copyError';
-
-function triggerCopyClick(success = true) {
-  if (success) {
-    triggerCopySuccess('.provider-host-copy-btn');
-  } else {
-    triggerCopyError('.provider-host-copy-btn');
-  }
-}
 
 const GuiUtils = Service.extend({
   getRoutableIdFor(id) {
@@ -46,6 +35,8 @@ describe('Integration | Component | provider-place', function () {
       'globalNotify',
       registerService(this, 'globalNotify', GlobalNotifyStub)
     );
+    const globalClipboardCopyStub =
+      sinon.stub(lookupService(this, 'global-clipboard'), 'copy');
     registerService(this, 'guiUtils', GuiUtils);
     registerService(this, 'router', Router);
     this.set('i18n', registerService(this, 'i18n', I18nStub));
@@ -69,6 +60,7 @@ describe('Integration | Component | provider-place', function () {
       spaces,
       provider,
       providers,
+      globalClipboardCopyStub,
     });
   });
 
@@ -96,22 +88,14 @@ describe('Integration | Component | provider-place', function () {
       .to.be.equal(prevWidth / 2);
   });
 
-  it('notifies about hostname copy to clipboard success', async function () {
+  it('notifies about hostname copy to clipboard', async function () {
     await render(hbs `
       <ProviderPlace @provider={{provider}} />`);
     await click('.circle');
-    triggerCopyClick();
-    expect(this.get('globalNotify.infoMessages')).to.have.length(1);
-    expect(this.get('globalNotify.infoMessages')).to.contain(COPY_SUCCESS_MSG);
-  });
-
-  it('notifies about hostname copy to clipboard error', async function () {
-    await render(hbs `
-      <ProviderPlace @provider={{provider}} />`);
-    await click('.circle');
-    triggerCopyClick(false);
-    expect(this.get('globalNotify.infoMessages')).to.have.length(1);
-    expect(this.get('globalNotify.infoMessages')).to.contain(COPY_ERROR_MSG);
+    await click('.provider-host-text');
+    expect(this.globalClipboardCopyStub).to.be.calledOnce.and.to.be.calledWith(
+      this.provider.domain
+    );
   });
 
   it('shows list of supported spaces', async function () {
@@ -177,6 +161,7 @@ async function createRecords(mochaContext) {
       aspect: 'instance',
     }),
     name: 'provider1',
+    domain: 'provider1-domain',
     online: true,
     spaceList: spaceList1,
     cluster,
@@ -188,6 +173,7 @@ async function createRecords(mochaContext) {
       aspect: 'instance',
     }),
     name: 'provider2',
+    domain: 'provider2-domain',
     online: true,
     spaceList: spaceList2,
     cluster,
