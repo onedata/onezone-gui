@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-13712 Fixed live refresh for spaces list in harvesters
 * VFS-13461 Added provider version on providers page
 * VFS-13513 Fixed white files option without privileges in space sidebar
 * VFS-13395 Added searching by id in space sidebar

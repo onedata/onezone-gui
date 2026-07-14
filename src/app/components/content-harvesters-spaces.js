@@ -23,6 +23,7 @@ import {
   initDestroyableCache,
 } from 'onedata-gui-common/utils/destroyable-computed';
 import { getNameWithConflictLabel } from 'onedata-gui-common/components/name-conflict';
+import { reads } from '@ember/object/computed';
 
 export default Component.extend(I18n, GlobalActions, {
   classNames: ['content-harvesters-spaces'],
@@ -58,14 +59,17 @@ export default Component.extend(I18n, GlobalActions, {
       } else {
         return resolve([]);
       }
-    })),
+    }
+  )),
+
+  harvesterSpaces: reads('harvesterSpacesProxy.content'),
 
   /**
    * @type {ComputedProperty<Array<SpaceListItem>>}
    */
-  spaceItems: computed('harvesterSpacesProxy.[]', function spaceItems() {
+  spaceItems: computed('harvesterSpaces.@each.name', function spaceItems() {
     const harvester = this.get('harvester');
-    const spaces = this.get('harvesterSpacesProxy.content') || [];
+    const spaces = this.harvesterSpaces || [];
     return spaces.map(space => SpaceListItem.create({
       ownerSource: this,
       parentHarvester: harvester,
@@ -85,7 +89,7 @@ export default Component.extend(I18n, GlobalActions, {
           item.record.name,
           item.record.conflictLabel
         );
-        return searchableName.toLowerCase().includes(this.searchString.toLowerCase());
+        return searchableName?.toLowerCase().includes(this.searchString.toLowerCase());
       });
     }
   ),
