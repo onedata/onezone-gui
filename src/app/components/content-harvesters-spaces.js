@@ -67,27 +67,33 @@ export default Component.extend(I18n, GlobalActions, {
   /**
    * @type {ComputedProperty<Array<SpaceListItem>>}
    */
-  spaceItems: computed('harvesterSpaces.@each.name', function spaceItems() {
+  spaceItems: computed('harvesterSpaces.[]', function spaceItems() {
     const harvester = this.get('harvester');
     const spaces = this.harvesterSpaces || [];
-    return spaces.map(space => SpaceListItem.create({
-      ownerSource: this,
-      parentHarvester: harvester,
-      record: space,
-    }));
+    return spaces.map(space => SpaceListItem
+      .extend({
+        name: reads('record.name'),
+        conflictLabel: reads('record.conflictLabel'),
+      })
+      .create({
+        ownerSource: this,
+        parentHarvester: harvester,
+        record: space,
+      })
+    );
   }),
 
   /**
    * @type {ComputedProperty<Array<SpaceListItem>>}
    */
   filteredSpaceItems: computed(
-    'spaceItems.[]',
+    'spaceItems.@each.{name,conflictLabel}',
     'searchString',
     function filteredSpaceItems() {
       return this.spaceItems.filter(item => {
         const searchableName = getNameWithConflictLabel(
-          item.record.name,
-          item.record.conflictLabel
+          item.name,
+          item.conflictLabel
         );
         return searchableName?.toLowerCase().includes(this.searchString.toLowerCase());
       });
