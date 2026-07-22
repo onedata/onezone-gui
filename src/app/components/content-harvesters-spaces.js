@@ -70,17 +70,11 @@ export default Component.extend(I18n, GlobalActions, {
   spaceItems: computed('harvesterSpaces.[]', function spaceItems() {
     const harvester = this.get('harvester');
     const spaces = this.harvesterSpaces || [];
-    return spaces.map(space => SpaceListItem
-      .extend({
-        name: reads('record.name'),
-        conflictLabel: reads('record.conflictLabel'),
-      })
-      .create({
-        ownerSource: this,
-        parentHarvester: harvester,
-        record: space,
-      })
-    );
+    return spaces.map(space => SpaceListItem.create({
+      ownerSource: this,
+      parentHarvester: harvester,
+      record: space,
+    }));
   }),
 
   /**
@@ -176,6 +170,16 @@ const SpaceListItem = ResourceListItem.extend(OwnerInjector, {
    * @virtual
    */
   parentHarvester: undefined,
+
+  /**
+   * @type {ComputedProperty<string>}
+   */
+  name: reads('record.name'),
+
+  /**
+   * @type {ComputedProperty<string>}
+   */
+  conflictLabel: reads('record.conflictLabel'),
 
   /**
    * @override
