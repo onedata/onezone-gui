@@ -124,6 +124,7 @@ export default Component.extend(I18n, {
   allRecordOption: computed(function allRecordOption() {
     return {
       record: null,
+      targetRecordId: null,
       name: this.t('targetFilter.record.options.all'),
     };
   }),
@@ -228,18 +229,21 @@ export default Component.extend(I18n, {
         recordOptions = recordOptions.filter(token =>
           token.targetModelName === selectedTargetModelName
         );
-        recordOptions = recordOptions.filter(token => token.tokenTarget);
-        recordOptions = _.uniqBy(recordOptions, token => token.tokenTarget);
+        recordOptions = _.uniqBy(recordOptions, token => token.targetRecordId);
         recordOptions = recordOptions.map(token => {
-          const tokenTargetName = token.tokenTarget.name;
-          const conflictLabel = token.tokenTarget.conflictLabel;
+          const tokenTarget = token.tokenTarget;
+          const tokenTargetName = tokenTarget?.name ?? token.targetRecordId;
+          const conflictLabel = tokenTarget?.conflictLabel;
           return {
-            record: token.tokenTarget,
+            record: tokenTarget ?? { entityId: token.targetRecordId, onlyId: true },
+            targetRecordId: token.targetRecordId,
             name: conflictLabel ?
               `${tokenTargetName}${defaultSeparator}${conflictLabel}` : tokenTargetName,
           };
         });
-        recordOptions = _.sortBy(recordOptions, 'name');
+        recordOptions = _.sortBy(recordOptions, option =>
+          `${option.record.onlyId ? '0' : '1'}${option.name}`
+        );
         return [allRecordOption, ...recordOptions];
       }
     }
@@ -251,19 +255,21 @@ export default Component.extend(I18n, {
   isTargetRecordDisabled: equal('selectedTargetModelOption', 'allModelOption'),
 
   effSelectedTargetRecordOption: computed(
-    'targetRecordOptionsLoaderProxy.isFulfilled',
+    'targetRecordOptionsLoaderProxy.isPending',
     'targetRecordOptions',
     'selectedTargetRecordOption',
     'allRecordOption',
     function effSelectedTargetRecordOption() {
       // Until the loader is not resolved, user should not be able to change target
       // record, so it is probably "all" option.
-      if (!this.targetRecordOptionsLoaderProxy.isFulfilled) {
+      if (this.targetRecordOptionsLoaderProxy.isPending) {
         return this.allRecordOption;
       }
-      const selectedRecord = this.selectedTargetRecordOption.record;
-      return this.targetRecordOptions.find(it => it.record === selectedRecord) ??
-        this.allRecordOption;
+      const selectedTargetRecordId =
+        this.selectedTargetRecordOption.targetRecordId;
+      return this.targetRecordOptions.find(
+        it => it.targetRecordId === selectedTargetRecordId
+      ) ?? this.allRecordOption;
     }
   ),
 
