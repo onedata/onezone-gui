@@ -279,8 +279,10 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
       },
     });
     const changeSpy = sinon.spy();
-    this.set('change', changeSpy);
-    this.set('tokensCollection', [inaccessibleSpaceToken]);
+    this.setProperties({
+      change: changeSpy,
+      tokensCollection: [inaccessibleSpaceToken],
+    });
 
     await render(hbs `
       <SidebarTokens::AdvancedFilters
@@ -298,7 +300,7 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
     expect(changeSpy.lastCall).to.be.calledWith({
       type: 'invite',
       targetModelName: 'space',
-      targetRecord: { entityId: inaccessibleSpaceId },
+      targetRecord: { entityId: inaccessibleSpaceId, onlyId: true },
     });
   });
 
