@@ -626,7 +626,8 @@ export default Component.extend(I18n, {
           membersSortKeys.set(key, member);
         }
       });
-      const orderedMembers = [...membersSortKeys.keys()].sort()
+      const orderedMembers = [...membersSortKeys.keys()]
+        .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
         .map(key => membersSortKeys.get(key));
 
       // Create list of member proxies reusing already generated ones as much
