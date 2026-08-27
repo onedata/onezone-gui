@@ -35,7 +35,7 @@ export default class TokensChunkableListModelFetcher extends ChunkableListModelF
         fieldsToFilter.targetModelName = targetModelName;
 
         if (targetRecord !== null) {
-          fieldsToFilter.tokenTarget = targetRecord;
+          fieldsToFilter.targetRecordId = targetRecord.entityId;
         }
       }
     }
