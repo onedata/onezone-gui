@@ -241,8 +241,9 @@ export default Component.extend(I18n, {
               `${tokenTargetName}${defaultSeparator}${conflictLabel}` : tokenTargetName,
           };
         });
+        // put only-ids records on the end of list
         recordOptions = _.sortBy(recordOptions, option =>
-          `${option.record.onlyId ? '0' : '1'}${option.name}`
+          `${option.record.onlyId ? '1' : '0'}${option.name}`
         );
         return [allRecordOption, ...recordOptions];
       }
