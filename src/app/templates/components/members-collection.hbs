@@ -75,9 +75,8 @@
               @isReadOnly={{not (contains memberProxy.member directMembers)}}
             />
             <RecordInfoWithIcon @record={{memberProxy.member}} />
-            <div class="right-container">
               {{#if memberProxy.privilegesProxy.isModified}}
-                <span class="hidden-xs">
+                <span class="hidden-xs hidden-sm">
                   <OneButton
                     @type="primary"
                     @buttonType="submit"
@@ -111,7 +110,6 @@
                   <span class="space"></span><span class="label label-default">{{tt this "direct"}}</span>
                 {{/if}}
               </span>
-            </div>
             {{#if memberProxy.actions.length}}
               <ActionsToolbar
                 @isMinimized={{true}}
@@ -125,7 +123,7 @@
           </listItem.header>
           <listItem.content>
             <RenderLater @triggerRender={{listItem.isActive}}>
-              <div class="hidden-sm hidden-md hidden-lg text-center row content-row">
+              <div class="hidden-md hidden-lg text-center row content-row">
                 <OneButton
                   @size="sm"
                   @type="primary"
