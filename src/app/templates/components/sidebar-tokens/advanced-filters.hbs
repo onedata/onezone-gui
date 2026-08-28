@@ -80,8 +80,10 @@
             as |option|
           >
             <TruncatedString>
-              {{#if option.record}}
+              {{#if option.record.name}}
                 <NameConflict @item={{option.record}} />
+              {{else if option.record.onlyId}}
+                ID: <code>{{option.record.entityId}}</code>
               {{else}}
                 {{option.name}}
               {{/if}}
