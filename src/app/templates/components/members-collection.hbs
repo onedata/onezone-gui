@@ -75,41 +75,41 @@
               @isReadOnly={{not (contains memberProxy.member directMembers)}}
             />
             <RecordInfoWithIcon @record={{memberProxy.member}} />
-              {{#if memberProxy.privilegesProxy.isModified}}
-                <span class="hidden-xs hidden-sm">
-                  <OneButton
-                    @type="primary"
-                    @buttonType="submit"
-                    @size="sm"
-                    @onClick={{action "savePrivileges" memberProxy}}
-                    class="save-btn"
-                  >
-                    {{tt this "save"}}
-                  </OneButton>
-                  <span class="space"></span>
-                  <OneButton
-                    @size="sm"
-                    @type="warning"
-                    class="discard-btn"
-                    @disabled={{memberProxy.privilegesProxy.isSaving}}
-                    @onClick={{action "discardChanges" memberProxy}}
-                  >
-                    {{tt this "discard"}}
-                  </OneButton>
-                  <span class="space"></span><span class="space"></span>
-                </span>
-              {{/if}}
-              <span class="labels-container">
-                {{#if memberProxy.isYou}}
-                <span class="space"></span><span class="label label-primary">{{tt this "you"}}</span>
-                {{/if}}
-                {{#if memberProxy.isOwner}}
-                  <span class="space"></span><span class="label label-info">{{tt this "owner"}}</span>
-                {{/if}}
-                {{#if (contains memberProxy.member directMembers)}}
-                  <span class="space"></span><span class="label label-default">{{tt this "direct"}}</span>
-                {{/if}}
+            {{#if memberProxy.privilegesProxy.isModified}}
+              <span class="hidden-xs hidden-sm">
+                <OneButton
+                  @type="primary"
+                  @buttonType="submit"
+                  @size="sm"
+                  @onClick={{action "savePrivileges" memberProxy}}
+                  class="save-btn"
+                >
+                  {{tt this "save"}}
+                </OneButton>
+                <span class="space"></span>
+                <OneButton
+                  @size="sm"
+                  @type="warning"
+                  class="discard-btn"
+                  @disabled={{memberProxy.privilegesProxy.isSaving}}
+                  @onClick={{action "discardChanges" memberProxy}}
+                >
+                  {{tt this "discard"}}
+                </OneButton>
+                <span class="space"></span><span class="space"></span>
               </span>
+            {{/if}}
+            <span class="labels-container">
+              {{#if memberProxy.isYou}}
+              <span class="space"></span><span class="label label-primary">{{tt this "you"}}</span>
+              {{/if}}
+              {{#if memberProxy.isOwner}}
+                <span class="space"></span><span class="label label-info">{{tt this "owner"}}</span>
+              {{/if}}
+              {{#if (contains memberProxy.member directMembers)}}
+                <span class="space"></span><span class="label label-default">{{tt this "direct"}}</span>
+              {{/if}}
+            </span>
             {{#if memberProxy.actions.length}}
               <ActionsToolbar
                 @isMinimized={{true}}
