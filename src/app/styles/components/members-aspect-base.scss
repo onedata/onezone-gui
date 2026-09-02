@@ -134,7 +134,8 @@
   }
 
   .member-item .one-collapsible-list-item-header {
-    height: 50px;
+    // Fixed height prevents elements from shifting when buttons appear.
+    height: 49px;
     padding-right: 50px;
     display: flex;
     align-items: center;
