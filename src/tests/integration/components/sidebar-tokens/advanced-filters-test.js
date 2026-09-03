@@ -268,6 +268,42 @@ describe('Integration | Component | sidebar-tokens/advanced-filters', function (
     });
   });
 
+  it('allows selecting an inaccessible target record', async function () {
+    const inaccessibleSpaceId = 'inaccessible-space';
+    const inaccessibleSpaceToken = await this.tokenHelper.createToken({
+      type: {
+        inviteToken: {
+          inviteType: 'userJoinSpace',
+          spaceId: inaccessibleSpaceId,
+        },
+      },
+    });
+    const changeSpy = sinon.spy();
+    this.setProperties({
+      change: changeSpy,
+      tokensCollection: [inaccessibleSpaceToken],
+    });
+
+    await render(hbs `
+      <SidebarTokens::AdvancedFilters
+        @collection={{this.tokensCollection}}
+        @onChange={{action change}}
+      />
+    `);
+
+    await selectType('invite');
+    await selectChoose('.target-model-filter', 'Space');
+    await settled();
+    await waitForRender();
+    await selectChoose('.target-record-filter', inaccessibleSpaceId);
+
+    expect(changeSpy.lastCall).to.be.calledWith({
+      type: 'invite',
+      targetModelName: 'space',
+      targetRecord: { entityId: inaccessibleSpaceId, onlyId: true },
+    });
+  });
+
   it('removes duplicated records from target record filter dropdown', async function () {
     const targetModelName = 'cluster';
     const target =
