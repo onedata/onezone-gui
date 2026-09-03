@@ -134,22 +134,21 @@
   }
 
   .member-item .one-collapsible-list-item-header {
-    padding-right: 190px;
+    // Fixed height prevents elements from shifting when buttons appear.
+    height: 49px;
+    padding-right: 50px;
+    display: flex;
+    align-items: center;
     .btn-toolbar {
       margin-right: 140px;
     }
-    padding-top: $padding-small-horizontal;
-    padding-bottom: $padding-small-horizontal;
+    padding-top: $padding-small-vertical;
+    padding-bottom: $padding-small-vertical;
     padding-left: $padding-large-horizontal;
   }
 
   .one-collapsible-list-header .collapse-hidden {
     opacity: 1 !important;
-  }
-
-  .right-container {
-    @include vertical-align-middle();
-    right: 50px;
   }
 
   .privileges-warning {
@@ -168,9 +167,6 @@
   }
 
   .member-item .item-modified-header {
-    @media (min-width: $screen-sm-min) {
-      padding-right: 370px;
-    }
     .one-label {
       @include font-bold();
     }
@@ -218,17 +214,15 @@
   }
 
   .header-content-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-grow: 1;
     .record-info-with-icon {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      margin-left: 9px;
-      padding-right: 210px;
-      width: 100%;
-
-      .record-name {
-        padding-left: 0.6em;
-      }
+      flex-grow: 1;
+    }
+    .item-checkbox {
+      margin-bottom: 0;
     }
   }
 

@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-13761 Fixed vertical shifting of tags when action buttons appear on members page
 * VFS-13773 Removed enter when copy from clipboard line
 * VFS-13271 Fixed selecting invite token target in sidebar filter when there is a token for non-existing entity
 * VFS-13560 Added new development scripts
