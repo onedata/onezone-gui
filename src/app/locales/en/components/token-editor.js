@@ -320,12 +320,24 @@ export default {
         },
       },
     },
+    s3Access: {
+      header: 'S3 Access',
+      accessKeyId: {
+        label: 'Access key ID',
+      },
+      secretAccessKey: {
+        label: 'Secret access key',
+      },
+    },
   },
   hideCaveats: 'Hide inactive caveats',
   showCaveats: 'Show inactive caveats',
   noCaveatsBeforeExpand: 'This token has no active caveats.',
   noCaveatsExpand: 'Show possible options',
   noCaveatsAfterExpand: 'and customize caveats setup to make the token more secure.',
+  hideS3Access: 'Hide S3 access details',
+  showS3Access: 'Show S3 access details',
+  s3AccessWarning: 'This token will be declined on S3 endpoints',
   serviceCaveatWarning: {
     ...warningCommon,
     header: 'Full access token',

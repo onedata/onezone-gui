@@ -3,9 +3,11 @@
   min-height: 200px;
   position: relative;
 
-  .form-horizontal .caveats-header {
-    display: inline-block;
-    margin: $padding-base-vertical $padding-small-horizontal $padding-base-vertical 0;
+  .form-horizontal {
+    .caveats-header, .s3-access-header {
+      display: inline-block;
+      margin: $padding-base-vertical $padding-small-horizontal $padding-base-vertical 0;
+    }
   }
 
   .caveat-group {
@@ -39,6 +41,11 @@
     display: initial;
     font-size: 1.2em;
     vertical-align: middle;
+  }
+
+  .s3-access-warning-info-icon {
+    font-size: 1.4em;
+    vertical-align: text-bottom;
   }
 
   .usageLimit-children,
@@ -272,6 +279,10 @@
 
     .pathSpace-field {
       width: 200px;
+    }
+
+    .s3-access-header {
+      width: 180px;
     }
   }
 

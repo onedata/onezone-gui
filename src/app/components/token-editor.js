@@ -44,6 +44,7 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import computedT from 'onedata-gui-common/utils/computed-t';
 import { BasicGroup } from 'onezone-gui/utils/token-editor/fields/basic-group';
 import { CaveatsGroup } from 'onezone-gui/utils/token-editor/fields/caveats-group';
+import { S3AccessGroup } from 'onezone-gui/utils/token-editor/fields/s3-access-group';
 import { cloneFormValue } from 'onedata-gui-common/utils/form-component/values-container';
 
 export default Component.extend(I18n, {
@@ -105,6 +106,11 @@ export default Component.extend(I18n, {
   areAllCaveatsExpanded: false,
 
   /**
+   * @type {Boolean}
+   */
+  isS3AccessExpanded: false,
+
+  /**
    * @type {boolean}
    */
   areServiceCaveatWarningDetailsVisible: false,
@@ -164,6 +170,7 @@ export default Component.extend(I18n, {
         fields: [
           BasicGroup,
           CaveatsGroup,
+          S3AccessGroup,
         ].map((FieldClass) => FieldClass.create({ context: formContext })),
       });
   }),
@@ -180,6 +187,13 @@ export default Component.extend(I18n, {
    */
   caveatsGroup: computed('fields', function caveatsGroup() {
     return this.fields.getFieldByPath('caveats');
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
+  s3AccessGroup: computed('fields', function s3AccessGroup() {
+    return this.fields.getFieldByPath('s3Access');
   }),
 
   /**
@@ -277,6 +291,39 @@ export default Component.extend(I18n, {
     }
   }),
 
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isS3AccessSectionVisible: computed(
+    'fields.valuesSource.basic.type',
+    'mode',
+    function isS3AccessSectionVisible() {
+      return this.mode === 'view' && this.fields.valuesSource.basic.type === 'access';
+    }
+  ),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isS3AccessWarningVisible: computed(
+    'isS3AccessSectionVisible',
+    'fields.valuesSource.caveats',
+    function isS3AccessWarningVisible() {
+      const endpointCaveats = this.fields.valuesSource.caveats.endpointCaveats;
+      const interfaceCaveat = endpointCaveats.interfaceCaveat;
+      const isInterfaceCaveatEnabled = interfaceCaveat.interfaceEnabled;
+      const isInterfaceCaveatOneclient = interfaceCaveat.interface === 'oneclient';
+      const serviceCaveat = endpointCaveats.serviceCaveat;
+      const isServiceCaveatEnabled = serviceCaveat.serviceEnabled;
+      const isServiceCaveatOneprovider = serviceCaveat.service?.some(
+        option => option.record?.entityType === 'provider');
+      return this.isS3AccessSectionVisible && (
+        isInterfaceCaveatEnabled && !isInterfaceCaveatOneclient ||
+        isServiceCaveatEnabled && !isServiceCaveatOneprovider
+      );
+    }
+  ),
+
   tokenDataSourceObserver: observer(
     'tokenDataSource.content',
     'mode',
@@ -368,6 +415,9 @@ export default Component.extend(I18n, {
   actions: {
     toggleCaveatsGroup() {
       this.toggleProperty('areAllCaveatsExpanded');
+    },
+    toggleS3AccessGroup() {
+      this.toggleProperty('isS3AccessExpanded');
     },
     submit() {
       const {
