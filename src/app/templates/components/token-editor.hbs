@@ -8,7 +8,9 @@
         </h1>
         {{#if this.isS3AccessWarningVisible}}
           {{tt this "s3AccessWarning"}}
-          <OneIcon @icon="browser-info" class="s3-access-warning-info-icon" />
+          <OneIcon @icon="browser-info" class="s3-access-warning-info-icon">
+            <OneTooltip @title={{tt this "s3AccessWarningTooltip"}} />
+          </OneIcon>
         {{else}}
           <a
             class="toggle-expand caveats-expand clickable"

@@ -1,7 +1,7 @@
 const warningCommon = {
   showDetailsLink: 'Show details...',
   hideDetailsLink: 'Hide details',
-  detailsInterfaceItem: 'Interface = Oneclient',
+  detailsInterfaceItem: 'Interface = Oneclient & S3',
   detailsReadonlyItem: 'Read‐only',
   detailsPathItem: 'Path',
   detailsObjectIdItem: 'Object ID',
@@ -268,7 +268,7 @@ export default {
                 label: 'REST',
               },
               oneclient: {
-                label: 'Oneclient',
+                label: 'Oneclient & S3',
               },
             },
           },
@@ -338,6 +338,7 @@ export default {
   hideS3Access: 'Hide S3 access details',
   showS3Access: 'Show S3 access details',
   s3AccessWarning: 'This token will be declined on S3 endpoints',
+  s3AccessWarningTooltip: 'For the token to be usable on S3 endpoints, it must:<br>1. Have no service caveat, or all service caveats must allow Oneprovider access.<br>2. Have no interface caveat, or all interface caveats must allow Oneclient & S3 access.',
   serviceCaveatWarning: {
     ...warningCommon,
     header: 'Full access token',
