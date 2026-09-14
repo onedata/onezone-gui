@@ -55,6 +55,7 @@ export default Component.extend(I18n, {
   guiContext: service(),
   recordManager: service(),
   onedataConnection: service(),
+  navigationState: service(),
 
   /**
    * @override
@@ -123,7 +124,9 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<String>}
    */
-  modeClass: tag `${'mode'}-mode`,
+  modeClass: tag`${'mode'}-mode`,
+
+  s3AccessExpanded: reads('navigationState.aspectOptions.s3AccessExpanded'),
 
   /**
    * @type {ComputedProperty<PromiseObject<EmberObject>>}
@@ -369,6 +372,9 @@ export default Component.extend(I18n, {
       this.modeObserver();
       this.autoNameGenerator();
     }));
+    if (this.s3AccessExpanded) {
+      this.set('isS3AccessExpanded', true);
+    }
   },
 
   willDestroyElement() {
@@ -435,7 +441,8 @@ export default Component.extend(I18n, {
         if (mode === 'create') {
           submitPromise = onSubmit(creatorDataToToken(
             formValues,
-            recordManager.getCurrentUserRecord()
+            recordManager.getCurrentUserRecord(),
+            this.templateName
           ));
         } else {
           submitPromise = onSubmit(editorDataToDiffObject(formValues, token));

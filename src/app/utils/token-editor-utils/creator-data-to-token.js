@@ -18,7 +18,7 @@ const consumerModelToPrefix = {
   provider: 'prv',
 };
 
-export default function creatorDataToToken(editorData, currentUser) {
+export default function creatorDataToToken(editorData, currentUser, templateName) {
   const tokenData = {};
 
   let {
@@ -257,5 +257,8 @@ export default function creatorDataToToken(editorData, currentUser) {
   if (caveatsData.length) {
     tokenData.caveats = caveatsData;
   }
+
+  tokenData.templateName = templateName;
+
   return tokenData;
 }

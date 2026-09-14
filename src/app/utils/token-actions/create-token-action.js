@@ -12,6 +12,7 @@ import { get } from '@ember/object';
 import { inject as service } from '@ember/service';
 import Action from 'onedata-gui-common/utils/action';
 import ActionResult from 'onedata-gui-common/utils/action-result';
+import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 
 export default Action.extend({
   tokenManager: service(),
@@ -54,7 +55,13 @@ export default Action.extend({
             router.transitionTo(
               'onedata.sidebar.content',
               'tokens',
-              guiUtils.getRoutableIdFor(get(result, 'result'))
+              guiUtils.getRoutableIdFor(get(result, 'result')), {
+                queryParams: {
+                  options: serializeAspectOptions({
+                    s3AccessExpanded: this.rawToken.templateName === 's3',
+                  }),
+                },
+              }
             );
           }
           return result;
