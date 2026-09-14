@@ -901,7 +901,7 @@ describe('Integration | Component | token-editor', function () {
       expect(restOption).to.exist;
       expect(restOption).to.have.trimmed.text('REST');
       expect(oneclientOption).to.exist;
-      expect(oneclientOption).to.have.trimmed.text('Oneclient');
+      expect(oneclientOption).to.have.trimmed.text('Oneclient & S3');
 
       expectCaveatToHaveValue(this, 'interface', true, 'rest');
       expectToBeValid(this, 'interface');
