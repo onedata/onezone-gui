@@ -126,7 +126,7 @@ export default Component.extend(I18n, {
    */
   modeClass: tag`${'mode'}-mode`,
 
-  s3AccessExpanded: reads('navigationState.aspectOptions.s3AccessExpanded'),
+  s3AccessExpandedFromUrl: reads('navigationState.aspectOptions.s3AccessExpanded'),
 
   /**
    * @type {ComputedProperty<PromiseObject<EmberObject>>}
@@ -372,7 +372,7 @@ export default Component.extend(I18n, {
       this.modeObserver();
       this.autoNameGenerator();
     }));
-    if (this.s3AccessExpanded) {
+    if (this.s3AccessExpandedFromUrl === 'true') {
       this.set('isS3AccessExpanded', true);
     }
   },
