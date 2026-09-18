@@ -18,6 +18,24 @@ const consumerModelToPrefix = {
   provider: 'prv',
 };
 
+/**
+ * @typedef {Object} TokenData
+ * @property {String} name
+ * @property {Object} type
+ * @property {Array<String>} [privileges]
+ * @property {String|Number} [usageLimit] Maximum number of times the token can be used.
+ * The value can be infinity or a positive integer.
+ * @property {Array<Object>} [caveats]
+ * @property {String} templateName Name of the token template used by the editor.
+ */
+
+/**
+ * @param {Object} editorData Data collected by the token editor.
+ * @param {Models.User} [currentUser] Current user object.Needed only when token type
+ * is invite and inviteType is registerOneprovider
+ * @param {String} [templateName] Name of the token template used by the editor.
+ * @returns {TokenData} Token data compatible with the token model.
+ */
 export default function creatorDataToToken(editorData, currentUser, templateName) {
   const tokenData = {};
 

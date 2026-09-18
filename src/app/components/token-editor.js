@@ -76,6 +76,12 @@ export default Component.extend(I18n, {
   token: undefined,
 
   /**
+   * @virtual optional
+   * @type {string}
+   */
+  templateName: undefined,
+
+  /**
    * @type {Function}
    * @param {EmberObject} formValues
    * @param {boolean} isValid
@@ -126,7 +132,15 @@ export default Component.extend(I18n, {
    */
   modeClass: tag`${'mode'}-mode`,
 
-  s3AccessExpandedFromUrl: reads('navigationState.aspectOptions.s3AccessExpanded'),
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  s3AccessExpandedFromUrl: computed(
+    'navigationState.aspectOptions.s3AccessExpanded',
+    function s3AccessExpandedFromUrl() {
+      return this.navigationState.aspectOptions?.s3AccessExpanded === 'true';
+    }
+  ),
 
   /**
    * @type {ComputedProperty<PromiseObject<EmberObject>>}
@@ -167,14 +181,21 @@ export default Component.extend(I18n, {
         isValidObserver: observer('isValid', function isValidObserver() {
           this.component.notifyAboutChange();
         }),
+        fields: computed('component.mode', function fields() {
+          const fieldsList = [
+            BasicGroup,
+            CaveatsGroup,
+          ];
+          if (this.component.mode === 'view') {
+            fieldsList.push(S3AccessGroup);
+          }
+          return fieldsList.map((FieldClass) =>
+            FieldClass.create({ context: formContext })
+          );
+        }),
       })
       .create({
         component,
-        fields: [
-          BasicGroup,
-          CaveatsGroup,
-          S3AccessGroup,
-        ].map((FieldClass) => FieldClass.create({ context: formContext })),
       });
   }),
 
@@ -318,8 +339,9 @@ export default Component.extend(I18n, {
       const isInterfaceCaveatOneclient = interfaceCaveat.interface === 'oneclient';
       const serviceCaveat = endpointCaveats.serviceCaveat;
       const isServiceCaveatEnabled = serviceCaveat.serviceEnabled;
-      const isServiceCaveatOneprovider = serviceCaveat.service?.some(
-        option => option.record?.entityType === 'provider');
+      const isServiceCaveatOneprovider = serviceCaveat.service?.some(option =>
+        option.record?.entityType === 'provider'
+      );
       return this.isS3AccessSectionVisible && (
         isInterfaceCaveatEnabled && !isInterfaceCaveatOneclient ||
         isServiceCaveatEnabled && !isServiceCaveatOneprovider
@@ -372,7 +394,7 @@ export default Component.extend(I18n, {
       this.modeObserver();
       this.autoNameGenerator();
     }));
-    if (this.s3AccessExpandedFromUrl === 'true') {
+    if (this.s3AccessExpandedFromUrl) {
       this.set('isS3AccessExpanded', true);
     }
   },

@@ -33,7 +33,7 @@ export const SecretAccessKeyField = ClipboardField.extend({
    * @override
    */
   value: computed('tokenString', 'mode', function value() {
-    if (this.mode === 'view' && this.tokenString) {
+    if (this.isInViewMode && this.tokenString) {
       return md5('s3-' + this.tokenString);
     }
     return '';

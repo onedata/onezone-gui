@@ -1,7 +1,7 @@
 <PromiseProxyContainer @proxy={{tokenDataSource}}>
   <form onsubmit={{prevent-default}} class="form form-horizontal form-component">
     <FormComponent::FieldRenderer @field={{basicGroup}} />
-    {{#if isS3AccessSectionVisible}}
+    {{#if this.isS3AccessSectionVisible}}
       <div>
         <h1 class="s3-access-header">
           {{tt this "fields.s3Access.header"}}
@@ -9,7 +9,10 @@
         {{#if this.isS3AccessWarningVisible}}
           {{tt this "s3AccessWarning"}}
           <OneIcon @icon="browser-info" class="s3-access-warning-info-icon">
-            <OneTooltip @title={{tt this "s3AccessWarningTooltip"}} />
+            <OneTooltip
+              class="tooltip-lg tooltip-text-left"
+              @title={{tt this "s3AccessWarningTooltip"}}
+            />
           </OneIcon>
         {{else}}
           <a
@@ -23,7 +26,7 @@
             />
           </a>
           {{#if this.isS3AccessExpanded}}
-            <FormComponent::FieldRenderer @field={{s3AccessGroup}} />
+            <FormComponent::FieldRenderer @field={{this.s3AccessGroup}} />
           {{/if}}
         {{/if}}
       </div>

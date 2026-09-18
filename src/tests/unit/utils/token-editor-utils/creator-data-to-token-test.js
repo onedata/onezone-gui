@@ -139,6 +139,22 @@ describe('Unit | Utility | token-editor-utils/creator-data-to-token', function (
     }
   );
 
+  it(
+    'returns object with templateName',
+    function () {
+      const currentUser = { entityId: 'user1' };
+      const result = creatorDataToToken({
+          basic: {
+            name: 'asd',
+          },
+        },
+        currentUser,
+        's3',
+      );
+      expect(result).to.have.property('templateName', 's3');
+    }
+  );
+
   Object.keys(tokenInviteTypeToTargetModelMapping).forEach(inviteType => {
     const privilegesModel =
       get(tokenInviteTypeToTargetModelMapping, `${inviteType}.hasPrivileges`);

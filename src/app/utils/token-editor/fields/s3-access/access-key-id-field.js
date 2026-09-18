@@ -27,7 +27,7 @@ export const AccessKeyIdField = ClipboardField.extend({
    * @override
    */
   value: computed('tokenString', 'mode', function value() {
-    return this.mode === 'view' ? this.tokenString : '';
+    return this.isInViewMode ? this.tokenString : '';
   }),
 
   /**
