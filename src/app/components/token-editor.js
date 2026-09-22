@@ -181,7 +181,7 @@ export default Component.extend(I18n, {
         isValidObserver: observer('isValid', function isValidObserver() {
           this.component.notifyAboutChange();
         }),
-        fields: computed('component.mode', function fields() {
+        fields: computed(function fields() {
           const fieldsList = [
             BasicGroup,
             CaveatsGroup,

@@ -7,19 +7,14 @@
  */
 
 import { reads } from '@ember/object/computed';
-import ClipboardField from 'onedata-gui-common/utils/form-component/clipboard-field';
+import ClipboardSecretField from 'onedata-gui-common/utils/form-component/clipboard-secret-field';
 import { computed } from '@ember/object';
 
-export const AccessKeyIdField = ClipboardField.extend({
+export const AccessKeyIdField = ClipboardSecretField.extend({
   /**
    * @override
    */
   name: 'accessKeyId',
-
-  /**
-   * @override
-   */
-  type: 'textarea',
 
   tokenString: reads('parent.parent.value.basic.tokenString'),
 
