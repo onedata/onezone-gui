@@ -1965,7 +1965,7 @@ describe('Integration | Component | token-editor', function () {
       expect(getFieldElement('revoked').querySelector('.one-way-toggle'))
         .to.exist;
       expectLabelToEqual('tokenString', 'Token');
-      expect(getFieldElement('tokenString').querySelector('textarea'))
+      expect(getFieldElement('tokenString').querySelector('input'))
         .to.exist;
     }
   );
@@ -2056,8 +2056,8 @@ describe('Integration | Component | token-editor', function () {
       expect(getFieldElement('name')).to.contain.text('token1');
       expect(getFieldElement('revoked').querySelector('.one-way-toggle'))
         .to.have.class('checked');
-      expect(getFieldElement('tokenString').querySelector('textarea').value)
-        .to.contain('abc');
+      expect(getFieldElement('tokenString').querySelector('input').value)
+        .to.contain('••••••');
       expect(getFieldElement('type')).to.contain.text('Access');
       expect(getFieldElement('expire'))
         .to.contain.text(moment(now).format('YYYY/MM/DD H:mm'));
@@ -2361,7 +2361,7 @@ describe('Integration | Component | token-editor', function () {
       />`);
 
       await click('.submit-token');
-      expect(find('input:not([disabled])')).to.not.exist;
+      expect(find('.name-field input:not([disabled])')).to.not.exist;
       expect(find('.submit-token [role="progressbar"]')).to.exist;
       expect(find('.cancel-edition')).to.have.attr('disabled');
       submitResolve();
