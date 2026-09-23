@@ -163,12 +163,6 @@ export default Component.extend(I18n, {
   fields: computed(function fields() {
     const component = this;
 
-    const formContext = EmberObject.extend({
-      editorMode: reads('component.mode'),
-      loadedToken: reads('component.token'),
-      areAllCaveatsExpanded: reads('component.areAllCaveatsExpanded'),
-    }).create({ component });
-
     return FormFieldsRootGroup
       .extend({
         i18nPrefix: tag `${'component.i18nPrefix'}.fields`,
@@ -181,22 +175,30 @@ export default Component.extend(I18n, {
         isValidObserver: observer('isValid', function isValidObserver() {
           this.component.notifyAboutChange();
         }),
-        fields: computed(function fields() {
-          const fieldsList = [
-            BasicGroup,
-            CaveatsGroup,
-          ];
-          if (this.component.mode === 'view') {
-            fieldsList.push(S3AccessGroup);
-          }
-          return fieldsList.map((FieldClass) =>
-            FieldClass.create({ context: formContext })
-          );
-        }),
+        fields: reads('component.fieldsArray'),
       })
       .create({
         component,
       });
+  }),
+
+  fieldsArray: computed('mode', function fieldsArray() {
+    const formContext = EmberObject.extend({
+      editorMode: reads('component.mode'),
+      loadedToken: reads('component.token'),
+      areAllCaveatsExpanded: reads('component.areAllCaveatsExpanded'),
+    }).create({ component: this });
+
+    const fieldsList = [
+      BasicGroup,
+      CaveatsGroup,
+    ];
+    if (this.mode === 'view') {
+      fieldsList.push(S3AccessGroup);
+    }
+    return fieldsList.map((FieldClass) =>
+      FieldClass.create({ context: formContext })
+    );
   }),
 
   /**
