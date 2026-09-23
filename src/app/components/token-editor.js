@@ -46,6 +46,11 @@ import { BasicGroup } from 'onezone-gui/utils/token-editor/fields/basic-group';
 import { CaveatsGroup } from 'onezone-gui/utils/token-editor/fields/caveats-group';
 import { S3AccessGroup } from 'onezone-gui/utils/token-editor/fields/s3-access-group';
 import { cloneFormValue } from 'onedata-gui-common/utils/form-component/values-container';
+import {
+  destroyDestroyableComputedValues,
+  destroyableComputed,
+  initDestroyableCache,
+} from 'onedata-gui-common/utils/destroyable-computed';
 
 export default Component.extend(I18n, {
   classNames: ['token-editor'],
@@ -182,7 +187,7 @@ export default Component.extend(I18n, {
       });
   }),
 
-  fieldsArray: computed('mode', function fieldsArray() {
+  fieldsArray: destroyableComputed('mode', function fieldsArray() {
     const formContext = EmberObject.extend({
       editorMode: reads('component.mode'),
       loadedToken: reads('component.token'),
@@ -390,6 +395,7 @@ export default Component.extend(I18n, {
   ),
 
   init() {
+    initDestroyableCache(this);
     this._super(...arguments);
     this.get('tokenDataSource').then(() => safeExec(this, () => {
       this.tokenDataSourceObserver();
@@ -404,6 +410,17 @@ export default Component.extend(I18n, {
   willDestroyElement() {
     this._super(...arguments);
     this.get('fields').destroy();
+  },
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      destroyDestroyableComputedValues(this);
+    } finally {
+      this._super(...arguments);
+    }
   },
 
   notifyAboutChange() {
