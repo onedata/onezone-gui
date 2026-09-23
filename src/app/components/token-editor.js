@@ -165,8 +165,14 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsRootGroup>}
    */
-  fields: computed(function fields() {
+  fields: destroyableComputed('mode', function fields() {
     const component = this;
+
+    const formContext = EmberObject.extend({
+      editorMode: reads('component.mode'),
+      loadedToken: reads('component.token'),
+      areAllCaveatsExpanded: reads('component.areAllCaveatsExpanded'),
+    }).create({ component });
 
     return FormFieldsRootGroup
       .extend({
@@ -180,30 +186,22 @@ export default Component.extend(I18n, {
         isValidObserver: observer('isValid', function isValidObserver() {
           this.component.notifyAboutChange();
         }),
-        fields: reads('component.fieldsArray'),
+        fields: computed(function fields() {
+          const fieldsList = [
+            BasicGroup,
+            CaveatsGroup,
+          ];
+          if (this.component.mode === 'view') {
+            fieldsList.push(S3AccessGroup);
+          }
+          return fieldsList.map((FieldClass) =>
+            FieldClass.create({ context: formContext })
+          );
+        }),
       })
       .create({
         component,
       });
-  }),
-
-  fieldsArray: computed('mode', function fieldsArray() {
-    const formContext = EmberObject.extend({
-      editorMode: reads('component.mode'),
-      loadedToken: reads('component.token'),
-      areAllCaveatsExpanded: reads('component.areAllCaveatsExpanded'),
-    }).create({ component: this });
-
-    const fieldsList = [
-      BasicGroup,
-      CaveatsGroup,
-    ];
-    if (this.mode === 'view') {
-      fieldsList.push(S3AccessGroup);
-    }
-    return fieldsList.map((FieldClass) =>
-      FieldClass.create({ context: formContext })
-    );
   }),
 
   /**
@@ -395,6 +393,7 @@ export default Component.extend(I18n, {
   ),
 
   init() {
+    initDestroyableCache(this);
     this._super(...arguments);
     this.get('tokenDataSource').then(() => safeExec(this, () => {
       this.tokenDataSourceObserver();
@@ -406,9 +405,15 @@ export default Component.extend(I18n, {
     }
   },
 
-  willDestroyElement() {
-    this._super(...arguments);
-    this.get('fields').destroy();
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      destroyDestroyableComputedValues(this);
+    } finally {
+      this._super(...arguments);
+    }
   },
 
   notifyAboutChange() {
