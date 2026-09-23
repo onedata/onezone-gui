@@ -187,7 +187,7 @@ export default Component.extend(I18n, {
       });
   }),
 
-  fieldsArray: destroyableComputed('mode', function fieldsArray() {
+  fieldsArray: computed('mode', function fieldsArray() {
     const formContext = EmberObject.extend({
       editorMode: reads('component.mode'),
       loadedToken: reads('component.token'),
@@ -395,7 +395,6 @@ export default Component.extend(I18n, {
   ),
 
   init() {
-    initDestroyableCache(this);
     this._super(...arguments);
     this.get('tokenDataSource').then(() => safeExec(this, () => {
       this.tokenDataSourceObserver();
@@ -410,17 +409,6 @@ export default Component.extend(I18n, {
   willDestroyElement() {
     this._super(...arguments);
     this.get('fields').destroy();
-  },
-
-  /**
-   * @override
-   */
-  willDestroy() {
-    try {
-      destroyDestroyableComputedValues(this);
-    } finally {
-      this._super(...arguments);
-    }
   },
 
   notifyAboutChange() {
