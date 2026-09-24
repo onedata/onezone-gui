@@ -46,11 +46,6 @@ import { BasicGroup } from 'onezone-gui/utils/token-editor/fields/basic-group';
 import { CaveatsGroup } from 'onezone-gui/utils/token-editor/fields/caveats-group';
 import { S3AccessGroup } from 'onezone-gui/utils/token-editor/fields/s3-access-group';
 import { cloneFormValue } from 'onedata-gui-common/utils/form-component/values-container';
-import {
-  destroyDestroyableComputedValues,
-  destroyableComputed,
-  initDestroyableCache,
-} from 'onedata-gui-common/utils/destroyable-computed';
 
 export default Component.extend(I18n, {
   classNames: ['token-editor'],
@@ -165,7 +160,7 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsRootGroup>}
    */
-  fields: destroyableComputed('mode', function fields() {
+  fields: computed(function fields() {
     const component = this;
 
     const formContext = EmberObject.extend({
@@ -186,6 +181,9 @@ export default Component.extend(I18n, {
         isValidObserver: observer('isValid', function isValidObserver() {
           this.component.notifyAboutChange();
         }),
+        // NOTE: due to problems with using destroyableComputed for this property,
+        // is is not recomputed when component mode changes. It is required to implement
+        // so when the component will be initialized in "edit" mode and changed to "view".
         fields: computed(function fields() {
           const fieldsList = [
             BasicGroup,
@@ -393,7 +391,6 @@ export default Component.extend(I18n, {
   ),
 
   init() {
-    initDestroyableCache(this);
     this._super(...arguments);
     this.get('tokenDataSource').then(() => safeExec(this, () => {
       this.tokenDataSourceObserver();
@@ -410,7 +407,7 @@ export default Component.extend(I18n, {
    */
   willDestroy() {
     try {
-      destroyDestroyableComputedValues(this);
+      this.cacheFor('fields')?.destroy();
     } finally {
       this._super(...arguments);
     }
