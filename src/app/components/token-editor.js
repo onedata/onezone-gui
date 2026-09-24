@@ -182,7 +182,7 @@ export default Component.extend(I18n, {
           this.component.notifyAboutChange();
         }),
         // NOTE: due to problems with using destroyableComputed for this property,
-        // is is not recomputed when component mode changes. It is required to implement
+        // it is not recomputed when component mode changes. It is required to implement
         // so when the component will be initialized in "edit" mode and changed to "view".
         fields: computed(function fields() {
           const fieldsList = [
