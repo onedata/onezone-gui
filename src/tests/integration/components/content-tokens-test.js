@@ -69,6 +69,7 @@ describe('Integration | Component | content-tokens', function () {
       const tokenActions = lookupService(this, 'token-actions');
       const modifyTokenAction = {
         execute: sinon.stub().resolves({ status: 'done' }),
+        destroy() {},
       };
       const createModifyTokenActionStub =
         sinon.stub(tokenActions, 'createModifyTokenAction')
@@ -100,6 +101,7 @@ describe('Integration | Component | content-tokens', function () {
       const modifyTokenAction = {
         execute: sinon.stub()
           .returns(new Promise(resolve => resolveSubmit = resolve)),
+        destroy() {},
       };
       sinon.stub(tokenActions, 'createModifyTokenAction')
         .returns(modifyTokenAction);
@@ -121,6 +123,7 @@ describe('Integration | Component | content-tokens', function () {
       const tokenActions = lookupService(this, 'token-actions');
       const modifyTokenAction = {
         execute: sinon.stub().resolves({ status: 'done' }),
+        destroy() {},
       };
       sinon.stub(tokenActions, 'createModifyTokenAction')
         .returns(modifyTokenAction);
@@ -139,6 +142,7 @@ describe('Integration | Component | content-tokens', function () {
       const tokenActions = lookupService(this, 'token-actions');
       const modifyTokenAction = {
         execute: sinon.stub().resolves({ status: 'failed' }),
+        destroy() {},
       };
       sinon.stub(tokenActions, 'createModifyTokenAction')
         .returns(modifyTokenAction);
