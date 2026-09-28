@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-13822 Added S3 token credentials
 * VFS-13628 Added basic button whitelabeling
 * VFS-13761 Fixed vertical shifting of tags when action buttons appear on members page
 * VFS-13773 Removed enter when copy from clipboard line

@@ -7,9 +7,9 @@
  */
 
 import { reads } from '@ember/object/computed';
-import ClipboardField from 'onedata-gui-common/utils/form-component/clipboard-field';
+import ClipboardSecretField from 'onedata-gui-common/utils/form-component/clipboard-secret-field';
 
-export const TokenStringField = ClipboardField.extend({
+export const TokenStringField = ClipboardSecretField.extend({
   /**
    * @override
    */

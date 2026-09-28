@@ -44,6 +44,7 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import computedT from 'onedata-gui-common/utils/computed-t';
 import { BasicGroup } from 'onezone-gui/utils/token-editor/fields/basic-group';
 import { CaveatsGroup } from 'onezone-gui/utils/token-editor/fields/caveats-group';
+import { S3AccessGroup } from 'onezone-gui/utils/token-editor/fields/s3-access-group';
 import { cloneFormValue } from 'onedata-gui-common/utils/form-component/values-container';
 
 export default Component.extend(I18n, {
@@ -54,6 +55,7 @@ export default Component.extend(I18n, {
   guiContext: service(),
   recordManager: service(),
   onedataConnection: service(),
+  navigationState: service(),
 
   /**
    * @override
@@ -72,6 +74,12 @@ export default Component.extend(I18n, {
    * @type {Models.Token}
    */
   token: undefined,
+
+  /**
+   * @virtual optional
+   * @type {string}
+   */
+  templateName: undefined,
 
   /**
    * @type {Function}
@@ -105,6 +113,11 @@ export default Component.extend(I18n, {
   areAllCaveatsExpanded: false,
 
   /**
+   * @type {Boolean}
+   */
+  isS3AccessExpanded: false,
+
+  /**
    * @type {boolean}
    */
   areServiceCaveatWarningDetailsVisible: false,
@@ -117,7 +130,17 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<String>}
    */
-  modeClass: tag `${'mode'}-mode`,
+  modeClass: tag`${'mode'}-mode`,
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  s3AccessExpandedFromUrl: computed(
+    'navigationState.aspectOptions.s3AccessExpanded',
+    function s3AccessExpandedFromUrl() {
+      return this.navigationState.aspectOptions?.s3AccessExpanded === 'true';
+    }
+  ),
 
   /**
    * @type {ComputedProperty<PromiseObject<EmberObject>>}
@@ -158,13 +181,24 @@ export default Component.extend(I18n, {
         isValidObserver: observer('isValid', function isValidObserver() {
           this.component.notifyAboutChange();
         }),
+        // NOTE: due to problems with using destroyableComputed for this property,
+        // it is not recomputed when component mode changes. It is required to implement
+        // so when the component will be initialized in "edit" mode and changed to "view".
+        fields: computed(function fields() {
+          const fieldsList = [
+            BasicGroup,
+            CaveatsGroup,
+          ];
+          if (this.component.mode === 'view') {
+            fieldsList.push(S3AccessGroup);
+          }
+          return fieldsList.map((FieldClass) =>
+            FieldClass.create({ context: formContext })
+          );
+        }),
       })
       .create({
         component,
-        fields: [
-          BasicGroup,
-          CaveatsGroup,
-        ].map((FieldClass) => FieldClass.create({ context: formContext })),
       });
   }),
 
@@ -180,6 +214,13 @@ export default Component.extend(I18n, {
    */
   caveatsGroup: computed('fields', function caveatsGroup() {
     return this.fields.getFieldByPath('caveats');
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
+  s3AccessGroup: computed('fields', function s3AccessGroup() {
+    return this.fields.getFieldByPath('s3Access');
   }),
 
   /**
@@ -277,6 +318,40 @@ export default Component.extend(I18n, {
     }
   }),
 
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isS3AccessSectionVisible: computed(
+    'fields.valuesSource.basic.type',
+    'mode',
+    function isS3AccessSectionVisible() {
+      return this.mode === 'view' && this.fields.valuesSource.basic.type === 'access';
+    }
+  ),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isS3AccessWarningVisible: computed(
+    'isS3AccessSectionVisible',
+    'fields.valuesSource.caveats',
+    function isS3AccessWarningVisible() {
+      const endpointCaveats = this.fields.valuesSource.caveats.endpointCaveats;
+      const interfaceCaveat = endpointCaveats.interfaceCaveat;
+      const isInterfaceCaveatEnabled = interfaceCaveat.interfaceEnabled;
+      const isInterfaceCaveatOneclient = interfaceCaveat.interface === 'oneclient';
+      const serviceCaveat = endpointCaveats.serviceCaveat;
+      const isServiceCaveatEnabled = serviceCaveat.serviceEnabled;
+      const isServiceCaveatOneprovider = serviceCaveat.service?.some(option =>
+        option.record?.entityType === 'provider'
+      );
+      return this.isS3AccessSectionVisible && (
+        isInterfaceCaveatEnabled && !isInterfaceCaveatOneclient ||
+        isServiceCaveatEnabled && !isServiceCaveatOneprovider
+      );
+    }
+  ),
+
   tokenDataSourceObserver: observer(
     'tokenDataSource.content',
     'mode',
@@ -322,11 +397,20 @@ export default Component.extend(I18n, {
       this.modeObserver();
       this.autoNameGenerator();
     }));
+    if (this.s3AccessExpandedFromUrl) {
+      this.set('isS3AccessExpanded', true);
+    }
   },
 
-  willDestroyElement() {
-    this._super(...arguments);
-    this.get('fields').destroy();
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.cacheFor('fields')?.destroy();
+    } finally {
+      this._super(...arguments);
+    }
   },
 
   notifyAboutChange() {
@@ -369,6 +453,9 @@ export default Component.extend(I18n, {
     toggleCaveatsGroup() {
       this.toggleProperty('areAllCaveatsExpanded');
     },
+    toggleS3AccessGroup() {
+      this.toggleProperty('isS3AccessExpanded');
+    },
     submit() {
       const {
         fields,
@@ -385,7 +472,8 @@ export default Component.extend(I18n, {
         if (mode === 'create') {
           submitPromise = onSubmit(creatorDataToToken(
             formValues,
-            recordManager.getCurrentUserRecord()
+            recordManager.getCurrentUserRecord(),
+            this.templateName
           ));
         } else {
           submitPromise = onSubmit(editorDataToDiffObject(formValues, token));
