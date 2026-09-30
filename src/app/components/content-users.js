@@ -149,7 +149,7 @@ export default Component.extend(...mixins, {
    */
   passwordString: computed('user.hasPassword', function passwordString() {
     const hasPassword = this.get('user.hasPassword');
-    return hasPassword ? htmlSafe('&#9679;'.repeat(5)) : undefined;
+    return hasPassword ? htmlSafe('&#9679;'.repeat(6)) : undefined;
   }),
 
   /**

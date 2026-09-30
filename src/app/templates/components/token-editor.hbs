@@ -1,6 +1,36 @@
 <PromiseProxyContainer @proxy={{tokenDataSource}}>
   <form onsubmit={{prevent-default}} class="form form-horizontal form-component">
     <FormComponent::FieldRenderer @field={{basicGroup}} />
+    {{#if this.isS3AccessSectionVisible}}
+      <div>
+        <h1 class="s3-access-header">
+          {{tt this "fields.s3Access.header"}}
+        </h1>
+        {{#if this.isS3AccessWarningVisible}}
+          {{tt this "s3AccessWarning"}}
+          <OneIcon @icon="browser-info" class="s3-access-warning-info-icon">
+            <OneTooltip
+              class="tooltip-lg tooltip-text-left"
+              @title={{tt this "s3AccessWarningTooltip"}}
+            />
+          </OneIcon>
+        {{else}}
+          <a
+            class="toggle-expand caveats-expand clickable"
+            onClick={{action "toggleS3AccessGroup"}}
+          >
+            {{tt this (if this.isS3AccessExpanded "hideS3Access" "showS3Access")}}
+            <OneIcon
+              @icon={{if this.isS3AccessExpanded "arrow-up" "arrow-down"}}
+              class="toggle-icon"
+            />
+          </a>
+          {{#if this.isS3AccessExpanded}}
+            <FormComponent::FieldRenderer @field={{this.s3AccessGroup}} />
+          {{/if}}
+        {{/if}}
+      </div>
+    {{/if}}
     {{#if (or (eq mode "create") hasVisibleCaveats)}}
       <h1 class="caveats-header">
         {{tt this "fields.caveats.header"}}
