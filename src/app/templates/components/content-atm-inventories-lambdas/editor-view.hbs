@@ -17,7 +17,6 @@
     <div class="btn-toolbar">
       {{#if (contains dumpAction globalActions)}}
         <OneButton
-          @type="default"
           @onClick={{dumpAction.executeCallback}}
           @disabled={{dumpAction.disabled}}
           @size="sm"
