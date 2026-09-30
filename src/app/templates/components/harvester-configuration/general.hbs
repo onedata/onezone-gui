@@ -5,7 +5,7 @@
     {{#if (eq mode "view")}}
       <div class="form-group edit-btn-form-group">
         <div class="control-label"></div>
-        <OneButton @type="default" @onClick={{action "edit"}} class="edit-btn">
+        <OneButton @onClick={{action "edit"}} class="edit-btn">
           {{tt this "edit"}}
         </OneButton>
       </div>
@@ -22,7 +22,6 @@
 
       {{#if (eq mode "edit")}}
         <OneButton
-          @type="default"
           @onClick={{action "cancel"}}
           @disabled={{disabled}}
           class="cancel-btn"
