@@ -5,13 +5,11 @@
     <div class="pull-right header-buttons">
       {{#if (eq mode "view")}}
         <OneButton
-          @type="default"
           @size="sm"
           @onClick={{action "edit"}}
         >{{tt this "edit"}}</OneButton>
       {{else}}
         <OneButton
-          @type="default"
           @size="sm"
           @onClick={{action "cancel"}}
           @disabled={{isSaving}}
