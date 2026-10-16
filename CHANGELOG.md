@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-10525 Added sign-in button disabling when password or username is empty
 * VFS-13750 Removed btn-info class from styles
 * VFS-13822 Added S3 token credentials
 * VFS-13628 Added basic button whitelabeling
