@@ -114,14 +114,14 @@
           }
 
           &:nth-child(2) {
-            border-top-right-radius: $border-radius-small;
+            border-top-right-radius: $btn-border-radius-small;
             & ~ .btn {
               margin-top: -1px;
             }
           }
 
           &:nth-child(3) {
-            border-bottom-left-radius: $border-radius-small;
+            border-bottom-left-radius: $btn-border-radius-small;
             margin-left: 0;
           }
 
