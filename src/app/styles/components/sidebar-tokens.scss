@@ -32,12 +32,9 @@
       display: flex;
     }
 
-    .type-filter {
-      flex-wrap: wrap;
-
-      .btn {
-        flex-grow: 1;
-      }
+    .type-filter.btn-group {
+      display: grid;
+      grid-template-columns: repeat(4, auto);
     }
 
     .target-filter-row {
@@ -99,40 +96,6 @@
     display: block;
   }
 
-  @media (max-width: $screen-md-max) {
-    .advanced-filters {
-      .type-filter {
-        .btn {
-          flex-basis: 50%;
-          margin-left: -1px;
-          padding-left: $padding-small-horizontal;
-          padding-right: $padding-small-horizontal;
-
-          &:first-child {
-            border-bottom-left-radius: 0;
-            margin-left: 0;
-          }
-
-          &:nth-child(2) {
-            border-top-right-radius: $border-radius-small;
-            & ~ .btn {
-              margin-top: -1px;
-            }
-          }
-
-          &:nth-child(3) {
-            border-bottom-left-radius: $border-radius-small;
-            margin-left: 0;
-          }
-
-          &:last-child {
-            border-top-right-radius: 0;
-          }
-        }
-      }
-    }
-  }
-
   @media (max-width: $screen-sm-max) {
     .advanced-filters {
       .target-filter {
@@ -146,6 +109,58 @@
       .target-model-filter,
       .target-record-filter {
         flex-basis: 100%;
+      }
+    }
+  }
+
+  @media (max-width: $screen-md-max) {
+    .advanced-filters .type-filter.btn-group {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+
+      > .btn {
+        min-width: 0;
+        margin: 0;
+        padding-left: $padding-small-horizontal;
+        padding-right: $padding-small-horizontal;
+        border-radius: 0;
+
+        &:first-child {
+          border-top-left-radius: $btn-border-radius-small;
+        }
+
+        &:nth-child(2) {
+          margin-left: -1px;
+          border-top-right-radius: $btn-border-radius-small;
+        }
+
+        &:nth-child(n+3) {
+          margin-top: -1px;
+        }
+
+        &:nth-child(3) {
+          border-bottom-left-radius: $btn-border-radius-small;
+        }
+
+        &:last-child {
+          margin-left: -1px;
+          border-bottom-right-radius: $btn-border-radius-small;
+        }
+      }
+    }
+  }
+
+  @media (max-width: $screen-sm-max) {
+    .advanced-filters .type-filter.btn-group {
+      > .btn {
+        &:nth-child(n+3) {
+          grid-column: 1 / -1;
+          margin-left: 0;
+          border-bottom-left-radius: 0;
+        }
+
+        &:last-child {
+          border-bottom-left-radius: $btn-border-radius-small;
+        }
       }
     }
   }

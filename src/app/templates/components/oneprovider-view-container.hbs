@@ -39,7 +39,7 @@
               </span>{{#if multiOneproviders}}<span class="dot">.</span>{{/if}}
               {{#if multiOneproviders}}
                 <a {{action (mut isTabBarCollapsed) false}}
-                  class="choose-oneprovider-link black clickable"
+                  class="choose-oneprovider-link text-colored-link clickable"
                 >
                   {{tt this "chooseOneprovider"}}
                 </a>
@@ -68,7 +68,7 @@
                   }}
                 </p>
                 <div class="btn-toolbar text-right visible-xs-block">
-                  <OneButton @type="default" @onClick={{popmodal.close}}>
+                  <OneButton @onClick={{popmodal.close}}>
                     {{tt this "collapsedSelectorHint.close"}}
                   </OneButton>
                 </div>

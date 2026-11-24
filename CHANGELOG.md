@@ -4,6 +4,8 @@
 
 ### Latest changes
 
+* VFS-13669 Added basic whitelabeling for tabs, links, checkboxes, toggles, tags and radio buttons
+* VFS-13750 Removed btn-info class from styles
 * VFS-13822 Added S3 token credentials
 * VFS-13628 Added basic button whitelabeling
 * VFS-13761 Fixed vertical shifting of tags when action buttons appear on members page

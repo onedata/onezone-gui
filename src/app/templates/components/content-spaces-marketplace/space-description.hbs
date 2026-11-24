@@ -1,7 +1,7 @@
 <OneMarkdownToHtml class="markdown-view" @markdown={{spaceItem.description}} />
 {{#if hasOverflow}}
   <div class="toggle-expand-btn expand-btn">
-    <a class="toggle-expand-anchor navy" onclick={{action "expand"}}>
+    <a class="toggle-expand-anchor navigation-link with-icon" onclick={{action "expand"}}>
       <OneIcon @icon="info-modal" class="expand-icon" />
       <span class="text">{{tt this "expand"}}</span>
     </a>

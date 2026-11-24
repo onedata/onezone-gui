@@ -16,7 +16,7 @@
   <modal.body>
     <p>
       {{tt this "body.textIntro"}}
-      <a class="marketplace-link navy" href={{marketplaceHref}}>
+      <a class="marketplace-link navigation-link with-icon" href={{marketplaceHref}}>
         <span class="text">{{tt this "body.spacesMarketplace"}}</span>
         <OneIcon @icon="link-external" />
       </a>
@@ -48,7 +48,7 @@
   </modal.body>
 
   <modal.footer class="btn-toolbar">
-    <OneButton @type="default" class="cancel-btn" @onClick={{modal.close}}>
+    <OneButton class="cancel-btn" @onClick={{modal.close}}>
       {{tt this "cancel"}}
     </OneButton>
     <OneButton
