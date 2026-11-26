@@ -4,6 +4,7 @@
 
 ### Latest changes
 
+* VFS-14005 Fixed partially hidden tokens sidebar context menu
 * VFS-13669 Added basic whitelabeling for tabs, links, checkboxes, toggles, tags and radio buttons
 * VFS-10525 Added sign-in button disabling when password or username is empty
 * VFS-13750 Removed btn-info class from styles
